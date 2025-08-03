@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const os = require('os')
 const { dialog } = require('electron')
-const { processCsv } = require("../csvParser/CsvTools")
+const { processCsv } = require("../../csvParser/CsvTools")
 
 async function handleFileOpen() {
     const result = await dialog.showOpenDialog({
