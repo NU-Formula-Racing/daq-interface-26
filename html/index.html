@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    />
+    <style>
+      body {
+        height: 100vh;
+        overflow: hidden;
+      }
+      #sidebar {
+        min-width: 200px;
+        max-width: 200px;
+      }
+      #main {
+        overflow-y: auto;
+      }
+    </style>
+    <title>NFR 26 Interface Dashboard</title>
+  </head>
+  <body class="d-flex">
+    <!-- Sidebar -->
+    <div class="bg-dark text-white p-3 d-flex flex-column" id="sidebar">
+      <h4 class="mb-4"> NFR 26 Interface Dashboard</h4>
+      <button class="btn btn-outline-light mb-2" data-bs-target="#dashboard" data-bs-toggle="tab">Dashboard</button>
+      <button class="btn btn-outline-light mb-2" data-bs-target="#charts" data-bs-toggle="tab">Charts</button>
+      <button class="btn btn-outline-light mb-2" data-bs-target="#table" data-bs-toggle="tab">Table View</button>
+      <button class="btn btn-outline-light mb-2" data-bs-target="#settings" data-bs-toggle="tab">Settings</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex-fill p-4 tab-content" id="main">
+      <div class="tab-pane fade show active" id="dashboard">
+        <h5>Welcome to the Dashboard!</h5>
+        <div class="mb-3">
+          <button id="upload-button" class="btn btn-primary">Upload CSV File</button>
+        </div>
+        <div id="upload-status" class="text-muted small"></div>
+      </div>
+      <div class="tab-pane fade" id="charts">Charts will go here</div>
+      <div class="tab-pane fade" id="table">Raw CSV Table here</div>
+      <div class="tab-pane fade" id="settings">Settings go here</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../renderer/renderer.js"></script>
+  </body>
+</html>
