@@ -1,5 +1,6 @@
 // /renderer/src/components/Layout.jsx
 import React, { useState } from 'react';
+import Sidebar from './Sidebar';
 
 export default function Dashboard() {
   const [uploadStatus, setUploadStatus] = useState('');
@@ -9,31 +10,32 @@ export default function Dashboard() {
     const result = await window.fileUpload.openFile();
     if (result?.error) {
       setUploadStatus(result.error);
+    }
+    else if (result === null) {
+      return
     } 
     else {
+      for (let i = 0; i < csvFiles.length; i++) {
+        if (csvFiles[i].name.toLowerCase() === result.name.toLowerCase()) {
+          setUploadStatus('Cannot add the same CSV file.')
+          return
+        }
+      }
       setUploadStatus('CSV uploaded successfully!');
       setCsvFiles(prev => [...prev, result]);
       console.log(result);
     }
   };
 
+  const removeByIndex = (indexToRemove) => {
+    setCsvFiles(prev => prev.filter((_, i) => i !== indexToRemove));
+  };
+
   return (
     <div className="d-flex vh-100">
       {/* Sidebar */}
       <div className="bg-dark text-white p-3 d-flex flex-column" style={{ minWidth: 200, maxWidth: 200 }}>
-        <h4 className="mb-4">NFR 26 Interface Dashboard</h4>
-        <button className="btn btn-outline-light mb-2" data-bs-target="#dashboard" data-bs-toggle="tab">
-          Dashboard
-        </button>
-        <button className="btn btn-outline-light mb-2" data-bs-target="#charts" data-bs-toggle="tab">
-          Charts
-        </button>
-        <button className="btn btn-outline-light mb-2" data-bs-target="#table" data-bs-toggle="tab">
-          Table View
-        </button>
-        <button className="btn btn-outline-light mb-2" data-bs-target="#settings" data-bs-toggle="tab">
-          Settings
-        </button>
+        <Sidebar />
       </div>
 
       {/* Main content */}
@@ -71,6 +73,26 @@ export default function Dashboard() {
                 </div>
             </div>
             )}
+          {csvFiles.length > 0 && (
+            <div className="mt-4">
+              <h6>Uploaded CSV Files</h6>
+              <ul className="list-group">
+                {csvFiles.map((file, index) => (
+                  <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+                    <span>{file.name}</span>
+                    <div>
+                      <button onClick={() => window.expandFunction.openCsvWindow(file.data)} className="btn btn-sm btn-outline-primary me-2">
+                        Expand
+                      </button>
+                      <button onClick={() => removeByIndex(index)} className="btn btn-sm btn-outline-danger">
+                        Remove
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
         <div className="tab-pane fade" id="charts">
           Charts will go here

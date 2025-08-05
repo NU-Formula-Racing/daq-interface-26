@@ -16,6 +16,24 @@ const createWindow = () => {
 
 app.whenReady().then(() => {
     ipcMain.handle('dialog:openFile', handleFileOpen)
+
+    ipcMain.handle('open-csv-window', async (_event, csvData) => {
+        console.log('Received request to open CSV window:', csvData)
+        const newWin = new BrowserWindow({
+            width: 900,
+            height: 600,
+            webPreferences: {
+              preload: path.join(__dirname, 'preload.js'),
+              contextIsolation: true,
+              nodeIntegration: false,
+            }
+          });
+          newWin.loadFile(path.join(__dirname, '../renderer/dist/table.html'));
+
+          newWin.webContents.once('did-finish-load', () => {
+            newWin.webContents.send('csv-data', csvData);
+        });
+    })
     
     createWindow()
 
@@ -23,3 +41,4 @@ app.whenReady().then(() => {
         if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })
 })
+

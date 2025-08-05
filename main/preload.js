@@ -9,3 +9,8 @@ contextBridge.exposeInMainWorld('versions', {
 contextBridge.exposeInMainWorld('fileUpload', {
   openFile: () => ipcRenderer.invoke('dialog:openFile')
 })
+
+contextBridge.exposeInMainWorld('expandFunction', {
+  openCsvWindow: (data) => ipcRenderer.invoke('open-csv-window', data),
+  onCsvData: (callback) => ipcRenderer.on('csv-data', (_event, data) => callback(data))
+})
