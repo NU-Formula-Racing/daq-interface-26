@@ -18,7 +18,6 @@ app.whenReady().then(() => {
     ipcMain.handle('dialog:openFile', handleFileOpen)
 
     ipcMain.handle('open-csv-window', async (_event, csvData) => {
-        console.log('Received request to open CSV window:', csvData)
         const newWin = new BrowserWindow({
             width: 900,
             height: 600,

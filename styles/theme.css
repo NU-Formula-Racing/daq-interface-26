@@ -1,0 +1,13 @@
+:root{
+    --bg: #0f172a;          /* page background (slate-900) */
+    --panel: #111827;       /* sidebar bg (gray-900) */
+    --card: #1f2937;        /* card bg (gray-800) */
+    --muted: #94a3b8;       /* muted text (slate-400) */
+    --text: #e5e7eb;        /* main text */
+    --brand: #7c3aed;       /* accent purple */
+    --brand-weak: #6d28d9;  /* hover */
+    --stroke: #334155;      /* hairline borders */
+    --shadow: 0 6px 20px rgba(0,0,0,.25);
+  }
+  
+  html, body { background: var(--bg); color: var(--text); }

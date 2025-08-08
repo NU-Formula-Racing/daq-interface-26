@@ -1,22 +1,22 @@
 import React from 'react';
 import '../../../styles/Sidebar.css';
 
-export default function Sidebar() {
+export default function Sidebar({active, onTabChange}) {
     return (
-        <div>
-        <h4 className="mb-4">NFR 26 Dashboard</h4>
-        <button className="btn btn-outline-light mb-2" data-bs-target="#dashboard" data-bs-toggle="tab">
-            Dashboard
-        </button>
-        <button className="btn btn-outline-light mb-2" data-bs-target="#charts" data-bs-toggle="tab">
-            Charts
-        </button>
-        <button className="btn btn-outline-light mb-2" data-bs-target="#table" data-bs-toggle="tab">
-            Table View
-        </button>
-        <button className="btn btn-outline-light mb-2" data-bs-target="#settings" data-bs-toggle="tab">
-            Settings
-        </button>
-        </div>
-    )
-}
+      <div>
+        <h4>NFR 26<br/>Dashboard</h4>
+  
+        <button className={`nav-btn ${active==='dashboard'?'active':''}`}
+                onClick={()=>onTabChange('dashboard')}>Dashboard</button>
+  
+        <button className={`nav-btn ${active==='charts'?'active':''}`}
+                onClick={()=>onTabChange('charts')}>Charts</button>
+  
+        <button className={`nav-btn ${active==='table'?'active':''}`}
+                onClick={()=>onTabChange('table')}>Table View</button>
+  
+        <button className={`nav-btn ${active==='settings'?'active':''}`}
+                onClick={()=>onTabChange('settings')}>Settings</button>
+      </div>
+    );
+  }

@@ -1,3 +1,19 @@
-.sidebar {
-    background-color: #4E2A84;
-}
+.sidebar{
+    background:var(--panel) !important;
+    color:var(--text);
+    height:100vh;               /* full column height */
+    border-right:1px solid var(--stroke);
+    padding:20px;
+  }
+  
+  .sidebar h4{font-weight:700; line-height:1.1; margin-bottom:28px;}
+  
+  .sidebar .nav-btn{
+    width:100%; text-align:left; padding:12px 14px; margin-bottom:10px;
+    background:transparent; color:var(--text);
+    border:1px solid rgba(255,255,255,.15); border-radius:12px;
+    transition:background .15s, border-color .15s, transform .08s ease;
+  }
+  .sidebar .nav-btn:hover{ background:rgba(124,58,237,.12); border-color:rgba(124,58,237,.55); }
+  .sidebar .nav-btn.active{ background:var(--brand); border-color:var(--brand);
+    box-shadow:0 0 0 3px rgba(124,58,237,.25); }

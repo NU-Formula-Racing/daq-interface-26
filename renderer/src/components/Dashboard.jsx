@@ -2,10 +2,14 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import '../../../styles/Sidebar.css';
+import '../../../styles/list.css';
 
 export default function Dashboard() {
   const [uploadStatus, setUploadStatus] = useState('');
   const [csvFiles, setCsvFiles] = useState([]);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const last = csvFiles.at(-1);
+  const lastData = Array.isArray(last?.data) ? last.data : null;
 
   const handleUpload = async () => {
     const result = await window.fileUpload.openFile();
@@ -35,8 +39,8 @@ export default function Dashboard() {
   return (
     <div className="d-flex vh-100">
       {/* Sidebar */}
-      <div className="text-white p-3 d-flex flex-column sidebar" style={{ minWidth: 200, maxWidth: 200 }}>
-        <Sidebar />
+      <div className="sidebar" style={{ minWidth: 260, maxWidth: 260 }}>
+        <Sidebar active={activeTab} onTabChange={setActiveTab} />
       </div>
 
       {/* Main content */}
@@ -48,50 +52,41 @@ export default function Dashboard() {
               Upload CSV File
             </button>
           </div>
-          <div className="text-muted small">{uploadStatus}</div>
-          {csvFiles.length > 0 && Array.isArray(csvFiles[csvFiles.length - 1]) && csvFiles[csvFiles.length - 1].length > 0 && (
-            <div className="mt-4">
-                <h6>Preview of Last Uploaded File</h6>
-                <div className="table-responsive">
-                <table className="table table-bordered table-sm">
-                    <thead>
-                    <tr>
-                        {Object.keys(csvFiles[csvFiles.length - 1][0]).map((key, index) => (
-                        <th key={index}>{key}</th>
-                        ))}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {csvFiles[csvFiles.length - 1].slice(0, 10).map((row, i) => (
-                        <tr key={i}>
-                        {Object.values(row).map((val, j) => (
-                            <td key={j}>{val}</td>
-                        ))}
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-                </div>
-            </div>
-            )}
+          <div style={{color:'var(--muted)'}} className="small">{uploadStatus}</div>
           {csvFiles.length > 0 && (
             <div className="mt-4">
-              <h6>Uploaded CSV Files</h6>
-              <ul className="list-group">
-                {csvFiles.map((file, index) => (
-                  <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                    <span>{file.name}</span>
-                    <div>
-                      <button onClick={() => window.expandFunction.openCsvWindow(file.data)} className="btn btn-sm btn-outline-primary me-2">
+              <h6 className="upload-section-title">Uploaded CSV Files</h6>
+
+              {csvFiles.map((file, index) => {
+                const rows = Array.isArray(file.data) ? file.data.length : 0;
+                const cols = rows ? Object.keys(file.data[0] ?? {}).length : 0;
+
+                return (
+                  <div key={index} className="file-card mb-2">
+                    <div className="file-icon">📄</div>
+
+                    <div className="file-meta">
+                      <div className="file-name" title={file.name}>{file.name}</div>
+                      <div className="file-sub">{rows} rows • {cols} columns</div>
+                    </div>
+
+                    <div className="file-actions">
+                      <button
+                        onClick={() => window.expandFunction.openCsvWindow(file.data)}
+                        className="btn-ghost"
+                      >
                         Expand
                       </button>
-                      <button onClick={() => removeByIndex(index)} className="btn btn-sm btn-outline-danger">
+                      <button
+                        onClick={() => removeByIndex(index)}
+                        className="btn-danger-soft"
+                      >
                         Remove
                       </button>
                     </div>
-                  </li>
-                ))}
-              </ul>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
