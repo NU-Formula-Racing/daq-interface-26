@@ -1,6 +1,7 @@
 // /renderer/src/components/Layout.jsx
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
+import '../../../styles/Sidebar.css';
 
 export default function Dashboard() {
   const [uploadStatus, setUploadStatus] = useState('');
@@ -34,7 +35,7 @@ export default function Dashboard() {
   return (
     <div className="d-flex vh-100">
       {/* Sidebar */}
-      <div className="bg-dark text-white p-3 d-flex flex-column" style={{ minWidth: 200, maxWidth: 200 }}>
+      <div className="text-white p-3 d-flex flex-column sidebar" style={{ minWidth: 200, maxWidth: 200 }}>
         <Sidebar />
       </div>
 
