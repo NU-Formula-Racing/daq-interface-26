@@ -9,14 +9,18 @@ export default function Display({files}) {
 
     
     const layout = [
-      { type: 'gauge', span: 12, ratio: 3,  props: { title: 'Main',  value: 65, valueSize: 16 } },
+      { type:'gauge', span:12, ratio:3,
+        props:{ title:'Main', value:65, valueSize:18, titleSize:16, showTitle:true, showTicks:true, barThickness:0.18 } },
     
-      { type: 'gauge', span: 6,  ratio: 2,  props: { title: 'Left',  value: 42, valueSize: 14 } },
-      { type: 'gauge', span: 6,  ratio: 2,  props: { title: 'Right', value: 78, valueSize: 14 } },
+      { type:'gauge', span:6, ratio:2,
+        props:{ title:'Left', value:42, valueSize:14, titleSize:13, showTitle:true, showTicks:true } },
     
-      { type: 'progress', span: 4, height: 70, props: { label: 'Speed',    value: 72, color: '#22c55e' } },
-      { type: 'progress', span: 4, height: 70, props: { label: 'Temp',     value: 48, color: '#eab308', suffix: '°C' } },
-      { type: 'progress', span: 4, height: 70, props: { label: 'Pressure', value: 31, color: '#3b82f6' } },
+      { type:'gauge', span:6, ratio:2,
+        props:{ title:'Right', value:78, valueSize:14, titleSize:13, showTitle:true, showTicks:true } },
+    
+      { type:'progress', span:4, height:70, props:{ label:'Speed', value:72, color:'#22c55e' } },
+      { type:'progress', span:4, height:70, props:{ label:'Temp',  value:48, color:'#eab308', suffix:'°C' } },
+      { type:'progress', span:4, height:70, props:{ label:'Pressure', value:31, color:'#3b82f6' } },
     ];
 
     const getTimeKey = (rows) => {
