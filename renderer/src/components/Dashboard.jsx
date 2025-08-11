@@ -1,6 +1,7 @@
 // /renderer/src/components/Layout.jsx
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
+import Display from './Display';
 import '../../../styles/Sidebar.css';
 import '../../../styles/list.css';
 
@@ -90,13 +91,13 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-        <div className={`tab-pane fade ${activeTab === 'display' ? 'active' : ''}`} id="display">
-          Display will go here.
+        <div className={`tab-pane fade ${activeTab === 'display' ? 'show active' : ''}`} id="display">
+          <Display files={csvFiles} />
         </div>
-        <div className={`tab-pane fade ${activeTab === 'plot' ? 'active' : ''}`} id="plot">
+        <div className={`tab-pane fade ${activeTab === 'plot' ? 'show active' : ''}`} id="plot">
           Plots will go here.
         </div>
-        <div className={`tab-pane fade ${activeTab === 'settings' ? 'active' : ''}`} id="settings">
+        <div className={`tab-pane fade ${activeTab === 'settings' ? 'show active' : ''}`} id="settings">
           Settings will go here.
         </div>
       </div>
