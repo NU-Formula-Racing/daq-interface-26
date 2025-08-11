@@ -9,11 +9,11 @@ export default function Sidebar({active, onTabChange}) {
         <button className={`nav-btn ${active==='dashboard'?'active':''}`}
                 onClick={()=>onTabChange('dashboard')}>Dashboard</button>
   
-        <button className={`nav-btn ${active==='charts'?'active':''}`}
-                onClick={()=>onTabChange('charts')}>Charts</button>
+        <button className={`nav-btn ${active==='display'?'active':''}`}
+                onClick={()=>onTabChange('display')}>Display</button>
   
-        <button className={`nav-btn ${active==='table'?'active':''}`}
-                onClick={()=>onTabChange('table')}>Table View</button>
+        <button className={`nav-btn ${active==='plot'?'active':''}`}
+                onClick={()=>onTabChange('plot')}>Plot</button>
   
         <button className={`nav-btn ${active==='settings'?'active':''}`}
                 onClick={()=>onTabChange('settings')}>Settings</button>

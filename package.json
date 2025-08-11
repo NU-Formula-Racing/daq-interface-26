@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.11",
-    "csv": "^6.4.1"
+    "csv": "^6.4.1",
+    "plotly.js": "^3.0.3",
+    "react-plotly.js": "^2.6.0"
   }
 }

@@ -45,7 +45,7 @@ export default function Dashboard() {
 
       {/* Main content */}
       <div className="flex-fill p-4 tab-content" id="main">
-        <div className="tab-pane fade show active" id="dashboard">
+        <div className={`tab-pane fade ${activeTab ==='dashboard' ? 'show active' : ''}`} id="dashboard">
           <h5>Welcome to the Dashboard!</h5>
           <div className="mb-3">
             <button onClick={handleUpload} className="btn btn-primary">
@@ -90,14 +90,14 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-        <div className="tab-pane fade" id="charts">
-          Charts will go here
+        <div className={`tab-pane fade ${activeTab === 'display' ? 'active' : ''}`} id="display">
+          Display will go here.
         </div>
-        <div className="tab-pane fade" id="table">
-          Raw CSV Table here
+        <div className={`tab-pane fade ${activeTab === 'plot' ? 'active' : ''}`} id="plot">
+          Plots will go here.
         </div>
-        <div className="tab-pane fade" id="settings">
-          Settings go here
+        <div className={`tab-pane fade ${activeTab === 'settings' ? 'active' : ''}`} id="settings">
+          Settings will go here.
         </div>
       </div>
     </div>
