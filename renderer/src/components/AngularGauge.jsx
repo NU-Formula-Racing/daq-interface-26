@@ -7,7 +7,7 @@ Plotly.register([indicator]);
 const Plot = createPlotlyComponent(Plotly);
 
 export default function AngularGauge({
-  value = 65, min = 0, max = 100, title = 'Demo Gauge', 
+  value = 65, min = 0, max = 100, title = 'Demo Gauge',
   showTitle = true,
   showTicks = false,
   showNumber = true,
@@ -19,8 +19,19 @@ export default function AngularGauge({
   tickColor = '#7a8794',
   tickSize = 10,
   barThickness = 0.16,
+
+  // NEW: allow per-gauge control if needed
+  padTop = 0,            // extra px on top
+  domainYTop = 0.92,     // reserve ~8% for title by default
 }) {
   const v = Math.min(max, Math.max(min, Number(value) || 0));
+
+  // top padding heuristic: proportional to font sizes and ticks
+  const topPad =
+    (showTitle ? Math.ceil(titleSize * 2.8) : 8) +
+    (showTicks ? Math.ceil(tickSize * 1.2) + 6 : 0) +
+    (padTop || 0);
+
   return (
     <Plot
       data={[{
@@ -50,15 +61,16 @@ export default function AngularGauge({
           ],
           threshold: { value: v, line: { color: '#16a34a', width: 3 }, thickness: 0.75 },
         },
-        domain: { x: [0, 1], y: [0, 1] },
+        // NEW: leave headroom on top for the title
+        domain: { x: [0, 1], y: [0, Math.max(0.80, Math.min(1, domainYTop))] },
       }]}
       layout={{
         paper_bgcolor: 'transparent',
         margin: {
           l: 10,
           r: 10,
-          t: showTitle ? Math.max(28, titleSize * 2) : 8,
-          b: showNumber ? Math.max(24, valueSize * 1.2) : 6,
+          t: topPad,                                           // NEW
+          b: showNumber ? Math.max(24, valueSize * 1.3) : 6,
         },
       }}
       config={{ displayModeBar: false, displaylogo: false, responsive: true }}
