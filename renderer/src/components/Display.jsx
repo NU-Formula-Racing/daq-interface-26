@@ -17,7 +17,7 @@ export default function Display({ files }) {
   
     // --- main gauge (unchanged) ---
     { id:'g-main', type:'gauge', col:3, row:1, span:8, rowSpan:4,
-      props:{ title:'Main', value:65, showTitle:true, showTicks:true, titleSize:16, valueSize:18, barThickness:0.18 } },
+      props:{ title:'Main', value:selected !== null ? selected[sliderValue]["Speed (km/h)"] : 0, showTitle:true, showTicks:true, titleSize:16, valueSize:18, barThickness:0.18, max: 300 } },
   
       { id:'v-left',  type:'progress', col:2,  row:2, span:1, rowSpan:3,
         props:{ orientation:'vertical', label:'Coolant', value:55, color:'#3b82f6',
@@ -108,13 +108,17 @@ export default function Display({ files }) {
           <DashboardCanvas layout={layout} columns={12} colWidth={88} rowHeight={84} gap={6} />
           <Slider
           min={0}
-          max={100000}
+          max={Math.max(0, selected.length - 1)}
           value={sliderValue}
           onChange={setSliderValue}
           handleRender={(node, handleProps) => (
             <Tooltip
               prefixCls="rc-tooltip"
-              overlay={`${handleProps.value}`}
+              overlay={
+                selected?.[handleProps.value]
+                  ? `${Number(selected[handleProps.value]["Time (s)"]).toFixed(2)} s`
+                  : ""
+              }
               placement="top"
               visible={handleProps.dragging}
               key={handleProps.index}

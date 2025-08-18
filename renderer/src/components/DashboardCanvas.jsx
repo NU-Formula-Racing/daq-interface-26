@@ -8,13 +8,12 @@ function ProgressBar({
   max = 100,
   color = '#22c55e',
   suffix = '%',
-  orientation = 'horizontal',   // 'horizontal' | 'vertical'
-  thickness = 12,               // px (track height if horizontal, width if vertical)
+  orientation = 'horizontal',  
+  thickness = 12,              
 
-  // NEW: tick options
   showTicks = true,
-  tickInterval = 10,            // units between minor ticks
-  majorEvery = 10,              // units between major ticks (labels). Set 0/false to hide labels
+  tickInterval = 10,           
+  majorEvery = 10,             
   tickColor = 'rgba(255,255,255,.55)',
   labelColor = 'var(--muted,#9aa4b2)',
 }) {
@@ -22,13 +21,12 @@ function ProgressBar({
   const pct = ((clamp(value) - min) / (max - min)) * 100;
   const range = max - min;
 
-  // build tick values bottom→top (min..max)
   const tickVals = showTicks
     ? Array.from({ length: Math.floor(range / tickInterval) + 1 }, (_, i) => min + i * tickInterval)
     : [];
 
   if (orientation === 'vertical') {
-    const tickGutter = 32;  // left column for ticks + numbers
+    const tickGutter = 32;  
     return (
       <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr auto', gap: 6, height: '100%' }}>
         <div style={{ fontSize: 12, color: labelColor, textAlign: 'center' }}>{label}</div>
@@ -43,10 +41,9 @@ function ProgressBar({
             columnGap: 8,
           }}
         >
-          {/* Ticks + numbers (left) */}
           <div style={{ position: 'relative' }}>
             {tickVals.map((tv, i) => {
-              const y = 100 - ((tv - min) / range) * 100; // bottom=0 → top=100
+              const y = 100 - ((tv - min) / range) * 100; 
               const isMajor = majorEvery && ((tv - min) % majorEvery === 0);
               const len = isMajor ? 16 : 10;
               const weight = isMajor ? 2 : 1;
@@ -78,13 +75,12 @@ function ProgressBar({
             })}
           </div>
 
-          {/* Track + fill (right) */}
           <div style={{ position: 'relative', width: thickness, height: '100%' }}>
             <div
               style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'rgba(255,255,255,.15)', // rectangular track
+                background: 'rgba(255,255,255,.15)',
                 borderRadius: 2,
               }}
             />
@@ -111,7 +107,6 @@ function ProgressBar({
     );
   }
 
-  // HORIZONTAL (rectangular). Optional tiny ticks on top of track.
   return (
     <div style={{ display: 'grid', gap: 6 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: labelColor }}>
@@ -132,7 +127,6 @@ function ProgressBar({
             borderRadius: 2,
           }}
         />
-        {/* Fill */}
         <div
           style={{
             position: 'absolute',
@@ -145,7 +139,6 @@ function ProgressBar({
             transition: 'width .25s',
           }}
         />
-        {/* Optional ticks along the top edge */}
         {showTicks && (
           <div style={{ position: 'absolute', left: 0, right: 0, top: -6, height: 6 }}>
             {tickVals.map((tv, i) => {
