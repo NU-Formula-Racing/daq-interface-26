@@ -2,6 +2,8 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron/main')
 const path = require("node:path")
 const { handleFileOpen } = require('./utils/handleFileOpen')
 
+// test comment
+
 const createWindow = () => {
     const win = new BrowserWindow({
         width: 800,
