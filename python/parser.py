@@ -5,6 +5,7 @@ class DataSource:
     def __init__(self):
         pass
 
+# change
     def is_data_available(self):
         pass
 
