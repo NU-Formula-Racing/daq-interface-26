@@ -11,6 +11,11 @@ Features:
 
 Requirements (install on Windows terminal/PowerShell):
     pip install PySide6
+    
+New in this Python GUI:
+- Load CSV button in the sidebar
+- Drag & drop CSV anywhere onto the window
+- Time slider to scrub through rows by a time-like column (e.g., time, timestamp, lap)
 """
 
 import csv
@@ -19,11 +24,11 @@ import os
 from typing import List, Tuple, Optional, Any, Dict
 
 # ...existing code...
-from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex
+from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, QItemSelectionModel
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QFileDialog, QTableView,
     QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QProgressBar, QFrame,
-    QStackedLayout, QMessageBox
+    QStackedLayout, QMessageBox, QSlider
 )
 from PySide6.QtGui import QAction
 # ...existing code...
@@ -179,7 +184,12 @@ class DashboardWidget(QWidget):
         self._headers = headers or []
         self._rows = rows or []
         self._build_column_map()
-        self._refresh_latest()
+        # Default to last row on new data
+        self._refresh_row(len(self._rows) - 1 if self._rows else None)
+
+    def set_row_index(self, row_index: Optional[int]):
+        """Update gauges based on a specific row index (None clears)."""
+        self._refresh_row(row_index)
 
     def _build_column_map(self):
         self._col_map.clear()
@@ -200,14 +210,14 @@ class DashboardWidget(QWidget):
             if idx != -1:
                 self._col_map[key] = idx
 
-    def _refresh_latest(self):
-        if not self._rows:
+    def _refresh_row(self, row_index: Optional[int]):
+        if not self._rows or row_index is None or row_index < 0 or row_index >= len(self._rows):
             for key, bar in self._bars.items():
                 bar.setValue(0)
                 self._value_labels[key].setText("--")
             return
 
-        last = self._rows[-1]
+        last = self._rows[row_index]
         for key, cfg in self.COMMON_SIGNALS.items():
             val = None
             if key in self._col_map:
@@ -239,12 +249,24 @@ class TableViewWidget(QWidget):
         self._table.setSortingEnabled(True)
         self._table.setAlternatingRowColors(True)
         self._table.horizontalHeader().setStretchLastSection(True)
+        self._table.setSelectionBehavior(QTableView.SelectRows)
+        self._table.setSelectionMode(QTableView.SingleSelection)
 
         layout = QVBoxLayout(self)
         layout.addWidget(self._table)
 
     def set_data(self, headers: List[str], rows: List[List[str]]):
         self._model.set_data(headers, rows)
+
+    def select_row(self, row: int):
+        if row < 0 or row >= self._model.rowCount():
+            self._table.clearSelection()
+            return
+        sel_model = self._table.selectionModel()
+        index0 = self._model.index(row, 0)
+        if sel_model is not None and index0.isValid():
+            sel_model.setCurrentIndex(index0, QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows)
+            self._table.scrollTo(index0, QTableView.PositionAtCenter)
 
 
 # ----------------------------
@@ -273,6 +295,9 @@ class MainWindow(QMainWindow):
         self.resize(1000, 700)
         self._headers: List[str] = []
         self._rows: List[List[str]] = []
+        self._current_row: int = -1
+        self._time_col: Optional[int] = None
+        self._time_label_key: Optional[str] = None  # 'lap' or 'time'
 
         # Sidebar
         self._btn_dashboard = QPushButton("Dashboard")
@@ -300,11 +325,33 @@ class MainWindow(QMainWindow):
         self._stack.addWidget(self._dashboard)  # index 0
         self._stack.addWidget(self._table_view) # index 1
 
+        # Time controls (slider + labels)
+        controls = QWidget()
+        controls_layout = QHBoxLayout(controls)
+        controls_layout.setContentsMargins(8, 8, 8, 8)
+        self._time_label_desc = QLabel("Row:")
+        self._time_value_label = QLabel("--")
+        self._slider = QSlider(Qt.Horizontal)
+        self._slider.setEnabled(False)
+        self._slider.setMinimum(0)
+        self._slider.setMaximum(0)
+        self._slider.setSingleStep(1)
+        self._slider.setPageStep(50)
+        controls_layout.addWidget(self._time_label_desc)
+        controls_layout.addWidget(self._time_value_label)
+        controls_layout.addWidget(self._slider, 1)
+
+        # Center column with controls + stack
+        center = QWidget()
+        center_layout = QVBoxLayout(center)
+        center_layout.addWidget(controls)
+        center_layout.addWidget(self._stack_host, 1)
+
         # Root layout
         root = QWidget()
         main_layout = QHBoxLayout(root)
         main_layout.addWidget(sidebar)
-        main_layout.addWidget(self._stack_host, 1)
+        main_layout.addWidget(center, 1)
         self.setCentralWidget(root)
 
         # Menu actions
@@ -331,6 +378,7 @@ class MainWindow(QMainWindow):
         self._btn_dashboard.clicked.connect(lambda: self._switch_view(0))
         self._btn_table.clicked.connect(lambda: self._switch_view(1))
         self._btn_load_csv.clicked.connect(self._action_open_csv)
+        self._slider.valueChanged.connect(self._on_slider_changed)
 
         # Allow drag & drop of CSV files directly onto the window
         self.setAcceptDrops(True)
@@ -340,17 +388,63 @@ class MainWindow(QMainWindow):
 
     def _apply_basic_style(self):
         self.setStyleSheet("""
-            QMainWindow { background: #f5f6fa; }
-            #sidebar { background: #2f3542; }
-            QPushButton {
-                color: #f1f2f6; background: #57606f; border: none; padding: 10px; margin: 6px;
-                border-radius: 4px; text-align: left;
+            QMainWindow { 
+                background: #1e1e24; 
+                color: #e0e0e0; 
             }
-            QPushButton:checked { background: #3742fa; }
-            QPushButton:hover { background: #747d8c; }
-            QFrame[frameShape="5"] { /* StyledPanel */ background: #ffffff; border: 1px solid #e1e3e8; border-radius: 6px; }
-            QProgressBar { border: 1px solid #dfe4ea; border-radius: 3px; background: #ecf0f1; text-align: center; }
-            QProgressBar::chunk { background-color: #2ed573; }
+            #sidebar { 
+                background: #141419; 
+            }
+            QPushButton {
+                color: #e0e0e0; 
+                background: #2b2b34; 
+                border: 1px solid #303038; 
+                padding: 10px; 
+                margin: 6px; 
+                border-radius: 4px; 
+                text-align: left;
+            }
+            QPushButton:checked { 
+                background: #3d5afe; 
+                border-color: #3d5afe; 
+            }
+            QPushButton:hover { 
+                background: #373743; 
+            }
+            QFrame[frameShape="5"] { 
+                background: #23232a; 
+                border: 1px solid #303038; 
+                border-radius: 6px; 
+            }
+            QProgressBar { 
+                border: 1px solid #303038; 
+                border-radius: 3px; 
+                background: #2b2b34; 
+                color: #e0e0e0; 
+                text-align: center; 
+            }
+            QProgressBar::chunk { 
+                background-color: #03dac6; 
+            }
+            QTableView { 
+                background: #202027; 
+                color: #e0e0e0; 
+                gridline-color: #303038; 
+                alternate-background-color: #25252d; 
+                selection-background-color: #3d5afe; 
+                selection-color: #ffffff; 
+            }
+            QHeaderView::section { 
+                background: #2b2b34; 
+                color: #e0e0e0; 
+                padding: 4px 6px; 
+                border: none; 
+            }
+            QScrollBar:vertical, QScrollBar:horizontal {
+                background: #1e1e24; 
+                border: 1px solid #303038; 
+            }
+            QLabel { color: #e0e0e0; }
         """)
 
     def _switch_view(self, idx: int):
@@ -383,9 +477,69 @@ class MainWindow(QMainWindow):
             return
 
         self._headers, self._rows = headers, rows
+        # Identify time column and configure slider
+        self._time_col, self._time_label_key = self._find_time_column(self._headers)
+        total = len(self._rows)
+        self._slider.setEnabled(total > 0)
+        self._slider.setMinimum(0)
+        self._slider.setMaximum(max(0, total - 1))
+        self._current_row = total - 1 if total > 0 else -1
         self._table_view.set_data(headers, rows)
         self._dashboard.set_data(headers, rows)
+        if total > 0:
+            self._slider.blockSignals(True)
+            self._slider.setValue(self._current_row)
+            self._slider.blockSignals(False)
+        self._update_time_display(self._current_row)
+        self._apply_row_selection()
         self.statusBar().showMessage(f"Loaded {len(rows)} rows from: {os.path.basename(path)}")
+
+    def _on_slider_changed(self, value: int):
+        self._current_row = int(value)
+        self._update_time_display(self._current_row)
+        self._apply_row_selection()
+
+    def _apply_row_selection(self):
+        self._dashboard.set_row_index(self._current_row)
+        self._table_view.select_row(self._current_row)
+
+    def _find_time_column(self, headers: List[str]) -> Tuple[Optional[int], Optional[str]]:
+        """Return (index, key) where key is 'lap' or 'time', or (None,None) if not found."""
+        if not headers:
+            return None, None
+        lowers = [h.lower() for h in headers]
+        lap_candidates = ["lap", "lap_number", "lap no", "lap#"]
+        time_candidates = [
+            "time", "timestamp", "time_ms", "time_s", "time (s)", "t", "t[s]", "seconds", "ms", "millis"
+        ]
+        for name in lap_candidates:
+            for i, h in enumerate(lowers):
+                if name == h or name in h:
+                    return i, "lap"
+        for name in time_candidates:
+            for i, h in enumerate(lowers):
+                if name == h or name in h:
+                    return i, "time"
+        return None, None
+
+    def _update_time_display(self, row_index: int):
+        total = len(self._rows)
+        if row_index is None or row_index < 0 or row_index >= total or total == 0:
+            self._time_label_desc.setText("Row:")
+            self._time_value_label.setText("--")
+            return
+        if self._time_label_key == "lap":
+            self._time_label_desc.setText("Lap:")
+        elif self._time_label_key == "time":
+            self._time_label_desc.setText("Time:")
+        else:
+            self._time_label_desc.setText("Row:")
+
+        if self._time_col is not None and self._time_col < len(self._rows[row_index]):
+            val_text = str(self._rows[row_index][self._time_col])
+        else:
+            val_text = f"{row_index + 1}/{total}"
+        self._time_value_label.setText(val_text)
 
     # Drag & drop support
     def dragEnterEvent(self, event):  # type: ignore
