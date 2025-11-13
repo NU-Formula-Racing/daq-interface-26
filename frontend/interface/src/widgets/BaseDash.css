@@ -1,0 +1,24 @@
+.base-dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    padding: 40px;
+    height: 500px;
+    width: 100%;
+}
+
+.gauge {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.center-bar {
+    width: 60px;
+    /* Set this to whatever your bar width is */
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
