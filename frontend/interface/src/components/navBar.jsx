@@ -1,17 +1,18 @@
 import './navBar.css';
+import { Link } from 'react-router-dom';
 import logo from '../assets/nfr_logo.png';
 import ShinyText from './ui/ShinyText';
 
 export default function Navbar() {
     return (
         <nav className="navbar">
-            <div class="navbar-left">
+            <Link to="/" className="navbar-left">
                 <img src={logo} alt="Logo" className="navbar-logo" />
                 <ShinyText text="NFR Interface" className="navbar-title" />
-            </div>
+            </Link>
             <ul className="navbar-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/about">About</a></li>
+                <li><Link to="/graph">Graph</Link></li>
+                <li><Link to="/map">Map</Link></li>
             </ul>
         </nav>
     );

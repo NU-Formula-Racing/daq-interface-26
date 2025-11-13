@@ -12,18 +12,42 @@ import { fetchSignal } from "../lib/fetchSignals";
 
 export default function SignalChart({ signalName, color }) {
     const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchSignal(signalName).then(setData);
-        const interval = setInterval(() => fetchSignal(signalName).then(setData), 5000);
-        return () => clearInterval(interval);
+        let isMounted = true;
+
+        const loadData = async () => {
+            try {
+                const result = await fetchSignal(signalName, 50); // Reduced to 50 points
+                if (isMounted) {
+                    setData(result);
+                    setLoading(false);
+                }
+            } catch (error) {
+                console.error(`Error fetching ${signalName}:`, error);
+                if (isMounted) setLoading(false);
+            }
+        };
+
+        loadData();
+        const interval = setInterval(loadData, 10000); // Increased to 10 seconds
+
+        return () => {
+            isMounted = false;
+            clearInterval(interval);
+        };
     }, [signalName]);
 
     return (
         <div className="w-full h-64 p-4">
             <h2 className="font-semibold text-lg mb-2">{signalName}</h2>
 
-            {data.length === 0 ? (
+            {loading ? (
+                <div className="flex items-center justify-center h-full text-gray-400 italic">
+                    Loading...
+                </div>
+            ) : data.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-gray-400 italic">
                     No data available
                 </div>

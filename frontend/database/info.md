@@ -18,3 +18,6 @@ create table nfr26_signals (
 - signal_name (Gen_Amps, Fan_Amps, Cell1...)
 - value
 - unit (V, A, bool, RPM...)
+
+**WIP Step 2:**
+add MAP to find car based on xy value
