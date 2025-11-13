@@ -24,11 +24,14 @@ export default function IgbtTempGauge({ temp }) {
                 }}
                 labels={{
                     valueLabel: {
-                        style: { fontSize: 40 },
+                        style: { fontSize: 40, fill: '#000000' },
                         formatTextValue: (value) => `${Math.round(value)}°C`,
                     },
                     tickLabels: {
                         type: "outer",
+                        defaultTickValueConfig: {
+                            style: { fill: '#000000' }
+                        },
                         ticks: [
                             { value: 0 },
                             { value: 20 },

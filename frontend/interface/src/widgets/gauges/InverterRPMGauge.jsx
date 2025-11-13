@@ -19,11 +19,14 @@ export default function InverterRPMGauge({ rpm }) {
                 }}
                 labels={{
                     valueLabel: {
-                        style: { fontSize: 40 },
+                        style: { fontSize: 40, fill: '#000000' },
                         formatTextValue: (value) => `${Math.round(value * 100)} RPM`
                     },
                     tickLabels: {
                         type: "outer",
+                        defaultTickValueConfig: {
+                            style: { fill: '#000000' }
+                        },
                         ticks: [
                             { value: 0 },
                             { value: 10 },
