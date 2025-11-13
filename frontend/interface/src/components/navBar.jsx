@@ -11,6 +11,7 @@ export default function Navbar() {
                 <ShinyText text="NFR Interface" className="navbar-title" />
             </Link>
             <ul className="navbar-links">
+                <li><Link to="/">Dashboard</Link></li>
                 <li><Link to="/graph">Graph</Link></li>
                 <li><Link to="/map">Map</Link></li>
             </ul>
