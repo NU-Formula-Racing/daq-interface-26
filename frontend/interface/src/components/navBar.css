@@ -5,6 +5,7 @@
     background-color: white;
     color: #4E2A84;
     padding: 10px 20px;
+    border-bottom: 2px solid #4E2A84;
 }
 
 .navbar-left {
@@ -29,16 +30,20 @@
 .navbar-links {
     list-style: none;
     display: flex;
-    gap: 20px;
+    gap: 40px;
     margin: 0;
     padding-right: 40px;
+    font-weight: bold;
 }
 
 .navbar-links a {
     color: #4E2A84;
     text-decoration: none;
+    display: inline-block;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .navbar-links a:hover {
     text-decoration: underline;
+    transform: scale(1.1);
 }
