@@ -2,19 +2,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 40px;
+    padding: 10px;
     height: 500px;
     width: 100%;
 }
 
 .gauges-container {
     display: flex;
-    gap: 50px;
-    padding: 50px;
-    border: 3px solid #4E2A84;
-    border-radius: 16px;
-    background: linear-gradient(135deg, rgba(78, 42, 132, 0.05) 0%, rgba(78, 42, 132, 0.02) 100%);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    gap: 10px;
 }
 
 .gauge {

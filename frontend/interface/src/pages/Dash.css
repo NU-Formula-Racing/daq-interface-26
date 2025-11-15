@@ -1,0 +1,8 @@
+.base-dash-container {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+
+    /* NU Purple border */
+    border: 3px solid #4E2A84;
+}
