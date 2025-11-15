@@ -57,8 +57,8 @@ def run_test():
             unit="°C"
         )
 
-        # Wait 5 seconds before next cycle
-        time.sleep(5)
+        # Wait 2 seconds before next cycle
+        time.sleep(2)
         
     print("\nDone — 20 cycles completed.")
 
