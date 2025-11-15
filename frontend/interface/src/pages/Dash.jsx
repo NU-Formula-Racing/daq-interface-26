@@ -9,7 +9,7 @@ const ResponsiveGrid = WidthProvider(GridLayout);
 export default function Dashboard() {
     // Define the layout for grid items
     const layout = [
-        { i: 'basedash', x: 0, y: 0, w: 8, h: 5, minW: 8, minH: 5 }
+        { i: 'basedash', x: 0, y: 0, w:6.5, h: 4, minW: 6.5, minH: 4 }
     ];
 
     return (

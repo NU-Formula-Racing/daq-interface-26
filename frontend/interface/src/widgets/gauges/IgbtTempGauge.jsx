@@ -6,8 +6,8 @@ export default function IgbtTempGauge({ temp }) {
     return (
         <div
             style={{
-                width: "600px",
-                height: "320px",
+                width: "400px",
+                height: "300px",
                 justifyContent: "center",
                 alignItems: "center",
             }}
