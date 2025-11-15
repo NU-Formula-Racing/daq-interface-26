@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Navbar from '../components/navBar';
 import BaseDashboard from "@/widgets/BaseDash";
+import BatteryTemp from "@/widgets/bars/BatteryTemp";
 import Sidebar from "@/widgets/Sidebar";
 import './Dash.css'
 import "react-grid-layout/css/styles.css";
@@ -11,7 +12,8 @@ const ResponsiveGrid = WidthProvider(GridLayout);
 
 // Widget registry - maps widget types to components
 const widgetsList = [
-    { id: 'basedash', label: 'Inverter Information', defaultW: 8, defaultH: 3 },
+    { id: 'basedash', label: 'Inverter Information', defaultW: 8, defaultH: 3.7 },
+    { id: 'battery-temp', label: 'Battery Temperature', defaultW: 3, defaultH: 4 },
     { id: 'warning-lights', label: 'Warning Lights', defaultW: 4, defaultH: 2 },
     { id: 'temp-bars', label: 'Temperature Bars', defaultW: 4, defaultH: 3 },
 ];
@@ -19,7 +21,8 @@ const widgetsList = [
 export default function Dashboard() {
     // State to track active widgets and their positions
     const [widgets, setWidgets] = useState([
-        { i: 'basedash-1', x: 0, y: 0, w: 8, h: 3, minW: 8, minH: 3, type: 'basedash' }
+        { i: 'basedash-1', x: 0, y: 0, w: 8, h: 3.7, minW: 8, minH: 3.7, type: 'basedash' },
+        { i: 'battery-temp-1', x: 8, y: 0, w: 3, h: 4, minW: 3, minH: 4, type: 'battery-temp' }
     ]);
 
     // Toggle widget on/off
@@ -57,6 +60,8 @@ export default function Dashboard() {
         switch(widget.type) {
             case 'basedash':
                 return <BaseDashboard />;
+            case 'battery-temp':
+                return <BatteryTemp />;
             case 'warning-lights':
                 return <div style={{ padding: '20px', textAlign: 'center' }}>Warning Lights (Coming Soon)</div>;
             case 'temp-bars':
