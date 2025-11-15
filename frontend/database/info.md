@@ -19,5 +19,13 @@ create table nfr26_signals (
 - value
 - unit (V, A, bool, RPM...)
 
+**auto generate ID:**
+ALTER TABLE nfr26_signals
+ADD COLUMN id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY;
+
+**enable realtime**
+ALTER PUBLICATION supabase_realtime ADD TABLE nfr26_signals;
+
+
 **WIP Step 2:**
 add MAP to find car based on xy value
