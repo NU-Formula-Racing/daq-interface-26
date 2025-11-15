@@ -9,7 +9,7 @@ export default function BaseDashboard() {
     const [igbtTemp, setIgbtTemp] = useState(0);
 
     useEffect(() => {
-        // fetch latest values
+        // fetch latest values (ascending false)
         const fetchInitialValues = async () => {
             const { data } = await supabase
                 .from("nfr26_signals")
