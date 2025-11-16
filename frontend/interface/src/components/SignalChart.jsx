@@ -19,8 +19,9 @@ export default function SignalChart({ signalName, color }) {
 
         const loadData = async () => {
             try {
-                const result = await fetchSignal(signalName, 50); // Reduced to 50 points
+                const result = await fetchSignal(signalName, 100); // Fetch 100 points
                 if (isMounted) {
+                    result.reverse();
                     setData(result);
                     setLoading(false);
                 }
