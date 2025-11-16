@@ -3,7 +3,7 @@ import Navbar from '../components/navBar';
 import BaseDashboard from "@/widgets/BaseDash";
 import BatteryTemp from "@/widgets/bars/BatteryTemp";
 import Sidebar from "@/widgets/Sidebar";
-import './Dash.css'
+import './Dash.css';
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import GridLayout, { WidthProvider } from "react-grid-layout";

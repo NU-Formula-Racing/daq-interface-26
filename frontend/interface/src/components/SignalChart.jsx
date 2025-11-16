@@ -1,4 +1,5 @@
 // src/components/SignalChart.jsx
+import './SignalChart.css';
 import { useEffect, useState } from "react";
 import {
     LineChart,
@@ -41,8 +42,8 @@ export default function SignalChart({ signalName, color }) {
     }, [signalName]);
 
     return (
-        <div className="w-full h-64 p-4">
-            <h2 className="font-semibold text-lg mb-2">{signalName}</h2>
+        <div className="Signal-Chart w-full h-64 p-4">
+            <h2 className="Signal-Name font-semibold text-lg mb-2">{signalName}</h2>
 
             {loading ? (
                 <div className="flex items-center justify-center h-full text-gray-400 italic">

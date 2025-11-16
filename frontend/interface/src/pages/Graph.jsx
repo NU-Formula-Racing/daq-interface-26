@@ -1,5 +1,6 @@
 import Navbar from '../components/navBar';
 import SignalChart from "../components/SignalChart";
+import './Graph.css';
 
 function Graph() {
   return (
