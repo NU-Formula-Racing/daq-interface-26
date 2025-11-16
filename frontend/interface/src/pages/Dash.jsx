@@ -9,6 +9,8 @@ import "react-resizable/css/styles.css";
 import GridLayout, { WidthProvider } from "react-grid-layout";
 import MobileDashboard from "./MobileDashboard";
 import useIsMobile from "@/hooks/useIsMobile";
+import { cn } from "@/lib/utils"
+import { Slider } from "@/components/ui/slider"
 
 const ResponsiveGrid = WidthProvider(GridLayout);
 
@@ -22,6 +24,8 @@ const widgetsList = [
 
 export default function Dashboard() {
     const isMobile = useIsMobile();
+    const [isPlayback, setIsPlayback] = useState(false);
+    const [value, setValue] = useState([50])
 
     // State to track active widgets and their positions
     const [widgets, setWidgets] = useState([
@@ -82,56 +86,74 @@ export default function Dashboard() {
     return (
         <>
             <Navbar />
-            <div style={{ display: 'flex', height: 'calc(100vh - 62px)' }}>
+            <div style={{ display: 'flex', height: 'calc(100vh - 60px)' }}>
                 {/* Sidebar */}
                 <Sidebar
                     widgets={widgets}
                     onToggleWidget={handleToggleWidget}
+                    isPlayback={isPlayback}
+                    onTogglePlayback={() => setIsPlayback(prev => !prev)}
                 />
+                
+                <div className="main-content">
 
-                {/* Grid Dashboard */}
-                <div style={{ flex: 1, padding: '10px', overflow: 'auto' }}>
-                    <ResponsiveGrid
-                        className="layout"
-                        layout={widgets}
-                        onLayoutChange={handleLayoutChange}
-                        cols={12}
-                        rowHeight={100}
-                        isDraggable={true}
-                        isResizable={true}
-                        draggableHandle=".drag-handle"
-                    >
-                        {widgets.map(widget => (
-                            <div
-                                key={widget.i}
-                                className="widget-container"
-                                style={{
-                                    background: 'white',
-                                    borderRadius: '8px',
-                                    overflow: 'hidden',
-                                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                                }}
-                            >
+                    {/* Slider only appears when playback is ON */}
+                    {isPlayback && (
+                        <div className="slider-container">
+                            <Slider
+                                value={value}
+                                onValueChange={setValue}
+                                max={100}
+                                step={1}
+                                className="custom-slider"
+                            />
+                        </div>
+                    )}
+
+                    {/* Grid always exists (your gauges, etc.) */}
+                    <div style={{ flex: 1, padding: '10px', overflow: 'auto' }}>
+                        <ResponsiveGrid
+                            className="layout"
+                            layout={widgets}
+                            onLayoutChange={handleLayoutChange}
+                            cols={12}
+                            rowHeight={100}
+                            isDraggable={true}
+                            isResizable={true}
+                            draggableHandle=".drag-handle"
+                        >
+                            {widgets.map(widget => (
                                 <div
-                                    className="drag-handle"
+                                    key={widget.i}
+                                    className="widget-container"
                                     style={{
-                                        cursor: 'move',
-                                        padding: '10px',
-                                        background: '#4E2A84',
-                                        color: 'white',
-                                        fontWeight: 'bold',
-                                        textAlign: 'center',
-                                        flexShrink: 0
+                                        background: 'white',
+                                        borderRadius: '8px',
+                                        overflow: 'hidden',
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                                     }}
                                 >
-                                    {widgetsList.find(w => w.id === widget.type)?.label || 'Unknown Widget'}
+                                    <div
+                                        className="drag-handle"
+                                        style={{
+                                            cursor: 'move',
+                                            padding: '10px',
+                                            background: '#4E2A84',
+                                            color: 'white',
+                                            fontWeight: 'bold',
+                                            textAlign: 'center',
+                                            flexShrink: 0
+                                        }}
+                                    >
+                                        {widgetsList.find(w => w.id === widget.type)?.label || 'Unknown Widget'}
+                                    </div>
+                                    <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+                                        {renderWidget(widget)}
+                                    </div>
                                 </div>
-                                <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-                                    {renderWidget(widget)}
-                                </div>
-                            </div>
-                        ))}
-                    </ResponsiveGrid>
+                            ))}
+                        </ResponsiveGrid>
+                    </div>
                 </div>
             </div>
         </>

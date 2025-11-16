@@ -7,6 +7,19 @@
     border: 3px solid #4E2A84;
 }
 
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.slider-container {
+    width: 100%;
+    padding: 10px;
+}
+
 /* Ensure grid items and widget containers fill their allocated space */
 .react-grid-item {
     display: flex;
