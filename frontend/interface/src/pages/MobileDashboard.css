@@ -11,11 +11,8 @@
     gap: 10px;
     padding-bottom: 12px;
     border-bottom: 1px solid #444;
-}
-
-.mobile-logo {
-    width: 40px;
-    height: 40px;
+    font-weight: bold;
+    font-size: 1.5rem;
 }
 
 .mobile-signal-list {
@@ -31,6 +28,6 @@
 }
 
 .logo {
-    max-width: 50px;
+    max-width: 70px;
     height: auto;
 }
