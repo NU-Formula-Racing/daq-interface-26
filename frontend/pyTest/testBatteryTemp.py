@@ -1,0 +1,55 @@
+import time
+import random
+import os
+from datetime import datetime, timezone
+from supabase import create_client, Client
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY")
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+def generate_fake_battery_temp():
+    # Example: typical MOSFET / IGBT temperature range
+    return round(random.uniform(0, 60), 2)
+
+def insert_signal(source, signal_name, value, unit):
+    row = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "source": source,
+        "signal_name": signal_name,
+        "value": value,
+        "unit": unit
+    }
+
+    response = supabase.table("nfr26_signals").insert(row).execute()
+    print(f"Sent → {row}")
+    return response
+
+def run_test():
+    for i in range(20):
+        print(f"\n--- Cycle {i+1} / 20 ---")
+
+        # Generate fake values
+        fake_temp = generate_fake_battery_temp()
+
+        # Insert into Supabase
+        insert_signal(
+            source="BMS",
+            signal_name="Battery_Temperature",
+            value=fake_temp,
+            unit="C"
+        )
+
+        # Wait 2 seconds before next cycle
+        time.sleep(2)
+        
+    print("\nDone — 20 cycles completed.")
+
+
+if __name__ == "__main__":
+    run_test()

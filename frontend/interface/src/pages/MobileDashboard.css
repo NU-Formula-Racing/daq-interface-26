@@ -1,0 +1,36 @@
+.mobile-container {
+    padding: 12px;
+    font-family: Inter, sans-serif;
+    background: white;
+    color: #4E2A84;
+}
+
+.mobile-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #444;
+}
+
+.mobile-logo {
+    width: 40px;
+    height: 40px;
+}
+
+.mobile-signal-list {
+    margin-top: 15px;
+}
+
+.signal-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #333;
+    font-size: 1.1rem;
+}
+
+.logo {
+    max-width: 50px;
+    height: auto;
+}

@@ -7,6 +7,8 @@ import './Dash.css'
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import GridLayout, { WidthProvider } from "react-grid-layout";
+import MobileDashboard from "./MobileDashboard";
+import useIsMobile from "@/hooks/useIsMobile";
 
 const ResponsiveGrid = WidthProvider(GridLayout);
 
@@ -19,11 +21,17 @@ const widgetsList = [
 ];
 
 export default function Dashboard() {
+    const isMobile = useIsMobile();
+
     // State to track active widgets and their positions
     const [widgets, setWidgets] = useState([
         { i: 'basedash-1', x: 0, y: 0, w: 8, h: 3.7, minW: 8, minH: 3.7, type: 'basedash' },
         { i: 'battery-temp-1', x: 8, y: 0, w: 3, h: 4, minW: 3, minH: 4, type: 'battery-temp' }
     ]);
+
+    if (isMobile) {
+        return <MobileDashboard />;
+    }
 
     // Toggle widget on/off
     const handleToggleWidget = (widgetId) => {
