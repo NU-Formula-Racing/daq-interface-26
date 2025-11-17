@@ -27,5 +27,18 @@ ADD COLUMN id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY;
 ALTER PUBLICATION supabase_realtime ADD TABLE nfr26_signals;
 
 
-**WIP Step 2:**
-add MAP to find car based on xy value
+### WIP
+
+- add column for session ID (unique for each day), it will reset each day
+, everytime the python parser sends data to the database, it will check most recent id and increment it and all signals
+it adds will be based off that id number
+
+- add column for type (Live or SD)
+
+- if no session ID, implies its from SD card
+
+**SQL**
+alter table nfr26_signals 
+add column session_id integer,
+add column signal_type text;
+

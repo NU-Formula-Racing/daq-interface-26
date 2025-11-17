@@ -36,7 +36,7 @@ def run_test():
 
         # Generate fake values
         fake_temp = generate_fake_battery_temp()
-
+        
         # Insert into Supabase
         insert_signal(
             source="BMS",
