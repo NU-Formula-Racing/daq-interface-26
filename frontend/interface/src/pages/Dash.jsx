@@ -10,12 +10,13 @@ import "react-resizable/css/styles.css";
 import GridLayout, { WidthProvider } from "react-grid-layout";
 import MobileDashboard from "./MobileDashboard";
 import useIsMobile from "@/hooks/useIsMobile";
-import { cn } from "@/lib/utils"
 import { Slider } from "@/components/ui/slider"
 
 const ResponsiveGrid = WidthProvider(GridLayout);
 
-// Widget registry - maps widget types to components
+const SIGNALS = ["Inverter_RPM", "IGBT_Temperature", "Battery_Temperature"];
+
+// Widget registry
 const widgetsList = [
     { id: 'basedash', label: 'Inverter Information', defaultW: 8, defaultH: 3.7 },
     { id: 'battery-temp', label: 'Battery Temperature', defaultW: 3, defaultH: 4 },
@@ -25,109 +26,145 @@ const widgetsList = [
 
 export default function Dashboard() {
     const isMobile = useIsMobile();
+
+    // Playback controls
     const [isPlayback, setIsPlayback] = useState(false);
-    const [value, setValue] = useState([50])
+    const [sliderIndex, setSliderIndex] = useState(0);
+    const [playbackData, setPlaybackData] = useState([]);
+    const [channel, setChannel] = useState(null);
 
-
-    // SUPABASE DATA LOGIC
+    // Live values
     const [rpm, setRpm] = useState(0);
     const [igbtTemp, setIgbtTemp] = useState(0);
     const [batteryTemp, setBatteryTemp] = useState(0);
 
+    // -------------------------------
+    // Realtime Subscription Function
+    // -------------------------------
+    const startRealtime = () => {
+        const ch = supabase
+            .channel("signals-stream")
+            .on(
+                "postgres_changes",
+                { event: "INSERT", schema: "public", table: "nfr26_signals" },
+                (payload) => {
+                    if (isPlayback) return; // Ignore during playback
+
+                    const row = payload.new;
+
+                    if (row.signal_name === "Inverter_RPM") setRpm(row.value);
+                    if (row.signal_name === "IGBT_Temperature") setIgbtTemp(row.value);
+                    if (row.signal_name === "Battery_Temperature") setBatteryTemp(row.value);
+                }
+            )
+            .subscribe();
+
+        return ch;
+    };
+
+    // -------------------------------
+    // Fetch initial live values
+    // -------------------------------
     useEffect(() => {
-            // fetch latest values (ascending false)
-            const fetchInitialValues = async () => {
-                const { data } = await supabase
-                    .from("nfr26_signals")
-                    .select("signal_name, value")
-                    .in("signal_name", ["Inverter_RPM", "IGBT_Temperature", "Battery_Temperature"])
-                    .order("timestamp", { ascending: false });
+        const fetchInitialValues = async () => {
+            const { data } = await supabase
+                .from("nfr26_signals")
+                .select("signal_name, value")
+                .in("signal_name", SIGNALS)
+                .order("timestamp", { ascending: false });
 
-                if (!data) return;
+            if (!data) return;
 
-                // find latest rpm
-                const rpmRow = data.find(d => d.signal_name === "Inverter_RPM");
-                if (rpmRow) setRpm(rpmRow.value);
+            const rpmRow = data.find(d => d.signal_name === "Inverter_RPM");
+            if (rpmRow) setRpm(rpmRow.value);
 
-                // find latest igbt temp
-                const igbtTempRow = data.find(d => d.signal_name === "IGBT_Temperature");
-                if (igbtTempRow) setIgbtTemp(igbtTempRow.value);
+            const igbtRow = data.find(d => d.signal_name === "IGBT_Temperature");
+            if (igbtRow) setIgbtTemp(igbtRow.value);
 
-                // find latest battery temp
-                const batteryTempRow = data.find(d => d.signal_name === "Battery_Temperature");
-                if (batteryTempRow) setBatteryTemp(batteryTempRow.value);
-            };
+            const batRow = data.find(d => d.signal_name === "Battery_Temperature");
+            if (batRow) setBatteryTemp(batRow.value);
+        };
 
-            fetchInitialValues();
+        fetchInitialValues();
+        setChannel(startRealtime());
+    }, []);
 
-            // real time updates
-            const channel = supabase
-                .channel("signals-stream")
-                .on(
-                    "postgres_changes",
-                    {
-                        event: "INSERT",
-                        schema: "public",
-                        table: "nfr26_signals"
-                    },
-                    (payload) => {
-                        const row = payload.new;
+    // -------------------------------
+    // Fetch playback window (last 100 seconds)
+    // -------------------------------
+    const fetchPlaybackWindow = async () => {
+        const since = new Date(Date.now() - 100 * 1000).toISOString();
 
-                        if (row.signal_name === "Inverter_RPM") {
-                            setRpm(row.value);
-                        }
+        const { data } = await supabase
+            .from("nfr26_signals")
+            .select("*")
+            .gte("timestamp", since)
+            .order("timestamp", { ascending: true });
 
-                        if (row.signal_name === "IGBT_Temperature") {
-                            setIgbtTemp(row.value);
-                        }
+        if (data) {
+            setPlaybackData(data);
+            setSliderIndex(data.length - 1); // start at newest
+        }
+    };
 
-                        if (row.signal_name === "Battery_Temperature") {
-                            setBatteryTemp(row.value);
-                        }
-                    }
-                )
-                .subscribe();
+    // -------------------------------
+    // Handle playback toggle
+    // -------------------------------
+    useEffect(() => {
+        if (isPlayback) {
+            if (channel) supabase.removeChannel(channel);
+            fetchPlaybackWindow();
+        } else {
+            const newCh = startRealtime();
+            setChannel(newCh);
+            setPlaybackData([]);
+        }
+    }, [isPlayback]);
 
-            // cleanup
-            return () => {
-                supabase.removeChannel(channel);
-            };
-        }, []);
+    // -------------------------------
+    // Select value from playbackData based on slider
+    // -------------------------------
+    const getPlaybackValue = (signalName) => {
+        const items = playbackData.filter(x => x.signal_name === signalName);
+        if (!items.length) return null;
+        return items[Math.min(sliderIndex, items.length - 1)]?.value ?? null;
+    };
 
+    // Which values should the widgets use?
+    const rpmValue = isPlayback ? getPlaybackValue("Inverter_RPM") ?? rpm : rpm;
+    const igbtValue = isPlayback ? getPlaybackValue("IGBT_Temperature") ?? igbtTemp : igbtTemp;
+    const batValue = isPlayback ? getPlaybackValue("Battery_Temperature") ?? batteryTemp : batteryTemp;
 
-    // State to track active widgets and their positions
+    // -------------------------------
+    // Widget Logic
+    // -------------------------------
     const [widgets, setWidgets] = useState([
         { i: 'basedash-1', x: 0, y: 0, w: 8, h: 3.7, minW: 8, minH: 3.7, type: 'basedash' },
         { i: 'battery-temp-1', x: 8, y: 0, w: 3, h: 4, minW: 3, minH: 4, type: 'battery-temp' }
     ]);
 
-    if (isMobile) {
-        return <MobileDashboard />;
-    }
+    if (isMobile) return <MobileDashboard />;
 
-    // Toggle widget on/off
     const handleToggleWidget = (widgetId) => {
         const exists = widgets.some(w => w.type === widgetId);
-
         if (exists) {
-            // Remove all instances of this widget type
             setWidgets(widgets.filter(w => w.type !== widgetId));
         } else {
-            // Add widget with default position
             const widgetConfig = widgetsList.find(w => w.id === widgetId);
-            const newWidget = {
-                i: `${widgetId}-${Date.now()}`, // unique key
-                x: 0,
-                y: Infinity, // puts it at the bottom
-                w: widgetConfig.defaultW,
-                h: widgetConfig.defaultH,
-                type: widgetId
-            };
-            setWidgets([...widgets, newWidget]);
+            setWidgets([
+                ...widgets,
+                {
+                    i: `${widgetId}-${Date.now()}`,
+                    x: 0,
+                    y: Infinity,
+                    w: widgetConfig.defaultW,
+                    h: widgetConfig.defaultH,
+                    type: widgetId
+                }
+            ]);
         }
     };
 
-    // Handle layout changes when user drags/resizes widgets
     const handleLayoutChange = (newLayout) => {
         setWidgets(widgets.map((widget) => {
             const layoutItem = newLayout.find(item => item.i === widget.i);
@@ -135,51 +172,69 @@ export default function Dashboard() {
         }));
     };
 
-    // Render the appropriate component based on widget type
     const renderWidget = (widget) => {
-        switch(widget.type) {
+        switch (widget.type) {
             case 'basedash':
-                return <BaseDashboard rpm={rpm} igbtTemp={igbtTemp} />;
+                return <BaseDashboard rpm={rpmValue} igbtTemp={igbtValue} />;
+
             case 'battery-temp':
-                return <BatteryTemp temperature={batteryTemp} />;
+                return <BatteryTemp temperature={batValue} />;
+
             case 'warning-lights':
-                return <div style={{ padding: '20px', textAlign: 'center' }}>Warning Lights (Coming Soon)</div>;
+                return <div style={{ padding: 20 }}>Warning Lights (Coming Soon)</div>;
+
             case 'temp-bars':
-                return <div style={{ padding: '20px', textAlign: 'center' }}>Temperature Bars (Coming Soon)</div>;
+                return <div style={{ padding: 20 }}>Temperature Bars (Coming Soon)</div>;
+
             default:
                 return <div>Unknown widget</div>;
         }
     };
 
+    // -------------------------------
+    // Render
+    // -------------------------------
     return (
         <>
             <Navbar />
             <div style={{ display: 'flex', height: 'calc(100vh - 60px)' }}>
-                {/* Sidebar */}
+
                 <Sidebar
                     widgets={widgets}
                     onToggleWidget={handleToggleWidget}
                     isPlayback={isPlayback}
                     onTogglePlayback={() => setIsPlayback(prev => !prev)}
                 />
-                
+
                 <div className="main-content">
 
-                    {/* Slider only appears when playback is ON */}
-                    {isPlayback && (
+                    {isPlayback && playbackData.length === 0 && (
+                        <div style={{
+                            padding: '20px',
+                            textAlign: 'center',
+                            background: '#fff3cd',
+                            border: '1px solid #ffc107',
+                            borderRadius: '8px',
+                            margin: '10px',
+                            color: '#856404'
+                        }}>
+                            No playback data available for the last 100 seconds
+                        </div>
+                    )}
+
+                    {isPlayback && playbackData.length > 0 && (
                         <div className="slider-container">
                             <Slider
-                                value={value}
-                                onValueChange={setValue}
-                                max={100}
+                                value={[sliderIndex]}
+                                onValueChange={(v) => setSliderIndex(v[0])}
+                                max={Math.max(0, playbackData.length - 1)}
+                                min={0}
                                 step={1}
-                                className="custom-slider"
                             />
                         </div>
                     )}
 
-                    {/* Grid always exists (your gauges, etc.) */}
-                    <div style={{ flex: 1, padding: '10px', overflow: 'auto' }}>
+                    <div style={{ flex: 1, padding: 10, overflow: 'auto' }}>
                         <ResponsiveGrid
                             className="layout"
                             layout={widgets}
@@ -196,7 +251,7 @@ export default function Dashboard() {
                                     className="widget-container"
                                     style={{
                                         background: 'white',
-                                        borderRadius: '8px',
+                                        borderRadius: 8,
                                         overflow: 'hidden',
                                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                                     }}
@@ -205,19 +260,17 @@ export default function Dashboard() {
                                         className="drag-handle"
                                         style={{
                                             cursor: 'move',
-                                            padding: '10px',
+                                            padding: 10,
                                             background: '#4E2A84',
                                             color: 'white',
                                             fontWeight: 'bold',
-                                            textAlign: 'center',
-                                            flexShrink: 0
+                                            textAlign: 'center'
                                         }}
                                     >
-                                        {widgetsList.find(w => w.id === widget.type)?.label || 'Unknown Widget'}
+                                        {widgetsList.find(w => w.id === widget.type)?.label}
                                     </div>
-                                    <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-                                        {renderWidget(widget)}
-                                    </div>
+
+                                    {renderWidget(widget)}
                                 </div>
                             ))}
                         </ResponsiveGrid>
