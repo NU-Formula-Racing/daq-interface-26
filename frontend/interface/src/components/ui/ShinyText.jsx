@@ -1,5 +1,6 @@
 // src/components/ui/ShinyText.jsx
 import React from "react";
+import './ShinyText.css';
 
 export default function ShinyText({ text, className = "" }) {
     return (

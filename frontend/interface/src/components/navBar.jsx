@@ -6,7 +6,7 @@ import ShinyText from './ui/ShinyText';
 export default function Navbar() {
     return (
         <nav className="navbar">
-            <Link to="/dash" className="navbar-left">
+            <Link to="/" className="navbar-left">
                 <img src={logo} alt="Logo" className="navbar-logo" />
                 <ShinyText text="NFR Interface" className="navbar-title" />
             </Link>
