@@ -1,64 +1,8 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
 import './BaseDash.css';
 import InverterRPMGauge from "@/widgets/gauges/InverterRPMGauge";
 import IgbtTempGauge from "@/widgets/gauges/IgbtTempGauge";
 
-export default function BaseDashboard() {
-    const [rpm, setRpm] = useState(0);
-    const [igbtTemp, setIgbtTemp] = useState(0);
-
-    useEffect(() => {
-        // fetch latest values (ascending false)
-        const fetchInitialValues = async () => {
-            const { data } = await supabase
-                .from("nfr26_signals")
-                .select("signal_name, value")
-                .in("signal_name", ["Inverter_RPM", "IGBT_Temperature"])
-                .order("timestamp", { ascending: false });
-
-            if (!data) return;
-
-            // find latest rpm
-            const rpmRow = data.find(d => d.signal_name === "Inverter_RPM");
-            if (rpmRow) setRpm(rpmRow.value);
-
-            // find latest temp
-            const tempRow = data.find(d => d.signal_name === "IGBT_Temperature");
-            if (tempRow) setIgbtTemp(tempRow.value);
-        };
-
-        fetchInitialValues();
-
-        // real time updates
-        const channel = supabase
-            .channel("signals-stream")
-            .on(
-                "postgres_changes",
-                {
-                    event: "INSERT",
-                    schema: "public",
-                    table: "nfr26_signals"
-                },
-                (payload) => {
-                    const row = payload.new;
-
-                    if (row.signal_name === "Inverter_RPM") {
-                        setRpm(row.value);
-                    }
-
-                    if (row.signal_name === "IGBT_Temperature") {
-                        setIgbtTemp(row.value);
-                    }
-                }
-            )
-            .subscribe();
-
-        // cleanup
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, []);
+export default function BaseDashboard({ rpm = 0, igbtTemp = 0 }) {
 
     return (
         <div className="base-dashboard">

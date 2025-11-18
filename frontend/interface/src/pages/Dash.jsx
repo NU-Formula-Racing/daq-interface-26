@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from "@/lib/supabaseClient";
 import Navbar from '../components/navBar';
 import BaseDashboard from "@/widgets/BaseDash";
 import BatteryTemp from "@/widgets/bars/BatteryTemp";
@@ -26,6 +27,73 @@ export default function Dashboard() {
     const isMobile = useIsMobile();
     const [isPlayback, setIsPlayback] = useState(false);
     const [value, setValue] = useState([50])
+
+
+    // SUPABASE DATA LOGIC
+    const [rpm, setRpm] = useState(0);
+    const [igbtTemp, setIgbtTemp] = useState(0);
+    const [batteryTemp, setBatteryTemp] = useState(0);
+
+    useEffect(() => {
+            // fetch latest values (ascending false)
+            const fetchInitialValues = async () => {
+                const { data } = await supabase
+                    .from("nfr26_signals")
+                    .select("signal_name, value")
+                    .in("signal_name", ["Inverter_RPM", "IGBT_Temperature", "Battery_Temperature"])
+                    .order("timestamp", { ascending: false });
+
+                if (!data) return;
+
+                // find latest rpm
+                const rpmRow = data.find(d => d.signal_name === "Inverter_RPM");
+                if (rpmRow) setRpm(rpmRow.value);
+
+                // find latest igbt temp
+                const igbtTempRow = data.find(d => d.signal_name === "IGBT_Temperature");
+                if (igbtTempRow) setIgbtTemp(igbtTempRow.value);
+
+                // find latest battery temp
+                const batteryTempRow = data.find(d => d.signal_name === "Battery_Temperature");
+                if (batteryTempRow) setBatteryTemp(batteryTempRow.value);
+            };
+
+            fetchInitialValues();
+
+            // real time updates
+            const channel = supabase
+                .channel("signals-stream")
+                .on(
+                    "postgres_changes",
+                    {
+                        event: "INSERT",
+                        schema: "public",
+                        table: "nfr26_signals"
+                    },
+                    (payload) => {
+                        const row = payload.new;
+
+                        if (row.signal_name === "Inverter_RPM") {
+                            setRpm(row.value);
+                        }
+
+                        if (row.signal_name === "IGBT_Temperature") {
+                            setIgbtTemp(row.value);
+                        }
+
+                        if (row.signal_name === "Battery_Temperature") {
+                            setBatteryTemp(row.value);
+                        }
+                    }
+                )
+                .subscribe();
+
+            // cleanup
+            return () => {
+                supabase.removeChannel(channel);
+            };
+        }, []);
+
 
     // State to track active widgets and their positions
     const [widgets, setWidgets] = useState([
@@ -71,9 +139,9 @@ export default function Dashboard() {
     const renderWidget = (widget) => {
         switch(widget.type) {
             case 'basedash':
-                return <BaseDashboard />;
+                return <BaseDashboard rpm={rpm} igbtTemp={igbtTemp} />;
             case 'battery-temp':
-                return <BatteryTemp />;
+                return <BatteryTemp temperature={batteryTemp} />;
             case 'warning-lights':
                 return <div style={{ padding: '20px', textAlign: 'center' }}>Warning Lights (Coming Soon)</div>;
             case 'temp-bars':

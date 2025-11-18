@@ -1,48 +1,4 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
-
-export default function BatteryTemp() {
-    const [temperature, setTemperature] = useState(0);
-
-    useEffect(() => {
-        // Fetch latest value
-        const fetchInitialValue = async () => {
-            const { data } = await supabase
-                .from("nfr26_signals")
-                .select("value")
-                .eq("signal_name", "Battery_Temperature")
-                .order("timestamp", { ascending: false })
-                .limit(1);
-
-            if (data && data.length > 0) {
-                setTemperature(data[0].value);
-            }
-        };
-
-        fetchInitialValue();
-
-        // Real-time updates
-        const channel = supabase
-            .channel("battery-temp-stream")
-            .on(
-                "postgres_changes",
-                {
-                    event: "INSERT",
-                    schema: "public",
-                    table: "nfr26_signals",
-                    filter: "signal_name=eq.Battery_Temperature"
-                },
-                (payload) => {
-                    setTemperature(payload.new.value);
-                }
-            )
-            .subscribe();
-
-        // Cleanup
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, []);
+export default function BatteryTemp({ temperature = 0 }) {
 
     // Determine color based on temperature
     const getColor = (temp) => {
