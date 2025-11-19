@@ -42,3 +42,9 @@ alter table nfr26_signals
 add column session_id integer,
 add column signal_type text;
 
+
+ALTER PUBLICATION supabase_realtime DROP TABLE nfr26_signals;
+ALTER PUBLICATION supabase_realtime ADD TABLE nfr26_signals;
+
+ALTER TABLE nfr26_signals REPLICA IDENTITY DEFAULT;
+

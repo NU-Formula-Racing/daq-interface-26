@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from "@/lib/supabaseClient";
 import Navbar from '../components/navBar';
 import BaseDashboard from "@/widgets/BaseDash";
@@ -28,112 +28,166 @@ export default function Dashboard() {
     const isMobile = useIsMobile();
 
     // Playback controls
-    const [isPlayback, setIsPlayback] = useState(false);
-    const [sliderIndex, setSliderIndex] = useState(0);
-    const [playbackData, setPlaybackData] = useState([]);
-    const [channel, setChannel] = useState(null);
+    const [sessionData, setSessionData] = useState([]);
+    const [sliderIndex, setSliderIndex] = useState(100);
 
     // Live values
     const [rpm, setRpm] = useState(0);
     const [igbtTemp, setIgbtTemp] = useState(0);
     const [batteryTemp, setBatteryTemp] = useState(0);
 
+    // constantly update the slider index value
+    // otherwise supabase real time starts with arbitrary
+    const sliderRef = useRef(sliderIndex);
+    const [channel, setChannel] = useState(null);
+
+    useEffect(() => {
+        sliderRef.current = sliderIndex;
+    }, [sliderIndex]);
+
     // -------------------------------
     // Realtime Subscription Function
     // -------------------------------
     const startRealtime = () => {
+        // 1. Clear all stale channels (prevents binding mismatch)
+        supabase.getChannels().forEach((ch) => supabase.removeChannel(ch));
+
+        // 2. Create a new clean channel
         const ch = supabase
             .channel("signals-stream")
             .on(
                 "postgres_changes",
-                { event: "INSERT", schema: "public", table: "nfr26_signals" },
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "nfr26_signals",
+                },
                 (payload) => {
-                    if (isPlayback) return; // Ignore during playback
+                    console.log("Realtime payload:", payload); // debug
 
                     const row = payload.new;
+
+                    // ignore realtime if scrubbing
+                    if (sliderRef.current !== 100) return;
 
                     if (row.signal_name === "Inverter_RPM") setRpm(row.value);
                     if (row.signal_name === "IGBT_Temperature") setIgbtTemp(row.value);
                     if (row.signal_name === "Battery_Temperature") setBatteryTemp(row.value);
                 }
             )
-            .subscribe();
+            .subscribe((status) => console.log("SUB status:", status));
 
         return ch;
     };
 
+
+
     // -------------------------------
     // Fetch initial live values
     // -------------------------------
-    useEffect(() => {
-        const fetchInitialValues = async () => {
-            const { data } = await supabase
-                .from("nfr26_signals")
-                .select("signal_name, value")
-                .in("signal_name", SIGNALS)
-                .order("timestamp", { ascending: false });
-
-            if (!data) return;
-
-            const rpmRow = data.find(d => d.signal_name === "Inverter_RPM");
-            if (rpmRow) setRpm(rpmRow.value);
-
-            const igbtRow = data.find(d => d.signal_name === "IGBT_Temperature");
-            if (igbtRow) setIgbtTemp(igbtRow.value);
-
-            const batRow = data.find(d => d.signal_name === "Battery_Temperature");
-            if (batRow) setBatteryTemp(batRow.value);
-        };
-
-        fetchInitialValues();
-        setChannel(startRealtime());
-    }, []);
-
-    // -------------------------------
-    // Fetch playback window (last 100 seconds)
-    // -------------------------------
-    const fetchPlaybackWindow = async () => {
-        const since = new Date(Date.now() - 100 * 1000).toISOString();
-
+    const fetchInitialValues = async () => {
         const { data } = await supabase
             .from("nfr26_signals")
+            .select("signal_name, value")
+            .in("signal_name", SIGNALS)
+            .order("timestamp", { ascending: false });
+
+        if (!data) return;
+
+        const rpmRow = data.find(d => d.signal_name === "Inverter_RPM");
+        if (rpmRow) setRpm(rpmRow.value);
+
+        const igbtRow = data.find(d => d.signal_name === "IGBT_Temperature");
+        if (igbtRow) setIgbtTemp(igbtRow.value);
+
+        const batRow = data.find(d => d.signal_name === "Battery_Temperature");
+        if (batRow) setBatteryTemp(batRow.value);
+    };
+
+    // fetch the most recent signal ID
+    // update sessionData stored in state
+    // update sessionData stored in state
+    const loadLatestSession = async () => {
+        const { data: latest } = await supabase
+            .from("nfr26_signals")
+            .select("session_id")
+            .order("timestamp", { ascending: false })
+            .limit(1);  // removed .single()
+
+        if (!latest || latest.length === 0) return;
+
+        const latestRow = latest[0]; // extract first
+
+        // CASE 1: session_id is NULL → treat as "session 0"
+        if (latestRow.session_id === null) {
+            const { data: sessionRows } = await supabase
+                .from("nfr26_signals")
+                .select("*")
+                .is("session_id", null)        // fetch all null session rows
+                .order("timestamp", { ascending: true });
+
+            setSessionData(sessionRows || []);
+            return;
+        }
+
+        // CASE 2: normal session_id
+        const { data: sessionRows } = await supabase
+            .from("nfr26_signals")
             .select("*")
-            .gte("timestamp", since)
+            .eq("session_id", latestRow.session_id)
             .order("timestamp", { ascending: true });
 
-        if (data) {
-            setPlaybackData(data);
-            setSliderIndex(data.length - 1); // start at newest
-        }
+        setSessionData(sessionRows || []);
     };
 
-    // -------------------------------
-    // Handle playback toggle
-    // -------------------------------
+
+
+    // load latest session data
+    // then start the realtime updates
     useEffect(() => {
-        if (isPlayback) {
-            if (channel) supabase.removeChannel(channel);
-            fetchPlaybackWindow();
-        } else {
-            const newCh = startRealtime();
-            setChannel(newCh);
-            setPlaybackData([]);
-        }
-    }, [isPlayback]);
+        let ch;
 
-    // -------------------------------
-    // Select value from playbackData based on slider
-    // -------------------------------
-    const getPlaybackValue = (signalName) => {
-        const items = playbackData.filter(x => x.signal_name === signalName);
+        const init = async () => {
+            await fetchInitialValues();   // load live values
+            await loadLatestSession();    // load session for playback
+            ch = startRealtime();         // start realtime subscription
+            setChannel(ch);
+        };
+
+        init();
+
+        // Cleanup: unsubscribe on unmount
+        return () => {
+            if (ch) {
+                supabase.removeChannel(ch);
+            }
+        };
+    }, []);
+
+
+    // get data value based on slider index
+    const getScrubValue = (signalName) => {
+        if (sliderIndex === 100) return null; // live mode
+
+        if (!sessionData.length) return null;
+
+        const items = sessionData.filter(x => x.signal_name === signalName);
         if (!items.length) return null;
-        return items[Math.min(sliderIndex, items.length - 1)]?.value ?? null;
+
+        const idx = Math.floor((sliderIndex / 100) * (items.length - 1));
+        return items[idx]?.value ?? null;
     };
+
 
     // Which values should the widgets use?
-    const rpmValue = isPlayback ? getPlaybackValue("Inverter_RPM") ?? rpm : rpm;
-    const igbtValue = isPlayback ? getPlaybackValue("IGBT_Temperature") ?? igbtTemp : igbtTemp;
-    const batValue = isPlayback ? getPlaybackValue("Battery_Temperature") ?? batteryTemp : batteryTemp;
+    const scrubRpm = getScrubValue("Inverter_RPM");
+    const scrubIgbt = getScrubValue("IGBT_Temperature");
+    const scrubBat = getScrubValue("Battery_Temperature");
+
+    const rpmValue = scrubRpm ?? rpm;
+    const igbtValue = scrubIgbt ?? igbtTemp;
+    const batValue = scrubBat ?? batteryTemp;
+
 
     // -------------------------------
     // Widget Logic
@@ -202,37 +256,19 @@ export default function Dashboard() {
                 <Sidebar
                     widgets={widgets}
                     onToggleWidget={handleToggleWidget}
-                    isPlayback={isPlayback}
-                    onTogglePlayback={() => setIsPlayback(prev => !prev)}
                 />
 
                 <div className="main-content">
+                    <div className="slider-container">
+                        <Slider
+                            value={[sliderIndex]}
+                            onValueChange={(v) => setSliderIndex(v[0])}
+                            min={0}
+                            max={100}
+                            step={1}
+                        />
+                    </div>
 
-                    {isPlayback && playbackData.length === 0 && (
-                        <div style={{
-                            padding: '20px',
-                            textAlign: 'center',
-                            background: '#fff3cd',
-                            border: '1px solid #ffc107',
-                            borderRadius: '8px',
-                            margin: '10px',
-                            color: '#856404'
-                        }}>
-                            No playback data available for the last 100 seconds
-                        </div>
-                    )}
-
-                    {isPlayback && playbackData.length > 0 && (
-                        <div className="slider-container">
-                            <Slider
-                                value={[sliderIndex]}
-                                onValueChange={(v) => setSliderIndex(v[0])}
-                                max={Math.max(0, playbackData.length - 1)}
-                                min={0}
-                                step={1}
-                            />
-                        </div>
-                    )}
 
                     <div style={{ flex: 1, padding: 10, overflow: 'auto' }}>
                         <ResponsiveGrid

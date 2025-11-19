@@ -28,6 +28,7 @@ def insert_signal(source, signal_name, value, unit):
         "signal_name": signal_name,
         "value": value,
         "unit": unit
+        #"session_id": sessionID
     }
 
     response = supabase.table("nfr26_signals").insert(row).execute()
@@ -47,14 +48,16 @@ def run_test():
             source="Inverter",
             signal_name="Inverter_RPM",
             value=fake_rpm,
-            unit="RPM"
+            unit="RPM",
+            #sessionID=1
         )
 
         insert_signal(
             source="Inverter",
             signal_name="IGBT_Temperature",
             value=fake_temp,
-            unit="°C"
+            unit="°C",
+            #sessionID=1
         )
 
         # Wait 2 seconds before next cycle

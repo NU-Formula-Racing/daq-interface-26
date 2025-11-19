@@ -7,7 +7,7 @@ const widgetsList = [
     { id: 'temp-bars', label: 'Temperature Bars', defaultW: 4, defaultH: 3 },
 ];
 
-export default function Sidebar({ widgets, onToggleWidget, isPlayback, onTogglePlayback }) {
+export default function Sidebar({ widgets, onToggleWidget }) {
     return (
         <div className="sidebar">
             <h2>Dashboard Widgets</h2>
@@ -27,20 +27,6 @@ export default function Sidebar({ widgets, onToggleWidget, isPlayback, onToggleP
                     </div>
                 );
             })}
-
-            <button
-                style={{
-                    marginTop: "20px",
-                    padding: "10px",
-                    background: isPlayback ? "#4E2A84" : "green",
-                    color: "white",
-                    width: "100%",
-                    borderRadius: "6px"
-                }}
-                onClick={onTogglePlayback}
-            >
-                {isPlayback ? "Playback Mode" : "Live Mode"}
-            </button>
         </div>
     );
 }
