@@ -9,6 +9,8 @@ export default function HomePage() {
     const [showButtons, setShowButtons] = useState(false);
     const [typedText, setTypedText] = useState("");
     const [showGlow, setShowGlow] = useState(false);
+    const [selectedDate, setSelectedDate] = useState("");
+    const [dataSource, setDataSource] = useState("wireless"); // "sd" or "wireless"
 
     const fullText = "NFR Interface";
 
@@ -37,26 +39,23 @@ export default function HomePage() {
 
     return (
         <div className="relative w-full h-screen overflow-hidden">
-
             {/* BACKGROUND LAYER (white + particles) */}
-            <div className="absolute inset-0 w-full h-full z-0">
-                <PixelBlast
-                    variant="circle"
-                    pixelSize={8}
-                    color="#B19EEF"
-                    patternScale={1}
-                    patternDensity={1}
-                    pixelSizeJitter={0.5}
-                    enableRipples
-                    speed={0.4}
-                    edgeFade={0}
-                    transparent={true}
-                />
+            <div className="absolute inset-0 w-full h-full z-0"> 
+                <PixelBlast variant="circle" 
+                    pixelSize={8} 
+                    color="#B19EEF" 
+                    patternScale={1} 
+                    patternDensity={1} 
+                    pixelSizeJitter={0.5} 
+                    enableRipples speed={0.4} 
+                    edgeFade={0} 
+                    transparent={true} 
+                /> 
             </div>
-
+            
             <motion.div
                 initial={{ y: 0 }}
-                animate={showButtons ? { y: "-25vh" } : { y: 0 }}
+                animate={showButtons ? { y: "-35vh" } : { y: 0 }}
                 transition={{ duration: 1.2, ease: "easeInOut" }}
                 className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"
             >
@@ -94,24 +93,66 @@ export default function HomePage() {
                 <motion.div
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 4, scale: { type: "spring", visualDuration: 1.5, bounce: 0.3 }, }}
+                    transition={{ duration: 1.5, scale: { type: "spring", visualDuration: 1, bounce: 0.2 }, }}
                     className="relative z-30 w-full h-full flex flex-col gap-6 items-center justify-center pointer-events-none"
                 >
-                    <div className="navigation pointer-events-auto">
-                        <ol>
-                            <Link to="/dash">
-                                <button className="button transition">
-                                    LIVE
-                                </button>
-                            </Link>
-                        </ol>
-                        <ol>
-                            <Link to="/dash">
-                                <button className="button transition">
-                                    REPLAY
-                                </button>
-                            </Link>
-                        </ol>
+                    <div className="cards-container">
+
+                        <div className="mode-card">
+                            <div>
+                                <h2>Live Telemetry</h2>
+                                <p>Stream real-time CAN & sensor data from the car.</p>
+                                <div className="card-content">
+                                    <p className="card-details">Monitor critical metrics including:</p>
+                                    <ul className="feature-list">
+                                        <li>Inverter RPM & Temperature</li>
+                                        <li>Battery Temperature & Voltage</li>
+                                        <li>Motor Performance Data</li>
+                                        <li>Real-time CAN Bus Signals</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <Link to="/dash" className="card-btn">ENTER</Link>
+                        </div>
+
+                        <div className="mode-card">
+                            <div>
+                                <h2>Replay Sessions</h2>
+                                <p>Review past sessions with timeline-based playback.</p>
+
+                                <div className="card-form">
+                                    <label className="form-label">
+                                        Select Date
+                                        <input
+                                            type="date"
+                                            className="date-input"
+                                            value={selectedDate}
+                                            onChange={(e) => setSelectedDate(e.target.value)}
+                                        />
+                                    </label>
+
+                                    <div className="toggle-group">
+                                        <span className="form-label">Data Source</span>
+                                        <div className="toggle-buttons">
+                                            <button
+                                                className={`toggle-btn ${dataSource === 'sd' ? 'active' : ''}`}
+                                                onClick={() => setDataSource('sd')}
+                                            >
+                                                SD Card
+                                            </button>
+                                            <button
+                                                className={`toggle-btn ${dataSource === 'wireless' ? 'active' : ''}`}
+                                                onClick={() => setDataSource('wireless')}
+                                            >
+                                                Wireless
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <Link to="/replay" className="card-btn secondary">OPEN</Link>
+                        </div>
+
                     </div>
                 </motion.div>
             )}

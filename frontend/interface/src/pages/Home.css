@@ -65,3 +65,204 @@
 .hero-title {
     font-family: Georgia, serif;
 }
+
+.cards-container {
+    display: flex;
+    flex-direction: row;
+    gap: 2.5rem;
+    justify-content: center;
+    align-items: center;
+    pointer-events: auto;
+    margin-top: 8rem;
+}
+
+/* Mobile: stack cards vertically */
+@media (max-width: 768px) {
+    .cards-container {
+        flex-direction: column;
+        gap: 2rem;
+        margin-top: 10rem;
+    }
+
+    .mode-card {
+        width: 90%;
+        max-width: 360px;
+    }
+}
+
+.mode-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
+    padding: 3rem 2.5rem;
+    border-radius: 16px;
+    width: 320px;
+    height: 450px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(78, 42, 132, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.mode-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 48px rgba(78, 42, 132, 0.2);
+    border-color: rgba(78, 42, 132, 0.3);
+}
+
+.mode-card .icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.25rem;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.mode-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 0.75rem 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.mode-card p {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.6;
+    margin: 0 0 1.5rem 0;
+    flex-grow: 1;
+}
+
+.card-btn {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: white;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.card-btn.secondary {
+    background: linear-gradient(135deg, #4E2A84 0%, #6B46A8 100%);
+}
+
+.card-btn.secondary:hover {
+    box-shadow: 0 6px 20px rgba(78, 42, 132, 0.4);
+}
+
+.card-content {
+    margin-top: 1.5rem;
+    text-align: left;
+}
+
+.card-details {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.75rem;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.feature-list li {
+    font-size: 0.85rem;
+    color: #666;
+    padding: 0.5rem 0;
+    padding-left: 1.25rem;
+    position: relative;
+}
+
+.feature-list li::before {
+    content: "●";
+    position: absolute;
+    left: 0;
+    color: #4E2A84;
+    font-size: 0.8rem;
+}
+
+.card-form {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    text-align: left;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.date-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.date-input:focus {
+    outline: none;
+    border-color: #4E2A84;
+    box-shadow: 0 0 0 3px rgba(78, 42, 132, 0.1);
+}
+
+.toggle-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.toggle-buttons {
+    display: flex;
+    gap: 0.5rem;
+    background: #f5f5f5;
+    padding: 0.25rem;
+    border-radius: 8px;
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggle-btn.active {
+    background: white;
+    color: #4E2A84;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn:hover:not(.active) {
+    color: #4E2A84;
+}
