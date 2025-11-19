@@ -260,6 +260,7 @@ export default function Dashboard() {
 
                 <div className="main-content">
                     <div className="slider-container">
+                        <h2>SLIDERRERRKLJEKLR</h2>
                         <Slider
                             value={[sliderIndex]}
                             onValueChange={(v) => setSliderIndex(v[0])}
@@ -267,6 +268,12 @@ export default function Dashboard() {
                             max={100}
                             step={1}
                         />
+
+                        <p className="slider-helper">
+                            {sliderIndex === 100
+                                ? "Currently viewing LIVE data"
+                                : "Viewing replay data at position " + sliderIndex}
+                        </p>
                     </div>
 
 
