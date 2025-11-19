@@ -93,11 +93,14 @@ export default function HomePage() {
                 <motion.div
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 1.5, scale: { type: "spring", visualDuration: 1, bounce: 0.2 }, }}
+                    transition={{
+                        delay: 1.2,
+                        duration: 1.5,
+                        scale: { type: "spring", visualDuration: 1, bounce: 0.2 },
+                    }}
                     className="relative z-30 w-full h-full flex flex-col gap-6 items-center justify-center pointer-events-none"
                 >
                     <div className="cards-container">
-
                         <div className="mode-card">
                             <div>
                                 <h2>Live Telemetry</h2>
