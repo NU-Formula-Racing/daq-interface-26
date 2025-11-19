@@ -1,0 +1,76 @@
+.sidebar {
+    width: 280px;
+    background: #f8f9fa;
+    border-right: 3px solid #4E2A84;
+    padding: 20px;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.sidebar h2 {
+    margin: 0 0 20px 0;
+    color: #4E2A84;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4E2A84;
+}
+
+.sidebar-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    background: white;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    transition: all 0.2s ease;
+}
+
+.sidebar-item:hover {
+    border-color: #4E2A84;
+    box-shadow: 0 2px 6px rgba(78, 42, 132, 0.1);
+}
+
+.sidebar-item span {
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+.sidebar-item button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.sidebar-item button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Add button styling */
+.sidebar-item button:not(.active) {
+    background: #4E2A84;
+    color: white;
+}
+
+.sidebar-item button:not(.active):hover {
+    background: #3d2166;
+}
+
+/* Remove button styling */
+.sidebar-item button.active {
+    background: #dc3545;
+    color: white;
+}
+
+.sidebar-item button.active:hover {
+    background: #c82333;
+}

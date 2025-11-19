@@ -1,0 +1,19 @@
+.base-dashboard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    height: 100%;
+    width: 100%;
+}
+
+.gauges-container {
+    display: flex;
+    gap: 10px;
+}
+
+.gauge {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

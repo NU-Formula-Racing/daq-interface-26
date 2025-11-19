@@ -1,0 +1,5 @@
+.charts {
+    display: grid;
+    gap: 15px;
+    padding: 10px;
+}
