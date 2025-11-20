@@ -11,8 +11,16 @@ export default function HomePage() {
     const [showGlow, setShowGlow] = useState(false);
     const [selectedDate, setSelectedDate] = useState("");
     const [dataSource, setDataSource] = useState("wireless"); // "sd" or "wireless"
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
     const fullText = "NFR Interface";
+
+    // Detect mobile screen
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Typewriter
     useEffect(() => {
@@ -38,7 +46,7 @@ export default function HomePage() {
 
 
     return (
-        <div className="relative w-full h-screen overflow-hidden">
+        <div className="relative w-full min-h-screen overflow-x-hidden overflow-y-auto">
             {/* BACKGROUND LAYER (white + particles) */}
             <div className="absolute inset-0 w-full h-full z-0"> 
                 <PixelBlast variant="circle" 
@@ -55,9 +63,10 @@ export default function HomePage() {
             
             <motion.div
                 initial={{ y: 0 }}
-                animate={showButtons ? { y: "-35vh" } : { y: 0 }}
+                animate={showButtons ? { y: isMobile ? 0 : "-35vh" } : { y: 0 }}
                 transition={{ duration: 1.2, ease: "easeInOut" }}
                 className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"
+                style={isMobile && showButtons ? { position: 'relative', marginTop: '6rem' } : {}}
             >
                 <div className="relative">
 
@@ -99,6 +108,7 @@ export default function HomePage() {
                         scale: { type: "spring", visualDuration: 1, bounce: 0.2 },
                     }}
                     className="relative z-30 w-full h-full flex flex-col gap-6 items-center justify-center pointer-events-none"
+                    style={isMobile ? { position: 'relative', marginTop: '2rem' } : {}}
                 >
                     <div className="cards-container">
                         <div className="mode-card">

@@ -73,20 +73,25 @@
     justify-content: center;
     align-items: center;
     pointer-events: auto;
-    margin-top: 8rem;
+    margin-top: 12rem;
 }
 
 /* Mobile: stack cards vertically */
 @media (max-width: 768px) {
     .cards-container {
         flex-direction: column;
-        gap: 2rem;
-        margin-top: 10rem;
+        gap: 1rem;
+        margin-top: 0;
+        padding-bottom: 3rem;
     }
 
     .mode-card {
         width: 90%;
         max-width: 360px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
     }
 }
 
