@@ -1,19 +1,30 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "./Home.css";
 import PixelBlast from "@/components/ui/PixelBlast";
 import ShinyText from "@/components/ui/ShinyText";
 
 export default function HomePage() {
+    const navigate = useNavigate();
     const [showButtons, setShowButtons] = useState(false);
     const [typedText, setTypedText] = useState("");
     const [showGlow, setShowGlow] = useState(false);
-    const [selectedDate, setSelectedDate] = useState("");
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [dataSource, setDataSource] = useState("wireless"); // "sd" or "wireless"
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
     const fullText = "NFR Interface";
+
+    const handleOpenReplay = () => {
+        navigate('/replay', {
+            state: {
+                selectedDate,
+                dataSource,
+                sessionId: null
+            }
+        });
+    };
 
     // Detect mobile screen
     useEffect(() => {
@@ -163,7 +174,7 @@ export default function HomePage() {
                                     </div>
                                 </div>
                             </div>
-                            <Link to="/replay" className="card-btn secondary">OPEN</Link>
+                            <button onClick={handleOpenReplay} className="card-btn secondary">OPEN</button>
                         </div>
 
                     </div>

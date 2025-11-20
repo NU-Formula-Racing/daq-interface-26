@@ -260,7 +260,7 @@ export default function Dashboard() {
 
                 <div className="main-content">
                     <div className="slider-container">
-                        <h2>SLIDERRERRKLJEKLR</h2>
+                        <h2>CHOPPED SLIDER</h2>
                         <Slider
                             value={[sliderIndex]}
                             onValueChange={(v) => setSliderIndex(v[0])}
