@@ -40,6 +40,7 @@ stream.py    (CAN/log/socket frame source)
 ### `spec.py`
 
 Defines the domain models used throughout the system.
+A CAN **message** is a group of **signals**
 
 * `SignalSpec`
 
