@@ -1,34 +1,71 @@
 import sys
+import csv
+import struct
 from compile import compile_csv
 from decode import decode_frame
 
+HEADER_SIZE = 20
+FRAME_SIZE = 18  # 4 timestamp + 4 id + 2 length + 8 data
+
+
 def read_frames_from_file(file_path):
-    # Generator that reads frames from a binary file.
-    # Format: time, 4byte id, 1byte length, N byte data
-    pass
+    # Generator that yields (timestamp_ms, frame_id, data) from a .nfr log file.
+    # LogHeader: 9 byte version + 4 byte RtcDate + 7 byte RtcTime = 20 bytes
+    # LogFrame: 4 byte timestamp (uint32 ms) + 4 byte id (uint32) + 2 byte dlc (uint16) + 8 byte data = 18 bytes
+    # All little endian.
+
+    with open(file_path, "rb") as f:
+        header = f.read(HEADER_SIZE)
+        if len(header) < HEADER_SIZE:
+            return
+
+        while True:
+            frame = f.read(FRAME_SIZE)
+            if len(frame) < FRAME_SIZE:
+                return
+
+            timestamp, frame_id, dlc = struct.unpack_from("<IIH", frame, 0)
+            data = frame[10 : 10 + dlc]
+            yield timestamp, frame_id, data
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python main.py <dbc_csv_path>")
+    if len(sys.argv) < 3:
+        print("Usage: python main.py <dbc_csv_path> <nfr_file_path>")
         sys.exit(1)
 
     csv_path = sys.argv[1]
-    decode_table = compile_csv(csv_path)
+    nfr_path = sys.argv[2]
 
+    decode_table = compile_csv(csv_path)
     print(f"Compiled {len(decode_table)} message(s) from {csv_path}\n")
 
-    for frame_id, msg in sorted(decode_table.items()):
-        print(f"Message: {msg.name} (ID: 0x{frame_id:X}, sender: {msg.sender}, {msg.required_bytes} bytes)")
+    # Build a lookup from signal name -> unit for each message
+    signal_units = {}
+    for msg in decode_table.values():
         for sig in msg.signals:
-            sign = "signed" if sig.signed else "unsigned"
-            unit = sig.unit if sig.unit else ""
-            print(f"  Signal: {sig.name}")
-            print(f"    start_bit={sig.start_bit}, length={sig.length}, {sign}")
-            print(f"    scale={sig.scale}, offset={sig.offset}, unit={unit}")
-        print()
-    
-    
+            signal_units[(msg.frame_id, sig.name)] = sig.unit or ""
+
+    out_path = nfr_path.rsplit(".", 1)[0] + ".csv"
+    with open(out_path, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["signal_name", "timestamp_ms", "value", "message_id", "message_name", "unit"])
+
+        for timestamp, frame_id, data in read_frames_from_file(nfr_path):
+            decoded = decode_frame(frame_id, data, decode_table)
+            if not decoded:
+                continue
+
+            msg = decode_table[frame_id]
+            msg_id_hex = f"0x{frame_id:X}"
+            print(f"[{timestamp}ms] {msg.name} ({msg_id_hex}): {decoded}")
+
+            for signal_name, value in decoded.items():
+                unit = signal_units.get((frame_id, signal_name), "")
+                writer.writerow([signal_name, timestamp, value, msg_id_hex, msg.name, unit])
+
+    print(f"\nSaved to {out_path}")
 
 
-main()
+if __name__ == "__main__":
+    main()
