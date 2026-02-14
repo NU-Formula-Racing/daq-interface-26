@@ -1,0 +1,1457 @@
+signal_name,timestamp_ms,value,message_id,message_name,unit
+Strain_Gauge,197,-426103.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,197,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,297,-427923.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,297,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,398,-428243.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,398,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,499,-428187.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,499,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,600,-427862.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,600,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,701,-428582.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,701,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,802,-428377.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,802,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,902,-428280.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,902,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,1000,25.6,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,1000,25.54,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,1000,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,1000,25.36,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,1001,25.580000000000002,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,1001,26.17,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,1001,25.97,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,1001,25.73,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,1003,-429257.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1003,374.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,1104,-428380.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1104,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,1205,-428221.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1205,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,1306,-427288.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1306,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,1407,-428024.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1407,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,1508,-428675.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1508,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,1608,-428047.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1608,375.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,1709,-427118.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1709,374.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,1810,-427481.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1810,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,1911,-427982.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1911,370.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,2000,25.63,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,2000,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,2000,25.6,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,2000,25.580000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,2000,25.85,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,2000,26.2,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,2000,26.14,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,2000,25.79,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,2012,-426932.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2012,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,2112,-428044.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2112,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,2213,-427296.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2213,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,2314,-425603.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2314,371.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,2415,-426883.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2415,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,2516,-427032.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2516,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,2617,-426483.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2617,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,2718,-426120.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2718,374.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,2818,-426381.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2818,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,2919,-426389.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2919,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,2999,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,2999,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,2999,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,2999,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,2999,25.67,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,2999,26.26,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,2999,26.1,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,2999,25.97,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,3020,-425145.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3020,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,3121,-426546.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3121,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,3222,-425861.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3222,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,3322,-425508.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3322,371.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,3423,-425597.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3423,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,3524,-425155.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3524,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,3625,-426884.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3625,374.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,3725,-425330.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3725,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,3826,-423837.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3826,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,3927,-425115.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3927,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,3998,25.63,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,3998,25.41,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,3998,26.1,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,3998,25.580000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,3998,25.92,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,3998,26.35,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,3998,26.080000000000002,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,3998,25.97,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,4028,-424757.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4028,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,4129,-425077.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4129,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,4229,-425358.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4229,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,4330,-423520.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4330,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,4431,-424654.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4431,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,4532,-423887.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4532,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,4632,-425314.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4632,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,4733,-429927.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4733,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,4834,-442485.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4834,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,4935,-454964.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4935,367.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,4997,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,4997,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,4997,25.6,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,4997,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,4997,25.75,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,4997,26.41,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,4997,26.14,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,4997,26.04,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,5035,-471314.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5035,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,5136,-480265.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5136,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,5237,-490039.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5237,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,5338,-498323.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5338,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,5438,-509956.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5438,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,5539,-519930.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5539,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,5640,-518427.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5640,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,5741,-515039.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5741,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,5842,-515699.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5842,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,5942,-518013.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5942,368.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,5995,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,5995,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,5995,25.54,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,5995,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,5996,25.67,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,5996,26.29,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,5996,26.2,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,5996,25.97,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,6043,-508511.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6043,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,6144,-477108.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6144,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,6245,-450197.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6245,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,6345,-428203.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6345,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,6446,-410629.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6446,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,6547,-394349.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6547,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,6648,-386640.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6648,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,6749,-384874.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6749,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,6849,-384672.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6849,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,6950,-387469.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6950,368.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,6994,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,6994,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,6994,25.6,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,6994,25.580000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,6995,25.69,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,6995,26.2,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,6995,26.26,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,6995,25.97,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,7051,-391737.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7051,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,7152,-398314.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7152,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,7253,-412258.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7253,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,7353,-430963.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7353,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,7454,-440838.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7454,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,7555,-446063.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7555,485.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,7656,-455629.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7656,1433.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,7756,-476466.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7756,1807.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,7857,-501497.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7857,2323.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,7958,-519121.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7958,2886.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,7993,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,7993,25.580000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,7993,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,7993,25.48,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,7993,25.73,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,7993,26.14,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,7993,26.26,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,7993,25.97,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,8059,-528967.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8059,3654.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,8159,-534011.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8159,3653.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,8260,-529713.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8260,3651.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,8361,-524627.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8361,3653.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,8462,-514948.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8462,3653.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,8562,-469574.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8562,3654.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,8663,-441675.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8663,3651.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,8764,-427823.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8764,3652.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,8865,-425088.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8865,3654.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,8966,-418359.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8966,3653.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,8992,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,8992,25.6,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,8992,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,8992,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,8992,25.6,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,8992,26.23,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,8992,26.04,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,8992,26.14,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,9066,-416546.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9066,2924.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,9167,-409515.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9167,2083.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,9268,-402872.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9268,1339.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,9369,-401955.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9369,619.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,9469,-400103.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9469,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,9570,-400069.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9570,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,9671,-404030.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9671,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,9772,-409429.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9772,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,9872,-419398.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9872,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,9973,-432688.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9973,367.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,9990,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,9990,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,9990,25.54,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,9990,25.580000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,9991,25.69,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,9991,26.29,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,9991,26.03,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,9991,26.03,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,10074,-449930.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10074,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,10175,-477110.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10175,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,10275,-503054.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10275,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,10376,-519266.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10376,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,10477,-527094.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10477,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,10578,-526922.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10578,371.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,10679,-530865.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10679,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,10779,-530622.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10779,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,10880,-522166.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10880,374.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,10981,-507166.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10981,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,10989,25.63,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,10989,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,10989,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,10989,25.54,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,10989,25.92,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,10989,26.3,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,10989,26.17,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,10989,25.92,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,11082,-491310.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11082,374.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,11182,-484243.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11182,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,11283,-450211.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11283,377.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,11384,-429483.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11384,379.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,11484,-422153.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11484,382.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,11585,-410169.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11585,390.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,11686,-371975.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11686,390.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,11787,-349664.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11787,392.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,11887,-341466.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11887,390.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,11987,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,11987,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,11987,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,11987,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,11988,25.69,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,11988,26.42,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,11988,26.1,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,11988,26.1,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,11988,-341081.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11988,392.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,12089,-343050.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12089,390.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,12190,-344685.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12190,390.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,12290,-364209.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12290,389.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,12391,-398634.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12391,391.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,12492,-418017.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12492,393.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,12593,-433476.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12593,389.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,12694,-469139.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12694,392.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,12795,-494073.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12795,390.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,12895,-454755.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12895,519.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,12986,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,12986,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,12986,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,12986,25.48,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,12986,25.79,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,12986,26.3,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,12986,26.3,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,12986,26.03,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,12996,-424711.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12996,852.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,13097,-423151.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13097,1010.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,13198,-424577.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13198,1446.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,13298,-424109.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13298,1934.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,13399,-423292.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13399,2595.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,13500,-423589.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13500,3380.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,13601,-423037.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13601,3651.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,13702,-424611.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13702,3652.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,13802,-422974.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13802,3652.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,13903,-423904.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13903,3652.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,13985,25.98,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,13985,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,13985,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,13985,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,13985,25.69,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,13985,26.35,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,13985,26.17,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,13985,25.8,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,14004,-423399.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14004,3653.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,14105,-424004.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14105,3651.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,14205,-423176.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14205,3655.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,14306,-423811.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14306,3656.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,14407,-422862.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14407,3634.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,14508,-423233.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14508,2881.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,14608,-423719.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14608,2011.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,14709,-424139.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14709,1135.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,14810,-423268.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14810,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,14910,-423945.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14910,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,14983,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,14983,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,14983,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,14983,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,14984,25.69,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,14984,26.42,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,14984,26.17,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,14984,25.8,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,15011,-423727.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15011,374.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,15112,-424144.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15112,374.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,15213,-423000.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15213,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,15313,-422917.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15313,373.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,15414,-422592.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15414,379.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,15515,-422756.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15515,550.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,15616,-422743.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15616,1277.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,15716,-422760.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15716,1912.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,15817,-422449.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15817,2743.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,15918,-422528.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15918,3469.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,15982,26.080000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,15982,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,15982,26.23,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,15982,26.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,15982,26.98,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,15982,27.48,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,15982,27.42,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,15982,26.91,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,16019,-423858.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16019,3654.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,16120,-422800.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16120,3654.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,16220,-422794.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16220,3651.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,16321,-423004.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16321,3651.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,16422,-422916.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16422,3652.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,16523,-422634.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16523,3654.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,16623,-422878.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16623,3654.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,16724,-422705.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16724,3592.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,16825,-422394.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16825,2715.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,16926,-422756.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16926,1691.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,16981,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,16981,25.63,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,16981,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,16981,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,16981,26.3,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,16981,31.04,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,16981,31.82,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,16981,31.1,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,17027,-422760.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17027,837.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,17127,-422826.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17127,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,17228,-423109.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17228,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,17329,-422821.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17329,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,17430,-423319.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17430,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,17531,-422465.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17531,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,17631,-422592.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17631,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,17732,-423137.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17732,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,17833,-422724.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17833,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,17934,-423054.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17934,368.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,17980,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,17980,25.580000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,17980,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,17980,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,17980,25.97,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,17980,26.2,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,17980,26.26,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,17980,26.1,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,18034,-422893.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18034,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,18135,-423390.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18135,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,18236,-422500.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18236,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,18337,-422654.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18337,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,18438,-422496.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18438,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,18538,-422494.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18538,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,18639,-423722.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18639,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,18740,-423097.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18740,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,18841,-422496.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18841,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,18942,-423539.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18942,369.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,18979,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,18979,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,18979,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,18979,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,18979,25.53,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,18979,26.3,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,18979,26.04,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,18979,25.92,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,19042,-422738.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19042,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,19143,-422301.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19143,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,19244,-423314.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19244,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,19345,-423274.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19345,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,19445,-423086.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19445,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,19546,-422939.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19546,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,19647,-423408.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19647,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,19748,-423037.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19748,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,19849,-422367.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19849,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,19949,-422409.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19949,369.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,19977,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,19977,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,19977,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,19977,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,19978,25.73,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,19978,26.26,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,19978,26.04,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,19978,25.86,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,20050,-423186.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20050,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,20151,-423173.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20151,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,20252,-422708.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20252,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,20352,-422876.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20352,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,20453,-423829.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20453,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,20554,-422779.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20554,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,20655,-422800.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20655,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,20755,-422777.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20755,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,20856,-422759.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20856,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,20957,-423797.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20957,369.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,20976,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,20976,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,20976,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,20976,25.54,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,20976,25.6,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,20976,26.29,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,20976,26.080000000000002,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,20976,25.86,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,21057,-422500.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21057,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,21158,-423071.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21158,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,21259,-423332.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21259,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,21360,-423423.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21360,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,21460,-423197.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21460,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,21561,-423299.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21561,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,21662,-422776.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21662,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,21763,-423494.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21763,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,21863,-423109.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21863,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,21964,-423010.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21964,370.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,21974,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,21974,25.6,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,21974,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,21974,25.54,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,21975,25.63,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,21975,26.42,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,21975,26.03,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,21975,25.73,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,22065,-422728.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22065,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,22166,-422702.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22166,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,22266,-422870.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22266,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,22367,-422652.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22367,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,22468,-423692.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22468,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,22569,-422745.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22569,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,22670,-423337.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22670,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,22770,-423583.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22770,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,22871,-423132.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22871,370.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,22973,25.54,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,22973,25.6,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,22973,25.63,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,22973,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,22973,25.79,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,22973,26.36,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,22973,25.86,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,22973,25.98,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,22973,-423648.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22973,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,23073,-423796.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23073,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,23174,-422903.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23174,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,23275,-423580.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23275,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,23376,-423226.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23376,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,23476,-423205.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23476,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,23577,-422985.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23577,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,23678,-422934.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23678,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,23779,-423275.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23779,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,23880,-424605.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23880,370.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,23971,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,23971,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,23971,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,23971,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,23972,25.8,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,23972,26.29,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,23972,26.04,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,23972,25.97,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,23980,-425478.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23980,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,24081,-426120.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24081,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,24182,-424691.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24182,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,24283,-423457.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24283,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,24383,-422344.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24383,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,24484,-424509.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24484,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,24585,-423470.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24585,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,24685,-424432.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24685,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,24786,-423307.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24786,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,24887,-419462.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24887,368.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,24970,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,24970,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,24970,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,24970,25.580000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,24970,25.85,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,24970,26.29,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,24970,26.1,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,24970,26.03,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,24988,-421185.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24988,371.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,25088,-422960.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25088,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,25189,-424262.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25189,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,25290,-425217.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25290,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,25391,-425287.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25391,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,25491,-425438.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25491,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,25592,-425548.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25592,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,25693,-425274.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25693,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,25793,-428056.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25793,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,25894,-423087.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25894,369.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,25968,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,25968,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,25968,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,25968,25.580000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,25968,25.75,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,25968,26.1,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,25968,26.29,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,25968,25.86,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,25995,-424094.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25995,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,26096,-422461.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26096,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,26196,-417668.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26196,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,26297,-416584.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26297,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,26398,-427241.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26398,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,26499,-424147.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26499,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,26599,-422390.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26599,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,26700,-423469.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26700,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,26801,-422955.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26801,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,26901,-422551.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26901,368.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,26966,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,26966,25.48,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,26966,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,26966,25.63,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,26967,25.69,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,26967,26.2,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,26967,26.41,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,26967,26.17,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,27002,-424216.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27002,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,27103,-424227.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27103,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,27204,-424064.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27204,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,27304,-429407.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27304,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,27405,-424832.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27405,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,27506,-424230.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27506,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,27607,-425817.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27607,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,27707,-424447.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27707,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,27808,-424973.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27808,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,27909,-427295.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27909,364.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,27965,25.53,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,27965,25.580000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,27965,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,27965,25.36,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,27965,25.73,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,27965,26.2,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,27965,26.14,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,27965,26.03,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,28010,-428645.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28010,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,28110,-441484.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28110,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,28211,-449153.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28211,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,28312,-450759.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28312,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,28412,-437463.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28412,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,28513,-424872.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28513,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,28614,-421704.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28614,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,28714,-422731.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28714,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,28815,-422590.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28815,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,28916,-424852.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28916,369.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,28963,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,28963,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,28963,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,28963,25.63,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,28963,25.580000000000002,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,28963,26.35,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,28963,26.14,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,28963,25.92,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,29017,-424304.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29017,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,29117,-425150.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29117,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,29218,-425099.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29218,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,29319,-426128.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29319,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,29419,-424977.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29419,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,29520,-426344.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29520,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,29621,-426660.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29621,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,29722,-426116.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29722,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,29822,-427390.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29822,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,29923,-425215.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29923,368.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,29961,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,29961,25.580000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,29961,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,29961,25.54,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,29961,25.69,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,29961,26.53,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,29961,26.3,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,29961,26.1,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,30024,-426501.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30024,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,30124,-427278.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30124,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,30225,-429230.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30225,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,30326,-430451.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30326,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,30427,-429991.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30427,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,30527,-428770.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30527,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,30628,-428433.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30628,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,30729,-428899.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30729,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,30829,-427232.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30829,370.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,30930,-427184.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30930,589.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,30959,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,30959,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,30959,25.580000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,30959,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,30959,25.92,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,30959,26.53,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,30959,26.2,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,30959,25.97,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,31031,-426896.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31031,2478.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,31131,-426820.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31131,3008.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,31232,-427078.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31232,1380.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,31333,-426807.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31333,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,31433,-425667.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31433,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,31534,-425978.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31534,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,31635,-426049.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31635,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,31735,-426237.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31735,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,31836,-425516.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31836,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,31937,-438446.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31937,365.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,31957,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,31957,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,31957,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,31957,25.54,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,31957,25.75,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,31957,26.48,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,31957,26.17,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,31957,25.97,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,32037,-447015.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32037,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,32138,-449571.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32138,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,32239,-444648.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32239,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,32339,-446520.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32339,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,32440,-447236.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32440,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,32541,-448671.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32541,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,32641,-445442.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32641,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,32742,-445442.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32742,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,32843,-443038.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32843,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,32943,-438291.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32943,364.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,32955,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,32955,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,32955,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,32955,27.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,32955,32.7,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,32955,35.29,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,32955,34.36,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,32955,26.2,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,33044,-437260.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33044,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,33145,-434161.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33145,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,33246,-434133.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33246,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,33346,-439158.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33346,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,33447,-450530.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33447,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,33548,-453680.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33548,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,33648,-450235.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33648,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,33749,-443176.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33749,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,33850,-434781.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33850,366.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,33953,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,33953,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,33953,26.04,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,33953,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,33953,25.75,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,33953,26.36,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,33953,26.23,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,33953,26.23,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,33953,-429737.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33953,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,34053,-434741.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34053,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,34154,-463541.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34154,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,34255,-467837.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34255,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,34355,-458896.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34355,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,34456,-442605.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34456,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,34557,-430500.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34557,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,34657,-435346.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34657,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,34758,-450045.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34758,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,34859,-433259.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34859,365.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,34951,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,34951,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,34951,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,34951,25.63,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,34951,25.85,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,34951,26.35,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,34951,26.3,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,34951,25.91,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,34960,-425326.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34960,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,35060,-421237.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35060,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,35161,-421717.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35161,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,35262,-425370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35262,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,35362,-422308.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35362,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,35463,-396916.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35463,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,35564,-359949.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35564,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,35664,-296285.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35664,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,35765,-316629.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35765,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,35866,-417759.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35866,364.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,35949,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,35949,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,35949,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,35949,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,35949,25.85,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,35949,26.36,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,35949,26.29,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,35949,26.1,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,35966,-422345.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35966,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,36067,-428002.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36067,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,36168,-415149.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36168,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,36268,-389135.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36268,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,36369,-412970.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36369,362.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,36470,-401497.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36470,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,36571,-350363.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36571,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,36671,-343806.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36671,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,36772,-408702.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36772,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,36873,-417196.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36873,365.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,36947,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,36947,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,36947,26.04,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,36947,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,36947,26.1,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,36947,26.35,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,36947,26.29,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,36947,26.17,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,36973,-386282.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36973,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,37074,-321214.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37074,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,37175,-329870.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37175,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,37275,-407301.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37275,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,37376,-414785.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37376,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,37477,-362042.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37477,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,37577,-303326.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37577,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,37678,-405249.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37678,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,37779,-425163.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37779,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,37879,-441573.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37879,365.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,37944,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,37944,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,37944,26.080000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,37944,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,37944,25.98,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,37944,26.23,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,37944,26.3,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,37944,26.14,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,37980,-471707.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37980,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,38081,-579912.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38081,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,38181,-668460.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38181,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,38282,-520133.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38282,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,38383,-456518.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38383,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,38483,-563416.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38483,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,38584,-696140.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38584,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,38685,-617331.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38685,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,38785,-471731.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38785,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,38886,-458665.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38886,366.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,38942,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,38942,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,38942,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,38942,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,38942,25.75,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,38942,26.29,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,38942,26.1,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,38942,25.86,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,38987,-608008.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38987,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,39088,-685960.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39088,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,39188,-534083.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39188,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,39289,-452017.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39289,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,39390,-491521.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39390,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,39490,-637422.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39490,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,39591,-679794.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39591,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,39692,-694804.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39692,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,39792,-587895.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39792,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,39893,-439481.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39893,366.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,39940,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,39940,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,39940,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,39940,25.63,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,39940,25.63,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,39940,26.29,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,39940,26.03,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,39940,26.03,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,39994,-415544.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39994,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,40095,-400044.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40095,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,40195,-383554.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40195,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,40296,-371167.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40296,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,40397,-366065.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40397,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,40498,-378779.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40498,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,40598,-407616.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40598,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,40699,-406731.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40699,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,40800,-380000.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40800,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,40900,-359872.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40900,367.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,40938,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,40938,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,40938,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,40938,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,40939,25.6,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,40939,26.42,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,40939,26.04,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,40939,25.98,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,41001,-381772.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41001,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,41102,-405138.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41102,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,41202,-409168.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41202,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,41303,-410785.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41303,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,41404,-389369.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41404,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,41505,-366591.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41505,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,41605,-361921.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41605,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,41706,-392348.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41706,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,41807,-416275.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41807,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,41908,-432557.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41908,365.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,41937,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,41937,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,41937,25.98,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,41937,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,41937,25.69,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,41937,26.36,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,41937,26.2,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,41937,25.85,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,42008,-453663.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42008,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,42109,-530123.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42109,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,42210,-618494.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42210,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,42310,-645100.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42310,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,42411,-501358.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42411,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,42512,-442734.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42512,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,42612,-471861.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42612,363.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,42713,-568010.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42713,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,42814,-627561.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42814,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,42914,-642832.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42914,367.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,42935,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,42935,25.580000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,42935,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,42935,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,42935,25.67,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,42935,26.2,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,42935,26.14,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,42935,26.23,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,43015,-647259.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43015,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,43116,-643969.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43116,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,43217,-648075.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43217,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,43317,-645801.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43317,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,43418,-645010.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43418,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,43519,-645686.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43519,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,43619,-645475.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43619,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,43720,-642802.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43720,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,43821,-636869.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43821,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,43922,-631643.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43922,366.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,43933,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,43933,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,43933,26.1,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,43933,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,43933,25.79,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,43933,26.36,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,43933,26.26,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,43933,26.04,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,44022,-628534.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44022,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,44123,-624361.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44123,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,44224,-621191.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44224,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,44324,-623548.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44324,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,44425,-628710.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44425,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,44526,-620455.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44526,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,44627,-540370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44627,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,44727,-531649.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44727,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,44828,-591562.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44828,366.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,44931,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,44931,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,44931,25.98,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,44931,25.69,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,44931,25.8,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,44931,26.26,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,44931,26.1,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,44931,26.03,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,44931,-627474.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44931,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,45031,-522723.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45031,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,45132,-439021.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45132,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,45233,-427189.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45233,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,45334,-425100.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45334,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,45434,-424793.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45434,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,45535,-424345.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45535,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,45636,-425086.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45636,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,45736,-424680.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45736,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,45837,-424584.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45837,365.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,45929,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,45929,25.6,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,45929,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,45929,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,45929,25.63,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,45929,26.36,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,45929,26.1,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,45929,25.98,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,45938,-422206.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45938,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,46038,-425493.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46038,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,46139,-425607.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46139,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,46240,-425515.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46240,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,46340,-424994.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46340,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,46441,-425857.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46441,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,46542,-424695.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46542,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,46642,-424905.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46642,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,46743,-424720.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46743,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,46844,-424722.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46844,367.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,46927,25.6,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,46927,25.63,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,46927,25.98,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,46927,25.54,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,46927,25.6,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,46927,26.36,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,46927,26.04,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,46927,26.04,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,46945,-425254.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46945,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,47045,-424812.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47045,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,47146,-424991.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47146,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,47247,-425434.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47247,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,47347,-425288.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47347,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,47448,-424395.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47448,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,47549,-425350.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47549,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,47650,-425457.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47650,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,47750,-425226.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47750,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,47851,-425381.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47851,368.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,47925,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,47925,25.67,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,47925,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,47925,25.75,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,47925,25.63,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,47925,26.41,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,47925,26.26,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,47925,26.26,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,47952,-425380.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47952,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,48052,-424550.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48052,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,48153,-426135.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48153,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,48254,-425786.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48254,371.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,48354,-425551.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48354,375.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,48455,-424788.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48455,378.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,48556,-424709.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48556,376.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,48657,-426371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48657,379.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,48757,-425737.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48757,389.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,48858,-424507.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48858,390.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,48923,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,48923,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,48923,26.17,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,48923,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,48923,25.75,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,48923,26.26,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,48923,26.14,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,48923,26.03,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,48959,-425672.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48959,387.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,49059,-426076.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49059,394.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,49160,-425491.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49160,372.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,49261,-425458.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49261,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,49362,-425049.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49362,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,49462,-426091.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49462,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,49563,-425072.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49563,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,49664,-425002.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49664,364.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,49764,-425636.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49764,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,49865,-424961.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49865,367.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,49921,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,49921,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,49921,25.98,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,49921,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,49921,25.79,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,49921,26.29,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,49921,25.98,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,49921,25.86,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,49966,-425022.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49966,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,50066,-425294.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50066,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,50167,-425760.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50167,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,50268,-425032.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50268,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,50368,-425515.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50368,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,50469,-425841.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50469,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,50570,-425684.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50570,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,50670,-425751.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50670,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,50771,-425454.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50771,368.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,50872,-425184.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50872,368.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,50919,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,50919,25.73,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,50919,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,50919,25.6,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,50919,25.53,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,50919,26.41,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,50919,26.26,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,50919,25.8,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,50973,-425183.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50973,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,51073,-425872.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51073,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,51174,-425177.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51174,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,51274,-426038.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51274,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,51375,-425442.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51375,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,51476,-425470.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51476,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,51576,-425324.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51576,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,51677,-425565.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51677,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,51778,-424411.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51778,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,51878,-426057.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51878,365.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_0,51916,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_1,51916,25.85,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_2,51916,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_3,51916,25.63,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_4,51917,25.63,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_5,51917,26.41,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_6,51917,26.17,0x531,BR_Broker_Temp2,Celcius
+Tire_Temp_7,51917,26.04,0x531,BR_Broker_Temp2,Celcius
+Strain_Gauge,51979,-425484.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51979,369.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,52080,-425654.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52080,366.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,52180,-425450.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52180,365.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,52281,-425298.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52281,363.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,52382,-425746.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52382,367.0,0x538,BR_Broker_Sus,ADC Values
+Strain_Gauge,52482,-425651.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52482,367.0,0x538,BR_Broker_Sus,ADC Values

@@ -12,7 +12,7 @@ def compile_csv(csv_path):
 
     decode_table = {}
 
-    # Open and read the CSV file
+    # Open and read the CSV files
     with open(csv_path, newline="") as f:
         reader = csv.DictReader(f)
 
@@ -27,21 +27,25 @@ def compile_csv(csv_path):
             # 1. Determine the message ID
             # If Message ID is empty, it belongs to the previous message
             if row["Message ID"]:
-                # Finish the previous message (if any)
-                if current_frame_id is not None:
-                    _finalize_message(
-                        decode_table,
-                        current_frame_id,
-                        current_message_name,
-                        current_sender,
-                        current_signals,
-                    )
+                new_frame_id = int(row["Message ID"], 16)
 
-                # Start a new message
-                current_frame_id = int(row["Message ID"], 16)
-                current_message_name = row["Message Name"]
-                current_sender = row.get("Sender")
-                current_signals = []
+                # If same message ID as current, just keep appending signals
+                if new_frame_id != current_frame_id:
+                    # Finish the previous message (if any)
+                    if current_frame_id is not None:
+                        _finalize_message(
+                            decode_table,
+                            current_frame_id,
+                            current_message_name,
+                            current_sender,
+                            current_signals,
+                        )
+
+                    # Start a new message
+                    current_frame_id = new_frame_id
+                    current_message_name = row["Message Name"]
+                    current_sender = row.get("Sender")
+                    current_signals = []
 
             # 2. Create a SignalSpec from the row
             signal_name = row["Signal Name"]

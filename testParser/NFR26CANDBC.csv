@@ -1,0 +1,505 @@
+Message ID,Message Name,Sender,Signal Name,Start Bit,Size (bits),Factor,Offset,Min,Max,Unit,Cycle Time (ms),Data Type,Drive Bus,Data Bus,
+0x2A1,PDM_Current,PDM,Gen_Amps,0,16,0.01,0,0.25,15.5,A,500,float,TRUE,FALSE,
+,PDM_Current,PDM,Front_Fan_Amps,16,8,0.01,0,0.25,15.5,A,500,float,TRUE,FALSE,
+,PDM_Current,PDM,Rear_Fan_Amps,24,8,0.01,0,0.25,15.5,A,500,float,TRUE,FALSE,
+,PDM_Current,PDM,Front_Pump_Amps,32,8,0.01,0,0.25,15.5,A,500,float,TRUE,FALSE,
+,PDM_Current,PDM,Rear_Pump_Amps,40,8,0.01,0,0.25,15.5,A,500,float,TRUE,FALSE,
+0x2A2,PDM_Bat_Volt,PDM,Bat_Volt,0,16,0.01,0,0,16,V,5000,float,TRUE,FALSE,
+,PDM_Bat_Volt,PDM,Low_Bat_Volt_Warning,16,8,1,0,0,1,Bool,5000,bool,TRUE,FALSE,
+,PDM_Bat_Volt,PDM,Danger_Bat_Volt_Warning,24,8,1,0,0,1,Bool,5000,bool,TRUE,FALSE,
+0x28B,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,RPM,0,16,1,0,,,RPM,100,int16_t,TRUE,FALSE,
+,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,Motor_Current,16,16,0.1,0,,,A,100,int16_t,TRUE,FALSE,
+,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,DC_Voltage,32,16,0.1,0,,,V,100,int16_t,TRUE,FALSE,
+,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,DC_Current,48,16,0.1,0,,,A,100,int16_t,TRUE,FALSE,
+0x28C,Front_Right_Inverter_Temp_Status,Front-Right-Inverter,IGBT_Temp,0,16,0.1,0,,,deg C,1000,int16_t,TRUE,FALSE,
+,Front_Right_Inverter_Temp_Status,Front-Right-Inverter,Motor_Temp,16,16,0.1,0,,,deg C,1000,int16_t,TRUE,FALSE,
+0x28D,Front_Right_Inverter_Current_Draw,Front-Right-Inverter,Ah_Drawn,0,16,0.0001,0,,,Ah,100,uint32_t,TRUE,FALSE,
+,Front_Right_Inverter_Current_Draw,Front-Right-Inverter,Ah_Charged,32,32,0.0001,0,,,Ah,100,uint32_t,TRUE,FALSE,
+0x28E,Front_Right_Inverter_Power_Draw,Front-Right-Inverter,Wh_Drawn,0,32,0.001,0,,,Wh,100,uint32_t,TRUE,FALSE,
+,Front_Right_Inverter_Power_Draw,Front-Right-Inverter,Wh_Charged,32,32,0.001,0,,,Wh,100,uint32_t,TRUE,FALSE,
+0x28A,Front_Right_Inverter_Fault_Status,Front-Right-Inverter,Fault_Code,0,8,1,0,,,"0x00: NONE
+0x01: OVER_VOLTAGE
+0x02: UNDER_VOLTAGE
+0x03: DRV_FAULT
+0x04: ABS_OVER_CURRENT
+0x05: OVER_TEMP_FET
+0x06: OVER_TEMP_MOTOR
+0x07: GATE_DRIVER_OVER_VOLTAGE
+0x08: GATE_DRIVER_UNDER_VOLTAGE
+0x09: MCU_UNDER_VOLTAGE
+0x0A: BOOTING_FROM_WATCHDOG_RESET
+0x0B: ENCODER_SPI_FAULT
+0x0C: ENCODER_SINCOS_BELOW_MIN_AMPLITUDE
+0x0D: ENCODER_SINCOS_ABOVE_MAX_AMPLITUDE
+0x0E: FLASH_CORRUPTION
+0x0F: HIGH_OFFSET_CURRENT_SENSOR_1
+0x10: HIGH_OFFSET_CURRENT_SENSOR_2
+0x11: HIGH_OFFSET_CURRENT_SENSOR_3
+0x12: UNBALANCED_CURRENTS
+0x13: BRK_FAULT
+0x14: RESOLVER_LOT
+0x15: RESOLVER_DOS
+0x16: RESOLVER_LOS
+0x17: FLASH_CORRUPTION_APP_CFG
+0x18: FLASH_CORRUPTION_MC_CFG
+0x19: ENCODER_NO_MAGNET
+0x1A: ENCODER_MAGNET_TOO_STRONG
+0x1B: PHASE_FILTER_FAULT",,uint8_t,TRUE,FALSE,
+0x286,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,RPM,0,16,1,0,,,RPM,100,int16_t,TRUE,FALSE,
+,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,Motor_Current,16,16,0.1,0,,,A,100,int16_t,TRUE,FALSE,
+,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,DC_Voltage,32,16,0.1,0,,,V,100,int16_t,TRUE,FALSE,
+,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,DC_Current,48,16,0.1,0,,,A,100,int16_t,TRUE,FALSE,
+0x287,Front_Left_Inverter_Temp_Status,Front-Left-Inverter,IGBT_Temp,0,16,0.1,0,,,deg C,1000,int16_t,TRUE,FALSE,
+,Front_Left_Inverter_Temp_Status,Front-Left-Inverter,Motor_Temp,16,16,0.1,0,,,deg C,1000,int16_t,TRUE,FALSE,
+0x288,Front_Left_Inverter_Current_Draw,Front-Left-Inverter,Ah_Drawn,0,16,0.0001,0,,,Ah,100,uint32_t,TRUE,FALSE,
+,Front_Left_Inverter_Current_Draw,Front-Left-Inverter,Ah_Charged,32,32,0.0001,0,,,Ah,100,uint32_t,TRUE,FALSE,
+0x289,Front_Left_Inverter_Power_Draw,Front-Left-Inverter,Wh_Drawn,0,32,0.001,0,,,Wh,100,uint32_t,TRUE,FALSE,
+,Front_Left_Inverter_Power_Draw,Front-Left-Inverter,Wh_Charged,32,32,0.001,0,,,Wh,100,uint32_t,TRUE,FALSE,
+0x285,Front_Left_Inverter_Fault_Status,Front-Left-Inverter,Fault_Code,0,8,1,0,,,"0x00: NONE
+0x01: OVER_VOLTAGE
+0x02: UNDER_VOLTAGE
+0x03: DRV_FAULT
+0x04: ABS_OVER_CURRENT
+0x05: OVER_TEMP_FET
+0x06: OVER_TEMP_MOTOR
+0x07: GATE_DRIVER_OVER_VOLTAGE
+0x08: GATE_DRIVER_UNDER_VOLTAGE
+0x09: MCU_UNDER_VOLTAGE
+0x0A: BOOTING_FROM_WATCHDOG_RESET
+0x0B: ENCODER_SPI_FAULT
+0x0C: ENCODER_SINCOS_BELOW_MIN_AMPLITUDE
+0x0D: ENCODER_SINCOS_ABOVE_MAX_AMPLITUDE
+0x0E: FLASH_CORRUPTION
+0x0F: HIGH_OFFSET_CURRENT_SENSOR_1
+0x10: HIGH_OFFSET_CURRENT_SENSOR_2
+0x11: HIGH_OFFSET_CURRENT_SENSOR_3
+0x12: UNBALANCED_CURRENTS
+0x13: BRK_FAULT
+0x14: RESOLVER_LOT
+0x15: RESOLVER_DOS
+0x16: RESOLVER_LOS
+0x17: FLASH_CORRUPTION_APP_CFG
+0x18: FLASH_CORRUPTION_MC_CFG
+0x19: ENCODER_NO_MAGNET
+0x1A: ENCODER_MAGNET_TOO_STRONG
+0x1B: PHASE_FILTER_FAULT",,uint8_t,TRUE,FALSE,
+0x281,Rear_Inverter_Motor_Status,Rear Inverter,RPM,0,16,1,0,,,RPM,100,int16_t,TRUE,FALSE,
+,Rear_Inverter_Motor_Status,Rear Inverter,Motor_Current,16,16,0.1,0,,,A,100,int16_t,TRUE,FALSE,
+,Rear_Inverter_Motor_Status,Rear Inverter,DC_Voltage,32,16,0.1,0,,,V,100,int16_t,TRUE,FALSE,
+,Rear_Inverter_Motor_Status,Rear Inverter,DC_Current,48,16,0.1,0,,,A,100,int16_t,TRUE,FALSE,
+0x282,Rear_Inverter_Temp_Status,Rear Inverter,IGBT_Temp,0,16,0.1,0,,,deg C,1000,int16_t,TRUE,FALSE,
+,Rear_Inverter_Temp_Status,Rear Inverter,Motor_Temp,16,16,0.1,0,,,deg C,1000,int16_t,TRUE,FALSE,
+0x283,Rear_Inverter_Current_Draw,Rear Inverter,Ah_Drawn,0,16,0.0001,0,,,Ah,100,uint32_t,TRUE,FALSE,
+,Rear_Inverter_Current_Draw,Rear Inverter,Ah_Charged,32,32,0.0001,0,,,Ah,100,uint32_t,TRUE,FALSE,
+0x284,Rear_Inverter_Power_Draw,Rear Inverter,Wh_Drawn,0,32,0.001,0,,,Wh,100,uint32_t,TRUE,FALSE,
+,Rear_Inverter_Power_Draw,Rear Inverter,Wh_Charged,32,32,0.001,0,,,Wh,100,uint32_t,TRUE,FALSE,
+0x280,Rear_Inverter_Fault_Status,Rear Inverter,Fault_Code,0,8,1,0,,,"0x00: NONE
+0x01: OVER_VOLTAGE
+0x02: UNDER_VOLTAGE
+0x03: DRV_FAULT
+0x04: ABS_OVER_CURRENT
+0x05: OVER_TEMP_FET
+0x06: OVER_TEMP_MOTOR
+0x07: GATE_DRIVER_OVER_VOLTAGE
+0x08: GATE_DRIVER_UNDER_VOLTAGE
+0x09: MCU_UNDER_VOLTAGE
+0x0A: BOOTING_FROM_WATCHDOG_RESET
+0x0B: ENCODER_SPI_FAULT
+0x0C: ENCODER_SINCOS_BELOW_MIN_AMPLITUDE
+0x0D: ENCODER_SINCOS_ABOVE_MAX_AMPLITUDE
+0x0E: FLASH_CORRUPTION
+0x0F: HIGH_OFFSET_CURRENT_SENSOR_1
+0x10: HIGH_OFFSET_CURRENT_SENSOR_2
+0x11: HIGH_OFFSET_CURRENT_SENSOR_3
+0x12: UNBALANCED_CURRENTS
+0x13: BRK_FAULT
+0x14: RESOLVER_LOT
+0x15: RESOLVER_DOS
+0x16: RESOLVER_LOS
+0x17: FLASH_CORRUPTION_APP_CFG
+0x18: FLASH_CORRUPTION_MC_CFG
+0x19: ENCODER_NO_MAGNET
+0x1A: ENCODER_MAGNET_TOO_STRONG
+0x1B: PHASE_FILTER_FAULT",,uint8_t,TRUE,FALSE,
+0x20D,ECU_Set_Current_Front_Left_Inverter,ECU,Set_Current,0,32,0.001,0,0,50,A,,int32_t,TRUE,FALSE,
+0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,ECU,Set_Current_Brake,0,32,0.001,0,0,50,A,,int32_t,TRUE,FALSE,
+0x20F,ECU_Set_Current_Front_Right_Inverter,ECU,Set_Current,0,32,0.001,0,0,50,A,,int32_t,TRUE,FALSE,
+0x210,ECU_Set_Current_Brake_Front_Right_Inverter,ECU,Set_Current_Brake,0,32,0.001,0,0,50,A,,int32_t,TRUE,FALSE,
+0x200,ECU_Set_Current_Rear_Inverter,ECU,Set_Current,0,32,0.001,0,0,360,A,,int32_t,TRUE,FALSE,
+0x201,ECU_Set_Current_Brake_Rear_Inverter,ECU,Set_Current_Brake,0,32,0.001,0,0,360,A,,int32_t,TRUE,FALSE,
+0x202,ECU_Throttle,ECU,APPS1_Throttle,0,16,1,0,0,2047,,100,int16_t,TRUE,FALSE,
+,ECU_Throttle,ECU,APPS2_Throttle,16,16,1,0,0,2047,,100,int16_t,TRUE,FALSE,
+0x203,ECU_Brake,ECU,Front_Brake_Pressure,0,16,1,0,0,32767,,100,int16_t,TRUE,FALSE,
+,ECU_Brake,ECU,Rear_Brake_Pressure,16,16,1,0,0,32767,,100,int16_t,TRUE,FALSE,
+,ECU_Brake,ECU,Brake_Pressed,32,8,1,0,0,1,,100,bool,TRUE,FALSE,
+0x204,ECU_Implausibility,ECU,Implausibility_Present,0,8,1,0,0,1,,100,bool,TRUE,FALSE,
+,ECU_Implausibility,ECU,APPSs_Disagreement_Imp,8,8,1,0,0,1,,100,bool,TRUE,FALSE,
+,ECU_Implausibility,ECU,BPPC_Imp,16,8,1,0,0,1,,100,bool,TRUE,FALSE,
+,ECU_Implausibility,ECU,Brake_Invalid_Imp,24,8,1,0,0,1,,100,bool,TRUE,FALSE,
+,ECU_Implausibility,ECU,APPSs_Invalid_Imp,32,8,1,0,0,1,,100,bool,TRUE,FALSE,
+0x205,ECU_BMS_Command_Message,ECU,BMS_Command,0,8,1,0,0,4,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT",10,uint8_t,TRUE,FALSE,
+0x206,ECU_Drive_Status,ECU,Drive_State,0,8,1,0,0,4,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT",10,uint8_t,TRUE,FALSE,
+0x208,ECU_Active_Aero_Command,ECU,Active_Aero_State,0,1,1,0,0,1,"0: Closed
+1: Open",100,bool,TRUE,FALSE,
+,ECU_Active_Aero_Command,ECU,Active_Aero_Position,1,16,1,0,0,360,degrees,100,int16_t,TRUE,FALSE,
+0x209,ECU_Pump_Fan_Command,ECU,Front_Pump_Duty_Cycle,0,8,1,0,0,255,,100,uint8_t,TRUE,FALSE,
+,ECU_Pump_Fan_Command,ECU,Rear_Pump_Duty_Cycle,8,8,1,0,0,255,,100,uint8_t,TRUE,FALSE,
+,ECU_Pump_Fan_Command,ECU,Front_Fan_Duty_Cycle,16,8,1,0,0,255,,100,uint8_t,TRUE,FALSE,
+,ECU_Pump_Fan_Command,ECU,Rear_Fan_Duty_Cycle,24,8,1,0,0,255,,100,uint8_t,TRUE,FALSE,
+0x20A,ECU_LUT_Response,ECU,Accel_LUT_Id_Response,0,8,1,0,,,,,uint8_t,TRUE,FALSE,
+0x20B,ECU_Temp_Limiting_Status,ECU,IGBT_Temp_Limiting,0,1,1,0,0,1,,100,bool,TRUE,FALSE,
+,ECU_Temp_Limiting_Status,ECU,Battery_Temp_Limiting,1,1,1,0,0,1,,100,bool,TRUE,FALSE,
+,ECU_Temp_Limiting_Status,ECU,Motor_Temp_Limiting,2,1,1,0,0,1,,100,bool,TRUE,FALSE,
+0x20C,ECU_Torque_Status,ECU,Torque_Status,0,8,1,0,0,2,"0: ZERO
+1: ACCEL
+2: REGEN",100,uint8_t,TRUE,FALSE,
+0x150,BMS_SOE,BMS,Max_Discharge_Current,0,12,0.1,0,,,A,100,unsigned_float,TRUE,FALSE,
+,BMS_SOE,BMS,Max_Regen_Current,12,12,0.1,0,,,A,100,unsigned_float,TRUE,FALSE,
+,BMS_SOE,BMS,Battery_Voltage,24,16,0.01,0,,,V,100,unsigned_float,TRUE,FALSE,
+,BMS_SOE,BMS,Battery_Temperature,40,8,1,-40,,,C,100,unsigned_float,TRUE,FALSE,
+,BMS_SOE,BMS,Battery_Current,48,16,0.01,-100,,,A,100,unsigned_float,TRUE,FALSE,
+0x151,BMS_Faults,BMS,InternalFault_Summary,0,1,1,0,,,,100,bool,TRUE,FALSE,
+,BMS_Faults,BMS,External_Fault,1,1,1,0,,,,100,bool,TRUE,FALSE,
+,BMS_Faults,BMS,Undervoltage_Fault,2,1,1,0,,,,100,bool,TRUE,FALSE,
+,BMS_Faults,BMS,Overvoltage_Fault,3,1,1,0,,,,100,bool,TRUE,FALSE,
+,BMS_Faults,BMS,Undertemperature_Fault,4,1,1,0,,,,100,bool,TRUE,FALSE,
+,BMS_Faults,BMS,Overtemperature_Fault,5,1,1,0,,,,100,bool,TRUE,FALSE,
+,BMS_Faults,BMS,Overcurrent_Fault,6,1,1,0,,,,100,bool,TRUE,FALSE,
+,BMS_Faults,BMS,Open_Wire_Fault,7,1,1,0,,,,100,bool,TRUE,FALSE,
+,BMS_Faults,BMS,Open_Wire_Temp_Fault,8,1,1,0,,,,100,bool,FALSE,FALSE,Not working
+,BMS_Faults,BMS,Pec_Fault,9,1,1,0,,,,100,bool,TRUE,FALSE,Not working
+,BMS_Faults,BMS,Total_PEC_Failures,10,8,1,0,,,,100,uint8_t,TRUE,FALSE,Not working
+0x152,BMS_Status,BMS,BMS_State,0,8,1,0,,,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4",100,uint8_t,TRUE,FALSE,
+,BMS_Status,BMS,IMD_State,8,8,1,0,,,State of the IMD. High is Healthy ,100,uint8_t,TRUE,FALSE,
+,BMS_Status,BMS,Max_Cell_Temp,16,8,1,-40,,,C,100,unsigned_float,TRUE,FALSE,
+,BMS_Status,BMS,Min_Cell_Temp,24,8,1,-40,,,C,100,unsigned_float,TRUE,FALSE,
+,BMS_Status,BMS,Max_Cell_Voltage,32,8,0.012,2,,,V,100,unsigned_float,TRUE,FALSE,
+,BMS_Status,BMS,Min_Cell_Voltage,40,8,0.012,2,,,V,100,unsigned_float,TRUE,FALSE,
+,BMS_Status,BMS,BMS_SOC,48,8,0.004,0,,,,100,unsigned_float,TRUE,FALSE,
+0x153,BMS_Voltages_0,BMS,Cell_V_0,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_0,BMS,Cell_V_1,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_0,BMS,Cell_V_2,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_0,BMS,Cell_V_3,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_0,BMS,Cell_V_4,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_0,BMS,Cell_V_5,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_0,BMS,Cell_V_6,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_0,BMS,Cell_OCV_Offset_0,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x154,BMS_Voltages_1,BMS,Cell_V_7,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_1,BMS,Cell_V_8,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_1,BMS,Cell_V_9,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_1,BMS,Cell_V_10,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_1,BMS,Cell_V_11,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_1,BMS,Cell_V_12,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_1,BMS,Cell_V_13,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_1,BMS,Cell_OCV_Offset_1,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x155,BMS_Voltages_2,BMS,Cell_V_14,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_2,BMS,Cell_V_15,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_2,BMS,Cell_V_16,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_2,BMS,Cell_V_17,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_2,BMS,Cell_V_18,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_2,BMS,Cell_V_19,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_2,BMS,Cell_V_20,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_2,BMS,Cell_OCV_Offset_2,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x156,BMS_Voltages_3,BMS,Cell_V_21,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_3,BMS,Cell_V_22,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_3,BMS,Cell_V_23,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_3,BMS,Cell_V_24,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_3,BMS,Cell_V_25,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_3,BMS,Cell_V_26,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_3,BMS,Cell_V_27,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_3,BMS,Cell_OCV_Offset_3,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x157,BMS_Voltages_4,BMS,Cell_V_28,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_4,BMS,Cell_V_29,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_4,BMS,Cell_V_30,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_4,BMS,Cell_V_31,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_4,BMS,Cell_V_32,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_4,BMS,Cell_V_33,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_4,BMS,Cell_V_34,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_4,BMS,Cell_OCV_Offset_4,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x158,BMS_Voltages_5,BMS,Cell_V_35,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_5,BMS,Cell_V_36,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_5,BMS,Cell_V_37,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_5,BMS,Cell_V_38,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_5,BMS,Cell_V_39,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_5,BMS,Cell_V_40,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_5,BMS,Cell_V_41,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_5,BMS,Cell_OCV_Offset_5,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x159,BMS_Voltages_6,BMS,Cell_V_42,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_6,BMS,Cell_V_43,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_6,BMS,Cell_V_44,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_6,BMS,Cell_V_45,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_6,BMS,Cell_V_46,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_6,BMS,Cell_V_47,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_6,BMS,Cell_V_48,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_6,BMS,Cell_OCV_Offset_6,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x15A,BMS_Voltages_7,BMS,Cell_V_49,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_7,BMS,Cell_V_50,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_7,BMS,Cell_V_51,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_7,BMS,Cell_V_52,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_7,BMS,Cell_V_53,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_7,BMS,Cell_V_54,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_7,BMS,Cell_V_55,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_7,BMS,Cell_OCV_Offset_7,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x15B,BMS_Voltages_8,BMS,Cell_V_56,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_8,BMS,Cell_V_57,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_8,BMS,Cell_V_58,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_8,BMS,Cell_V_59,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_8,BMS,Cell_V_60,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_8,BMS,Cell_V_61,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_8,BMS,Cell_V_62,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_8,BMS,Cell_OCV_Offset_8,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x15C,BMS_Voltages_9,BMS,Cell_V_63,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_9,BMS,Cell_V_64,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_9,BMS,Cell_V_65,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_9,BMS,Cell_V_66,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_9,BMS,Cell_V_67,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_9,BMS,Cell_V_68,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_9,BMS,Cell_V_69,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_9,BMS,Cell_OCV_Offset_9,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x15D,BMS_Voltages_10,BMS,Cell_V_70,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_10,BMS,Cell_V_71,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_10,BMS,Cell_V_72,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_10,BMS,Cell_V_73,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_10,BMS,Cell_V_74,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_10,BMS,Cell_V_75,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_10,BMS,Cell_V_76,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_10,BMS,Cell_OCV_Offset_10,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x15E,BMS_Voltages_11,BMS,Cell_V_77,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_11,BMS,Cell_V_78,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_11,BMS,Cell_V_79,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_11,BMS,Cell_V_80,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_11,BMS,Cell_V_81,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_11,BMS,Cell_V_82,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_11,BMS,Cell_V_83,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_11,BMS,Cell_OCV_Offset_11,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x15F,BMS_Voltages_12,BMS,Cell_V_84,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_12,BMS,Cell_V_85,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_12,BMS,Cell_V_86,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_12,BMS,Cell_V_87,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_12,BMS,Cell_V_88,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_12,BMS,Cell_V_89,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_12,BMS,Cell_V_90,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_12,BMS,Cell_OCV_Offset_12,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x160,BMS_Voltages_13,BMS,Cell_V_91,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_13,BMS,Cell_V_92,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_13,BMS,Cell_V_93,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_13,BMS,Cell_V_94,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_13,BMS,Cell_V_95,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_13,BMS,Cell_V_96,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_13,BMS,Cell_V_97,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_13,BMS,Cell_OCV_Offset_13,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x161,BMS_Voltages_14,BMS,Cell_V_98,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_14,BMS,Cell_V_99,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_14,BMS,Cell_V_100,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_14,BMS,Cell_V_101,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_14,BMS,Cell_V_102,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_14,BMS,Cell_V_103,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_14,BMS,Cell_V_104,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_14,BMS,Cell_OCV_Offset_14,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x162,BMS_Voltages_15,BMS,Cell_V_105,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_15,BMS,Cell_V_106,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_15,BMS,Cell_V_107,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_15,BMS,Cell_V_108,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_15,BMS,Cell_V_109,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_15,BMS,Cell_V_110,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_15,BMS,Cell_V_111,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_15,BMS,Cell_OCV_Offset_15,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x163,BMS_Voltages_16,BMS,Cell_V_112,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_16,BMS,Cell_V_113,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_16,BMS,Cell_V_114,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_16,BMS,Cell_V_115,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_16,BMS,Cell_V_116,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_16,BMS,Cell_V_117,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_16,BMS,Cell_V_118,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_16,BMS,Cell_OCV_Offset_16,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x164,BMS_Voltages_17,BMS,Cell_V_119,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_17,BMS,Cell_V_120,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_17,BMS,Cell_V_121,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_17,BMS,Cell_V_122,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_17,BMS,Cell_V_123,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_17,BMS,Cell_V_124,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_17,BMS,Cell_V_125,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_17,BMS,Cell_OCV_Offset_17,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x165,BMS_Voltages_18,BMS,Cell_V_126,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_18,BMS,Cell_V_127,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_18,BMS,Cell_V_128,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_18,BMS,Cell_V_129,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_18,BMS,Cell_V_130,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_18,BMS,Cell_V_131,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_18,BMS,Cell_V_132,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_18,BMS,Cell_OCV_Offset_18,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x166,BMS_Voltages_19,BMS,Cell_V_133,0,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_19,BMS,Cell_V_134,8,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_19,BMS,Cell_V_135,16,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_19,BMS,Cell_V_136,24,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_19,BMS,Cell_V_137,32,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_19,BMS,Cell_V_138,40,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_19,BMS,Cell_V_139,48,8,0.012,2,,,V,,unsigned_float,TRUE,FALSE,
+,BMS_Voltages_19,BMS,Cell_OCV_Offset_19,56,8,0.004,0,,,V,,unsigned_float,TRUE,FALSE,
+0x167,BMS_Temperatures_0,BMS,Cell_T_0,0,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_0,BMS,Cell_T_1,8,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_0,BMS,Cell_T_2,16,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_0,BMS,Cell_T_3,24,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_0,BMS,Cell_T_4,32,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_0,BMS,Cell_T_5,40,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_0,BMS,Cell_T_6,48,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_0,BMS,Cell_T_7,56,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+0x168,BMS_Temperatures_1,BMS,Cell_T_8,0,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_1,BMS,Cell_T_9,8,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_1,BMS,Cell_T_10,16,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_1,BMS,Cell_T_11,24,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_1,BMS,Cell_T_12,32,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_1,BMS,Cell_T_13,40,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_1,BMS,Cell_T_14,48,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_1,BMS,Cell_T_15,56,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+0x169,BMS_Temperatures_2,BMS,Cell_T_16,0,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_2,BMS,Cell_T_17,8,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_2,BMS,Cell_T_18,16,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_2,BMS,Cell_T_19,24,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_2,BMS,Cell_T_20,32,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_2,BMS,Cell_T_21,40,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_2,BMS,Cell_T_22,48,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_2,BMS,Cell_T_23,56,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+0x16A,BMS_Temperatures_3,BMS,Cell_T_24,0,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_3,BMS,Cell_T_25,8,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_3,BMS,Cell_T_26,16,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_3,BMS,Cell_T_27,24,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_3,BMS,Cell_T_28,32,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_3,BMS,Cell_T_29,40,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_3,BMS,Cell_T_30,48,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_3,BMS,Cell_T_31,56,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+0x16B,BMS_Temperatures_4,BMS,Cell_T_32,0,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_4,BMS,Cell_T_33,8,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_4,BMS,Cell_T_34,16,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_4,BMS,Cell_T_35,24,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_4,BMS,Cell_T_36,32,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_4,BMS,Cell_T_37,40,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_4,BMS,Cell_T_38,48,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_4,BMS,Cell_T_39,56,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+0x16C,BMS_Temperatures_5,BMS,Cell_T_40,0,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_5,BMS,Cell_T_41,8,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_5,BMS,Cell_T_42,16,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_5,BMS,Cell_T_43,24,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_5,BMS,Cell_T_44,32,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_5,BMS,Cell_T_45,40,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_5,BMS,Cell_T_46,48,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_5,BMS,Cell_T_47,56,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+0x16D,BMS_Temperatures_6,BMS,Cell_T_48,0,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_6,BMS,Cell_T_49,8,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_6,BMS,Cell_T_50,16,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_6,BMS,Cell_T_51,24,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_6,BMS,Cell_T_52,32,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_6,BMS,Cell_T_53,40,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_6,BMS,Cell_T_54,48,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_6,BMS,Cell_T_55,56,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+0x16E,BMS_Temperatures_7,BMS,Cell_T_56,0,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_7,BMS,Cell_T_57,8,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_7,BMS,Cell_T_58,16,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_7,BMS,Cell_T_59,24,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_7,BMS,Cell_T_60,32,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_7,BMS,Cell_T_61,40,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_7,BMS,Cell_T_62,48,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_7,BMS,Cell_T_63,56,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+0x16F,BMS_Temperatures_8,BMS,Cell_T_64,0,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_8,BMS,Cell_T_65,8,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_8,BMS,Cell_T_66,16,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_8,BMS,Cell_T_67,24,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_8,BMS,Cell_T_68,32,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_8,BMS,Cell_T_69,40,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_8,BMS,Cell_T_70,48,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_8,BMS,Cell_T_71,56,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+0x170,BMS_Temperatures_9,BMS,Cell_T_72,0,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_9,BMS,Cell_T_73,8,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_9,BMS,Cell_T_74,16,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_9,BMS,Cell_T_75,24,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_9,BMS,Cell_T_76,32,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_9,BMS,Cell_T_77,40,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_9,BMS,Cell_T_78,48,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+,BMS_Temperatures_9,BMS,Cell_T_79,56,8,1,-40,,,C,,unsigned_float,TRUE,FALSE,
+0x004,CAN2USB_Controller_Error,CAN2USB Error Frame,Controller_Error,0,64,1,0,,,"Controller errors (data[1]):
+0x00: CAN_ERR_CRTL_UNSPEC /* unspecified */
+0x01: CAN_ERR_CRTL_RX_OVERFLOW /* RX buffer overflow */
+0x02: CAN_ERR_CRTL_TX_OVERFLOW /* TX buffer overflow */
+0x04: CAN_ERR_CRTL_RX_WARNING /* reached warning level for RX errors */
+0x08: CAN_ERR_CRTL_TX_WARNING /* reached warning level for TX errors */
+0x10: CAN_ERR_CRTL_RX_PASSIVE /* reached error passive status RX */
+0x20: CAN_ERR_CRTL_TX_PASSIVE /* reached error passive status TX */
+0x40: CAN_ERR_CRTL_ACTIVE /* recovered to error active state */",,uint64_t,TRUE,TRUE,
+0x024,CAN2USB_Controller_Error_NACK_Error,CAN2USB Error Frame,Controller_Error_NACK,0,64,1,0,,,"Controller errors (data[1]):
+0x00: CAN_ERR_CRTL_UNSPEC /* unspecified */
+0x01: CAN_ERR_CRTL_RX_OVERFLOW /* RX buffer overflow */
+0x02: CAN_ERR_CRTL_TX_OVERFLOW /* TX buffer overflow */
+0x04: CAN_ERR_CRTL_RX_WARNING /* reached warning level for RX errors */
+0x08: CAN_ERR_CRTL_TX_WARNING /* reached warning level for TX errors */
+0x10: CAN_ERR_CRTL_RX_PASSIVE /* reached error passive status RX */
+0x20: CAN_ERR_CRTL_TX_PASSIVE /* reached error passive status TX */
+0x40: CAN_ERR_CRTL_ACTIVE /* recovered to error active state */",,uint64_t,TRUE,TRUE,
+0x00C,CAN2USB_Controller_Error_Protocol_Violation,CAN2USB Error Frame,Controller_Error_Protocol_Violation,0,64,1,0,,,"Controller errors (data[1]):
+0x00: CAN_ERR_CRTL_UNSPEC /* unspecified */
+0x01: CAN_ERR_CRTL_RX_OVERFLOW /* RX buffer overflow */
+0x02: CAN_ERR_CRTL_TX_OVERFLOW /* TX buffer overflow */
+0x04: CAN_ERR_CRTL_RX_WARNING /* reached warning level for RX errors */
+0x08: CAN_ERR_CRTL_TX_WARNING /* reached warning level for TX errors */
+0x10: CAN_ERR_CRTL_RX_PASSIVE /* reached error passive status RX */
+0x20: CAN_ERR_CRTL_TX_PASSIVE /* reached error passive status TX */
+0x40: CAN_ERR_CRTL_ACTIVE /* recovered to error active state */
+
+Protocol violation error types (data[2]):
+0x00: CAN_ERR_PROT_UNSPEC /* unspecified */
+0x01: CAN_ERR_PROT_BIT /* single bit error */
+0x02: CAN_ERR_PROT_FORM  /* frame format error */
+0x04: CAN_ERR_PROT_STUFF /* bit stuffing error */
+0x08: CAN_ERR_PROT_BIT0 /* unable to send dominant bit */
+0x10: CAN_ERR_PROT_BIT1 /* unable to send recessive bit */
+0x20: CAN_ERR_PROT_OVERLOAD /* bus overload */
+0x40: CAN_ERR_PROT_ACTIVE /* active error announcement */
+0x80: CAN_ERR_PROT_TX /* error occurred on transmission */
+
+Protocol violation error locations (data[3]):
+0x00: CAN_ERR_PROT_LOC_UNSPEC /* unspecified */
+0x03: CAN_ERR_PROT_LOC_SOF /* start of frame */
+0x02: CAN_ERR_PROT_LOC_ID28_21 /* ID bits 28 - 21 (SFF: 10 - 3) */
+0x06: CAN_ERR_PROT_LOC_ID20_18 /* ID bits 20 - 18 (SFF: 2 - 0 )*/
+0x04: CAN_ERR_PROT_LOC_SRTR /* substitute RTR (SFF: RTR) */
+0x05: CAN_ERR_PROT_LOC_IDE /* identifier extension */
+0x07: CAN_ERR_PROT_LOC_ID17_13 /* ID bits 17-13 */
+0x0F: CAN_ERR_PROT_LOC_ID12_05 /* ID bits 12-5 */
+0x0E: CAN_ERR_PROT_LOC_ID04_00 /* ID bits 4-0 */
+0x0C: CAN_ERR_PROT_LOC_RTR /* RTR */
+0x0D: CAN_ERR_PROT_LOC_RES1 /* reserved bit 1 */
+0x09: CAN_ERR_PROT_LOC_RES0 /* reserved bit 0 */
+0x0B: CAN_ERR_PROT_LOC_DLC /* data length code */
+0x0A:  CAN_ERR_PROT_LOC_DATA /* data section */
+0x08: CAN_ERR_PROT_LOC_CRC_SEQ /* CRC sequence */
+0x18: CAN_ERR_PROT_LOC_CRC_DEL /* CRC delimiter */
+0x19: CAN_ERR_PROT_LOC_ACK /* ACK slot */
+0x1B: CAN_ERR_PROT_LOC_ACK_DEL /* ACK delimiter */
+0x1A: CAN_ERR_PROT_LOC_EOF /* end of frame */
+0x12: CAN_ERR_PROT_LOC_INTERM /* intermission */",,uint64_t,TRUE,TRUE,
+0x540,IMU_Acceleration_Uncompensated,DAQ-IMU,X_Axis_Acceleration_Uncompensated,0,21,0.0001,0,-160,160,m/s^2,10,float,,,
+,IMU_Acceleration_Uncompensated,DAQ-IMU,Y_Axis_Acceleration_Uncompensated,21,21,0.0001,0,-160,160,m/s^2,10,float,,,
+,IMU_Acceleration_Uncompensated,DAQ-IMU,Z_Axis_Acceleration_Uncompensated,42,21,0.0001,0,-160,160,m/s^2,10,float,,,
+0x510,Dashboard_Heartbeat,DAQ-Dashboard,Heartbeat_Count,0,64,1,0,0,0,Beats,,uint64_t,,,
+0x530,BR_Broker_Temp1,DAQ-BR-Wheel,Tire_Temp_0,0,16,0.01,0,0,60,Celcius,1000,float,,,
+0x530,BR_Broker_Temp1,DAQ-BR-Wheel,Tire_Temp_1,16,16,0.01,0,0,60,Celcius,1000,float,,,
+0x530,BR_Broker_Temp1,DAQ-BR-Wheel,Tire_Temp_2,32,16,0.01,0,0,60,Celcius,1000,float,,,
+0x530,BR_Broker_Temp1,DAQ-BR-Wheel,Tire_Temp_3,48,16,0.01,0,0,60,Celcius,1000,float,,,
+0x531,BR_Broker_Temp2,DAQ-BR-Wheel,Tire_Temp_4,0,16,0.01,0,0,60,Celcius,1000,float,,,
+0x531,BR_Broker_Temp2,DAQ-BR-Wheel,Tire_Temp_5,16,16,0.01,0,0,60,Celcius,1000,float,,,
+0x531,BR_Broker_Temp2,DAQ-BR-Wheel,Tire_Temp_6,32,16,0.01,0,0,60,Celcius,1000,float,,,
+0x531,BR_Broker_Temp2,DAQ-BR-Wheel,Tire_Temp_7,48,16,0.01,0,0,60,Celcius,1000,float,,,
+0x538,BR_Broker_Sus,DAQ-BR-Wheel,Strain_Gauge,0,32,1,0,-8388608,8388607,ADC Values,10,int32_t,,,
+0x538,BR_Broker_Sus,DAQ-BR-Wheel,Sus_Pot,32,32,1,0,0,4095,ADC Values,10,uint32_t,,,

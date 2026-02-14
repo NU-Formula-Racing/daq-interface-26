@@ -1,0 +1,1175 @@
+signal_name,timestamp_ms,value,message_id,message_name,unit
+Sus_Pot,197,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,298,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,399,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,499,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,600,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,701,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,802,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,903,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,1001,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,1001,25.86,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,1004,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1104,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1205,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1306,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1407,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1508,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1609,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1709,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1810,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,1911,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,2000,26.04,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,2000,25.98,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,2012,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2113,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2213,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2314,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2415,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2516,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2617,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2717,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2818,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,2919,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,2999,26.1,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,2999,26.04,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,3020,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3121,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3222,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3322,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3423,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3524,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3625,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3726,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3827,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,3927,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,3998,26.23,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,3999,25.92,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,4028,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4129,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4230,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4331,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4431,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4532,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4633,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4734,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4835,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,4935,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,4997,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,4998,26.14,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,5036,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5137,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5238,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5338,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5439,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5540,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5641,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5741,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5842,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,5943,369.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,5996,26.17,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,5996,26.23,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,6044,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6144,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6245,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6346,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6447,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6548,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6648,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6749,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6850,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,6951,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,6995,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,6995,25.92,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,7052,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7152,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7253,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7354,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7455,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7556,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7656,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7757,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7858,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,7959,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,7994,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,7994,26.03,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,8060,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8160,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8261,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8362,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8463,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8564,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8664,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8765,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8866,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,8967,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,8993,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,8993,26.03,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,9067,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9168,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9269,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9370,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9470,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9571,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9672,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9773,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9873,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,9974,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,9991,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,9992,26.17,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,10075,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10176,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10276,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10377,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10478,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10579,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10680,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10780,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10881,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,10982,371.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,10990,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,10990,26.23,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,11083,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11183,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11284,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11385,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11486,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11586,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11687,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11788,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,11889,369.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,11989,25.98,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,11989,26.03,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,11990,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12090,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12191,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12292,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12393,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12494,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12594,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12695,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12796,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,12897,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,12988,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,12988,26.1,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,12997,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13098,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13199,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13300,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13401,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13501,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13602,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13703,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13804,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,13905,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,13987,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,13987,26.23,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,14005,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14106,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14207,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14308,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14408,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14610,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14711,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14812,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,14912,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,14985,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,14986,26.2,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,15013,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15114,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15215,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15316,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15416,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15517,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15618,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15718,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15819,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,15920,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,15984,26.17,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,15984,26.17,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,16021,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16122,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16222,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16323,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16424,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16525,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16625,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16726,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16827,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,16928,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,16983,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,16983,25.98,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,17029,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17130,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17230,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17331,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17432,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17533,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17634,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17734,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17835,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,17936,371.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,17982,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,17982,26.14,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,18037,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18137,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18238,369.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18339,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18440,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18540,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18641,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18742,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18843,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,18944,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,18981,26.080000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,18981,26.080000000000002,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,19044,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19145,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19246,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19347,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19447,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19548,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19649,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19750,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19851,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,19951,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,19980,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,19980,26.14,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,20052,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20153,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20254,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20355,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20456,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20556,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20657,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20758,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20859,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,20960,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,20979,26.080000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,20979,26.29,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,21061,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21161,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21262,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21363,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21464,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21565,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21665,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21766,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21867,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,21968,371.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,21978,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,21978,26.14,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,22069,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22169,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22270,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22371,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22472,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22573,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22673,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22774,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,22875,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,22977,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,22977,26.35,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,22977,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23078,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23178,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23279,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23380,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23481,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23582,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23682,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23783,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,23884,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,23976,26.14,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,23976,26.14,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,23985,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24086,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24187,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24287,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24388,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24489,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24590,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24691,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24791,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,24892,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,24975,26.2,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,24975,26.080000000000002,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,24993,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25094,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25195,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25295,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25396,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25497,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25598,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25699,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25799,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,25900,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,25974,26.14,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,25974,26.2,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,26001,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26102,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26203,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26303,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26404,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26606,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26707,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26808,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,26908,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,26973,26.23,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,26974,26.14,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,27009,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27110,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27211,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27312,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27413,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27513,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27614,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27715,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27816,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,27917,374.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,27973,26.23,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,27973,26.23,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,28017,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28118,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28219,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28320,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28421,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28521,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28622,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28723,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28824,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,28925,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,28972,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,28972,26.36,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,29026,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29126,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29227,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29328,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29429,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29530,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29630,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29731,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29832,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,29933,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,29971,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,29971,26.2,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,30034,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30135,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30235,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30336,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30437,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30538,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30639,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30740,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30840,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,30941,375.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,30970,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,30970,26.080000000000002,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,31042,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31143,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31243,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31344,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31445,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31546,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31646,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31747,369.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31848,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,31949,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,31969,26.17,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,31969,26.04,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,32050,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32150,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32251,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32352,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32452,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32553,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32654,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32755,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32855,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,32956,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,32967,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,32968,26.26,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,33057,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33158,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33259,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33359,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33460,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33561,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33662,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33762,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,33863,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,33966,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,33966,26.1,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,33966,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34067,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34167,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34268,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34369,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34469,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34570,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34671,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34772,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,34873,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,34964,26.36,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,34965,26.04,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,34973,369.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35074,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35175,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35275,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35376,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35477,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35577,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35678,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35779,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,35880,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,35963,26.1,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,35963,26.2,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,35980,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36081,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36182,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36282,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36383,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36484,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36585,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36685,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36786,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,36887,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,36961,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,36961,26.26,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,36987,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37088,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37189,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37290,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37390,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37491,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37592,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37692,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37793,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,37894,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,37959,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,37959,26.04,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,37995,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38095,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38196,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38297,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38397,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38498,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38599,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38700,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38800,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,38901,371.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,38957,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,38957,26.2,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,39002,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39102,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39203,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39304,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39405,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39505,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39606,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39707,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39808,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,39908,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,39955,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,39956,26.080000000000002,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,40009,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40110,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40210,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40311,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40412,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40513,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40613,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40714,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40815,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,40916,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,40954,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,40954,26.17,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,41016,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41117,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41218,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41319,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41419,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41520,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41621,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41721,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41822,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,41923,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,41952,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,41952,26.17,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,42024,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42124,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42225,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42326,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42426,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42527,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42628,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42728,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42829,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,42930,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,42950,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,42950,26.3,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,43030,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43131,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43232,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43333,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43433,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43534,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43635,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43735,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43836,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,43937,371.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,43948,25.98,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,43948,26.36,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,44038,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44138,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44239,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44340,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44441,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44541,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44642,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44743,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,44844,370.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,44947,26.04,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,44947,26.26,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,44947,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45047,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45148,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45249,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45349,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45450,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45551,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45652,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45753,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,45853,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,45945,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,45945,26.080000000000002,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,45954,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46055,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46155,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46256,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46357,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46458,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46558,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46659,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46760,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,46860,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,46943,26.080000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,46944,26.2,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,46961,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47062,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47163,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47263,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47364,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47465,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47565,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47666,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47767,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,47867,370.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,47941,25.79,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,47942,26.03,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,47968,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48069,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48170,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48270,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48371,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48472,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48573,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48673,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48774,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,48875,374.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,48940,26.2,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,48940,26.1,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,48976,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49076,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49177,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49278,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49379,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49479,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49580,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49681,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49782,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,49882,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,49938,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,49939,26.35,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,49983,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50084,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50185,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50285,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50386,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50487,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50588,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50688,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50789,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,50890,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,50937,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,50937,25.98,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,50991,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51091,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51192,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51293,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51394,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51494,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51595,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51696,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51797,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,51897,374.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,51935,26.04,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,51936,26.2,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,51998,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52099,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52199,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52300,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52401,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52502,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52602,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52703,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52804,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,52905,371.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,52934,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,52934,26.3,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,53106,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,53207,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,53308,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,53408,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,53509,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,53610,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,53710,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,53811,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,53912,374.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,53932,26.1,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,53932,26.3,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,54013,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,54114,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,54214,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,54315,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,54416,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,54516,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,54617,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,54718,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,54819,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,54919,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,54930,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,54931,26.23,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,55020,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,55121,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,55221,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,55322,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,55423,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,55524,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,55624,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,55725,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,55826,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,55929,26.04,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,55929,26.26,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,55929,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,56029,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,56130,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,56231,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,56331,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,56432,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,56533,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,56634,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,56734,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,56835,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,56927,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,56927,26.1,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,56936,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,57036,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,57137,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,57238,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,57339,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,57439,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,57540,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,57641,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,57741,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,57842,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,57925,26.04,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,57925,25.98,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,57943,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,58043,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,58144,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,58245,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,58346,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,58446,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,58547,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,58648,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,58748,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,58849,371.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,58923,26.17,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,58923,26.14,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,58950,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,59050,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,59151,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,59252,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,59352,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,59453,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,59554,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,59654,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,59755,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,59856,370.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,59921,26.23,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,59921,26.26,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,59957,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,60057,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,60158,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,60258,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,60359,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,60460,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,60560,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,60661,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,60762,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,60862,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,60918,26.17,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,60918,26.26,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,60963,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,61064,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,61164,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,61265,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,61365,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,61466,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,61567,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,61667,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,61768,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,61869,371.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,61916,26.1,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,61916,26.14,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,61969,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,62070,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,62171,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,62271,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,62372,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,62473,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,62573,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,62674,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,62775,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,62876,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,62914,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,62914,26.080000000000002,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,62976,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,63077,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,63178,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,63278,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,63379,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,63480,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,63580,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,63681,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,63782,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,63882,374.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,63911,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,63912,25.98,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,63983,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,64084,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,64184,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,64285,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,64386,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,64487,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,64587,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,64688,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,64789,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,64889,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,64910,26.14,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,64910,26.1,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,64990,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,65091,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,65192,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,65292,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,65393,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,65494,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,65594,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,65695,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,65796,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,65897,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,65908,26.04,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,65908,26.26,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,65997,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,66098,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,66199,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,66299,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,66400,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,66501,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,66602,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,66702,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,66803,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,66906,26.17,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,66906,26.04,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,66907,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,67007,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,67107,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,67208,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,67309,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,67409,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,67611,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,67711,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,67812,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,67904,26.1,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,67904,26.14,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,67913,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,68013,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,68114,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,68215,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,68316,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,68416,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,68517,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,68618,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,68718,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,68819,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,68902,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,68902,26.42,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,68920,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,69021,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,69121,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,69222,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,69323,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,69424,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,69524,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,69625,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,69726,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,69827,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,69901,25.98,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,69901,26.2,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,69927,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,70028,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,70129,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,70229,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,70330,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,70431,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,70531,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,70632,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,70733,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,70834,371.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,70898,26.04,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,70899,26.35,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,70934,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,71035,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,71135,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,71236,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,71337,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,71438,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,71538,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,71639,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,71740,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,71840,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,71896,25.98,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,71896,26.23,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,71941,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,72042,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,72142,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,72243,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,72344,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,72444,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,72545,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,72646,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,72746,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,72847,371.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,72894,25.98,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,72894,25.97,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,72948,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,73048,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,73149,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,73250,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,73350,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,73451,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,73552,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,73652,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,73753,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,73853,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,73891,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,73892,26.23,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,73954,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,74055,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,74155,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,74256,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,74356,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,74457,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,74558,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,74658,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,74759,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,74860,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,74889,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,74889,26.17,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,74960,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,75061,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,75162,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,75262,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,75363,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,75463,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,75564,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,75665,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,75765,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,75866,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,75886,25.86,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,75886,26.14,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,75966,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,76067,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,76168,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,76268,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,76369,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,76469,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,76570,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,76670,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,76771,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,76872,374.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,76883,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,76883,26.23,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,76972,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,77073,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,77173,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,77274,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,77375,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,77475,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,77576,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,77676,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,77777,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,77880,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,77880,25.91,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,77880,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,77980,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,78081,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,78181,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,78282,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,78383,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,78483,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,78584,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,78684,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,78785,375.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,78877,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,78877,26.26,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,78886,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,78986,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,79087,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,79188,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,79288,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,79389,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,79490,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,79590,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,79691,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,79791,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,79874,26.17,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,79875,26.35,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,79892,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,79993,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,80093,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,80194,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,80295,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,80395,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,80496,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,80597,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,80697,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,80798,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,80872,25.97,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,80872,26.2,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,80898,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,80999,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,81100,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,81200,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,81301,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,81402,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,81502,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,81603,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,81704,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,81804,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,81869,26.080000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,81869,26.14,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,81905,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,82005,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,82106,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,82207,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,82307,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,82408,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,82508,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,82609,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,82710,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,82810,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,82866,25.98,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,82866,26.14,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,82911,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,83012,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,83112,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,83213,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,83313,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,83414,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,83515,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,83615,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,83716,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,83817,371.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,83864,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,83864,26.03,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,83917,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,84018,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,84118,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,84219,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,84320,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,84420,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,84521,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,84622,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,84722,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,84823,374.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,84861,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,84861,26.23,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,84924,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,85024,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,85125,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,85225,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,85326,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,85427,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,85527,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,85628,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,85729,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,85829,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,85858,25.98,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,85859,25.92,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,85930,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,86031,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,86131,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,86232,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,86332,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,86433,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,86534,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,86634,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,86735,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,86836,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,86856,25.91,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,86856,26.17,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,86936,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,87037,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,87137,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,87238,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,87339,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,87439,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,87540,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,87640,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,87741,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,87842,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,87853,26.080000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,87853,26.29,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,87942,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,88043,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,88143,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,88244,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,88345,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,88445,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,88546,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,88647,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,88747,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,88850,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,88850,26.2,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,88850,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,88950,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,89051,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,89152,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,89252,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,89353,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,89454,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,89554,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,89655,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,89755,371.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,89847,26.17,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,89848,25.86,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,89856,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,89957,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,90057,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,90158,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,90259,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,90359,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,90460,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,90561,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,90661,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,90762,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,90845,26.26,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,90845,26.04,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,90863,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,90963,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,91064,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,91165,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,91265,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,91366,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,91466,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,91567,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,91668,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,91768,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,91842,26.080000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,91842,26.03,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,91869,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,91969,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,92070,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,92171,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,92271,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,92372,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,92473,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,92574,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,92674,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,92775,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,92840,25.8,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,92840,26.080000000000002,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,92876,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,92976,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,93077,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,93178,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,93278,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,93379,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,93480,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,93580,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,93681,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,93782,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,93837,26.080000000000002,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,93838,26.17,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,93882,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,93983,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,94083,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,94184,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,94285,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,94385,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,94486,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,94587,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,94687,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,94788,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,94835,26.2,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,94835,25.85,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,94889,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,94989,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,95090,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,95191,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,95291,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,95392,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,95492,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,95593,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,95694,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,95794,374.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,95832,26.14,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,95833,26.17,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,95895,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,95996,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,96096,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,96197,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,96297,374.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,96398,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,96499,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,96599,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,96700,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,96800,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,96830,26.03,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,96830,26.17,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,96901,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,97002,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,97102,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,97203,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,97304,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,97404,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,97505,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,97606,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,97706,375.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,97807,372.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,97827,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,97827,25.92,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,97908,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,98008,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,98109,372.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,98210,370.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,98311,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,98411,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,98613,373.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,98713,371.0,0x538,BR_Broker_Sus,ADC Values
+Sus_Pot,98814,373.0,0x538,BR_Broker_Sus,ADC Values
+Tire_Temp_3,98825,25.92,0x530,BR_Broker_Temp1,Celcius
+Tire_Temp_7,98825,26.2,0x531,BR_Broker_Temp2,Celcius
+Sus_Pot,98915,373.0,0x538,BR_Broker_Sus,ADC Values
