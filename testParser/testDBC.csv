@@ -1,0 +1,163 @@
+Message ID,Message Name,Sender,Signal Name,Start Bit,Size (bits),Factor,Offset,Min,Max,Unit,Cycle Time (ms),Data Type,Drive Bus,Data Bus
+0x2A1,PDM_Current,PDM,Gen_Amps,0,16,0.01,0,0.25,15.5,A,500,float,TRUE,FALSE
+,PDM_Current,PDM,Front_Fan_Amps,16,8,0.01,0,0.25,15.5,A,500,float,TRUE,FALSE
+,PDM_Current,PDM,Rear_Fan_Amps,24,8,0.01,0,0.25,15.5,A,500,float,TRUE,FALSE
+,PDM_Current,PDM,Front_Pump_Amps,32,8,0.01,0,0.25,15.5,A,500,float,TRUE,FALSE
+,PDM_Current,PDM,Rear_Pump_Amps,40,8,0.01,0,0.25,15.5,A,500,float,TRUE,FALSE
+0x2A2,PDM_Bat_Volt,PDM,Bat_Volt,0,16,0.01,0,0,16,V,5000,float,TRUE,FALSE
+,PDM_Bat_Volt,PDM,Low_Bat_Volt_Warning,16,8,1,0,0,1,Bool,5000,bool,TRUE,FALSE
+,PDM_Bat_Volt,PDM,Danger_Bat_Volt_Warning,24,8,1,0,0,1,Bool,5000,bool,TRUE,FALSE
+0x28B,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,RPM,0,16,1,0,,,RPM,100,int16_t,TRUE,FALSE
+,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,Motor_Current,16,16,0.1,0,,,A,100,int16_t,TRUE,FALSE
+,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,DC_Voltage,32,16,0.1,0,,,V,100,int16_t,TRUE,FALSE
+,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,DC_Current,48,16,0.1,0,,,A,100,int16_t,TRUE,FALSE
+0x28C,Front_Right_Inverter_Temp_Status,Front-Right-Inverter,IGBT_Temp,0,16,0.1,0,,,deg C,1000,int16_t,TRUE,FALSE
+,Front_Right_Inverter_Temp_Status,Front-Right-Inverter,Motor_Temp,16,16,0.1,0,,,deg C,1000,int16_t,TRUE,FALSE
+0x28D,Front_Right_Inverter_Current_Draw,Front-Right-Inverter,Ah_Drawn,0,16,0.0001,0,,,Ah,100,uint32_t,TRUE,FALSE
+,Front_Right_Inverter_Current_Draw,Front-Right-Inverter,Ah_Charged,32,32,0.0001,0,,,Ah,100,uint32_t,TRUE,FALSE
+0x28E,Front_Right_Inverter_Power_Draw,Front-Right-Inverter,Wh_Drawn,0,32,0.001,0,,,Wh,100,uint32_t,TRUE,FALSE
+,Front_Right_Inverter_Power_Draw,Front-Right-Inverter,Wh_Charged,32,32,0.001,0,,,Wh,100,uint32_t,TRUE,FALSE
+0x28A,Front_Right_Inverter_Fault_Status,Front-Right-Inverter,Fault_Code,0,8,1,0,,,"0x00: NONE
+0x01: OVER_VOLTAGE
+0x02: UNDER_VOLTAGE
+0x03: DRV_FAULT
+0x04: ABS_OVER_CURRENT
+0x05: OVER_TEMP_FET
+0x06: OVER_TEMP_MOTOR
+0x07: GATE_DRIVER_OVER_VOLTAGE
+0x08: GATE_DRIVER_UNDER_VOLTAGE
+0x09: MCU_UNDER_VOLTAGE
+0x0A: BOOTING_FROM_WATCHDOG_RESET
+0x0B: ENCODER_SPI_FAULT
+0x0C: ENCODER_SINCOS_BELOW_MIN_AMPLITUDE
+0x0D: ENCODER_SINCOS_ABOVE_MAX_AMPLITUDE
+0x0E: FLASH_CORRUPTION
+0x0F: HIGH_OFFSET_CURRENT_SENSOR_1
+0x10: HIGH_OFFSET_CURRENT_SENSOR_2
+0x11: HIGH_OFFSET_CURRENT_SENSOR_3
+0x12: UNBALANCED_CURRENTS
+0x13: BRK_FAULT
+0x14: RESOLVER_LOT
+0x15: RESOLVER_DOS
+0x16: RESOLVER_LOS
+0x17: FLASH_CORRUPTION_APP_CFG
+0x18: FLASH_CORRUPTION_MC_CFG
+0x19: ENCODER_NO_MAGNET
+0x1A: ENCODER_MAGNET_TOO_STRONG
+0x1B: PHASE_FILTER_FAULT",,uint8_t,TRUE,FALSE
+0x286,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,RPM,0,16,1,0,,,RPM,100,int16_t,TRUE,FALSE
+,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,Motor_Current,16,16,0.1,0,,,A,100,int16_t,TRUE,FALSE
+,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,DC_Voltage,32,16,0.1,0,,,V,100,int16_t,TRUE,FALSE
+,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,DC_Current,48,16,0.1,0,,,A,100,int16_t,TRUE,FALSE
+0x287,Front_Left_Inverter_Temp_Status,Front-Left-Inverter,IGBT_Temp,0,16,0.1,0,,,deg C,1000,int16_t,TRUE,FALSE
+,Front_Left_Inverter_Temp_Status,Front-Left-Inverter,Motor_Temp,16,16,0.1,0,,,deg C,1000,int16_t,TRUE,FALSE
+0x288,Front_Left_Inverter_Current_Draw,Front-Left-Inverter,Ah_Drawn,0,16,0.0001,0,,,Ah,100,uint32_t,TRUE,FALSE
+,Front_Left_Inverter_Current_Draw,Front-Left-Inverter,Ah_Charged,32,32,0.0001,0,,,Ah,100,uint32_t,TRUE,FALSE
+0x289,Front_Left_Inverter_Power_Draw,Front-Left-Inverter,Wh_Drawn,0,32,0.001,0,,,Wh,100,uint32_t,TRUE,FALSE
+,Front_Left_Inverter_Power_Draw,Front-Left-Inverter,Wh_Charged,32,32,0.001,0,,,Wh,100,uint32_t,TRUE,FALSE
+0x285,Front_Left_Inverter_Fault_Status,Front-Left-Inverter,Fault_Code,0,8,1,0,,,"0x00: NONE
+0x01: OVER_VOLTAGE
+0x02: UNDER_VOLTAGE
+0x03: DRV_FAULT
+0x04: ABS_OVER_CURRENT
+0x05: OVER_TEMP_FET
+0x06: OVER_TEMP_MOTOR
+0x07: GATE_DRIVER_OVER_VOLTAGE
+0x08: GATE_DRIVER_UNDER_VOLTAGE
+0x09: MCU_UNDER_VOLTAGE
+0x0A: BOOTING_FROM_WATCHDOG_RESET
+0x0B: ENCODER_SPI_FAULT
+0x0C: ENCODER_SINCOS_BELOW_MIN_AMPLITUDE
+0x0D: ENCODER_SINCOS_ABOVE_MAX_AMPLITUDE
+0x0E: FLASH_CORRUPTION
+0x0F: HIGH_OFFSET_CURRENT_SENSOR_1
+0x10: HIGH_OFFSET_CURRENT_SENSOR_2
+0x11: HIGH_OFFSET_CURRENT_SENSOR_3
+0x12: UNBALANCED_CURRENTS
+0x13: BRK_FAULT
+0x14: RESOLVER_LOT
+0x15: RESOLVER_DOS
+0x16: RESOLVER_LOS
+0x17: FLASH_CORRUPTION_APP_CFG
+0x18: FLASH_CORRUPTION_MC_CFG
+0x19: ENCODER_NO_MAGNET
+0x1A: ENCODER_MAGNET_TOO_STRONG
+0x1B: PHASE_FILTER_FAULT",,uint8_t,TRUE,FALSE
+0x281,Rear_Inverter_Motor_Status,Rear Inverter,RPM,0,16,1,0,,,RPM,100,int16_t,TRUE,FALSE
+,Rear_Inverter_Motor_Status,Rear Inverter,Motor_Current,16,16,0.1,0,,,A,100,int16_t,TRUE,FALSE
+,Rear_Inverter_Motor_Status,Rear Inverter,DC_Voltage,32,16,0.1,0,,,V,100,int16_t,TRUE,FALSE
+,Rear_Inverter_Motor_Status,Rear Inverter,DC_Current,48,16,0.1,0,,,A,100,int16_t,TRUE,FALSE
+0x282,Rear_Inverter_Temp_Status,Rear Inverter,IGBT_Temp,0,16,0.1,0,,,deg C,1000,int16_t,TRUE,FALSE
+,Rear_Inverter_Temp_Status,Rear Inverter,Motor_Temp,16,16,0.1,0,,,deg C,1000,int16_t,TRUE,FALSE
+0x283,Rear_Inverter_Current_Draw,Rear Inverter,Ah_Drawn,0,16,0.0001,0,,,Ah,100,uint32_t,TRUE,FALSE
+,Rear_Inverter_Current_Draw,Rear Inverter,Ah_Charged,32,32,0.0001,0,,,Ah,100,uint32_t,TRUE,FALSE
+0x284,Rear_Inverter_Power_Draw,Rear Inverter,Wh_Drawn,0,32,0.001,0,,,Wh,100,uint32_t,TRUE,FALSE
+,Rear_Inverter_Power_Draw,Rear Inverter,Wh_Charged,32,32,0.001,0,,,Wh,100,uint32_t,TRUE,FALSE
+0x280,Rear_Inverter_Fault_Status,Rear Inverter,Fault_Code,0,8,1,0,,,"0x00: NONE
+0x01: OVER_VOLTAGE
+0x02: UNDER_VOLTAGE
+0x03: DRV_FAULT
+0x04: ABS_OVER_CURRENT
+0x05: OVER_TEMP_FET
+0x06: OVER_TEMP_MOTOR
+0x07: GATE_DRIVER_OVER_VOLTAGE
+0x08: GATE_DRIVER_UNDER_VOLTAGE
+0x09: MCU_UNDER_VOLTAGE
+0x0A: BOOTING_FROM_WATCHDOG_RESET
+0x0B: ENCODER_SPI_FAULT
+0x0C: ENCODER_SINCOS_BELOW_MIN_AMPLITUDE
+0x0D: ENCODER_SINCOS_ABOVE_MAX_AMPLITUDE
+0x0E: FLASH_CORRUPTION
+0x0F: HIGH_OFFSET_CURRENT_SENSOR_1
+0x10: HIGH_OFFSET_CURRENT_SENSOR_2
+0x11: HIGH_OFFSET_CURRENT_SENSOR_3
+0x12: UNBALANCED_CURRENTS
+0x13: BRK_FAULT
+0x14: RESOLVER_LOT
+0x15: RESOLVER_DOS
+0x16: RESOLVER_LOS
+0x17: FLASH_CORRUPTION_APP_CFG
+0x18: FLASH_CORRUPTION_MC_CFG
+0x19: ENCODER_NO_MAGNET
+0x1A: ENCODER_MAGNET_TOO_STRONG
+0x1B: PHASE_FILTER_FAULT",,uint8_t,TRUE,FALSE
+0x20D,ECU_Set_Current_Front_Left_Inverter,ECU,Set_Current,0,32,0.001,0,0,50,A,,int32_t,TRUE,FALSE
+0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,ECU,Set_Current_Brake,0,32,0.001,0,0,50,A,,int32_t,TRUE,FALSE
+0x20F,ECU_Set_Current_Front_Right_Inverter,ECU,Set_Current,0,32,0.001,0,0,50,A,,int32_t,TRUE,FALSE
+0x210,ECU_Set_Current_Brake_Front_Right_Inverter,ECU,Set_Current_Brake,0,32,0.001,0,0,50,A,,int32_t,TRUE,FALSE
+0x200,ECU_Set_Current_Rear_Inverter,ECU,Set_Current,0,32,0.001,0,0,360,A,,int32_t,TRUE,FALSE
+0x201,ECU_Set_Current_Brake_Rear_Inverter,ECU,Set_Current_Brake,0,32,0.001,0,0,360,A,,int32_t,TRUE,FALSE
+0x202,ECU_Throttle,ECU,APPS1_Throttle,0,16,1,0,0,2047,,100,int16_t,TRUE,FALSE
+,ECU_Throttle,ECU,APPS2_Throttle,16,16,1,0,0,2047,,100,int16_t,TRUE,FALSE
+0x203,ECU_Brake,ECU,Front_Brake_Pressure,0,16,1,0,0,32767,,100,int16_t,TRUE,FALSE
+,ECU_Brake,ECU,Rear_Brake_Pressure,16,16,1,0,0,32767,,100,int16_t,TRUE,FALSE
+,ECU_Brake,ECU,Brake_Pressed,32,8,1,0,0,1,,100,bool,TRUE,FALSE
+0x204,ECU_Implausibility,ECU,Implausibility_Present,0,8,1,0,0,1,,100,bool,TRUE,FALSE
+,ECU_Implausibility,ECU,APPSs_Disagreement_Imp,8,8,1,0,0,1,,100,bool,TRUE,FALSE
+,ECU_Implausibility,ECU,BPPC_Imp,16,8,1,0,0,1,,100,bool,TRUE,FALSE
+,ECU_Implausibility,ECU,Brake_Invalid_Imp,24,8,1,0,0,1,,100,bool,TRUE,FALSE
+,ECU_Implausibility,ECU,APPSs_Invalid_Imp,32,8,1,0,0,1,,100,bool,TRUE,FALSE
+0x205,ECU_BMS_Command_Message,ECU,BMS_Command,0,8,1,0,0,4,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT",10,uint8_t,TRUE,FALSE
+0x206,ECU_Drive_Status,ECU,Drive_State,0,8,1,0,0,4,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT",10,uint8_t,TRUE,FALSE
+0x208,ECU_Active_Aero_Command,ECU,Active_Aero_State,0,1,1,0,0,1,"0: Closed
+1: Open",100,bool,TRUE,FALSE
+,ECU_Active_Aero_Command,ECU,Active_Aero_Position,1,16,1,0,0,360,degrees,100,int16_t,TRUE,FALSE
+0x209,ECU_Pump_Fan_Command,ECU,Front_Pump_Duty_Cycle,0,8,1,0,0,255,,100,uint8_t,TRUE,FALSE
+,ECU_Pump_Fan_Command,ECU,Rear_Pump_Duty_Cycle,8,8,1,0,0,255,,100,uint8_t,TRUE,FALSE
+,ECU_Pump_Fan_Command,ECU,Front_Fan_Duty_Cycle,16,8,1,0,0,255,,100,uint8_t,TRUE,FALSE
+,ECU_Pump_Fan_Command,ECU,Rear_Fan_Duty_Cycle,24,8,1,0,0,255,,100,uint8_t,TRUE,FALSE
+0x20A,ECU_LUT_Response,ECU,Accel_LUT_Id_Response,0,8,1,0,,,,,uint8_t,TRUE,FALSE
+0x20B,ECU_Temp_Limiting_Status,ECU,IGBT_Temp_Limiting,0,1,1,0,0,1,,100,bool,TRUE,FALSE
+,ECU_Temp_Limiting_Status,ECU,Battery_Temp_Limiting,1,1,1,0,0,1,,100,bool,TRUE,FALSE
+,ECU_Temp_Limiting_Status,ECU,Motor_Temp_Limiting,2,1,1,0,0,1,,100,bool,TRUE,FALSE
+0x20C,ECU_Torque_Status,ECU,Torque_Status,0,8,1,0,0,2,"0: ZERO
+1: ACCEL
+2: REGEN",100,uint8_t,TRUE,FALSE

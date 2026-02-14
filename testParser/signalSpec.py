@@ -1,11 +1,8 @@
 class SignalSpec:
-    """
-    Describes how to decode a single signal from a CAN frame payload.
+    # Describes how to decode a single signal from a CAN frame payload.
 
-    All bit positions are absolute:
-    bit 0 is the least-significant bit of byte 0.
-    """
-
+    # All bit positions are absolute:
+    # bit 0 is the least-significant bit of byte 0.
     def __init__(self, name, start_bit, length, signed, scale, offset,
                  unit=None, min_value=None, max_value=None):
         if start_bit < 0:
@@ -33,11 +30,8 @@ class SignalSpec:
         )
 
 
+# Describes how to decode an entire CAN message (frame).
 class MessageSpec:
-    """
-    Describes how to decode an entire CAN message (frame).
-    """
-
     def __init__(self, frame_id, name, signals, required_bytes, sender=None):
         if frame_id < 0:
             raise ValueError("frame_id must be non-negative")
