@@ -56,7 +56,7 @@ def compile_csv(csv_path):
 
             # Determine signed vs unsigned from Data Type
             data_type = row["Data Type"].lower()
-            signed = data_type.startswith("int") and not data_type.startswith("uint")
+            signed = (data_type.startswith("int") and not data_type.startswith("uint")) or data_type == "float"
 
             unit = row.get("Unit") or None
 

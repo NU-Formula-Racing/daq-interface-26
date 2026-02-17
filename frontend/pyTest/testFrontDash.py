@@ -21,14 +21,14 @@ def generate_fake_igbt_temp():
     # Example: typical MOSFET / IGBT temperature range
     return round(random.uniform(25.0, 90.0), 2)
 
-def insert_signal(source, signal_name, value, unit):
+def insert_signal(source, signal_name, value, unit, sessionID):
     row = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "source": source,
         "signal_name": signal_name,
         "value": value,
-        "unit": unit
-        #"session_id": sessionID
+        "unit": unit,
+        "session_id": sessionID
     }
 
     response = supabase.table("nfr26_signals").insert(row).execute()
@@ -36,7 +36,7 @@ def insert_signal(source, signal_name, value, unit):
     return response
 
 def run_test():
-    for i in range(20):
+    for i in range(40):
         print(f"\n--- Cycle {i+1} / 20 ---")
 
         # Generate fake values
@@ -49,7 +49,7 @@ def run_test():
             signal_name="Inverter_RPM",
             value=fake_rpm,
             unit="RPM",
-            #sessionID=1
+            sessionID=1
         )
 
         insert_signal(
@@ -57,13 +57,13 @@ def run_test():
             signal_name="IGBT_Temperature",
             value=fake_temp,
             unit="°C",
-            #sessionID=1
+            sessionID=1
         )
 
         # Wait 2 seconds before next cycle
         time.sleep(2)
         
-    print("\nDone — 20 cycles completed.")
+    print("\nDone — 40 cycles completed.")
 
 
 if __name__ == "__main__":
