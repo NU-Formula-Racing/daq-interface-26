@@ -1,0 +1,785 @@
+signal_name,timestamp_ms,value,message_id,message_name,unit
+Set_Current,114,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,115,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,115,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,115,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,115,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,116,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,116,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,116,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,116,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,116,0.0,0x203,ECU_Brake,
+Brake_Pressed,116,0.0,0x203,ECU_Brake,
+Implausibility_Present,117,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,117,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,117,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,117,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,117,0.0,0x204,ECU_Implausibility,
+BMS_Command,117,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,117,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Gen_Amps,163,12.96,0x2A1,PDM_Current,A
+Front_Fan_Amps,163,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,163,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,163,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,163,-0.08,0x2A1,PDM_Current,A
+Set_Current,215,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,215,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,215,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,215,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,216,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,216,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,216,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,216,1301.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,217,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,217,0.0,0x203,ECU_Brake,
+Brake_Pressed,217,0.0,0x203,ECU_Brake,
+Implausibility_Present,217,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,217,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,217,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,217,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,217,0.0,0x204,ECU_Implausibility,
+BMS_Command,217,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,218,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,315,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,315,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,315,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,316,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,316,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,316,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,317,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,317,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,317,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,317,0.0,0x203,ECU_Brake,
+Brake_Pressed,317,0.0,0x203,ECU_Brake,
+Implausibility_Present,317,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,317,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,317,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,317,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,317,0.0,0x204,ECU_Implausibility,
+BMS_Command,317,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,318,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,415,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,415,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,416,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,416,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,416,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,417,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,417,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,417,1299.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,417,110.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,417,0.0,0x203,ECU_Brake,
+Brake_Pressed,417,0.0,0x203,ECU_Brake,
+Implausibility_Present,417,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,417,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,417,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,417,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,417,0.0,0x204,ECU_Implausibility,
+BMS_Command,418,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,418,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,515,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,516,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,516,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,516,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,516,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,517,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,517,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,517,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,517,105.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,517,0.0,0x203,ECU_Brake,
+Brake_Pressed,517,0.0,0x203,ECU_Brake,
+Implausibility_Present,518,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,518,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,518,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,518,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,518,0.0,0x204,ECU_Implausibility,
+BMS_Command,518,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,518,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,616,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,616,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,616,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,616,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,617,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,617,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,617,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,617,1298.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,618,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,618,0.0,0x203,ECU_Brake,
+Brake_Pressed,618,0.0,0x203,ECU_Brake,
+Implausibility_Present,618,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,618,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,618,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,618,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,618,0.0,0x204,ECU_Implausibility,
+BMS_Command,618,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,618,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Gen_Amps,679,12.96,0x2A1,PDM_Current,A
+Front_Fan_Amps,679,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,679,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,679,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,679,-0.08,0x2A1,PDM_Current,A
+Set_Current,716,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,716,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,716,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,717,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,717,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,717,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,718,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,718,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,718,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,718,0.0,0x203,ECU_Brake,
+Brake_Pressed,718,0.0,0x203,ECU_Brake,
+Implausibility_Present,718,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,718,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,718,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,718,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,718,0.0,0x204,ECU_Implausibility,
+BMS_Command,718,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,719,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,816,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,816,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,817,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,817,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,817,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,817,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,818,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,818,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,818,110.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,818,0.0,0x203,ECU_Brake,
+Brake_Pressed,818,0.0,0x203,ECU_Brake,
+Implausibility_Present,818,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,818,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,818,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,818,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,818,0.0,0x204,ECU_Implausibility,
+BMS_Command,819,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,819,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,916,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,916,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,917,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,917,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,917,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,918,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,918,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,918,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,918,110.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,918,0.0,0x203,ECU_Brake,
+Brake_Pressed,918,0.0,0x203,ECU_Brake,
+Implausibility_Present,919,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,919,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,919,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,919,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,919,0.0,0x204,ECU_Implausibility,
+BMS_Command,919,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,919,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,1016,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1017,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1017,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1017,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1018,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1018,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1018,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,1018,1299.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1018,112.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1018,0.0,0x203,ECU_Brake,
+Brake_Pressed,1018,0.0,0x203,ECU_Brake,
+Implausibility_Present,1019,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1019,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1019,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1019,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1019,0.0,0x204,ECU_Implausibility,
+BMS_Command,1019,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1019,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,1117,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1117,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1117,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1117,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1118,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1118,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1118,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,1118,1299.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1119,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1119,0.0,0x203,ECU_Brake,
+Brake_Pressed,1119,0.0,0x203,ECU_Brake,
+Implausibility_Present,1119,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1119,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1119,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1119,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1119,0.0,0x204,ECU_Implausibility,
+BMS_Command,1119,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1120,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Gen_Amps,1195,12.96,0x2A1,PDM_Current,A
+Front_Fan_Amps,1195,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,1195,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,1195,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,1195,-0.08,0x2A1,PDM_Current,A
+Set_Current,1217,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1217,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1217,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1218,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1218,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1218,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1219,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,1219,1298.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1219,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1219,0.0,0x203,ECU_Brake,
+Brake_Pressed,1219,0.0,0x203,ECU_Brake,
+Implausibility_Present,1219,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1219,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1219,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1219,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1219,0.0,0x204,ECU_Implausibility,
+BMS_Command,1220,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1220,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,1317,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1317,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1318,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1318,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1318,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1319,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1319,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,1319,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1319,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1319,0.0,0x203,ECU_Brake,
+Brake_Pressed,1319,0.0,0x203,ECU_Brake,
+Implausibility_Present,1320,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1320,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1320,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1320,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1320,0.0,0x204,ECU_Implausibility,
+BMS_Command,1320,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1320,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,1417,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1418,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1418,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1418,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1419,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1419,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1419,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,1419,1299.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1420,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1420,0.0,0x203,ECU_Brake,
+Brake_Pressed,1420,0.0,0x203,ECU_Brake,
+Implausibility_Present,1420,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1420,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1420,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1420,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1420,0.0,0x204,ECU_Implausibility,
+BMS_Command,1420,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1420,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,1518,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1518,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1518,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1519,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1519,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1519,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1519,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,1519,1298.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1520,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1520,0.0,0x203,ECU_Brake,
+Brake_Pressed,1520,0.0,0x203,ECU_Brake,
+Implausibility_Present,1520,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1520,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1520,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1520,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1520,0.0,0x204,ECU_Implausibility,
+BMS_Command,1520,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1521,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,1618,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1618,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1619,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1619,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1619,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1619,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1620,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,1620,1299.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1620,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1620,0.0,0x203,ECU_Brake,
+Brake_Pressed,1620,0.0,0x203,ECU_Brake,
+Implausibility_Present,1620,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1620,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1620,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1620,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1620,0.0,0x204,ECU_Implausibility,
+BMS_Command,1621,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1621,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Gen_Amps,1711,12.950000000000001,0x2A1,PDM_Current,A
+Front_Fan_Amps,1711,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,1711,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,1711,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,1711,-0.08,0x2A1,PDM_Current,A
+Set_Current,1718,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1719,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1719,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1719,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1719,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1720,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1720,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,1720,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1720,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1720,0.0,0x203,ECU_Brake,
+Brake_Pressed,1720,0.0,0x203,ECU_Brake,
+Implausibility_Present,1721,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1721,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1721,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1721,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1721,0.0,0x204,ECU_Implausibility,
+BMS_Command,1721,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1721,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,1819,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1819,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1819,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1819,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1820,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1820,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1820,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,1820,1298.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1821,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1821,0.0,0x203,ECU_Brake,
+Brake_Pressed,1821,0.0,0x203,ECU_Brake,
+Implausibility_Present,1821,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1821,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1821,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1821,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1821,0.0,0x204,ECU_Implausibility,
+BMS_Command,1821,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1821,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,1919,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1919,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1919,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1920,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1920,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1920,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1921,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,1921,1298.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1921,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1921,0.0,0x203,ECU_Brake,
+Brake_Pressed,1921,0.0,0x203,ECU_Brake,
+Implausibility_Present,1921,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1921,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1921,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1921,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1921,0.0,0x204,ECU_Implausibility,
+BMS_Command,1921,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1922,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2019,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2019,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2020,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2020,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2020,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2021,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2021,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,2021,1297.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2021,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2021,0.0,0x203,ECU_Brake,
+Brake_Pressed,2021,0.0,0x203,ECU_Brake,
+Implausibility_Present,2021,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2021,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2021,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2021,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2021,0.0,0x204,ECU_Implausibility,
+BMS_Command,2022,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2022,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2119,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2120,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2120,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2120,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2120,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2121,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2121,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,2121,1301.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2121,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2121,0.0,0x203,ECU_Brake,
+Brake_Pressed,2121,0.0,0x203,ECU_Brake,
+Implausibility_Present,2122,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2122,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2122,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2122,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2122,0.0,0x204,ECU_Implausibility,
+BMS_Command,2122,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2122,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2220,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2220,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2220,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2220,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2221,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2221,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2221,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,2221,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2222,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2222,0.0,0x203,ECU_Brake,
+Brake_Pressed,2222,0.0,0x203,ECU_Brake,
+Implausibility_Present,2222,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2222,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2222,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2222,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2222,0.0,0x204,ECU_Implausibility,
+BMS_Command,2222,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2222,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Gen_Amps,2227,12.96,0x2A1,PDM_Current,A
+Front_Fan_Amps,2227,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,2227,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,2227,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,2227,-0.08,0x2A1,PDM_Current,A
+Set_Current,2320,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2320,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2320,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2321,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2321,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2321,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2322,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,2322,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2322,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2322,0.0,0x203,ECU_Brake,
+Brake_Pressed,2322,0.0,0x203,ECU_Brake,
+Implausibility_Present,2322,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2322,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2322,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2322,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2322,0.0,0x204,ECU_Implausibility,
+BMS_Command,2322,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2323,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2420,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2420,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2421,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2421,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2421,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2421,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2422,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,2422,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2422,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2422,0.0,0x203,ECU_Brake,
+Brake_Pressed,2422,0.0,0x203,ECU_Brake,
+Implausibility_Present,2422,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2422,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2422,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2422,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2422,0.0,0x204,ECU_Implausibility,
+BMS_Command,2423,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2423,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2520,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2520,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2521,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2521,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2521,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2522,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2522,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,2522,1299.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2522,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2522,0.0,0x203,ECU_Brake,
+Brake_Pressed,2522,0.0,0x203,ECU_Brake,
+Implausibility_Present,2522,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2522,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2522,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2522,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2522,0.0,0x204,ECU_Implausibility,
+BMS_Command,2523,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2523,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2620,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2621,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2621,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2621,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2622,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2622,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2622,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,2622,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2622,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2622,0.0,0x203,ECU_Brake,
+Brake_Pressed,2622,0.0,0x203,ECU_Brake,
+Implausibility_Present,2623,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2623,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2623,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2623,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2623,0.0,0x204,ECU_Implausibility,
+BMS_Command,2623,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2623,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2721,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2721,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2721,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2721,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2722,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2722,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2722,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,2722,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2723,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2723,0.0,0x203,ECU_Brake,
+Brake_Pressed,2723,0.0,0x203,ECU_Brake,
+Implausibility_Present,2723,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2723,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2723,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2723,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2723,0.0,0x204,ECU_Implausibility,
+BMS_Command,2723,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2723,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Gen_Amps,2743,12.96,0x2A1,PDM_Current,A
+Front_Fan_Amps,2743,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,2743,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,2743,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,2743,-0.08,0x2A1,PDM_Current,A
+Set_Current,2821,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2821,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2821,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2822,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2822,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2822,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2823,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,2823,1302.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2823,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2823,0.0,0x203,ECU_Brake,
+Brake_Pressed,2823,0.0,0x203,ECU_Brake,
+Implausibility_Present,2823,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2823,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2823,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2823,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2823,0.0,0x204,ECU_Implausibility,
+BMS_Command,2823,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2824,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2921,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2921,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2922,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2922,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2922,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2922,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2923,0.0,0x202,ECU_Throttle,
+APPS2_Throttle,2923,1300.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2923,111.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2923,0.0,0x203,ECU_Brake,
+Brake_Pressed,2923,0.0,0x203,ECU_Brake,
+Implausibility_Present,2923,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2923,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2923,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2923,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2923,0.0,0x204,ECU_Implausibility,
+BMS_Command,2924,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2924,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"

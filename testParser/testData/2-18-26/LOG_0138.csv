@@ -1,0 +1,3016 @@
+signal_name,timestamp_ms,value,message_id,message_name,unit
+Set_Current,314,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,315,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,315,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,315,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,315,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,316,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,316,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,316,1646.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,316,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,316,0.0,0x203,ECU_Brake,
+Brake_Pressed,316,0.0,0x203,ECU_Brake,
+Implausibility_Present,317,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,317,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,317,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,317,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,317,0.0,0x204,ECU_Implausibility,
+BMS_Command,317,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,317,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,397,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,397,0.0,0x150,BMS_SOE,A
+Battery_Voltage,397,0.0,0x150,BMS_SOE,V
+Battery_Temperature,397,0.0,0x150,BMS_SOE,C
+Battery_Current,397,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,397,1.0,0x151,BMS_Faults,
+External_Fault,397,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,397,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,397,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,397,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,397,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,397,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,397,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,397,0.0,0x151,BMS_Faults,
+Pec_Fault,397,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,397,0.0,0x151,BMS_Faults,
+BMS_State,398,0.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,398,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,398,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,398,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,398,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,398,2.0,0x152,BMS_Status,V
+BMS_SOC,398,0.0,0x152,BMS_Status,
+Cell_V_0,398,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,398,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,398,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,398,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,398,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,398,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,398,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,398,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,398,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,398,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,398,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,398,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,398,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,398,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,398,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,398,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,398,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,398,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,398,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,398,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,398,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,398,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,398,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,398,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,399,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,399,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,399,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,399,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,399,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,399,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,399,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,399,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,399,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,399,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,399,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,399,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,399,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,399,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,399,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,399,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,400,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,400,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,400,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,400,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,400,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,400,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,400,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,400,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,415,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,415,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,415,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,415,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,416,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,416,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,416,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,416,1648.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,417,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,417,0.0,0x203,ECU_Brake,
+Brake_Pressed,417,0.0,0x203,ECU_Brake,
+Implausibility_Present,417,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,417,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,417,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,417,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,417,0.0,0x204,ECU_Implausibility,
+BMS_Command,417,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,418,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,515,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,515,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,515,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,516,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,516,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,516,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,517,894.0,0x202,ECU_Throttle,
+APPS2_Throttle,517,1639.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,517,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,517,0.0,0x203,ECU_Brake,
+Brake_Pressed,517,0.0,0x203,ECU_Brake,
+Implausibility_Present,517,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,517,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,517,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,517,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,517,0.0,0x204,ECU_Implausibility,
+BMS_Command,518,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,518,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,615,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,615,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,616,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,616,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,616,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,617,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,617,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,617,1648.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,617,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,617,0.0,0x203,ECU_Brake,
+Brake_Pressed,617,0.0,0x203,ECU_Brake,
+Implausibility_Present,618,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,618,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,618,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,618,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,618,0.0,0x204,ECU_Implausibility,
+BMS_Command,618,0.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,618,0.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,647,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,647,0.0,0x150,BMS_SOE,A
+Battery_Voltage,647,0.0,0x150,BMS_SOE,V
+Battery_Temperature,647,0.0,0x150,BMS_SOE,C
+Battery_Current,647,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,647,1.0,0x151,BMS_Faults,
+External_Fault,647,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,647,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,647,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,647,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,647,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,647,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,647,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,647,0.0,0x151,BMS_Faults,
+Pec_Fault,647,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,647,0.0,0x151,BMS_Faults,
+BMS_State,648,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,648,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,648,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,648,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,648,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,648,2.0,0x152,BMS_Status,V
+BMS_SOC,648,0.0,0x152,BMS_Status,
+Cell_V_0,648,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,648,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,648,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,648,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,648,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,648,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,648,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,648,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,648,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,648,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,648,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,648,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,648,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,648,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,648,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,648,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,648,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,648,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,648,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,648,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,648,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,648,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,648,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,648,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,649,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,649,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,649,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,649,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,649,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,649,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,649,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,649,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,649,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,649,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,649,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,649,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,649,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,649,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,649,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,649,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,649,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,649,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,649,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,649,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,649,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,649,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,649,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,649,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,649,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,716,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,716,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,716,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,716,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,717,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,717,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,717,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,717,1647.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,718,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,718,0.0,0x203,ECU_Brake,
+Brake_Pressed,718,0.0,0x203,ECU_Brake,
+Implausibility_Present,718,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,718,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,718,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,718,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,718,0.0,0x204,ECU_Implausibility,
+BMS_Command,718,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,718,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Gen_Amps,792,12.950000000000001,0x2A1,PDM_Current,A
+Front_Fan_Amps,792,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,792,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,792,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,792,-0.08,0x2A1,PDM_Current,A
+Set_Current,816,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,816,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,816,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,817,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,817,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,817,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,818,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,818,1646.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,818,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,818,0.0,0x203,ECU_Brake,
+Brake_Pressed,818,0.0,0x203,ECU_Brake,
+Implausibility_Present,818,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,818,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,818,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,818,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,818,0.0,0x204,ECU_Implausibility,
+BMS_Command,818,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,819,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,897,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,897,0.0,0x150,BMS_SOE,A
+Battery_Voltage,897,0.0,0x150,BMS_SOE,V
+Battery_Temperature,897,0.0,0x150,BMS_SOE,C
+Battery_Current,897,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,897,1.0,0x151,BMS_Faults,
+External_Fault,897,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,897,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,897,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,897,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,897,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,897,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,897,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,897,0.0,0x151,BMS_Faults,
+Pec_Fault,897,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,897,0.0,0x151,BMS_Faults,
+BMS_State,897,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,897,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,897,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,897,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,897,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,897,2.0,0x152,BMS_Status,V
+BMS_SOC,897,0.0,0x152,BMS_Status,
+Cell_V_0,898,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,898,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,898,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,898,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,898,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,898,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,898,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,898,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,898,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,898,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,898,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,898,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,898,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,898,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,898,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,898,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,898,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,898,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,898,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,898,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,898,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,898,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,898,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,898,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,898,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,898,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,898,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,898,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,898,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,898,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,898,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,898,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,899,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,899,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,899,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,899,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,899,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,899,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,899,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,899,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,899,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,899,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,899,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,899,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,899,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,899,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,899,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,899,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,899,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,916,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,916,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,917,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,917,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,917,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,918,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,918,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,918,1646.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,918,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,918,0.0,0x203,ECU_Brake,
+Brake_Pressed,918,0.0,0x203,ECU_Brake,
+Implausibility_Present,919,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,919,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,919,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,919,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,919,0.0,0x204,ECU_Implausibility,
+BMS_Command,919,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,919,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,1016,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1017,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1017,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1017,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1018,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1018,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1018,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,1018,1649.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1018,107.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1018,0.0,0x203,ECU_Brake,
+Brake_Pressed,1018,0.0,0x203,ECU_Brake,
+Implausibility_Present,1019,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1019,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1019,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1019,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1019,0.0,0x204,ECU_Implausibility,
+BMS_Command,1019,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1019,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,1117,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1117,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1117,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1118,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1118,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1118,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1118,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,1118,1638.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1119,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1119,0.0,0x203,ECU_Brake,
+Brake_Pressed,1119,0.0,0x203,ECU_Brake,
+Implausibility_Present,1119,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1119,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1119,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1119,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1119,0.0,0x204,ECU_Implausibility,
+BMS_Command,1119,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1120,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,1147,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,1147,0.0,0x150,BMS_SOE,A
+Battery_Voltage,1147,0.0,0x150,BMS_SOE,V
+Battery_Temperature,1147,0.0,0x150,BMS_SOE,C
+Battery_Current,1147,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,1147,1.0,0x151,BMS_Faults,
+External_Fault,1147,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,1147,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,1147,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,1147,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,1147,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,1147,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,1147,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,1147,0.0,0x151,BMS_Faults,
+Pec_Fault,1147,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,1147,0.0,0x151,BMS_Faults,
+BMS_State,1147,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,1147,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,1147,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,1147,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,1147,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,1147,2.0,0x152,BMS_Status,V
+BMS_SOC,1147,0.0,0x152,BMS_Status,
+Cell_V_0,1148,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,1148,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,1148,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,1148,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,1148,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,1148,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,1148,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,1148,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,1148,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,1148,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,1148,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,1148,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,1148,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,1148,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,1148,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,1148,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,1148,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,1148,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,1148,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,1148,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,1148,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,1148,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,1148,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,1148,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,1148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,1148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,1148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,1148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,1148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,1148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,1148,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,1148,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,1149,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,1149,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,1149,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,1149,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,1149,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,1149,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,1149,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,1149,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,1149,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,1149,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,1149,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,1149,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,1149,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,1149,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,1149,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,1149,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,1149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,1149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,1149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,1149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,1149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,1149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,1149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,1149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,1149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,1149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,1149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,1149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,1149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,1149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,1149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,1149,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,1217,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1217,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1218,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1218,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1218,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1218,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1219,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,1219,1639.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1219,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1219,0.0,0x203,ECU_Brake,
+Brake_Pressed,1219,0.0,0x203,ECU_Brake,
+Implausibility_Present,1219,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1219,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1219,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1219,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1219,0.0,0x204,ECU_Implausibility,
+BMS_Command,1220,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1220,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Gen_Amps,1308,12.950000000000001,0x2A1,PDM_Current,A
+Front_Fan_Amps,1308,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,1308,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,1308,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,1308,-0.08,0x2A1,PDM_Current,A
+Set_Current,1317,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1318,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1318,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1318,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1318,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1319,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1319,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,1319,1639.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1319,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1319,0.0,0x203,ECU_Brake,
+Brake_Pressed,1319,0.0,0x203,ECU_Brake,
+Implausibility_Present,1320,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1320,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1320,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1320,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1320,0.0,0x204,ECU_Implausibility,
+BMS_Command,1320,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1320,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,1397,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,1397,0.0,0x150,BMS_SOE,A
+Battery_Voltage,1397,0.0,0x150,BMS_SOE,V
+Battery_Temperature,1397,0.0,0x150,BMS_SOE,C
+Battery_Current,1397,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,1397,1.0,0x151,BMS_Faults,
+External_Fault,1397,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,1397,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,1397,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,1397,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,1397,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,1397,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,1397,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,1397,0.0,0x151,BMS_Faults,
+Pec_Fault,1397,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,1397,0.0,0x151,BMS_Faults,
+BMS_State,1397,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,1397,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,1397,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,1397,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,1397,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,1397,2.0,0x152,BMS_Status,V
+BMS_SOC,1397,0.0,0x152,BMS_Status,
+Cell_V_0,1397,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,1397,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,1397,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,1397,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,1397,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,1397,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,1397,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,1397,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,1398,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,1398,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,1398,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,1398,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,1398,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,1398,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,1398,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,1398,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,1398,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,1398,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,1398,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,1398,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,1398,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,1398,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,1398,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,1398,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,1398,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,1398,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,1398,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,1398,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,1398,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,1398,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,1398,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,1398,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,1398,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,1398,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,1398,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,1398,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,1398,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,1398,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,1398,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,1398,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,1399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,1399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,1399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,1399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,1399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,1399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,1399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,1399,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,1399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,1399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,1399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,1399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,1399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,1399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,1399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,1399,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,1399,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,1399,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,1399,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,1399,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,1399,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,1399,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,1399,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,1399,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,1418,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1418,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1418,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1419,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1419,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1419,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1419,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,1419,1647.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1420,107.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1420,0.0,0x203,ECU_Brake,
+Brake_Pressed,1420,0.0,0x203,ECU_Brake,
+Implausibility_Present,1420,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1420,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1420,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1420,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1420,0.0,0x204,ECU_Implausibility,
+BMS_Command,1420,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1421,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,1518,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1518,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1519,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1519,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1519,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1519,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1520,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,1520,1643.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1520,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1520,0.0,0x203,ECU_Brake,
+Brake_Pressed,1520,0.0,0x203,ECU_Brake,
+Implausibility_Present,1520,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1520,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1520,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1520,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1520,0.0,0x204,ECU_Implausibility,
+BMS_Command,1521,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1521,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,1618,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1619,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1619,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1619,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1619,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1620,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1620,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,1620,1647.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1620,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1620,0.0,0x203,ECU_Brake,
+Brake_Pressed,1620,0.0,0x203,ECU_Brake,
+Implausibility_Present,1621,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1621,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1621,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1621,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1621,0.0,0x204,ECU_Implausibility,
+BMS_Command,1621,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1621,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,1646,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,1646,0.0,0x150,BMS_SOE,A
+Battery_Voltage,1646,0.0,0x150,BMS_SOE,V
+Battery_Temperature,1646,0.0,0x150,BMS_SOE,C
+Battery_Current,1646,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,1647,1.0,0x151,BMS_Faults,
+External_Fault,1647,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,1647,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,1647,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,1647,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,1647,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,1647,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,1647,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,1647,0.0,0x151,BMS_Faults,
+Pec_Fault,1647,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,1647,0.0,0x151,BMS_Faults,
+BMS_State,1647,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,1647,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,1647,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,1647,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,1647,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,1647,2.0,0x152,BMS_Status,V
+BMS_SOC,1647,0.0,0x152,BMS_Status,
+Cell_V_0,1647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,1647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,1647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,1647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,1647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,1647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,1647,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,1647,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,1647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,1647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,1647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,1647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,1647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,1647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,1647,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,1647,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,1648,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,1648,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,1648,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,1648,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,1648,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,1648,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,1648,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,1648,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,1648,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,1648,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,1648,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,1648,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,1648,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,1648,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,1648,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,1648,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,1648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,1648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,1648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,1648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,1648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,1648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,1648,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,1648,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,1648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,1648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,1648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,1648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,1648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,1648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,1648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,1648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,1649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,1649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,1649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,1649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,1649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,1649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,1649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,1649,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,1649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,1649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,1649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,1649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,1649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,1649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,1649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,1649,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,1719,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1719,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1719,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1719,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1720,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1720,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1720,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,1720,1648.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1721,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1721,0.0,0x203,ECU_Brake,
+Brake_Pressed,1721,0.0,0x203,ECU_Brake,
+Implausibility_Present,1721,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1721,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1721,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1721,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1721,0.0,0x204,ECU_Implausibility,
+BMS_Command,1721,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1722,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,1819,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1819,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1819,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1820,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1820,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1820,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1821,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,1821,1649.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1821,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1821,0.0,0x203,ECU_Brake,
+Brake_Pressed,1821,0.0,0x203,ECU_Brake,
+Implausibility_Present,1821,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1821,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1821,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1821,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1821,0.0,0x204,ECU_Implausibility,
+BMS_Command,1822,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1822,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Gen_Amps,1824,12.950000000000001,0x2A1,PDM_Current,A
+Front_Fan_Amps,1824,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,1824,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,1824,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,1824,-0.08,0x2A1,PDM_Current,A
+Max_Discharge_Current,1896,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,1896,0.0,0x150,BMS_SOE,A
+Battery_Voltage,1896,0.0,0x150,BMS_SOE,V
+Battery_Temperature,1896,0.0,0x150,BMS_SOE,C
+Battery_Current,1896,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,1897,1.0,0x151,BMS_Faults,
+External_Fault,1897,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,1897,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,1897,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,1897,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,1897,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,1897,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,1897,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,1897,0.0,0x151,BMS_Faults,
+Pec_Fault,1897,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,1897,0.0,0x151,BMS_Faults,
+BMS_State,1897,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,1897,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,1897,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,1897,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,1897,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,1897,2.0,0x152,BMS_Status,V
+BMS_SOC,1897,0.0,0x152,BMS_Status,
+Cell_V_0,1897,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,1897,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,1897,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,1897,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,1897,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,1897,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,1897,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,1897,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,1897,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,1897,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,1897,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,1897,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,1897,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,1897,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,1897,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,1897,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,1898,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,1898,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,1898,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,1898,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,1898,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,1898,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,1898,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,1898,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,1898,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,1898,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,1898,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,1898,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,1898,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,1898,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,1898,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,1898,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,1898,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,1898,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,1898,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,1898,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,1898,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,1898,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,1898,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,1898,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,1898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,1898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,1898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,1898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,1898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,1898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,1898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,1898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,1899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,1899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,1899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,1899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,1899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,1899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,1899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,1899,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,1899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,1899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,1899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,1899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,1899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,1899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,1899,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,1899,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,1919,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,1920,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,1920,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,1920,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,1920,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,1921,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,1921,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,1921,1647.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,1921,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,1921,0.0,0x203,ECU_Brake,
+Brake_Pressed,1921,0.0,0x203,ECU_Brake,
+Implausibility_Present,1922,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,1922,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,1922,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,1922,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,1922,0.0,0x204,ECU_Implausibility,
+BMS_Command,1922,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,1922,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2020,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2020,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2020,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2020,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2021,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2021,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2021,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,2021,1649.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2022,107.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2022,0.0,0x203,ECU_Brake,
+Brake_Pressed,2022,0.0,0x203,ECU_Brake,
+Implausibility_Present,2022,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2022,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2022,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2022,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2022,0.0,0x204,ECU_Implausibility,
+BMS_Command,2022,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2023,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2120,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2120,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2120,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2121,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2121,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2121,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2122,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,2122,1650.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2122,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2122,0.0,0x203,ECU_Brake,
+Brake_Pressed,2122,0.0,0x203,ECU_Brake,
+Implausibility_Present,2122,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2122,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2122,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2122,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2122,0.0,0x204,ECU_Implausibility,
+BMS_Command,2123,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2123,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,2146,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,2146,0.0,0x150,BMS_SOE,A
+Battery_Voltage,2146,0.0,0x150,BMS_SOE,V
+Battery_Temperature,2146,0.0,0x150,BMS_SOE,C
+Battery_Current,2146,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,2146,1.0,0x151,BMS_Faults,
+External_Fault,2146,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,2146,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,2146,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,2146,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,2146,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,2146,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,2146,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,2146,0.0,0x151,BMS_Faults,
+Pec_Fault,2146,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,2146,0.0,0x151,BMS_Faults,
+BMS_State,2147,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,2147,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,2147,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,2147,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,2147,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,2147,2.0,0x152,BMS_Status,V
+BMS_SOC,2147,0.0,0x152,BMS_Status,
+Cell_V_0,2147,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,2147,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,2147,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,2147,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,2147,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,2147,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,2147,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,2147,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,2147,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,2147,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,2147,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,2147,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,2147,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,2147,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,2147,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,2147,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,2147,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,2147,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,2147,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,2147,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,2147,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,2147,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,2147,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,2147,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,2148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,2148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,2148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,2148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,2148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,2148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,2148,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,2148,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,2148,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,2148,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,2148,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,2148,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,2148,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,2148,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,2148,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,2148,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,2148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,2148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,2148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,2148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,2148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,2148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,2148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,2148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,2148,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,2148,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,2148,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,2148,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,2148,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,2148,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,2148,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,2148,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,2149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,2149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,2149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,2149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,2149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,2149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,2149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,2149,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,2220,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2221,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2221,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2221,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2221,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2222,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2222,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,2222,1639.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2222,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2222,0.0,0x203,ECU_Brake,
+Brake_Pressed,2222,0.0,0x203,ECU_Brake,
+Implausibility_Present,2223,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2223,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2223,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2223,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2223,0.0,0x204,ECU_Implausibility,
+BMS_Command,2223,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2223,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2321,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2321,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2321,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2321,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2322,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2322,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2322,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,2322,1649.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2323,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2323,0.0,0x203,ECU_Brake,
+Brake_Pressed,2323,0.0,0x203,ECU_Brake,
+Implausibility_Present,2323,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2323,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2323,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2323,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2323,0.0,0x204,ECU_Implausibility,
+BMS_Command,2323,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2324,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Gen_Amps,2340,12.950000000000001,0x2A1,PDM_Current,A
+Front_Fan_Amps,2340,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,2340,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,2340,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,2340,-0.08,0x2A1,PDM_Current,A
+Max_Discharge_Current,2396,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,2396,0.0,0x150,BMS_SOE,A
+Battery_Voltage,2396,0.0,0x150,BMS_SOE,V
+Battery_Temperature,2396,0.0,0x150,BMS_SOE,C
+Battery_Current,2396,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,2396,1.0,0x151,BMS_Faults,
+External_Fault,2396,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,2396,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,2396,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,2396,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,2396,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,2396,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,2396,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,2396,0.0,0x151,BMS_Faults,
+Pec_Fault,2396,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,2396,0.0,0x151,BMS_Faults,
+BMS_State,2396,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,2396,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,2396,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,2396,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,2396,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,2396,2.0,0x152,BMS_Status,V
+BMS_SOC,2396,0.0,0x152,BMS_Status,
+Cell_V_0,2397,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,2397,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,2397,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,2397,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,2397,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,2397,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,2397,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,2397,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,2397,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,2397,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,2397,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,2397,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,2397,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,2397,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,2397,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,2397,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,2397,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,2397,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,2397,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,2397,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,2397,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,2397,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,2397,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,2397,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,2397,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,2397,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,2397,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,2397,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,2397,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,2397,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,2397,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,2397,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,2398,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,2398,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,2398,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,2398,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,2398,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,2398,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,2398,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,2398,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,2398,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,2398,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,2398,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,2398,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,2398,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,2398,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,2398,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,2398,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,2398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,2398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,2398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,2398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,2398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,2398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,2398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,2398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,2398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,2398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,2398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,2398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,2398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,2398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,2398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,2398,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,2421,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2421,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2421,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2422,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2422,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2422,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2423,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,2423,1648.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2423,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2423,0.0,0x203,ECU_Brake,
+Brake_Pressed,2423,0.0,0x203,ECU_Brake,
+Implausibility_Present,2423,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2423,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2423,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2423,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2423,0.0,0x204,ECU_Implausibility,
+BMS_Command,2424,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2424,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2521,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2522,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2522,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2522,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2522,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2523,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2523,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,2523,1649.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2523,107.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2523,0.0,0x203,ECU_Brake,
+Brake_Pressed,2523,0.0,0x203,ECU_Brake,
+Implausibility_Present,2524,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2524,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2524,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2524,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2524,0.0,0x204,ECU_Implausibility,
+BMS_Command,2524,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2524,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2622,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2622,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2622,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2622,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2623,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2623,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2623,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,2623,1641.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2624,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2624,0.0,0x203,ECU_Brake,
+Brake_Pressed,2624,0.0,0x203,ECU_Brake,
+Implausibility_Present,2624,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2624,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2624,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2624,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2624,0.0,0x204,ECU_Implausibility,
+BMS_Command,2624,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2624,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,2646,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,2646,0.0,0x150,BMS_SOE,A
+Battery_Voltage,2646,0.0,0x150,BMS_SOE,V
+Battery_Temperature,2646,0.0,0x150,BMS_SOE,C
+Battery_Current,2646,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,2646,1.0,0x151,BMS_Faults,
+External_Fault,2646,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,2646,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,2646,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,2646,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,2646,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,2646,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,2646,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,2646,0.0,0x151,BMS_Faults,
+Pec_Fault,2646,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,2646,0.0,0x151,BMS_Faults,
+BMS_State,2646,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,2646,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,2646,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,2646,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,2646,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,2646,2.0,0x152,BMS_Status,V
+BMS_SOC,2646,0.0,0x152,BMS_Status,
+Cell_V_0,2647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,2647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,2647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,2647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,2647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,2647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,2647,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,2647,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,2647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,2647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,2647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,2647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,2647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,2647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,2647,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,2647,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,2647,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,2647,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,2647,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,2647,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,2647,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,2647,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,2647,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,2647,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,2647,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,2647,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,2647,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,2647,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,2647,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,2647,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,2647,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,2647,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,2648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,2648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,2648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,2648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,2648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,2648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,2648,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,2648,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,2648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,2648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,2648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,2648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,2648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,2648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,2648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,2648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,2648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,2648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,2648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,2648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,2648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,2648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,2648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,2648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,2648,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,2648,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,2648,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,2648,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,2648,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,2648,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,2648,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,2648,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,2722,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2722,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2722,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2723,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2723,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2723,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2724,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,2724,1641.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2724,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2724,0.0,0x203,ECU_Brake,
+Brake_Pressed,2724,0.0,0x203,ECU_Brake,
+Implausibility_Present,2724,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2724,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2724,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2724,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2724,0.0,0x204,ECU_Implausibility,
+BMS_Command,2724,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2725,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,2822,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2822,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2823,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2823,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2823,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2824,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2824,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,2824,1650.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2824,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2824,0.0,0x203,ECU_Brake,
+Brake_Pressed,2824,0.0,0x203,ECU_Brake,
+Implausibility_Present,2825,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2825,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2825,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2825,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2825,0.0,0x204,ECU_Implausibility,
+BMS_Command,2825,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2825,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Gen_Amps,2856,12.950000000000001,0x2A1,PDM_Current,A
+Front_Fan_Amps,2856,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,2856,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,2856,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,2856,-0.08,0x2A1,PDM_Current,A
+Max_Discharge_Current,2896,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,2896,0.0,0x150,BMS_SOE,A
+Battery_Voltage,2896,0.0,0x150,BMS_SOE,V
+Battery_Temperature,2896,0.0,0x150,BMS_SOE,C
+Battery_Current,2896,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,2896,1.0,0x151,BMS_Faults,
+External_Fault,2896,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,2896,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,2896,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,2896,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,2896,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,2896,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,2896,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,2896,0.0,0x151,BMS_Faults,
+Pec_Fault,2896,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,2896,0.0,0x151,BMS_Faults,
+BMS_State,2896,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,2896,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,2896,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,2896,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,2896,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,2896,2.0,0x152,BMS_Status,V
+BMS_SOC,2896,0.0,0x152,BMS_Status,
+Cell_V_0,2896,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,2896,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,2896,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,2896,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,2896,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,2896,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,2896,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,2896,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,2897,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,2897,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,2897,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,2897,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,2897,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,2897,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,2897,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,2897,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,2897,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,2897,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,2897,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,2897,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,2897,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,2897,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,2897,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,2897,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,2897,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,2897,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,2897,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,2897,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,2897,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,2897,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,2897,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,2897,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,2897,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,2897,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,2897,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,2897,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,2897,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,2897,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,2897,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,2897,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,2898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,2898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,2898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,2898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,2898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,2898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,2898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,2898,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,2898,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,2898,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,2898,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,2898,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,2898,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,2898,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,2898,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,2898,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,2898,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,2898,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,2898,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,2898,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,2898,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,2898,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,2898,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,2898,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,2922,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,2923,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,2923,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,2923,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,2924,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,2924,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,2924,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,2924,1648.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,2925,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,2925,0.0,0x203,ECU_Brake,
+Brake_Pressed,2925,0.0,0x203,ECU_Brake,
+Implausibility_Present,2925,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,2925,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,2925,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,2925,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,2925,0.0,0x204,ECU_Implausibility,
+BMS_Command,2925,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,2925,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,3023,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,3023,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,3023,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,3024,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,3024,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,3024,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,3025,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,3025,1649.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,3025,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,3025,0.0,0x203,ECU_Brake,
+Brake_Pressed,3025,0.0,0x203,ECU_Brake,
+Implausibility_Present,3025,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,3025,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,3025,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,3025,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,3025,0.0,0x204,ECU_Implausibility,
+BMS_Command,3025,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,3026,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,3123,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,3123,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,3124,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,3124,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,3124,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,3125,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,3125,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,3125,1649.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,3125,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,3125,0.0,0x203,ECU_Brake,
+Brake_Pressed,3125,0.0,0x203,ECU_Brake,
+Implausibility_Present,3126,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,3126,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,3126,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,3126,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,3126,0.0,0x204,ECU_Implausibility,
+BMS_Command,3126,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,3126,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,3147,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,3147,0.0,0x150,BMS_SOE,A
+Battery_Voltage,3147,0.0,0x150,BMS_SOE,V
+Battery_Temperature,3147,0.0,0x150,BMS_SOE,C
+Battery_Current,3147,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,3147,1.0,0x151,BMS_Faults,
+External_Fault,3147,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,3147,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,3147,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,3147,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,3147,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,3147,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,3147,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,3147,0.0,0x151,BMS_Faults,
+Pec_Fault,3147,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,3147,0.0,0x151,BMS_Faults,
+BMS_State,3147,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,3147,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,3147,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,3147,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,3147,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,3147,2.0,0x152,BMS_Status,V
+BMS_SOC,3147,0.0,0x152,BMS_Status,
+Cell_V_0,3147,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,3147,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,3147,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,3147,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,3147,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,3147,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,3147,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,3147,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,3147,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,3147,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,3147,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,3147,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,3147,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,3147,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,3147,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,3147,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,3148,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,3148,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,3148,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,3148,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,3148,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,3148,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,3148,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,3148,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,3148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,3148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,3148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,3148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,3148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,3148,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,3148,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,3148,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,3148,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,3148,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,3148,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,3148,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,3148,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,3148,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,3148,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,3148,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,3148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,3148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,3148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,3148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,3148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,3148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,3148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,3148,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,3149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,3149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,3149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,3149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,3149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,3149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,3149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,3149,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,3149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,3149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,3149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,3149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,3149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,3149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,3149,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,3149,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,3224,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,3224,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,3224,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,3224,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,3225,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,3225,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,3225,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,3225,1648.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,3226,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,3226,0.0,0x203,ECU_Brake,
+Brake_Pressed,3226,0.0,0x203,ECU_Brake,
+Implausibility_Present,3226,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,3226,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,3226,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,3226,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,3226,0.0,0x204,ECU_Implausibility,
+BMS_Command,3226,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,3226,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,3324,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,3324,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,3324,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,3325,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,3325,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,3325,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,3326,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,3326,1648.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,3326,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,3326,0.0,0x203,ECU_Brake,
+Brake_Pressed,3326,0.0,0x203,ECU_Brake,
+Implausibility_Present,3326,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,3326,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,3326,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,3326,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,3326,0.0,0x204,ECU_Implausibility,
+BMS_Command,3326,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,3327,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Gen_Amps,3372,12.950000000000001,0x2A1,PDM_Current,A
+Front_Fan_Amps,3372,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,3372,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,3372,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,3372,-0.08,0x2A1,PDM_Current,A
+Max_Discharge_Current,3395,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,3395,0.0,0x150,BMS_SOE,A
+Battery_Voltage,3395,0.0,0x150,BMS_SOE,V
+Battery_Temperature,3395,0.0,0x150,BMS_SOE,C
+Battery_Current,3395,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,3396,1.0,0x151,BMS_Faults,
+External_Fault,3396,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,3396,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,3396,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,3396,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,3396,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,3396,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,3396,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,3396,0.0,0x151,BMS_Faults,
+Pec_Fault,3396,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,3396,0.0,0x151,BMS_Faults,
+BMS_State,3396,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,3396,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,3396,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,3396,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,3396,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,3396,2.0,0x152,BMS_Status,V
+BMS_SOC,3396,0.0,0x152,BMS_Status,
+Cell_V_0,3396,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,3396,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,3396,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,3396,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,3396,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,3396,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,3396,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,3396,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,3396,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,3396,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,3396,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,3396,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,3396,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,3396,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,3396,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,3396,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,3397,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,3397,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,3397,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,3397,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,3397,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,3397,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,3397,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,3397,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,3397,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,3397,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,3397,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,3397,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,3397,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,3397,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,3397,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,3397,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,3397,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,3397,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,3397,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,3397,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,3397,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,3397,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,3397,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,3397,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,3397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,3397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,3397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,3397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,3397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,3397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,3397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,3397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,3398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,3398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,3398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,3398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,3398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,3398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,3398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,3398,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,3398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,3398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,3398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,3398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,3398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,3398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,3398,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,3398,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,3424,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,3424,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,3425,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,3425,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,3425,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,3426,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,3426,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,3426,1642.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,3426,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,3426,0.0,0x203,ECU_Brake,
+Brake_Pressed,3426,0.0,0x203,ECU_Brake,
+Implausibility_Present,3427,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,3427,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,3427,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,3427,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,3427,0.0,0x204,ECU_Implausibility,
+BMS_Command,3427,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,3427,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,3524,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,3525,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,3525,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,3525,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,3526,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,3526,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,3526,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,3526,1639.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,3527,107.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,3527,0.0,0x203,ECU_Brake,
+Brake_Pressed,3527,0.0,0x203,ECU_Brake,
+Implausibility_Present,3527,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,3527,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,3527,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,3527,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,3527,0.0,0x204,ECU_Implausibility,
+BMS_Command,3527,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,3527,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,3625,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,3625,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,3625,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,3626,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,3626,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,3626,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,3627,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,3627,1646.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,3627,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,3627,0.0,0x203,ECU_Brake,
+Brake_Pressed,3627,0.0,0x203,ECU_Brake,
+Implausibility_Present,3627,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,3627,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,3627,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,3627,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,3627,0.0,0x204,ECU_Implausibility,
+BMS_Command,3627,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,3628,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,3646,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,3646,0.0,0x150,BMS_SOE,A
+Battery_Voltage,3646,0.0,0x150,BMS_SOE,V
+Battery_Temperature,3646,0.0,0x150,BMS_SOE,C
+Battery_Current,3646,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,3646,1.0,0x151,BMS_Faults,
+External_Fault,3646,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,3646,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,3646,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,3646,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,3646,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,3646,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,3646,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,3646,0.0,0x151,BMS_Faults,
+Pec_Fault,3646,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,3646,0.0,0x151,BMS_Faults,
+BMS_State,3647,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,3647,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,3647,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,3647,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,3647,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,3647,2.0,0x152,BMS_Status,V
+BMS_SOC,3647,0.0,0x152,BMS_Status,
+Cell_V_0,3647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,3647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,3647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,3647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,3647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,3647,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,3647,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,3647,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,3647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,3647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,3647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,3647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,3647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,3647,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,3647,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,3647,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,3647,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,3647,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,3647,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,3647,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,3647,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,3647,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,3647,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,3647,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,3648,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,3648,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,3648,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,3648,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,3648,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,3648,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,3648,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,3648,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,3648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,3648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,3648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,3648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,3648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,3648,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,3648,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,3648,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,3648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,3648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,3648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,3648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,3648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,3648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,3648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,3648,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,3648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,3648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,3648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,3648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,3648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,3648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,3648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,3648,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,3649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,3649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,3649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,3649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,3649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,3649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,3649,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,3649,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,3725,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,3725,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,3726,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,3726,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,3726,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,3727,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,3727,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,3727,1650.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,3727,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,3727,0.0,0x203,ECU_Brake,
+Brake_Pressed,3727,0.0,0x203,ECU_Brake,
+Implausibility_Present,3727,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,3727,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,3727,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,3727,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,3727,0.0,0x204,ECU_Implausibility,
+BMS_Command,3728,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,3728,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,3825,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,3826,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,3826,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,3826,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,3827,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,3827,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,3827,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,3827,1648.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,3828,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,3828,0.0,0x203,ECU_Brake,
+Brake_Pressed,3828,0.0,0x203,ECU_Brake,
+Implausibility_Present,3828,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,3828,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,3828,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,3828,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,3828,0.0,0x204,ECU_Implausibility,
+BMS_Command,3828,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,3828,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Gen_Amps,3888,12.950000000000001,0x2A1,PDM_Current,A
+Front_Fan_Amps,3888,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,3888,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,3888,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,3888,-0.08,0x2A1,PDM_Current,A
+Max_Discharge_Current,3895,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,3895,0.0,0x150,BMS_SOE,A
+Battery_Voltage,3895,0.0,0x150,BMS_SOE,V
+Battery_Temperature,3895,0.0,0x150,BMS_SOE,C
+Battery_Current,3895,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,3895,1.0,0x151,BMS_Faults,
+External_Fault,3895,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,3895,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,3895,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,3895,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,3895,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,3895,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,3895,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,3895,0.0,0x151,BMS_Faults,
+Pec_Fault,3895,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,3895,0.0,0x151,BMS_Faults,
+BMS_State,3895,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,3895,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,3895,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,3895,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,3895,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,3895,2.0,0x152,BMS_Status,V
+BMS_SOC,3895,0.0,0x152,BMS_Status,
+Cell_V_0,3896,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,3896,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,3896,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,3896,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,3896,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,3896,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,3896,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,3896,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,3896,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,3896,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,3896,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,3896,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,3896,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,3896,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,3896,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,3896,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,3896,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,3896,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,3896,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,3896,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,3896,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,3896,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,3896,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,3896,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,3896,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,3896,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,3896,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,3896,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,3896,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,3896,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,3896,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,3896,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,3897,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,3897,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,3897,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,3897,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,3897,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,3897,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,3897,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,3897,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,3897,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,3897,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,3897,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,3897,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,3897,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,3897,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,3897,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,3897,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,3897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,3897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,3897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,3897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,3897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,3897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,3897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,3897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,3897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,3897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,3897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,3897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,3897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,3897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,3897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,3897,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,3926,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,3926,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,3926,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,3927,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,3927,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,3927,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,3928,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,3928,1648.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,3928,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,3928,0.0,0x203,ECU_Brake,
+Brake_Pressed,3928,0.0,0x203,ECU_Brake,
+Implausibility_Present,3928,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,3928,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,3928,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,3928,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,3928,0.0,0x204,ECU_Implausibility,
+BMS_Command,3928,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,3929,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,4026,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,4026,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,4027,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,4027,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,4027,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,4028,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,4028,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,4028,1640.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,4028,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,4028,0.0,0x203,ECU_Brake,
+Brake_Pressed,4028,0.0,0x203,ECU_Brake,
+Implausibility_Present,4029,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,4029,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,4029,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,4029,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,4029,0.0,0x204,ECU_Implausibility,
+BMS_Command,4029,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,4029,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,4126,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,4127,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,4127,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,4127,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,4128,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,4128,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,4128,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,4128,1639.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,4129,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,4129,0.0,0x203,ECU_Brake,
+Brake_Pressed,4129,0.0,0x203,ECU_Brake,
+Implausibility_Present,4129,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,4129,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,4129,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,4129,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,4129,0.0,0x204,ECU_Implausibility,
+BMS_Command,4129,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,4130,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,4145,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,4145,0.0,0x150,BMS_SOE,A
+Battery_Voltage,4145,0.0,0x150,BMS_SOE,V
+Battery_Temperature,4145,0.0,0x150,BMS_SOE,C
+Battery_Current,4145,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,4145,1.0,0x151,BMS_Faults,
+External_Fault,4145,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,4145,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,4145,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,4145,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,4145,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,4145,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,4145,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,4145,0.0,0x151,BMS_Faults,
+Pec_Fault,4145,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,4145,0.0,0x151,BMS_Faults,
+BMS_State,4145,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,4145,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,4145,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,4145,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,4145,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,4145,2.0,0x152,BMS_Status,V
+BMS_SOC,4145,0.0,0x152,BMS_Status,
+Cell_V_0,4146,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,4146,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,4146,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,4146,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,4146,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,4146,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,4146,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,4146,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,4146,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,4146,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,4146,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,4146,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,4146,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,4146,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,4146,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,4146,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,4146,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,4146,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,4146,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,4146,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,4146,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,4146,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,4146,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,4146,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,4146,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,4146,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,4146,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,4146,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,4146,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,4146,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,4146,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,4146,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,4147,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,4147,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,4147,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,4147,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,4147,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,4147,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,4147,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,4147,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,4147,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,4147,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,4147,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,4147,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,4147,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,4147,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,4147,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,4147,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,4147,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,4147,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,4147,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,4147,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,4147,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,4147,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,4147,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,4147,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,4147,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,4147,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,4147,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,4147,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,4147,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,4147,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,4147,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,4147,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,4227,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,4227,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,4227,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,4228,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,4228,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,4228,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,4229,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,4229,1639.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,4229,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,4229,0.0,0x203,ECU_Brake,
+Brake_Pressed,4229,0.0,0x203,ECU_Brake,
+Implausibility_Present,4229,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,4229,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,4229,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,4229,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,4229,0.0,0x204,ECU_Implausibility,
+BMS_Command,4230,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,4230,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,4327,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,4327,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,4328,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,4328,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,4328,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,4328,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,4329,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,4329,1646.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,4329,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,4329,0.0,0x203,ECU_Brake,
+Brake_Pressed,4329,0.0,0x203,ECU_Brake,
+Implausibility_Present,4329,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,4329,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,4329,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,4329,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,4329,0.0,0x204,ECU_Implausibility,
+BMS_Command,4330,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,4330,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,4395,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,4395,0.0,0x150,BMS_SOE,A
+Battery_Voltage,4395,0.0,0x150,BMS_SOE,V
+Battery_Temperature,4395,0.0,0x150,BMS_SOE,C
+Battery_Current,4395,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,4395,1.0,0x151,BMS_Faults,
+External_Fault,4395,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,4395,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,4395,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,4395,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,4395,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,4395,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,4395,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,4395,0.0,0x151,BMS_Faults,
+Pec_Fault,4395,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,4395,0.0,0x151,BMS_Faults,
+BMS_State,4395,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,4395,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,4395,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,4395,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,4395,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,4395,2.0,0x152,BMS_Status,V
+BMS_SOC,4395,0.0,0x152,BMS_Status,
+Cell_V_0,4395,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,4395,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,4395,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,4395,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,4395,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,4395,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,4395,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,4395,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,4396,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,4396,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,4396,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,4396,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,4396,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,4396,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,4396,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,4396,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,4396,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,4396,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,4396,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,4396,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,4396,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,4396,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,4396,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,4396,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,4396,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,4396,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,4396,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,4396,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,4396,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,4396,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,4396,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,4396,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,4396,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,4396,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,4396,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,4396,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,4396,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,4396,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,4396,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,4396,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,4397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,4397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,4397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,4397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,4397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,4397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,4397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,4397,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,4397,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,4397,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,4397,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,4397,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,4397,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,4397,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,4397,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,4397,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,4397,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,4397,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,4397,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,4397,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,4397,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,4397,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,4397,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,4397,0.0,0x169,BMS_Temperatures_2,C
+Gen_Amps,4404,12.950000000000001,0x2A1,PDM_Current,A
+Front_Fan_Amps,4404,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,4404,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,4404,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,4404,-0.08,0x2A1,PDM_Current,A
+Set_Current,4427,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,4428,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,4428,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,4428,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,4428,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,4429,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,4429,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,4429,1647.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,4429,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,4429,0.0,0x203,ECU_Brake,
+Brake_Pressed,4429,0.0,0x203,ECU_Brake,
+Implausibility_Present,4430,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,4430,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,4430,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,4430,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,4430,0.0,0x204,ECU_Implausibility,
+BMS_Command,4430,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,4430,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,4528,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,4528,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,4528,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,4528,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,4529,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,4529,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,4529,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,4529,1641.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,4530,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,4530,0.0,0x203,ECU_Brake,
+Brake_Pressed,4530,0.0,0x203,ECU_Brake,
+Implausibility_Present,4530,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,4530,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,4530,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,4530,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,4530,0.0,0x204,ECU_Implausibility,
+BMS_Command,4530,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,4531,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,4628,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,4628,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,4628,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,4629,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,4629,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,4629,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,4630,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,4630,1648.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,4630,109.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,4630,0.0,0x203,ECU_Brake,
+Brake_Pressed,4630,0.0,0x203,ECU_Brake,
+Implausibility_Present,4630,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,4630,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,4630,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,4630,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,4630,0.0,0x204,ECU_Implausibility,
+BMS_Command,4631,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,4631,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,4645,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,4645,0.0,0x150,BMS_SOE,A
+Battery_Voltage,4645,0.0,0x150,BMS_SOE,V
+Battery_Temperature,4645,0.0,0x150,BMS_SOE,C
+Battery_Current,4645,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,4645,1.0,0x151,BMS_Faults,
+External_Fault,4645,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,4645,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,4645,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,4645,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,4645,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,4645,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,4645,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,4645,0.0,0x151,BMS_Faults,
+Pec_Fault,4645,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,4645,0.0,0x151,BMS_Faults,
+BMS_State,4645,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,4645,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,4645,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,4645,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,4645,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,4645,2.0,0x152,BMS_Status,V
+BMS_SOC,4645,0.0,0x152,BMS_Status,
+Cell_V_0,4645,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,4645,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,4645,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,4645,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,4645,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,4645,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,4645,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,4645,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,4645,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,4645,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,4645,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,4645,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,4645,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,4645,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,4645,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,4645,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,4646,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,4646,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,4646,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,4646,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,4646,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,4646,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,4646,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,4646,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,4646,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,4646,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,4646,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,4646,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,4646,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,4646,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,4646,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,4646,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,4646,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,4646,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,4646,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,4646,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,4646,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,4646,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,4646,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,4646,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,4646,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,4646,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,4646,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,4646,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,4646,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,4646,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,4646,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,4646,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,4647,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,4647,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,4647,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,4647,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,4647,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,4647,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,4647,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,4647,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,4647,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,4647,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,4647,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,4647,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,4647,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,4647,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,4647,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,4647,0.0,0x169,BMS_Temperatures_2,C
+Set_Current,4728,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,4728,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,4729,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,4729,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,4729,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,4730,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,4730,894.0,0x202,ECU_Throttle,
+APPS2_Throttle,4730,1643.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,4730,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,4730,0.0,0x203,ECU_Brake,
+Brake_Pressed,4730,0.0,0x203,ECU_Brake,
+Implausibility_Present,4731,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,4731,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,4731,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,4731,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,4731,0.0,0x204,ECU_Implausibility,
+BMS_Command,4731,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,4731,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Set_Current,4829,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,4829,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,4829,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,4829,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,4830,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,4830,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,4830,895.0,0x202,ECU_Throttle,
+APPS2_Throttle,4830,1642.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,4831,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,4831,0.0,0x203,ECU_Brake,
+Brake_Pressed,4831,0.0,0x203,ECU_Brake,
+Implausibility_Present,4831,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,4831,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,4831,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,4831,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,4831,0.0,0x204,ECU_Implausibility,
+BMS_Command,4831,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,4832,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Max_Discharge_Current,4894,0.0,0x150,BMS_SOE,A
+Max_Regen_Current,4894,0.0,0x150,BMS_SOE,A
+Battery_Voltage,4894,0.0,0x150,BMS_SOE,V
+Battery_Temperature,4894,0.0,0x150,BMS_SOE,C
+Battery_Current,4894,0.0,0x150,BMS_SOE,A
+InternalFault_Summary,4895,1.0,0x151,BMS_Faults,
+External_Fault,4895,1.0,0x151,BMS_Faults,
+Undervoltage_Fault,4895,1.0,0x151,BMS_Faults,
+Overvoltage_Fault,4895,0.0,0x151,BMS_Faults,
+Undertemperature_Fault,4895,0.0,0x151,BMS_Faults,
+Overtemperature_Fault,4895,0.0,0x151,BMS_Faults,
+Overcurrent_Fault,4895,0.0,0x151,BMS_Faults,
+Open_Wire_Fault,4895,0.0,0x151,BMS_Faults,
+Open_Wire_Temp_Fault,4895,0.0,0x151,BMS_Faults,
+Pec_Fault,4895,0.0,0x151,BMS_Faults,
+Total_PEC_Failures,4895,0.0,0x151,BMS_Faults,
+BMS_State,4895,4.0,0x152,BMS_Status,"State that the BMS is in:
+Idle = 0,
+Precharge = 1,
+Active = 2,
+Charge = 3,
+Fault = 4"
+IMD_State,4895,1.0,0x152,BMS_Status,State of the IMD. High is Healthy 
+Max_Cell_Temp,4895,0.0,0x152,BMS_Status,C
+Min_Cell_Temp,4895,0.0,0x152,BMS_Status,C
+Max_Cell_Voltage,4895,2.0,0x152,BMS_Status,V
+Min_Cell_Voltage,4895,2.0,0x152,BMS_Status,V
+BMS_SOC,4895,0.0,0x152,BMS_Status,
+Cell_V_0,4895,2.0,0x153,BMS_Voltages_0,V
+Cell_V_1,4895,2.0,0x153,BMS_Voltages_0,V
+Cell_V_2,4895,2.0,0x153,BMS_Voltages_0,V
+Cell_V_3,4895,2.0,0x153,BMS_Voltages_0,V
+Cell_V_4,4895,2.0,0x153,BMS_Voltages_0,V
+Cell_V_5,4895,2.0,0x153,BMS_Voltages_0,V
+Cell_V_6,4895,2.0,0x153,BMS_Voltages_0,V
+Cell_OCV_Offset_0,4895,0.0,0x153,BMS_Voltages_0,V
+Cell_V_7,4895,2.0,0x154,BMS_Voltages_1,V
+Cell_V_8,4895,2.0,0x154,BMS_Voltages_1,V
+Cell_V_9,4895,2.0,0x154,BMS_Voltages_1,V
+Cell_V_10,4895,2.0,0x154,BMS_Voltages_1,V
+Cell_V_11,4895,2.0,0x154,BMS_Voltages_1,V
+Cell_V_12,4895,2.0,0x154,BMS_Voltages_1,V
+Cell_V_13,4895,2.0,0x154,BMS_Voltages_1,V
+Cell_OCV_Offset_1,4895,0.0,0x154,BMS_Voltages_1,V
+Cell_V_14,4896,2.0,0x155,BMS_Voltages_2,V
+Cell_V_15,4896,2.0,0x155,BMS_Voltages_2,V
+Cell_V_16,4896,2.0,0x155,BMS_Voltages_2,V
+Cell_V_17,4896,2.0,0x155,BMS_Voltages_2,V
+Cell_V_18,4896,2.0,0x155,BMS_Voltages_2,V
+Cell_V_19,4896,2.0,0x155,BMS_Voltages_2,V
+Cell_V_20,4896,2.0,0x155,BMS_Voltages_2,V
+Cell_OCV_Offset_2,4896,0.0,0x155,BMS_Voltages_2,V
+Cell_V_21,4896,2.0,0x156,BMS_Voltages_3,V
+Cell_V_22,4896,2.0,0x156,BMS_Voltages_3,V
+Cell_V_23,4896,2.0,0x156,BMS_Voltages_3,V
+Cell_V_24,4896,2.0,0x156,BMS_Voltages_3,V
+Cell_V_25,4896,2.0,0x156,BMS_Voltages_3,V
+Cell_V_26,4896,2.0,0x156,BMS_Voltages_3,V
+Cell_V_27,4896,2.0,0x156,BMS_Voltages_3,V
+Cell_OCV_Offset_3,4896,0.0,0x156,BMS_Voltages_3,V
+Cell_V_28,4896,2.0,0x157,BMS_Voltages_4,V
+Cell_V_29,4896,2.0,0x157,BMS_Voltages_4,V
+Cell_V_30,4896,2.0,0x157,BMS_Voltages_4,V
+Cell_V_31,4896,2.0,0x157,BMS_Voltages_4,V
+Cell_V_32,4896,2.0,0x157,BMS_Voltages_4,V
+Cell_V_33,4896,2.0,0x157,BMS_Voltages_4,V
+Cell_V_34,4896,2.0,0x157,BMS_Voltages_4,V
+Cell_OCV_Offset_4,4896,0.0,0x157,BMS_Voltages_4,V
+Cell_T_0,4896,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_1,4896,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_2,4896,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_3,4896,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_4,4896,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_5,4896,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_6,4896,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_7,4896,0.0,0x167,BMS_Temperatures_0,C
+Cell_T_8,4897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_9,4897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_10,4897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_11,4897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_12,4897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_13,4897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_14,4897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_15,4897,0.0,0x168,BMS_Temperatures_1,C
+Cell_T_16,4897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_17,4897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_18,4897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_19,4897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_20,4897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_21,4897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_22,4897,0.0,0x169,BMS_Temperatures_2,C
+Cell_T_23,4897,0.0,0x169,BMS_Temperatures_2,C
+Gen_Amps,4920,12.950000000000001,0x2A1,PDM_Current,A
+Front_Fan_Amps,4920,0.01,0x2A1,PDM_Current,A
+Rear_Fan_Amps,4920,0.0,0x2A1,PDM_Current,A
+Front_Pump_Amps,4920,-0.05,0x2A1,PDM_Current,A
+Rear_Pump_Amps,4920,-0.08,0x2A1,PDM_Current,A
+Set_Current,4929,0.0,0x20D,ECU_Set_Current_Front_Left_Inverter,A
+Set_Current_Brake,4929,0.0,0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,A
+Set_Current,4929,0.0,0x20F,ECU_Set_Current_Front_Right_Inverter,A
+Set_Current_Brake,4930,0.0,0x210,ECU_Set_Current_Brake_Front_Right_Inverter,A
+Set_Current,4930,0.0,0x200,ECU_Set_Current_Rear_Inverter,A
+Set_Current_Brake,4930,0.0,0x201,ECU_Set_Current_Brake_Rear_Inverter,A
+APPS1_Throttle,4931,896.0,0x202,ECU_Throttle,
+APPS2_Throttle,4931,1650.0,0x202,ECU_Throttle,
+Front_Brake_Pressure,4931,108.0,0x203,ECU_Brake,
+Rear_Brake_Pressure,4931,0.0,0x203,ECU_Brake,
+Brake_Pressed,4931,0.0,0x203,ECU_Brake,
+Implausibility_Present,4931,0.0,0x204,ECU_Implausibility,
+APPSs_Disagreement_Imp,4931,0.0,0x204,ECU_Implausibility,
+BPPC_Imp,4931,0.0,0x204,ECU_Implausibility,
+Brake_Invalid_Imp,4931,0.0,0x204,ECU_Implausibility,
+APPSs_Invalid_Imp,4931,0.0,0x204,ECU_Implausibility,
+BMS_Command,4932,4.0,0x205,ECU_BMS_Command_Message,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
+Drive_State,4932,4.0,0x206,ECU_Drive_Status,"0: IDLE
+1: PRECHARGE
+2: NEUTRAL
+3: DRIVE
+4: FAULT"
