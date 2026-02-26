@@ -23,14 +23,14 @@ export default function MiniGraph({ signals = [], unit = '', sessionData = [], l
     const signalNames = signals.map(s => s.name);
     const relevantData = sessionData.filter(d => signalNames.includes(d.signal_name));
 
-    // Group by rounded timestamp (nearest second)
+    // Group by raw timestamp so all data points are visible
     const byTimestamp = {};
     relevantData.forEach(d => {
-      const rounded = new Date(Math.round(new Date(d.timestamp).getTime() / 1000) * 1000).toISOString();
-      if (!byTimestamp[rounded]) {
-        byTimestamp[rounded] = { timestamp: rounded };
+      const ts = d.timestamp;
+      if (!byTimestamp[ts]) {
+        byTimestamp[ts] = { timestamp: ts };
       }
-      byTimestamp[rounded][d.signal_name] = Number(d.value);
+      byTimestamp[ts][d.signal_name] = Number(d.value);
     });
 
     return Object.values(byTimestamp).sort((a, b) =>
@@ -44,18 +44,15 @@ export default function MiniGraph({ signals = [], unit = '', sessionData = [], l
     return chartData.filter(d => d.timestamp >= zoomDomain.left && d.timestamp <= zoomDomain.right);
   }, [chartData, zoomDomain]);
 
-  // Compute cursor timestamp from chartData timestamps (rounded) to avoid mismatch
+  // Compute cursor timestamp from chartData timestamps
   const cursorTimestamp = useMemo(() => {
     if (mode !== 'replay' || replayPosition == null || !chartData.length) return null;
-    // Get unique raw timestamps from sessionData for slider indexing
     const uniqueTimestamps = [...new Set(sessionData.map(d => d.timestamp))].sort();
     const rawTs = uniqueTimestamps[replayPosition];
     if (!rawTs) return null;
-    // Round to match chartData timestamps
-    const rounded = new Date(Math.round(new Date(rawTs).getTime() / 1000) * 1000).toISOString();
-    // Verify it exists in chartData
-    const match = chartData.find(d => d.timestamp === rounded);
-    return match ? rounded : null;
+    // Find the closest chartData timestamp
+    const match = chartData.find(d => d.timestamp === rawTs);
+    return match ? rawTs : null;
   }, [mode, replayPosition, sessionData, chartData]);
 
   // Get cursor data point for ReferenceDots

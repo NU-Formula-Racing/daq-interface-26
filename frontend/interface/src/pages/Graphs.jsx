@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Navigate, Link } from "react-router-dom";
 import {
   ComposedChart,
@@ -64,18 +64,18 @@ function roundTs(ts) {
   return new Date(Math.round(new Date(ts).getTime() / 1000) * 1000).toISOString();
 }
 
-function transformChartData(sessionData, activeSignalNames, liveSignals, mode) {
+function transformChartData(sessionData, activeSignalNames, liveSignals, mode, useFullDetail = false) {
   const nameSet = new Set(activeSignalNames);
 
-  // Group by rounded timestamp (nearest second) so co-occurring signals merge
+  // Group by timestamp — round to nearest second for overview, or use raw ms for detail
   const tsMap = new Map();
   for (const row of sessionData) {
     if (!nameSet.has(row.signal_name)) continue;
-    const rounded = roundTs(row.timestamp);
-    if (!tsMap.has(rounded)) {
-      tsMap.set(rounded, { timestamp: rounded });
+    const key = useFullDetail ? row.timestamp : roundTs(row.timestamp);
+    if (!tsMap.has(key)) {
+      tsMap.set(key, { timestamp: key });
     }
-    tsMap.get(rounded)[row.signal_name] = Number(row.value);
+    tsMap.get(key)[row.signal_name] = Number(row.value);
   }
 
   const sorted = Array.from(tsMap.values()).sort(
@@ -170,7 +170,7 @@ function CursorValueReadout({ cursorData, visibleSignals, replayTimestamp }) {
 // Main Chart
 // ---------------------------------------------------------------------------
 
-function MainChart({ chartData, activeSignals, unitAxes, replayTimestamp, cursorData }) {
+function MainChart({ chartData, activeSignals, unitAxes, replayTimestamp, cursorData, onBrushChange }) {
   const visibleSignals = activeSignals.filter((s) => s.visible);
   const hasThirdAxis = unitAxes.some((a) => a.isThirdAxis);
 
@@ -291,6 +291,7 @@ function MainChart({ chartData, activeSignals, unitAxes, replayTimestamp, cursor
           stroke="#4E2A84"
           fill="rgba(10,10,15,0.95)"
           tickFormatter={formatTime}
+          onChange={onBrushChange}
         />
       </ComposedChart>
     </ResponsiveContainer>
@@ -352,6 +353,7 @@ export default function Graphs() {
     mode,
     replayPosition,
     setReplayPosition,
+    fetchSessionWindow,
   } = useSession();
 
   const isMobile = useIsMobile();
@@ -360,6 +362,8 @@ export default function Graphs() {
   const [activeSignals, setActiveSignals] = useState([]);
   // Track color index for assignment
   const [colorIndex, setColorIndex] = useState(0);
+  // Track Brush zoom range for progressive detail
+  const [brushRange, setBrushRange] = useState(null);
 
   // Derive available signals from replaySessionData
   const availableSignals = useMemo(
@@ -442,10 +446,50 @@ export default function Graphs() {
     [activeSignals]
   );
 
-  const chartData = useMemo(
-    () => transformChartData(replaySessionData, activeSignalNames, null, "replay"),
+  // Overview: server already returns 1-second-bucketed data, just transform for Recharts
+  const overviewData = useMemo(
+    () => transformChartData(replaySessionData, activeSignalNames, null, "replay", true),
     [replaySessionData, activeSignalNames]
   );
+
+  // Zoom detail: when Brush selects a small window, fetch raw ms data from server
+  const [detailData, setDetailData] = useState(null);
+  const brushDebounce = useRef(null);
+
+  useEffect(() => {
+    // Clear pending debounce on every brush change
+    if (brushDebounce.current) clearTimeout(brushDebounce.current);
+
+    if (!brushRange || !overviewData.length) {
+      setDetailData(null);
+      return;
+    }
+
+    const startTs = new Date(overviewData[brushRange.startIndex]?.timestamp).getTime();
+    const endTs = new Date(overviewData[brushRange.endIndex]?.timestamp).getTime();
+    const windowSec = (endTs - startTs) / 1000;
+
+    if (windowSec > 30) {
+      setDetailData(null);
+      return;
+    }
+
+    // Debounce the server fetch so we don't fire on every brush drag frame
+    const startIso = overviewData[brushRange.startIndex]?.timestamp;
+    const endIso = overviewData[brushRange.endIndex]?.timestamp;
+
+    brushDebounce.current = setTimeout(async () => {
+      const rows = await fetchSessionWindow(sessionId, startIso, endIso);
+      const detailed = transformChartData(rows, activeSignalNames, null, "replay", true);
+      setDetailData(detailed);
+    }, 300);
+
+    return () => {
+      if (brushDebounce.current) clearTimeout(brushDebounce.current);
+    };
+  }, [brushRange, overviewData, sessionId, activeSignalNames, fetchSessionWindow]);
+
+  const chartData = detailData || overviewData;
 
   // Unique sorted timestamps for the slider
   const timestamps = useMemo(
@@ -595,6 +639,7 @@ export default function Graphs() {
             unitAxes={unitAxes}
             replayTimestamp={replayTimestamp}
             cursorData={cursorData}
+            onBrushChange={setBrushRange}
           />
         </div>
         <CursorValueReadout

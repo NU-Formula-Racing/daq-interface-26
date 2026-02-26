@@ -21,7 +21,8 @@ const CARDS_REVEAL_MS = 3500;
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { sessionId, setMode, setSelectedDate: setCtxSelectedDate } = useSession();
+  const { sessionId, mode, setMode, setSelectedDate: setCtxSelectedDate } = useSession();
+  const isLive = mode === "live" && sessionId;
   const isMobile = useIsMobile();
 
   // Local date state for the replay date picker
@@ -151,7 +152,7 @@ export default function HomePage() {
           <div className="entry-cards">
             {/* Live Telemetry card */}
             <motion.div
-              className={`entry-card${sessionId ? ' entry-card--live-active' : ''}`}
+              className={`entry-card${isLive ? ' entry-card--live-active' : ''}`}
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: 'easeOut', delay: 0 }}
@@ -160,7 +161,7 @@ export default function HomePage() {
               <p className="entry-card__subtitle">
                 Stream real-time CAN &amp; sensor data
               </p>
-              {sessionId && (
+              {isLive && (
                 <span className="session-badge">
                   <span className="session-badge__dot" />
                   SESSION #{sessionId} ACTIVE

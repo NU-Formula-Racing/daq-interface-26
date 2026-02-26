@@ -10,43 +10,14 @@ import SessionIndicator from "./SessionIndicator";
 import "./TopBar.css";
 
 export default function TopBar() {
-  const { sessionData, sessionId, selectedDate, mode } = useSession();
+  const { sessionId, selectedDate, mode, downloadFullSessionCsv } = useSession();
   const isMobile = useIsMobile();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleCsvDownload = () => {
-    if (!sessionData.length) return;
-
-    // Get unique signal names and timestamps
-    const signalNames = [
-      ...new Set(sessionData.map((d) => d.signal_name)),
-    ].sort();
-    const timestamps = [
-      ...new Set(sessionData.map((d) => d.timestamp)),
-    ].sort();
-
-    // Build header
-    const header = ["timestamp", ...signalNames].join(",");
-
-    // Build rows - pivot data
-    const rows = timestamps.map((ts) => {
-      const rowData = sessionData.filter((d) => d.timestamp === ts);
-      const values = signalNames.map((name) => {
-        const match = rowData.find((d) => d.signal_name === name);
-        return match ? match.value : "";
-      });
-      return [ts, ...values].join(",");
-    });
-
-    const csv = [header, ...rows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `NFR_Session_${sessionId}_${selectedDate}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    if (sessionId == null) return;
+    downloadFullSessionCsv(sessionId, selectedDate);
   };
 
   return (
