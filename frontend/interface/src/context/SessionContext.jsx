@@ -265,22 +265,33 @@ export function SessionProvider({ children }) {
   // --- Fetch dates with data (for calendar highlights) --------------------
 
   const fetchDatesWithData = useCallback(async ({ start, end }) => {
-    const { data, error } = await supabase
-      .from("nfr26_signals")
-      .select("timestamp")
-      .gte("timestamp", start)
-      .lte("timestamp", end)
-      .order("timestamp", { ascending: true });
-
-    if (error) {
-      console.error("Error fetching dates with data:", error);
-      return new Set();
-    }
-
+    // Check each day of the month individually with limit(1).
+    // This avoids the 1000-row default limit that caused dates to be missed
+    // when there are thousands of signal rows in a month.
     const dates = new Set();
-    for (const row of data ?? []) {
-      dates.add(row.timestamp.split("T")[0]);
+    const queries = [];
+    const d = new Date(start);
+    const endDate = new Date(end);
+
+    while (d <= endDate) {
+      const dayStr = d.toISOString().split("T")[0];
+      const dayStart = `${dayStr}T00:00:00.000Z`;
+      const dayEnd = `${dayStr}T23:59:59.999Z`;
+      queries.push(
+        supabase
+          .from("nfr26_signals")
+          .select("timestamp")
+          .gte("timestamp", dayStart)
+          .lte("timestamp", dayEnd)
+          .limit(1)
+          .then(({ data }) => {
+            if (data?.length) dates.add(dayStr);
+          })
+      );
+      d.setDate(d.getDate() + 1);
     }
+
+    await Promise.all(queries);
     return dates;
   }, []);
 
