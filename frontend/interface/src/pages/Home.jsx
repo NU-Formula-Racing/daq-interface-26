@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useSession } from '@/context/SessionContext';
 import useIsMobile from '@/hooks/useIsMobile';
 import CircuitBoard from '@/components/CircuitBoard';
@@ -24,6 +24,39 @@ export default function HomePage() {
   const { sessionId, mode, setMode, setSelectedDate: setCtxSelectedDate } = useSession();
   const isLive = mode === "live" && sessionId;
   const isMobile = useIsMobile();
+  const reduceMotion = useReducedMotion();
+  const cardsContainerVariants = reduceMotion
+    ? {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { duration: 0.2 } },
+      }
+    : {
+        hidden: { opacity: 1 },
+        visible: {
+          opacity: 1,
+        },
+      };
+  const cardVariants = reduceMotion
+    ? {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { duration: 0.2 } },
+      }
+    : {
+        hidden: {
+          opacity: 0.28,
+          clipPath: 'inset(0 100% 0 0 round 8px)',
+          filter: 'blur(7px)',
+        },
+        visible: {
+          opacity: 1,
+          clipPath: 'inset(0 0% 0 0 round 8px)',
+          filter: 'blur(0px)',
+          transition: {
+            duration: 1.15,
+            ease: [0.22, 1, 0.36, 1],
+          },
+        },
+      };
 
   // Local date state for the replay date picker
   const [selectedDate, setSelectedDate] = useState(
@@ -39,15 +72,19 @@ export default function HomePage() {
 
   // ---- Boot sequence (desktop only) ----
   useEffect(() => {
-    if (isMobile) {
-      // Mobile: skip boot, show title immediately with powered state
+    if (isMobile || reduceMotion) {
+      // Mobile / reduced motion: skip boot and show content quickly
       setBootFaded(true);
       setTitlePowered(true);
+      let cardsTimer;
       const t = setTimeout(() => {
         setShowTitle(true);
-        setTimeout(() => setShowCards(true), 400);
+        cardsTimer = setTimeout(() => setShowCards(true), 400);
       }, 200);
-      return () => clearTimeout(t);
+      return () => {
+        clearTimeout(t);
+        clearTimeout(cardsTimer);
+      };
     }
 
     // Phase 1: stagger boot lines
@@ -84,7 +121,7 @@ export default function HomePage() {
       clearTimeout(poweredTimer);
       clearTimeout(cardsTimer);
     };
-  }, [isMobile]);
+  }, [isMobile, reduceMotion]);
 
   // ---- Handlers ----
   const handleEnterLive = () => {
@@ -111,8 +148,11 @@ export default function HomePage() {
       />
 
       <div className="home-wrapper">
+        <div className="home-ambient-glow" aria-hidden="true" />
+        <div className="home-scanlines" aria-hidden="true" />
+
         {/* ---- Boot text (desktop only) ---- */}
-        {!isMobile && (
+        {!isMobile && !reduceMotion && (
           <div
             className="boot-container"
             style={{
@@ -127,35 +167,49 @@ export default function HomePage() {
                   'boot-line',
                   visibleLines.includes(i) ? 'visible' : '',
                 ].join(' ')}
+                style={{ '--line-delay': `${i * 0.08}s` }}
               >
                 {line}
               </div>
             ))}
+            <div className="boot-cursor">_</div>
           </div>
         )}
 
         {/* ---- Title ---- */}
         {showTitle && (
-          <motion.h1
-            className="home-title"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            style={{ color: titlePowered ? '#f0f0f0' : '#4ade80' }}
-          >
-            NFR DAQ INTERFACE
-          </motion.h1>
+          <>
+            <motion.h1
+              className={`home-title${titlePowered ? ' is-powered' : ''}`}
+              initial={{ opacity: 0, y: 18, filter: 'blur(6px)', scale: 0.985 }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
+              transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            >
+              NFR DAQ INTERFACE
+            </motion.h1>
+            <motion.p
+              className="home-kicker"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 0.8, y: 0 }}
+              transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
+            >
+              TELEMETRY CONTROL SURFACE
+            </motion.p>
+          </>
         )}
 
         {/* ---- Entry cards ---- */}
         {showCards && (
-          <div className="entry-cards">
+          <motion.div
+            className="entry-cards"
+            variants={cardsContainerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             {/* Live Telemetry card */}
             <motion.div
               className={`entry-card${isLive ? ' entry-card--live-active' : ''}`}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: 'easeOut', delay: 0 }}
+              variants={cardVariants}
             >
               <h2 className="entry-card__title">ENTER LIVE TELEMETRY</h2>
               <p className="entry-card__subtitle">
@@ -178,9 +232,7 @@ export default function HomePage() {
             {/* Replay Session card */}
             <motion.div
               className="entry-card entry-card--replay"
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
+              variants={cardVariants}
             >
               <h2 className="entry-card__title">REVIEW SESSION DATA</h2>
               <p className="entry-card__subtitle">
@@ -199,7 +251,7 @@ export default function HomePage() {
                 OPEN
               </button>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </div>
     </>

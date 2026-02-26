@@ -3,24 +3,23 @@ import { useRef, useEffect, useCallback } from "react";
 const CELL_SIZE = 100;
 const TRACE_COLOR_DESKTOP = "rgba(255,255,255,0.22)";
 const TRACE_COLOR_MOBILE = "rgba(255,255,255,0.25)";
-const LINE_WIDTH = 1.5;
-const PAD_RADIUS = 4;
-const VIA_RADIUS = 2;
+const LINE_WIDTH = 2.8;
+const PAD_RADIUS = 5;
+const VIA_RADIUS = 2.4;
 
-const INFLUENCE_RADIUS = 180;
+const AMBIENT_SWEEP_RADIUS = 260;
+const AMBIENT_SWEEP_BASE = 0.2;
+const AMBIENT_SWEEP_PULSE = 0.1;
 const MAX_PARTICLES = 30;
-const PARTICLE_MAX_AGE = 2000; // ms
-const PARTICLE_SPEED = 250; // px/sec
-const SPAWN_INTERVAL = 80; // ms
-const SPAWN_INTERVAL_IDLE = 500; // ms
-const SPAWN_INTERVAL_CONVERGE = 40; // ms
-const IDLE_TIMEOUT = 3000; // ms
-const SPAWN_RADIUS = 250; // px — find pads within this distance of cursor
-const TRAIL_LENGTH = 4;
+const PARTICLE_MAX_AGE = 4200; // ms
+const PARTICLE_SPEED = 120; // px/sec
+const SPAWN_INTERVAL = 120; // ms
+const SPAWN_INTERVAL_CONVERGE = 70; // ms
 const PARTICLE_ARRIVE_DIST = 10; // px
 const PARTICLE_FADE_START = 50; // px — start fading within this distance of target
-const TRAIL_OPACITIES = [0.15, 0.3, 0.5];
-const TRAIL_RADII = [1, 1.5, 1.8];
+const PACKET_LENGTH = 24;
+const PACKET_WIDTH = 5.2;
+const PACKET_GLOW = 10;
 
 /**
  * Seeded pseudo-random number generator (mulberry32).
@@ -44,107 +43,135 @@ function createRng(seed) {
  *   - vias:   array of { x, y, radius }
  */
 function generateTraces(width, height) {
-  const rng = createRng(42);
-
-  const cols = Math.ceil(width / CELL_SIZE);
-  const rows = Math.ceil(height / CELL_SIZE);
-  const cx = width / 2;
-  const cy = height / 2;
-  const maxDist = Math.sqrt(cx * cx + cy * cy);
+  const rng = createRng(42 + Math.floor(width * 0.13) + Math.floor(height * 0.17));
 
   const traces = [];
   const pads = [];
   const vias = [];
+  const margin = 0;
+  const stepX = Math.max(120, Math.min(190, Math.floor(width / 8)));
+  const stepY = Math.max(110, Math.min(180, Math.floor(height / 7)));
 
-  // Helper: distance-from-center probability weighting
-  // Cells near center have higher probability of spawning a trace.
-  const spawnProbability = (col, row) => {
-    const cellX = (col + 0.5) * CELL_SIZE;
-    const cellY = (row + 0.5) * CELL_SIZE;
-    const dist = Math.sqrt((cellX - cx) ** 2 + (cellY - cy) ** 2);
-    const normalized = dist / maxDist; // 0 = center, 1 = corner
-    // Higher probability near center, tapering toward edges
-    return 0.45 * (1 - normalized * 0.7);
+  const clampPoint = (x, y) => ({
+    x: Math.min(width - margin, Math.max(margin, x)),
+    y: Math.min(height - margin, Math.max(margin, y)),
+  });
+
+  const addTrace = (rawPoints) => {
+    const points = rawPoints
+      .map((pt) => clampPoint(pt.x, pt.y))
+      .filter((pt, idx, arr) => idx === 0 || dist(pt.x, pt.y, arr[idx - 1].x, arr[idx - 1].y) > 6);
+    if (points.length < 2) return;
+
+    const traceIdx = traces.length;
+    const tracePadIndices = [];
+
+    const padStart = { x: points[0].x, y: points[0].y, radius: PAD_RADIUS, traceIndices: [traceIdx] };
+    tracePadIndices.push(pads.length);
+    pads.push(padStart);
+
+    const lastPt = points[points.length - 1];
+    const padEnd = { x: lastPt.x, y: lastPt.y, radius: PAD_RADIUS, traceIndices: [traceIdx] };
+    tracePadIndices.push(pads.length);
+    pads.push(padEnd);
+
+    for (let i = 0; i < points.length - 1; i++) {
+      if (rng() < 0.45) {
+        const t = 0.25 + rng() * 0.5;
+        const vx = points[i].x + (points[i + 1].x - points[i].x) * t;
+        const vy = points[i].y + (points[i + 1].y - points[i].y) * t;
+        vias.push({ x: vx, y: vy, radius: VIA_RADIUS });
+      }
+    }
+
+    traces.push({ points, padIndices: tracePadIndices });
   };
 
-  // Directions: 0 = right, 1 = down, 2 = left, 3 = up
-  const dirVectors = [
-    { dx: 1, dy: 0 },
-    { dx: 0, dy: 1 },
-    { dx: -1, dy: 0 },
-    { dx: 0, dy: -1 },
-  ];
+  const horizontalLanes = Math.max(2, Math.floor((height - margin * 2) / (stepY * 1.25)));
+  for (let lane = 0; lane < horizontalLanes; lane++) {
+    const yBase = margin + ((lane + 1) / (horizontalLanes + 1)) * (height - margin * 2);
+    const y = yBase + (rng() - 0.5) * stepY * 0.14;
+    const xStart = 0;
+    const xEnd = width;
+    if (xEnd - xStart < stepX * 2) continue;
 
-  // 45-degree bend directions relative to primary direction
-  const bendOffsets = [1, -1]; // turn clockwise or counter-clockwise
-
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      if (rng() > spawnProbability(col, row)) continue;
-
-      // Starting point: center of cell with slight jitter
-      const startX = (col + 0.5) * CELL_SIZE + (rng() - 0.5) * CELL_SIZE * 0.4;
-      const startY = (row + 0.5) * CELL_SIZE + (rng() - 0.5) * CELL_SIZE * 0.4;
-
-      // Pick a primary direction
-      const dirIdx = Math.floor(rng() * 4);
-      const dir = dirVectors[dirIdx];
-
-      // First segment: extend 1-4 cells
-      const seg1Len = (1 + Math.floor(rng() * 4)) * CELL_SIZE;
-      const midX = startX + dir.dx * seg1Len;
-      const midY = startY + dir.dy * seg1Len;
-
-      const points = [{ x: startX, y: startY }, { x: midX, y: midY }];
-
-      // Optionally add a 45-degree bend and second segment
-      if (rng() < 0.65) {
-        const bendDir = bendOffsets[Math.floor(rng() * 2)];
-        const newDirIdx = (dirIdx + bendDir + 4) % 4;
-        const newDir = dirVectors[newDirIdx];
-
-        // For 45-degree appearance, we move diagonally for a short distance
-        // then continue in the new orthogonal direction
-        const diagLen = CELL_SIZE * 0.5;
-        const diagX = midX + (dir.dx + newDir.dx) * diagLen * 0.7;
-        const diagY = midY + (dir.dy + newDir.dy) * diagLen * 0.7;
-        points.push({ x: diagX, y: diagY });
-
-        const seg2Len = (1 + Math.floor(rng() * 3)) * CELL_SIZE;
-        const endX = diagX + newDir.dx * seg2Len;
-        const endY = diagY + newDir.dy * seg2Len;
-        points.push({ x: endX, y: endY });
-      }
-
-      const traceIdx = traces.length;
-      const tracePadIndices = [];
-
-      // Place pads at start and end of the trace
-      const padStart = { x: points[0].x, y: points[0].y, radius: PAD_RADIUS, traceIndices: [traceIdx] };
-      tracePadIndices.push(pads.length);
-      pads.push(padStart);
-
-      const lastPt = points[points.length - 1];
-      const padEnd = { x: lastPt.x, y: lastPt.y, radius: PAD_RADIUS, traceIndices: [traceIdx] };
-      tracePadIndices.push(pads.length);
-      pads.push(padEnd);
-
-      // Place vias at random points along segments
-      for (let i = 0; i < points.length - 1; i++) {
-        if (rng() < 0.4) {
-          const t = 0.2 + rng() * 0.6; // avoid placing too close to endpoints
-          const vx = points[i].x + (points[i + 1].x - points[i].x) * t;
-          const vy = points[i].y + (points[i + 1].y - points[i].y) * t;
-          vias.push({ x: vx, y: vy, radius: VIA_RADIUS });
-        }
-      }
-
-      traces.push({ points, padIndices: tracePadIndices });
+    if (rng() < 0.58) {
+      const jogX = xStart + (xEnd - xStart) * (0.28 + rng() * 0.44);
+      const jogY = y + (rng() < 0.5 ? -1 : 1) * stepY * (0.55 + rng() * 0.45);
+      addTrace([
+        { x: xStart, y },
+        { x: jogX, y },
+        { x: jogX, y: jogY },
+        { x: xEnd, y: jogY },
+      ]);
+    } else {
+      addTrace([
+        { x: xStart, y },
+        { x: xEnd, y },
+      ]);
     }
   }
 
-  // Build adjacency: check if any pads from different traces are close enough to be "connected"
-  const CONNECT_THRESHOLD = CELL_SIZE * 0.3;
+  const verticalLanes = Math.max(2, Math.floor((width - margin * 2) / (stepX * 1.25)));
+  for (let lane = 0; lane < verticalLanes; lane++) {
+    const xBase = margin + ((lane + 1) / (verticalLanes + 1)) * (width - margin * 2);
+    const x = xBase + (rng() - 0.5) * stepX * 0.14;
+    const yStart = 0;
+    const yEnd = height;
+    if (yEnd - yStart < stepY * 2) continue;
+
+    if (rng() < 0.62) {
+      const jogY = yStart + (yEnd - yStart) * (0.25 + rng() * 0.5);
+      const jogX = x + (rng() < 0.5 ? -1 : 1) * stepX * (0.55 + rng() * 0.45);
+      addTrace([
+        { x, y: yStart },
+        { x, y: jogY },
+        { x: jogX, y: jogY },
+        { x: jogX, y: yEnd },
+      ]);
+    } else {
+      addTrace([
+        { x, y: yStart },
+        { x, y: yEnd },
+      ]);
+    }
+  }
+
+  const baseTraces = traces.slice();
+  const branchBudget = Math.max(6, Math.floor((width + height) / 240));
+  for (let i = 0; i < branchBudget; i++) {
+    if (baseTraces.length === 0) break;
+    const base = baseTraces[Math.floor(rng() * baseTraces.length)];
+    if (!base || base.points.length < 2) continue;
+
+    const segIdx = Math.floor(rng() * (base.points.length - 1));
+    const a = base.points[segIdx];
+    const b = base.points[segIdx + 1];
+    const t = 0.18 + rng() * 0.64;
+    const anchor = {
+      x: a.x + (b.x - a.x) * t,
+      y: a.y + (b.y - a.y) * t,
+    };
+
+    const horizontal = Math.abs(b.x - a.x) >= Math.abs(b.y - a.y);
+    const primaryLen = (horizontal ? stepY : stepX) * (0.8 + rng() * 1.6);
+    const secondaryLen = (horizontal ? stepX : stepY) * (0.55 + rng() * 1.15);
+    const dirA = rng() < 0.5 ? -1 : 1;
+    const dirB = rng() < 0.5 ? -1 : 1;
+
+    if (horizontal) {
+      const p2 = { x: anchor.x, y: anchor.y + dirA * primaryLen };
+      const p3 = { x: p2.x + dirB * secondaryLen, y: p2.y };
+      addTrace([anchor, p2, p3]);
+    } else {
+      const p2 = { x: anchor.x + dirA * primaryLen, y: anchor.y };
+      const p3 = { x: p2.x, y: p2.y + dirB * secondaryLen };
+      addTrace([anchor, p2, p3]);
+    }
+  }
+
+  // Build adjacency: connect nearby pad endpoints into navigable network
+  const CONNECT_THRESHOLD = Math.min(stepX, stepY) * 0.34;
   for (let i = 0; i < pads.length; i++) {
     for (let j = i + 1; j < pads.length; j++) {
       const dx = pads[i].x - pads[j].x;
@@ -275,23 +302,79 @@ function traceColorInterp(factor) {
   return `rgba(${r},${g},${b},${alpha.toFixed(4)})`;
 }
 
+function traceInfluenceFactor(trace, x, y, radius) {
+  const bb = trace.bbox;
+  if (
+    x < bb.minX - radius ||
+    x > bb.maxX + radius ||
+    y < bb.minY - radius ||
+    y > bb.maxY + radius
+  ) {
+    return 0;
+  }
+  const d = pointToTraceDist(x, y, trace);
+  if (d >= radius) return 0;
+  return 1 - d / radius;
+}
+
+function ambientSweep(now, width, height) {
+  return {
+    x: width * 0.5 + Math.cos(now * 0.00023) * width * 0.34,
+    y: height * 0.5 + Math.sin(now * 0.00017) * height * 0.29,
+    strength: AMBIENT_SWEEP_BASE + Math.sin(now * 0.0015) * AMBIENT_SWEEP_PULSE,
+  };
+}
+
 // ─── Particle helpers ──────────────────────────────────────────────────────────
 
-function createParticle(x, y, traceIndex, segmentIndex, t, targetX, targetY, idle) {
+function createParticle(x, y, traceIndex, segmentIndex, t, targetX, targetY, idle, dir = 1) {
+  const initialAngle = Math.atan2(targetY - y, targetX - x);
   return {
     x,
     y,
+    prevX: x,
+    prevY: y,
+    angle: Number.isFinite(initialAngle) ? initialAngle : 0,
     targetX,
     targetY,
     traceIndex,
     segmentIndex,
     t,
+    dir,
     speed: PARTICLE_SPEED,
-    opacity: idle ? 0.3 : 0.8,
-    trail: [],
+    opacity: idle ? 0.35 : 0.9,
     age: 0,
     idle,
   };
+}
+
+function drawParticlePacket(ctx, particle, alpha) {
+  const length = particle.idle ? PACKET_LENGTH * 0.88 : PACKET_LENGTH;
+  const width = particle.idle ? PACKET_WIDTH * 0.9 : PACKET_WIDTH;
+  const halfLength = length * 0.5;
+  const halfWidth = width * 0.5;
+  const clampedAlpha = Math.max(0, Math.min(1, alpha));
+
+  ctx.save();
+  ctx.translate(particle.x, particle.y);
+  ctx.rotate(particle.angle);
+
+  ctx.shadowColor = `rgba(170,130,235,${(0.45 * clampedAlpha).toFixed(3)})`;
+  ctx.shadowBlur = PACKET_GLOW;
+
+  const gradient = ctx.createLinearGradient(-halfLength, 0, halfLength, 0);
+  gradient.addColorStop(0, "rgba(140,100,200,0)");
+  gradient.addColorStop(0.16, `rgba(140,100,200,${(0.55 * clampedAlpha).toFixed(3)})`);
+  gradient.addColorStop(0.5, `rgba(205,180,255,${(0.95 * clampedAlpha).toFixed(3)})`);
+  gradient.addColorStop(0.84, `rgba(140,100,200,${(0.55 * clampedAlpha).toFixed(3)})`);
+  gradient.addColorStop(1, "rgba(140,100,200,0)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(-halfLength, -halfWidth, length, width);
+
+  ctx.fillStyle = `rgba(240,232,255,${(0.35 * clampedAlpha).toFixed(3)})`;
+  ctx.fillRect(-length * 0.16, -width * 0.18, length * 0.32, width * 0.36);
+
+  ctx.restore();
 }
 
 /** Find the segment index and t value for the point on the trace closest to (px, py). */
@@ -342,14 +425,22 @@ function segmentLength(trace, segmentIndex) {
   return dist(a.x, a.y, b.x, b.y);
 }
 
+function chooseSegmentDirection(trace, segmentIndex, targetX, targetY) {
+  const pts = trace.points;
+  const si = Math.max(0, Math.min(segmentIndex, pts.length - 2));
+  const startPt = pts[si];
+  const endPt = pts[si + 1];
+  const dStart = dist(startPt.x, startPt.y, targetX, targetY);
+  const dEnd = dist(endPt.x, endPt.y, targetX, targetY);
+  return dEnd < dStart ? 1 : -1;
+}
+
 // ─── Component ─────────────────────────────────────────────────────────────────
 
 export default function CircuitBoard({ mobile = false, convergeTo = null }) {
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
   const dataRef = useRef(null);
-  const mouseRef = useRef({ x: -9999, y: -9999 });
-  const lastMoveTimeRef = useRef(0);
   const particlesRef = useRef([]);
   const lastSpawnTimeRef = useRef(0);
   const lastFrameTimeRef = useRef(0);
@@ -366,9 +457,6 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
 
   const drawAnimated = useCallback((ctx, data, dpr, now, dt) => {
     const { traces, pads, vias } = data;
-    const mouse = mouseRef.current;
-    const lastMove = lastMoveTimeRef.current;
-    const isIdle = now - lastMove > IDLE_TIMEOUT;
     const converge = convergeToRef.current;
 
     const w = ctx.canvas.width / dpr;
@@ -378,11 +466,16 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, w, h);
 
-    // Determine the point for proximity brightening
-    const brightX = mouse.x;
-    const brightY = mouse.y;
+    // Passive ambient energy sweep across the board
+    const ambient = ambientSweep(now, w, h);
+    const secondaryAmbient = {
+      x: w * 0.5 + Math.sin(now * 0.00011) * w * 0.42,
+      y: h * 0.5 + Math.cos(now * 0.00019) * h * 0.36,
+      strength: 0.45,
+    };
+    const ambientRadius = converge ? AMBIENT_SWEEP_RADIUS * 1.2 : AMBIENT_SWEEP_RADIUS;
 
-    // ── Draw traces with proximity-based brightness ───────────────────────
+    // ── Draw traces with passive ambient brightness sweeps ────────────────
     ctx.lineWidth = LINE_WIDTH;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -391,23 +484,15 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
       if (trace.points.length < 2) continue;
 
       let color = TRACE_COLOR_DESKTOP;
-
-      if (!isIdle) {
-        // Quick bounding box check
-        const bb = trace.bbox;
-        const outsideBB =
-          brightX < bb.minX - INFLUENCE_RADIUS ||
-          brightX > bb.maxX + INFLUENCE_RADIUS ||
-          brightY < bb.minY - INFLUENCE_RADIUS ||
-          brightY > bb.maxY + INFLUENCE_RADIUS;
-
-        if (!outsideBB) {
-          const d = pointToTraceDist(brightX, brightY, trace);
-          if (d < INFLUENCE_RADIUS) {
-            const factor = 1 - d / INFLUENCE_RADIUS;
-            color = traceColorInterp(factor);
-          }
-        }
+      let colorFactor =
+        traceInfluenceFactor(trace, ambient.x, ambient.y, ambientRadius) * ambient.strength;
+      colorFactor = Math.max(
+        colorFactor,
+        traceInfluenceFactor(trace, secondaryAmbient.x, secondaryAmbient.y, ambientRadius * 0.82) *
+          secondaryAmbient.strength
+      );
+      if (colorFactor > 0) {
+        color = traceColorInterp(Math.min(colorFactor, 1));
       }
 
       ctx.strokeStyle = color;
@@ -419,15 +504,26 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
       ctx.stroke();
     }
 
-    // ── Draw pads with proximity brightness ───────────────────────────────
+    // ── Draw pads with passive ambient brightness ─────────────────────────
     for (const pad of pads) {
       let color = TRACE_COLOR_DESKTOP;
-      if (!isIdle) {
-        const d = dist(brightX, brightY, pad.x, pad.y);
-        if (d < INFLUENCE_RADIUS) {
-          const factor = 1 - d / INFLUENCE_RADIUS;
-          color = traceColorInterp(factor);
-        }
+      let colorFactor = 0;
+      const dAmbient = dist(ambient.x, ambient.y, pad.x, pad.y);
+      if (dAmbient < ambientRadius) {
+        colorFactor = Math.max(
+          colorFactor,
+          (1 - dAmbient / ambientRadius) * ambient.strength
+        );
+      }
+      const dSecondary = dist(secondaryAmbient.x, secondaryAmbient.y, pad.x, pad.y);
+      if (dSecondary < ambientRadius * 0.82) {
+        colorFactor = Math.max(
+          colorFactor,
+          (1 - dSecondary / (ambientRadius * 0.82)) * secondaryAmbient.strength
+        );
+      }
+      if (colorFactor > 0) {
+        color = traceColorInterp(Math.min(colorFactor, 1));
       }
       ctx.strokeStyle = color;
       ctx.lineWidth = LINE_WIDTH;
@@ -436,15 +532,26 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
       ctx.stroke();
     }
 
-    // ── Draw vias with proximity brightness ───────────────────────────────
+    // ── Draw vias with passive ambient brightness ─────────────────────────
     for (const via of vias) {
       let color = TRACE_COLOR_DESKTOP;
-      if (!isIdle) {
-        const d = dist(brightX, brightY, via.x, via.y);
-        if (d < INFLUENCE_RADIUS) {
-          const factor = 1 - d / INFLUENCE_RADIUS;
-          color = traceColorInterp(factor);
-        }
+      let colorFactor = 0;
+      const dAmbient = dist(ambient.x, ambient.y, via.x, via.y);
+      if (dAmbient < ambientRadius) {
+        colorFactor = Math.max(
+          colorFactor,
+          (1 - dAmbient / ambientRadius) * ambient.strength
+        );
+      }
+      const dSecondary = dist(secondaryAmbient.x, secondaryAmbient.y, via.x, via.y);
+      if (dSecondary < ambientRadius * 0.82) {
+        colorFactor = Math.max(
+          colorFactor,
+          (1 - dSecondary / (ambientRadius * 0.82)) * secondaryAmbient.strength
+        );
+      }
+      if (colorFactor > 0) {
+        color = traceColorInterp(Math.min(colorFactor, 1));
       }
       ctx.fillStyle = color;
       ctx.beginPath();
@@ -454,67 +561,56 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
 
     // ── Spawn particles ───────────────────────────────────────────────────
     const particles = particlesRef.current;
-    let spawnInterval = SPAWN_INTERVAL;
-    if (converge) {
-      spawnInterval = SPAWN_INTERVAL_CONVERGE;
-    } else if (isIdle) {
-      spawnInterval = SPAWN_INTERVAL_IDLE;
-    }
+    const spawnInterval = converge ? SPAWN_INTERVAL_CONVERGE : SPAWN_INTERVAL;
 
-    if (now - lastSpawnTimeRef.current > spawnInterval && particles.length < MAX_PARTICLES) {
+    if (
+      now - lastSpawnTimeRef.current > spawnInterval &&
+      particles.length < MAX_PARTICLES &&
+      pads.length > 0
+    ) {
       lastSpawnTimeRef.current = now;
 
-      if (converge) {
-        // Spawn from random pads across the viewport
-        if (pads.length > 0) {
-          const padIdx = Math.floor(Math.random() * pads.length);
-          const pad = pads[padIdx];
-          if (pad.traceIndices.length > 0) {
-            const traceIdx = pad.traceIndices[Math.floor(Math.random() * pad.traceIndices.length)];
-            const trace = traces[traceIdx];
-            const { segmentIndex, t } = findClosestSegment(trace, pad.x, pad.y);
-            particles.push(
-              createParticle(pad.x, pad.y, traceIdx, segmentIndex, t, converge.x, converge.y, false)
-            );
+      const sourcePad = pads[Math.floor(Math.random() * pads.length)];
+      if (sourcePad.traceIndices.length > 0) {
+        const traceIdx = sourcePad.traceIndices[Math.floor(Math.random() * sourcePad.traceIndices.length)];
+        const trace = traces[traceIdx];
+        const { segmentIndex, t } = findClosestSegment(trace, sourcePad.x, sourcePad.y);
+
+        let targetX = sourcePad.x;
+        let targetY = sourcePad.y;
+        if (converge) {
+          targetX = converge.x;
+          targetY = converge.y;
+        } else if (pads.length > 1) {
+          let targetPad = pads[Math.floor(Math.random() * pads.length)];
+          let guard = 0;
+          while (targetPad === sourcePad && guard < 6) {
+            targetPad = pads[Math.floor(Math.random() * pads.length)];
+            guard++;
           }
+          targetX = targetPad.x + (Math.random() - 0.5) * 16;
+          targetY = targetPad.y + (Math.random() - 0.5) * 16;
+        } else {
+          const angle = Math.random() * Math.PI * 2;
+          targetX = sourcePad.x + Math.cos(angle) * 700;
+          targetY = sourcePad.y + Math.sin(angle) * 700;
         }
-      } else if (isIdle) {
-        // Spawn at random pads, travel in random direction
-        if (pads.length > 0) {
-          const padIdx = Math.floor(Math.random() * pads.length);
-          const pad = pads[padIdx];
-          if (pad.traceIndices.length > 0) {
-            const traceIdx = pad.traceIndices[Math.floor(Math.random() * pad.traceIndices.length)];
-            const trace = traces[traceIdx];
-            const { segmentIndex, t } = findClosestSegment(trace, pad.x, pad.y);
-            // Random target far away
-            const angle = Math.random() * Math.PI * 2;
-            const targetX = pad.x + Math.cos(angle) * 1000;
-            const targetY = pad.y + Math.sin(angle) * 1000;
-            particles.push(
-              createParticle(pad.x, pad.y, traceIdx, segmentIndex, t, targetX, targetY, true)
-            );
-          }
-        }
-      } else {
-        // Spawn from pads near cursor
-        const nearbyPads = [];
-        for (let i = 0; i < pads.length; i++) {
-          const d = dist(mouse.x, mouse.y, pads[i].x, pads[i].y);
-          if (d < SPAWN_RADIUS && pads[i].traceIndices.length > 0) {
-            nearbyPads.push(i);
-          }
-        }
-        if (nearbyPads.length > 0) {
-          const padIdx = nearbyPads[Math.floor(Math.random() * nearbyPads.length)];
-          const pad = pads[padIdx];
-          const traceIdx = pad.traceIndices[Math.floor(Math.random() * pad.traceIndices.length)];
-          const trace = traces[traceIdx];
-          const { segmentIndex, t } = findClosestSegment(trace, pad.x, pad.y);
-          particles.push(
-            createParticle(pad.x, pad.y, traceIdx, segmentIndex, t, mouse.x, mouse.y, false)
-          );
-        }
+
+        const initialDir = chooseSegmentDirection(trace, segmentIndex, targetX, targetY);
+        const startT = initialDir > 0 ? Math.min(0.03, Math.max(0, t)) : Math.max(0.97, Math.min(1, t));
+        particles.push(
+          createParticle(
+            sourcePad.x,
+            sourcePad.y,
+            traceIdx,
+            segmentIndex,
+            startT,
+            targetX,
+            targetY,
+            false,
+            initialDir
+          )
+        );
       }
     }
 
@@ -525,18 +621,6 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
       const p = particles[i];
       p.age += dt;
 
-      // Update target for non-idle, non-converge particles (follow mouse)
-      if (!p.idle && !converge) {
-        p.targetX = mouse.x;
-        p.targetY = mouse.y;
-      }
-
-      // Store trail
-      p.trail.push({ x: p.x, y: p.y });
-      if (p.trail.length > TRAIL_LENGTH) {
-        p.trail.shift();
-      }
-
       // Advance along trace
       const trace = traces[p.traceIndex];
       if (!trace) {
@@ -546,21 +630,12 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
 
       const sLen = segmentLength(trace, p.segmentIndex);
       if (sLen > 0) {
-        // Determine direction: which end of segment is closer to target?
-        const pts = trace.points;
-        const si = Math.min(p.segmentIndex, pts.length - 2);
-        const startPt = pts[si];
-        const endPt = pts[si + 1];
-        const dStart = dist(startPt.x, startPt.y, p.targetX, p.targetY);
-        const dEnd = dist(endPt.x, endPt.y, p.targetX, p.targetY);
-        const direction = dEnd < dStart ? 1 : -1;
-
         const tAdvance = (p.speed * dtSec) / sLen;
-        p.t += direction * tAdvance;
+        p.t += p.dir * tAdvance;
       }
 
       // Handle segment transitions
-      if (p.t >= 1) {
+      if (p.dir > 0 && p.t >= 1) {
         p.t = 0;
         p.segmentIndex += 1;
         if (p.segmentIndex >= trace.points.length - 1) {
@@ -579,7 +654,8 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
                 p.traceIndex = ti;
                 const closest = findClosestSegment(nextTrace, pad.x, pad.y);
                 p.segmentIndex = closest.segmentIndex;
-                p.t = closest.t;
+                p.dir = chooseSegmentDirection(nextTrace, p.segmentIndex, p.targetX, p.targetY);
+                p.t = p.dir > 0 ? Math.min(0.03, Math.max(0, closest.t)) : Math.max(0.97, Math.min(1, closest.t));
                 jumped = true;
                 break;
               }
@@ -592,7 +668,7 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
             continue;
           }
         }
-      } else if (p.t <= 0) {
+      } else if (p.dir < 0 && p.t <= 0) {
         p.t = 1;
         p.segmentIndex -= 1;
         if (p.segmentIndex < 0) {
@@ -610,7 +686,8 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
                 p.traceIndex = ti;
                 const closest = findClosestSegment(nextTrace, pad.x, pad.y);
                 p.segmentIndex = closest.segmentIndex;
-                p.t = closest.t;
+                p.dir = chooseSegmentDirection(nextTrace, p.segmentIndex, p.targetX, p.targetY);
+                p.t = p.dir > 0 ? Math.min(0.03, Math.max(0, closest.t)) : Math.max(0.97, Math.min(1, closest.t));
                 jumped = true;
                 break;
               }
@@ -627,9 +704,16 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
       // Update position
       const currentTrace = traces[p.traceIndex];
       if (currentTrace) {
+        p.prevX = p.x;
+        p.prevY = p.y;
         const pos = positionOnTrace(currentTrace, p.segmentIndex, p.t);
         p.x = pos.x;
         p.y = pos.y;
+        const moveDx = p.x - p.prevX;
+        const moveDy = p.y - p.prevY;
+        if (moveDx * moveDx + moveDy * moveDy > 0.0001) {
+          p.angle = Math.atan2(moveDy, moveDx);
+        }
       }
 
       // Remove if close to target or too old
@@ -640,29 +724,13 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
       }
 
       // Fade opacity as approaching target
+      const baseOpacity = p.idle ? 0.35 : 0.9;
+      p.opacity = baseOpacity;
       if (dToTarget < PARTICLE_FADE_START) {
-        p.opacity = (p.idle ? 0.3 : 0.8) * (dToTarget / PARTICLE_FADE_START);
+        p.opacity = baseOpacity * (dToTarget / PARTICLE_FADE_START);
       }
-
-      // ── Render particle trail ─────────────────────────────────────────
-      for (let ti = 0; ti < p.trail.length; ti++) {
-        const trailPt = p.trail[ti];
-        // Map trail index: trail[0] is oldest, trail[length-1] is newest
-        const reverseIdx = p.trail.length - 1 - ti;
-        if (reverseIdx >= TRAIL_OPACITIES.length) continue;
-        const opMult = TRAIL_OPACITIES[TRAIL_OPACITIES.length - 1 - reverseIdx];
-        const rad = TRAIL_RADII[TRAIL_RADII.length - 1 - reverseIdx];
-        ctx.fillStyle = `rgba(140,100,200,${(opMult * p.opacity).toFixed(3)})`;
-        ctx.beginPath();
-        ctx.arc(trailPt.x, trailPt.y, rad, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // ── Render particle dot ───────────────────────────────────────────
-      ctx.fillStyle = `rgba(140,100,200,${p.opacity.toFixed(3)})`;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-      ctx.fill();
+      const pulse = 0.82 + 0.18 * Math.sin((now + p.age * 3) * 0.014);
+      drawParticlePacket(ctx, p, p.opacity * pulse);
 
       i++;
     }
@@ -719,16 +787,6 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
     })();
     window.addEventListener("resize", onResize);
 
-    // ── Mouse tracking (desktop only) ─────────────────────────────────────
-    let onMouseMove = null;
-    if (!mobile) {
-      onMouseMove = (e) => {
-        mouseRef.current = { x: e.clientX, y: e.clientY };
-        lastMoveTimeRef.current = Date.now();
-      };
-      window.addEventListener("mousemove", onMouseMove);
-    }
-
     // ── Animation loop (desktop only) ─────────────────────────────────────
     if (!mobile) {
       lastFrameTimeRef.current = performance.now();
@@ -766,9 +824,6 @@ export default function CircuitBoard({ mobile = false, convergeTo = null }) {
       if (animFrameRef.current) {
         cancelAnimationFrame(animFrameRef.current);
         animFrameRef.current = null;
-      }
-      if (onMouseMove) {
-        window.removeEventListener("mousemove", onMouseMove);
       }
     };
   }, [generate, mobile, drawAnimated]);
