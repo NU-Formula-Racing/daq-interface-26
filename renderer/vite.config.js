@@ -7,10 +7,22 @@ export default defineConfig({
   // 👉 Emit all asset urls as relative (./foo.js instead of /foo.js)
   base: './',
 
+  define: {
+    global: 'globalThis',
+  },
+
   // your source root:
   root: path.resolve(__dirname, 'src'),
 
   plugins: [react()],
+
+  server: {
+    fs: {
+      allow: [
+        path.resolve(__dirname, '..'),
+      ],
+    },
+  },
 
   build: {
     // output folder at project root

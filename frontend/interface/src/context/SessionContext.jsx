@@ -116,7 +116,9 @@ export function SessionProvider({ children }) {
   // LIVE MODE helpers
   // =========================================================================
 
-  /** Load today's signals for live mode. Returns the session_id found. */
+  /** Load today's signals for live mode. Returns the session_id found.
+   *  Only considers the car "live" if the most recent signal arrived
+   *  within the last 30 seconds. */
   const loadTodayLiveData = useCallback(async () => {
     const { start, end } = dayRange(new Date());
 
@@ -139,6 +141,12 @@ export function SessionProvider({ children }) {
       setLiveSessionData(rows);
 
       if (rows.length === 0) return null;
+
+      // Only report a live session if there is data from today
+      const today = new Date().toISOString().split("T")[0];
+      const newestRow = rows[rows.length - 1];
+      const newestDate = newestRow.timestamp.split("T")[0];
+      if (newestDate !== today) return null;
 
       // Derive session_id from the most recent row that has one
       for (let i = rows.length - 1; i >= 0; i--) {
@@ -325,6 +333,8 @@ export function SessionProvider({ children }) {
     let cancelled = false;
 
     unsubscribe();
+    // Clear stale session immediately — only re-set if today's data exists
+    setSessionIdState(null);
 
     (async () => {
       const sid = await loadTodayLiveData();
