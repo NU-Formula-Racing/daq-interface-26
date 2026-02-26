@@ -5,8 +5,14 @@
   box-sizing: border-box;
 }
 
+a, button, select, input, [role="button"] {
+  touch-action: manipulation;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--hud-bg);
+  color: #f0f0f0;
 }

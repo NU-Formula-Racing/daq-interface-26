@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSession } from '@/context/SessionContext';
 import useIsMobile from '@/hooks/useIsMobile';
@@ -10,49 +10,56 @@ import BatteryTemp from '@/widgets/bars/BatteryTemp';
 import MiniGraph from '@/widgets/MiniGraph';
 import Readout from '@/widgets/Readout';
 import StatusLight from '@/widgets/StatusLight';
-import { LayoutGrid, X } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { LayoutGrid, X, BarChart3 } from 'lucide-react';
 import './Dash.css';
+import './Replay.css';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import GridLayout, { WidthProvider } from 'react-grid-layout';
 
 const ResponsiveGrid = WidthProvider(GridLayout);
 
-const STORAGE_KEY = 'daqWidgetLayout';
+const STORAGE_KEY = 'daqReplayWidgetLayout';
 
 // ---------------------------------------------------------------------------
-// Default widget layout
+// Default widget layout — graph-focused for replay analysis
 // ---------------------------------------------------------------------------
 const DEFAULT_WIDGETS = [
   {
-    i: 'gauge-1',
-    type: 'gauge',
-    x: 0, y: 0, w: 4, h: 3,
-    config: { signalName: 'Inverter_RPM', unit: 'RPM', min: 0, max: 8000 },
-  },
-  {
-    i: 'gauge-2',
-    type: 'gauge',
-    x: 4, y: 0, w: 4, h: 3,
-    config: { signalName: 'IGBT_Temperature', unit: '\u00B0C', min: 0, max: 120 },
-  },
-  {
-    i: 'bar-meter-1',
-    type: 'bar-meter',
-    x: 8, y: 0, w: 2, h: 4,
-    config: { signalName: 'Battery_Temperature' },
-  },
-  {
     i: 'mini-graph-1',
     type: 'mini-graph',
-    x: 0, y: 3, w: 8, h: 3,
+    x: 0, y: 0, w: 6, h: 4,
     config: {
       signals: [
-        { name: 'Inverter_RPM', color: '#a78bfa' },
-        { name: 'IGBT_Temperature', color: '#4ade80' },
+        { name: 'IGBT_Temperature', color: '#a78bfa' },
+        { name: 'Battery_Temperature', color: '#4ade80' },
       ],
-      unit: '',
+      unit: '°C',
     },
+  },
+  {
+    i: 'mini-graph-2',
+    type: 'mini-graph',
+    x: 6, y: 0, w: 6, h: 4,
+    config: {
+      signals: [
+        { name: 'Inverter_RPM', color: '#f97316' },
+      ],
+      unit: 'RPM',
+    },
+  },
+  {
+    i: 'readout-1',
+    type: 'readout',
+    x: 0, y: 4, w: 4, h: 2,
+    config: { signalName: 'Inverter_RPM', unit: 'RPM' },
+  },
+  {
+    i: 'gauge-1',
+    type: 'gauge',
+    x: 4, y: 4, w: 4, h: 3,
+    config: { signalName: 'IGBT_Temperature', unit: '°C', min: 0, max: 120 },
   },
 ];
 
@@ -84,7 +91,6 @@ const WIDGET_LABELS = {
   'status-light': 'Status Light',
 };
 
-// Mobile widget heights by type
 const MOBILE_WIDGET_HEIGHTS = {
   'gauge':        '300px',
   'bar-meter':    '300px',
@@ -101,13 +107,14 @@ function getWidgetTitle(widget) {
 }
 
 // ---------------------------------------------------------------------------
-// Dashboard
+// Replay Page
 // ---------------------------------------------------------------------------
-export default function Dashboard() {
+export default function Replay() {
   const {
     mode,
-    liveSessionData,
-    liveSignals,
+    replaySessionData,
+    replayPosition,
+    setReplayPosition,
   } = useSession();
 
   const isMobile = useIsMobile();
@@ -115,44 +122,66 @@ export default function Dashboard() {
   const [configWidgetId, setConfigWidgetId] = useState(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
+  // -------------------------------------------------------------------------
+  // Round to nearest second so signals at slightly different ms group together
+  // -------------------------------------------------------------------------
+  const roundTs = (ts) =>
+    new Date(Math.round(new Date(ts).getTime() / 1000) * 1000).toISOString();
 
   // -------------------------------------------------------------------------
-  // Latest value per signal from liveSessionData (fallback for live mode)
-  // liveSessionData is sorted ascending, so last occurrence = most recent
+  // Unique timestamps for replay scrubber (rounded to nearest second)
   // -------------------------------------------------------------------------
-  const latestSessionValues = useMemo(() => {
+  const uniqueTimestamps = useMemo(() => {
+    if (!replaySessionData.length) return [];
+    return [...new Set(replaySessionData.map(d => roundTs(d.timestamp)))].sort();
+  }, [replaySessionData]);
+
+  // -------------------------------------------------------------------------
+  // Signal lookup index for O(1) replay resolution (keyed by rounded ts)
+  // -------------------------------------------------------------------------
+  const signalIndex = useMemo(() => {
     const map = new Map();
-    for (const d of liveSessionData) {
-      map.set(d.signal_name, d.value);
+    for (const d of replaySessionData) {
+      map.set(`${d.signal_name}::${roundTs(d.timestamp)}`, d);
     }
     return map;
-  }, [liveSessionData]);
+  }, [replaySessionData]);
 
   // -------------------------------------------------------------------------
-  // Available signal names (union of realtime keys + session data names)
+  // Available signal names from replay data
   // -------------------------------------------------------------------------
   const availableSignals = useMemo(() => {
-    const names = new Set(Object.keys(liveSignals));
-    for (const d of liveSessionData) {
+    const names = new Set();
+    for (const d of replaySessionData) {
       names.add(d.signal_name);
     }
     return [...names].sort();
-  }, [liveSignals, liveSessionData]);
+  }, [replaySessionData]);
 
   // -------------------------------------------------------------------------
-  // Signal value resolution (live mode only)
+  // Signal value resolution (replay only)
   // -------------------------------------------------------------------------
   const resolveValue = useCallback((signalName) => {
     if (!signalName) return { value: 0, previousValue: null };
 
-    // Prefer realtime value, fall back to latest from today's loaded data
-    const entry = liveSignals[signalName];
-    if (entry) {
-      return { value: entry.value ?? 0, previousValue: null };
+    if (!replaySessionData.length || replayPosition == null) {
+      return { value: 0, previousValue: null };
     }
-    const fallback = latestSessionValues.get(signalName);
-    return { value: fallback ?? 0, previousValue: null };
-  }, [liveSignals, latestSessionValues]);
+
+    const currentTs = uniqueTimestamps[replayPosition];
+    if (!currentTs) return { value: 0, previousValue: null };
+
+    const match = signalIndex.get(`${signalName}::${currentTs}`);
+
+    let previousValue = null;
+    if (replayPosition > 0) {
+      const prevTs = uniqueTimestamps[replayPosition - 1];
+      const prevMatch = signalIndex.get(`${signalName}::${prevTs}`);
+      previousValue = prevMatch?.value ?? null;
+    }
+
+    return { value: match?.value ?? 0, previousValue };
+  }, [replaySessionData, replayPosition, uniqueTimestamps, signalIndex]);
 
   // -------------------------------------------------------------------------
   // Widget CRUD
@@ -164,7 +193,7 @@ export default function Dashboard() {
       'bar-meter':    { signalName: 'Battery_Temperature' },
       'mini-graph':   { signals: [{ name: 'Inverter_RPM', color: '#a78bfa' }], unit: '' },
       'readout':      { signalName: 'Inverter_RPM', unit: 'RPM' },
-      'status-light': { signalName: 'Battery_Temperature', threshold: 50, unit: '\u00B0C' },
+      'status-light': { signalName: 'Battery_Temperature', threshold: 50, unit: '°C' },
     };
 
     setWidgets(prev => [
@@ -246,9 +275,9 @@ export default function Dashboard() {
           <MiniGraph
             signals={config.signals ?? []}
             unit={config.unit ?? ''}
-            sessionData={liveSessionData}
-            liveSignals={liveSignals}
-            mode="live"
+            sessionData={replaySessionData}
+            mode="replay"
+            replayPosition={replayPosition}
           />
         );
       }
@@ -288,16 +317,30 @@ export default function Dashboard() {
           </div>
         );
     }
-  }, [resolveValue, liveSessionData, liveSignals]);
+  }, [resolveValue, replaySessionData, replayPosition]);
 
   // Layout for react-grid-layout
   const layout = useMemo(() => widgets.map(w => ({
     i: w.i, x: w.x, y: w.y, w: w.w, h: w.h,
   })), [widgets]);
 
-  // Mode guard: redirect to /replay if in replay mode
-  if (mode === 'replay') {
-    return <Navigate to="/replay" replace />;
+  // Current replay timestamp display
+  const currentTimestamp = useMemo(() => {
+    if (replayPosition == null || !uniqueTimestamps.length) return null;
+    const ts = uniqueTimestamps[replayPosition];
+    if (!ts) return null;
+    try {
+      return new Date(ts).toLocaleTimeString('en-US', {
+        hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit',
+      }) + '.' + String(new Date(ts).getMilliseconds()).padStart(3, '0');
+    } catch {
+      return ts;
+    }
+  }, [replayPosition, uniqueTimestamps]);
+
+  // Mode guard: redirect to /dashboard if live
+  if (mode === 'live') {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (
@@ -314,10 +357,17 @@ export default function Dashboard() {
       )}
 
       <div className="dashboard-main">
+        {/* Detailed Analysis link */}
+        <div className="replay-analysis-bar">
+          <Link to="/graphs" className="replay-analysis-link">
+            <BarChart3 size={16} />
+            DETAILED ANALYSIS
+          </Link>
+        </div>
+
         {/* Grid Area */}
         <div className="dashboard-grid-area">
           {isMobile ? (
-            /* Mobile: stacked widgets, no react-grid-layout */
             <div className="dashboard-mobile-stack">
               {widgets.map((widget, index) => (
                 <motion.div
@@ -338,7 +388,6 @@ export default function Dashboard() {
               ))}
             </div>
           ) : (
-            /* Desktop: react-grid-layout */
             <ResponsiveGrid
               className="layout"
               layout={layout}
@@ -370,8 +419,21 @@ export default function Dashboard() {
           )}
         </div>
 
-
-
+        {/* Replay Scrubber — always visible */}
+        {uniqueTimestamps.length > 0 && (
+          <div className={`replay-scrubber ${isMobile ? 'replay-scrubber--mobile' : ''}`}>
+            <div className="replay-scrubber-timestamp">
+              {currentTimestamp ?? '--:--:--'}
+            </div>
+            <Slider
+              value={[replayPosition ?? 0]}
+              onValueChange={(v) => setReplayPosition(v[0])}
+              min={0}
+              max={Math.max(uniqueTimestamps.length - 1, 0)}
+              step={1}
+            />
+          </div>
+        )}
       </div>
 
       {/* Mobile floating sidebar toggle */}
@@ -433,7 +495,7 @@ export default function Dashboard() {
 }
 
 // ---------------------------------------------------------------------------
-// Config Modal Component
+// Config Modal Component (same as Dashboard)
 // ---------------------------------------------------------------------------
 const SIGNAL_COLORS = ['#a78bfa', '#4ade80', '#f97316', '#38bdf8', '#fb7185'];
 
@@ -510,7 +572,7 @@ function ConfigModal({ widget, availableSignals = [], onSave, onCancel }) {
               type="text"
               value={config.unit ?? ''}
               onChange={e => updateField('unit', e.target.value)}
-              placeholder="e.g. RPM, \u00B0C"
+              placeholder="e.g. RPM, °C"
             />
           </>
         )}

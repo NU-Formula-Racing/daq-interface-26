@@ -1,0 +1,65 @@
+.hud-widget {
+  overflow: hidden;
+  border-radius: 3px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.hud-card-inner {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.hud-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  border-left: 2px solid rgba(78, 42, 132, 0.6);
+  background: rgba(255, 255, 255, 0.035);
+  cursor: move;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.hud-widget-title {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.hud-widget-settings {
+  background: none;
+  border: 1px solid transparent;
+  color: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.hud-widget:hover .hud-widget-settings {
+  opacity: 1;
+}
+
+.hud-widget-settings:hover {
+  color: #a78bfa;
+  background: rgba(78, 42, 132, 0.12);
+  border-color: rgba(78, 42, 132, 0.3);
+}
+
+.hud-widget-body {
+  flex: 1;
+  overflow: hidden;
+  padding: 6px;
+}

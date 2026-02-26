@@ -13,19 +13,19 @@ export default function InverterRPMGauge({ rpm }) {
             <GaugeComponent
                 arc={{
                     nbSubArcs: 150,
-                    colorArray: ['#5BE12C', '#F5CD19', '#EA4228'],
+                    colorArray: ['#a78bfa', '#facc15', '#fb7185'],
                     width: 0.3,
                     padding: 0.003
                 }}
                 labels={{
                     valueLabel: {
-                        style: { fontSize: 40, fill: '#000000' },
+                        style: { fontSize: 40, fill: '#f0f0f0' },
                         formatTextValue: (value) => `${Math.round(value * 100)} RPM`
                     },
                     tickLabels: {
                         type: "outer",
                         defaultTickValueConfig: {
-                            style: { fill: '#000000' }
+                            style: { fill: 'rgba(255,255,255,0.5)' }
                         },
                         ticks: [
                             { value: 0 },

@@ -2,9 +2,9 @@ export default function BatteryTemp({ temperature = 0 }) {
 
     // Determine color based on temperature
     const getColor = (temp) => {
-        if (temp < 30) return "#5BE12C"; // Green
-        if (temp < 45) return "#F5CD19"; // Yellow
-        return "#EA4228"; // Red
+        if (temp < 30) return "#4ade80"; // Green
+        if (temp < 45) return "#facc15"; // Yellow
+        return "#fb7185"; // Rose
     };
 
     const maxTemp = 60; // Li-ion safe upper bound
@@ -27,6 +27,7 @@ export default function BatteryTemp({ temperature = 0 }) {
             <div style={{
                 fontSize: '2.0rem',
                 fontWeight: 'bold',
+                fontFamily: 'var(--font-mono)',
                 color: getColor(temperature),
                 marginBottom: '15px'
             }}>
@@ -46,7 +47,7 @@ export default function BatteryTemp({ temperature = 0 }) {
                     justifyContent: 'space-between',
                     height: `${barHeight}px`,
                     fontSize: '12px',
-                    color: '#666'
+                    color: 'rgba(255,255,255,0.6)'
                 }}>
                     {ticks.map(tick => (
                         <div key={tick} style={{ lineHeight: '1' }}>
@@ -60,7 +61,7 @@ export default function BatteryTemp({ temperature = 0 }) {
                     position: 'relative',
                     width: '60px',
                     height: `${barHeight}px`,
-                    background: '#e0e0e0',
+                    background: 'rgba(255,255,255,0.08)',
                     borderRadius: '10px 10px 0 0',
                     overflow: 'hidden'
                 }}>
@@ -79,7 +80,7 @@ export default function BatteryTemp({ temperature = 0 }) {
 
             <div style={{
                 fontSize: '0.9rem',
-                color: '#666',
+                color: 'rgba(255,255,255,0.45)',
                 marginTop: '10px'
             }}>
                 Max: {maxTemp}°C

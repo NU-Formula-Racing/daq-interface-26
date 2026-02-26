@@ -1,0 +1,49 @@
+/* ============================================================
+   Replay Page — additions beyond shared Dash.css styles
+   ============================================================ */
+
+/* "DETAILED ANALYSIS" link bar */
+.replay-analysis-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 12px 0;
+  flex-shrink: 0;
+}
+
+.replay-analysis-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: rgba(167, 139, 250, 0.8);
+  padding: 5px 12px;
+  border: 1px solid rgba(78, 42, 132, 0.45);
+  border-radius: 3px;
+  background: rgba(78, 42, 132, 0.06);
+  transition: all 0.2s ease;
+}
+
+.replay-analysis-link:hover {
+  background: rgba(78, 42, 132, 0.14);
+  border-color: rgba(78, 42, 132, 0.5);
+  color: #a78bfa;
+}
+
+/* ============================================================
+   Mobile
+   ============================================================ */
+@media (max-width: 768px) {
+  .replay-analysis-bar {
+    padding: 4px 6px 0;
+  }
+
+  .replay-analysis-link {
+    font-size: 0.55rem;
+    padding: 4px 8px;
+  }
+}

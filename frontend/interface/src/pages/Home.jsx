@@ -1,185 +1,206 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Link, useNavigate } from 'react-router-dom';
-import "./Home.css";
-import PixelBlast from "@/components/ui/PixelBlast";
-import ShinyText from "@/components/ui/ShinyText";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useSession } from '@/context/SessionContext';
+import useIsMobile from '@/hooks/useIsMobile';
+import CircuitBoard from '@/components/CircuitBoard';
+import DatePicker from '@/components/DatePicker';
+import './Home.css';
+
+const BOOT_LINES = [
+  '> INITIALIZING CAN BUS INTERFACE...',
+  '> CONNECTING TO TELEMETRY FEED...',
+  '> LOADING SIGNAL DATABASE...',
+  '> SESSION LINK ESTABLISHED',
+];
+
+const LINE_STAGGER_MS = 400;
+const BOOT_FADE_MS = 2000;
+const TITLE_REVEAL_MS = 2300;
+const CARDS_REVEAL_MS = 3500;
 
 export default function HomePage() {
-    const navigate = useNavigate();
-    const [showButtons, setShowButtons] = useState(false);
-    const [typedText, setTypedText] = useState("");
-    const [showGlow, setShowGlow] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-    const [dataSource, setDataSource] = useState("wireless"); // "sd" or "wireless"
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const navigate = useNavigate();
+  const { sessionId, setMode, setSelectedDate: setCtxSelectedDate } = useSession();
+  const isMobile = useIsMobile();
 
-    const fullText = "NFR Interface";
+  // Local date state for the replay date picker
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split('T')[0]
+  );
 
-    const handleOpenReplay = () => {
-        navigate('/replay', {
-            state: {
-                selectedDate,
-                dataSource,
-                sessionId: null
-            }
-        });
+  // Animation phase state
+  const [visibleLines, setVisibleLines] = useState([]);
+  const [bootFaded, setBootFaded] = useState(false);
+  const [showTitle, setShowTitle] = useState(false);
+  const [titlePowered, setTitlePowered] = useState(false);
+  const [showCards, setShowCards] = useState(false);
+
+  // ---- Boot sequence (desktop only) ----
+  useEffect(() => {
+    if (isMobile) {
+      // Mobile: skip boot, show title immediately with powered state
+      setBootFaded(true);
+      setTitlePowered(true);
+      const t = setTimeout(() => {
+        setShowTitle(true);
+        setTimeout(() => setShowCards(true), 400);
+      }, 200);
+      return () => clearTimeout(t);
+    }
+
+    // Phase 1: stagger boot lines
+    const lineTimers = BOOT_LINES.map((_, i) =>
+      setTimeout(() => {
+        setVisibleLines((prev) => [...prev, i]);
+      }, i * LINE_STAGGER_MS)
+    );
+
+    // Phase 2: fade boot text
+    const fadeBootTimer = setTimeout(() => {
+      setBootFaded(true);
+    }, BOOT_FADE_MS);
+
+    // Phase 3: title reveal
+    const titleTimer = setTimeout(() => {
+      setShowTitle(true);
+    }, TITLE_REVEAL_MS);
+
+    // Phase 4: title powered (green -> white)
+    const poweredTimer = setTimeout(() => {
+      setTitlePowered(true);
+    }, TITLE_REVEAL_MS + 800);
+
+    // Phase 5: cards
+    const cardsTimer = setTimeout(() => {
+      setShowCards(true);
+    }, CARDS_REVEAL_MS);
+
+    return () => {
+      lineTimers.forEach(clearTimeout);
+      clearTimeout(fadeBootTimer);
+      clearTimeout(titleTimer);
+      clearTimeout(poweredTimer);
+      clearTimeout(cardsTimer);
     };
+  }, [isMobile]);
 
-    // Detect mobile screen
-    useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth <= 768);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+  // ---- Handlers ----
+  const handleEnterLive = () => {
+    setMode('live');
+    navigate('/dashboard');
+  };
 
-    // Typewriter
-    useEffect(() => {
-        let i = 0;
-        const interval = setInterval(() => {
-            setTypedText(fullText.slice(0, i));
-            i++;
+  const handleOpenReplay = () => {
+    setMode('replay');
+    setCtxSelectedDate(selectedDate);
+    navigate('/replay');
+  };
 
-            if (i > fullText.length) {
-                clearInterval(interval);
-                setTimeout(() => setShowButtons(true), 500);
-            }
-        }, 90);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    useEffect(() => {
-        if (showButtons) {
-            setTimeout(() => setShowGlow(true), 800);
+  return (
+    <>
+      {/* Background circuit board */}
+      <CircuitBoard
+        mobile={isMobile}
+        convergeTo={
+          showTitle && !titlePowered
+            ? { x: window.innerWidth / 2, y: window.innerHeight * 0.45 }
+            : null
         }
-    }, [showButtons]);
+      />
 
+      <div className="home-wrapper">
+        {/* ---- Boot text (desktop only) ---- */}
+        {!isMobile && (
+          <div
+            className="boot-container"
+            style={{
+              opacity: bootFaded ? 0 : 1,
+              pointerEvents: bootFaded ? 'none' : 'auto',
+            }}
+          >
+            {BOOT_LINES.map((line, i) => (
+              <div
+                key={i}
+                className={[
+                  'boot-line',
+                  visibleLines.includes(i) ? 'visible' : '',
+                ].join(' ')}
+              >
+                {line}
+              </div>
+            ))}
+          </div>
+        )}
 
-    return (
-        <div className="relative w-full min-h-screen overflow-x-hidden overflow-y-auto">
-            {/* BACKGROUND LAYER (white + particles) */}
-            <div className="absolute inset-0 w-full h-full z-0"> 
-                <PixelBlast variant="circle" 
-                    pixelSize={8} 
-                    color="#B19EEF" 
-                    patternScale={1} 
-                    patternDensity={1} 
-                    pixelSizeJitter={0.5} 
-                    enableRipples speed={0.4} 
-                    edgeFade={0} 
-                    transparent={true} 
-                /> 
-            </div>
-            
+        {/* ---- Title ---- */}
+        {showTitle && (
+          <motion.h1
+            className="home-title"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+            style={{ color: titlePowered ? '#f0f0f0' : '#4ade80' }}
+          >
+            NFR DAQ INTERFACE
+          </motion.h1>
+        )}
+
+        {/* ---- Entry cards ---- */}
+        {showCards && (
+          <div className="entry-cards">
+            {/* Live Telemetry card */}
             <motion.div
-                initial={{ y: 0 }}
-                animate={showButtons ? { y: isMobile ? 0 : "-35vh" } : { y: 0 }}
-                transition={{ duration: 1.2, ease: "easeInOut" }}
-                className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"
-                style={isMobile && showButtons ? { position: 'relative', marginTop: '6rem' } : {}}
+              className={`entry-card${sessionId ? ' entry-card--live-active' : ''}`}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0 }}
             >
-                <div className="relative">
-
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.6 }}
-                        animate={showGlow ? { opacity: 1, scale: 1 } : { opacity: 0 }}
-                        transition={{ duration: 1.2, ease: "easeOut" }}
-                        className="title-glow"
-                    />
-
-                    <motion.h1
-                        initial={{ color: "#FFFFFF" }}
-                        animate={showButtons ? { color: "#4E2A84" } : { color: "#FFFFFF" }}
-                        transition={{ duration: 1.2, ease: "easeInOut" }}
-                        className="text-5xl font-bold tracking-wide hero-title"
-                    >
-                        <ShinyText text={typedText} />
-                    </motion.h1>
-
-                </div>
+              <h2 className="entry-card__title">ENTER LIVE TELEMETRY</h2>
+              <p className="entry-card__subtitle">
+                Stream real-time CAN &amp; sensor data
+              </p>
+              {sessionId && (
+                <span className="session-badge">
+                  <span className="session-badge__dot" />
+                  SESSION #{sessionId} ACTIVE
+                </span>
+              )}
+              <button
+                className="entry-card__btn"
+                onClick={handleEnterLive}
+              >
+                ENTER
+              </button>
             </motion.div>
 
-            {/* BLACK OVERLAY (fades out ONLY) */}
+            {/* Replay Session card */}
             <motion.div
-                initial={{ opacity: 1 }}
-                animate={showButtons ? { opacity: 0 } : { opacity: 1 }}
-                transition={{ duration: 1.2, ease: "easeInOut" }}
-                className="absolute inset-0 bg-black z-10 pointer-events-none"
-            />
-
-            {/* BUTTONS (fade in after animation) */}
-            {showButtons && (
-                <motion.div
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{
-                        delay: 1.2,
-                        duration: 1.5,
-                        scale: { type: "spring", visualDuration: 1, bounce: 0.2 },
-                    }}
-                    className="relative z-30 w-full h-full flex flex-col gap-6 items-center justify-center pointer-events-none"
-                    style={isMobile ? { position: 'relative', marginTop: '2rem' } : {}}
-                >
-                    <div className="cards-container">
-                        <div className="mode-card">
-                            <div>
-                                <h2>Live Telemetry</h2>
-                                <p>Stream real-time CAN & sensor data from the car.</p>
-                                <div className="card-content">
-                                    <p className="card-details">Monitor critical metrics including:</p>
-                                    <ul className="feature-list">
-                                        <li>Inverter RPM & Temperature</li>
-                                        <li>Battery Temperature & Voltage</li>
-                                        <li>Motor Performance Data</li>
-                                        <li>Real-time CAN Bus Signals</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <Link to="/dash" className="card-btn">ENTER</Link>
-                        </div>
-
-                        <div className="mode-card">
-                            <div>
-                                <h2>Replay Sessions</h2>
-                                <p>Review past sessions with timeline-based playback.</p>
-
-                                <div className="card-form">
-                                    <label className="form-label">
-                                        Select Date
-                                        <input
-                                            type="date"
-                                            className="date-input"
-                                            value={selectedDate}
-                                            onChange={(e) => setSelectedDate(e.target.value)}
-                                        />
-                                    </label>
-
-                                    <div className="toggle-group">
-                                        <span className="form-label">Data Source</span>
-                                        <div className="toggle-buttons">
-                                            <button
-                                                className={`toggle-btn ${dataSource === 'sd' ? 'active' : ''}`}
-                                                onClick={() => setDataSource('sd')}
-                                            >
-                                                SD Card
-                                            </button>
-                                            <button
-                                                className={`toggle-btn ${dataSource === 'wireless' ? 'active' : ''}`}
-                                                onClick={() => setDataSource('wireless')}
-                                            >
-                                                Wireless
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button onClick={handleOpenReplay} className="card-btn secondary">OPEN</button>
-                        </div>
-
-                    </div>
-                </motion.div>
-            )}
-        </div>
-    );
+              className="entry-card entry-card--replay"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
+            >
+              <h2 className="entry-card__title">REVIEW SESSION DATA</h2>
+              <p className="entry-card__subtitle">
+                Analyze past drive sessions
+              </p>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <DatePicker
+                  value={selectedDate}
+                  onChange={setSelectedDate}
+                />
+              </div>
+              <button
+                className="entry-card__btn"
+                onClick={handleOpenReplay}
+              >
+                OPEN
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </div>
+    </>
+  );
 }

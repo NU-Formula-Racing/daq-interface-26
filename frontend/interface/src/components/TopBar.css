@@ -1,0 +1,223 @@
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: blink 1s infinite;
+  margin-right: 6px;
+}
+
+/* ============================================================
+   TopBar base styles
+   ============================================================ */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 56px;
+  padding: 0 1.25rem;
+  background: rgba(8, 8, 12, 0.97);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.topbar-logo {
+  height: 44px;
+  opacity: 0.9;
+}
+
+.topbar-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.08em;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topbar-csv-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.topbar-csv-btn:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.topbar-csv-label {
+  display: none;
+}
+
+.topbar-hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.topbar-hamburger:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.topbar-mobile-panel {
+  position: absolute;
+  top: 56px;
+  left: 0;
+  right: 0;
+  background: rgba(8, 8, 12, 0.99);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  padding: 10px 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 49;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   Center container (mode toggle + nav links)
+   ============================================================ */
+.topbar-center {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.topbar-nav-link {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.45);
+  padding: 5px 12px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.topbar-nav-link:hover {
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.topbar-nav-link--active {
+  color: #a78bfa;
+  background: rgba(78, 42, 132, 0.12);
+}
+
+.topbar-nav-link--active:hover {
+  color: #a78bfa;
+  background: rgba(78, 42, 132, 0.18);
+}
+
+/* Mobile nav links inside dropdown */
+.topbar-mobile-nav {
+  display: flex;
+  gap: 6px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.topbar-mobile-nav .topbar-nav-link {
+  flex: 1;
+  text-align: center;
+  padding: 8px 12px;
+}
+
+/* ============================================================
+   Mobile TopBar (below 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+  .topbar {
+    height: 48px;
+    padding: 0 0.75rem;
+    position: relative;
+  }
+
+  .topbar-logo {
+    height: 26px;
+  }
+
+  .topbar-title {
+    font-size: 0.8rem;
+  }
+
+  .topbar-mobile-panel {
+    top: 48px;
+  }
+
+  .topbar-mobile-panel .topbar-csv-btn {
+    width: 100%;
+    height: 38px;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .topbar-mobile-panel .topbar-csv-label {
+    display: inline;
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}

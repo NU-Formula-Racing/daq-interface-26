@@ -1,76 +1,229 @@
 .sidebar {
-    width: 280px;
-    background: #f8f9fa;
-    border-right: 3px solid #4E2A84;
-    padding: 20px;
-    overflow-y: auto;
-    flex-shrink: 0;
+  width: 260px;
+  background: rgba(6, 6, 10, 0.98);
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
-.sidebar h2 {
-    margin: 0 0 20px 0;
-    color: #4E2A84;
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #4E2A84;
+.sidebar-header {
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-.sidebar-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    background: white;
-    border-radius: 8px;
-    border: 2px solid #e0e0e0;
-    transition: all 0.2s ease;
+.sidebar-title {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-align: center;
+  margin: 0 0 10px 0;
 }
 
-.sidebar-item:hover {
-    border-color: #4E2A84;
-    box-shadow: 0 2px 6px rgba(78, 42, 132, 0.1);
+/* Add Widget dropdown wrapper */
+.sidebar-add-wrapper {
+  position: relative;
 }
 
-.sidebar-item span {
-    font-weight: 500;
-    color: #333;
-    font-size: 14px;
+.sidebar-add-btn {
+  width: 100%;
+  padding: 7px 10px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 3px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
-.sidebar-item button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 13px;
-    transition: all 0.2s ease;
+.sidebar-add-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.7);
 }
 
-.sidebar-item button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.sidebar-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: rgba(12, 12, 18, 0.99);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 3px;
+  z-index: 100;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
-/* Add button styling */
-.sidebar-item button:not(.active) {
-    background: #4E2A84;
-    color: white;
+.sidebar-dropdown-item {
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
 }
 
-.sidebar-item button:not(.active):hover {
-    background: #3d2166;
+.sidebar-dropdown-item:last-child {
+  border-bottom: none;
 }
 
-/* Remove button styling */
-.sidebar-item button.active {
-    background: #dc3545;
-    color: white;
+.sidebar-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #f0f0f0;
 }
 
-.sidebar-item button.active:hover {
-    background: #c82333;
+/* Scrollable widget list */
+.sidebar-widgets {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.sidebar-widgets::-webkit-scrollbar {
+  width: 3px;
+}
+
+.sidebar-widgets::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-widgets::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+}
+
+/* Individual widget item in sidebar */
+.sidebar-widget-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-left: 2px solid rgba(78, 42, 132, 0.5);
+  border-radius: 3px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.sidebar-widget-item:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  border-left-color: rgba(78, 42, 132, 0.7);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.sidebar-widget-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-widget-type {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.sidebar-widget-signal {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 1px;
+}
+
+.sidebar-remove-btn {
+  background: none;
+  border: 1px solid rgba(251, 113, 133, 0.2);
+  border-radius: 2px;
+  color: rgba(251, 113, 133, 0.6);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  padding: 2px 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sidebar-remove-btn:hover {
+  background: rgba(251, 113, 133, 0.08);
+  border-color: rgba(251, 113, 133, 0.5);
+  color: #fb7185;
+}
+
+/* Empty state */
+.sidebar-empty {
+  text-align: center;
+  padding: 24px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.15);
+  line-height: 1.6;
+}
+
+/* Footer with Save/Reset buttons */
+.sidebar-footer {
+  padding: 10px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  gap: 6px;
+}
+
+.sidebar-save-btn,
+.sidebar-reset-btn {
+  flex: 1;
+  padding: 7px 8px;
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sidebar-save-btn {
+  background: rgba(78, 42, 132, 0.1);
+  border: 1px solid rgba(78, 42, 132, 0.4);
+  color: #a78bfa;
+}
+
+.sidebar-save-btn:hover {
+  background: rgba(78, 42, 132, 0.2);
+  border-color: rgba(78, 42, 132, 0.6);
+}
+
+.sidebar-reset-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.sidebar-reset-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.6);
 }

@@ -1,0 +1,131 @@
+/* ============================================================
+   DatePicker — Dark theme popover calendar
+   ============================================================ */
+
+.datepicker-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* --- Trigger button --- */
+.datepicker-trigger {
+  background: rgba(10, 10, 15, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: #e0e6ed;
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.datepicker-trigger:hover,
+.datepicker-trigger:focus {
+  border-color: rgba(78, 42, 132, 0.5);
+}
+
+/* --- Popover container --- */
+.datepicker-popover {
+  z-index: 1000;
+  background: #111117;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  padding: 0.75rem;
+}
+
+/* ============================================================
+   react-day-picker v9 overrides (dark theme, purple accents)
+   ============================================================ */
+
+.datepicker-popover .rdp-root {
+  --rdp-accent-color: #7c3aed;
+  --rdp-accent-background-color: rgba(124, 58, 237, 0.2);
+  --rdp-day-height: 34px;
+  --rdp-day-width: 34px;
+  --rdp-day_button-height: 32px;
+  --rdp-day_button-width: 32px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #e0e6ed;
+}
+
+.datepicker-popover .rdp-month_caption {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #f0f0f0;
+  padding: 0.25rem 0;
+}
+
+.datepicker-popover .rdp-button_previous,
+.datepicker-popover .rdp-button_next {
+  color: rgba(255, 255, 255, 0.5);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.datepicker-popover .rdp-button_previous:hover,
+.datepicker-popover .rdp-button_next:hover {
+  color: #f0f0f0;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.datepicker-popover .rdp-weekday {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.datepicker-popover .rdp-day_button {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.datepicker-popover .rdp-day_button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f0f0f0;
+}
+
+/* Selected day */
+.datepicker-popover .rdp-selected .rdp-day_button {
+  background: rgba(124, 58, 237, 0.3);
+  color: #f0f0f0;
+  font-weight: 600;
+}
+
+/* Today indicator */
+.datepicker-popover .rdp-today .rdp-day_button {
+  border: 1px solid rgba(124, 58, 237, 0.4);
+}
+
+/* Outside (other month) */
+.datepicker-popover .rdp-outside .rdp-day_button {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Purple dot for days with data --- */
+.datepicker-popover .rdp-day {
+  position: relative;
+}
+
+.day-has-data::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #7c3aed;
+}
