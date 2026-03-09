@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { startOfMonth, endOfMonth, format, parse } from "date-fns";
@@ -34,11 +35,15 @@ export default function DatePicker({ value, onChange }) {
     });
   }, [open]);
 
+  const popoverRef = useRef(null);
+
   // Close on outside click/touch
   useEffect(() => {
     if (!open) return;
     function handleClick(e) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+      const inWrapper = wrapperRef.current && wrapperRef.current.contains(e.target);
+      const inPopover = popoverRef.current && popoverRef.current.contains(e.target);
+      if (!inWrapper && !inPopover) {
         setOpen(false);
       }
     }
@@ -93,24 +98,26 @@ export default function DatePicker({ value, onChange }) {
         {value || "Select date"}
       </button>
 
-      {open && (
-        <div className="datepicker-popover" style={popoverStyle}>
-          <DayPicker
-            mode="single"
-            selected={selected}
-            onSelect={handleSelect}
-            month={displayMonth}
-            onMonthChange={handleMonthChange}
-            modifiers={{
-              hasData: (day) =>
-                datesWithData.has(format(day, "yyyy-MM-dd")),
-            }}
-            modifiersClassNames={{
-              hasData: "day-has-data",
-            }}
-          />
-        </div>
-      )}
+      {open &&
+        createPortal(
+          <div className="datepicker-popover" style={popoverStyle} ref={popoverRef}>
+            <DayPicker
+              mode="single"
+              selected={selected}
+              onSelect={handleSelect}
+              month={displayMonth}
+              onMonthChange={handleMonthChange}
+              modifiers={{
+                hasData: (day) =>
+                  datesWithData.has(format(day, "yyyy-MM-dd")),
+              }}
+              modifiersClassNames={{
+                hasData: "day-has-data",
+              }}
+            />
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
