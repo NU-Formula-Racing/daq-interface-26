@@ -225,7 +225,6 @@
 }
 
 .entry-card:hover {
-  transform: translateY(-6px);
   box-shadow:
     0 24px 44px rgba(0,0,0,0.32),
     0 0 24px rgba(var(--glow-color), 0.12);
