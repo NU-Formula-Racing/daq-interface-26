@@ -138,7 +138,7 @@ for timestamp, frame_id, data in stream:
 
 ## When to Use Jupyter
 
-Jupyter notebooks may be used for:
+Jupyter notebooks used for:
 
 * Exploring the CSV
 * Visualizing bit layouts

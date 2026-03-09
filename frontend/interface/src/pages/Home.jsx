@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useSession } from '@/context/SessionContext';
@@ -123,6 +123,51 @@ export default function HomePage() {
     };
   }, [isMobile, reduceMotion]);
 
+  // ---- Magic Bento border glow (mouse-tracking) ----
+  const cardsRef = useRef(null);
+
+  useEffect(() => {
+    if (!showCards || isMobile || reduceMotion) return;
+
+    const SPOTLIGHT_RADIUS = 250;
+    const PROXIMITY = SPOTLIGHT_RADIUS * 0.5;
+    const FADE_DISTANCE = SPOTLIGHT_RADIUS * 0.75;
+
+    const handleMouseMove = (e) => {
+      const container = cardsRef.current;
+      if (!container) return;
+      const cards = container.querySelectorAll('.entry-card');
+
+      cards.forEach((card) => {
+        const rect = card.getBoundingClientRect();
+        const relativeX = ((e.clientX - rect.left) / rect.width) * 100;
+        const relativeY = ((e.clientY - rect.top) / rect.height) * 100;
+
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const distance =
+          Math.hypot(e.clientX - centerX, e.clientY - centerY) -
+          Math.max(rect.width, rect.height) / 2;
+        const effectiveDistance = Math.max(0, distance);
+
+        let glowIntensity = 0;
+        if (effectiveDistance <= PROXIMITY) {
+          glowIntensity = 1;
+        } else if (effectiveDistance <= FADE_DISTANCE) {
+          glowIntensity =
+            (FADE_DISTANCE - effectiveDistance) / (FADE_DISTANCE - PROXIMITY);
+        }
+
+        card.style.setProperty('--glow-x', `${relativeX}%`);
+        card.style.setProperty('--glow-y', `${relativeY}%`);
+        card.style.setProperty('--glow-intensity', glowIntensity.toString());
+      });
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => document.removeEventListener('mousemove', handleMouseMove);
+  }, [showCards, isMobile, reduceMotion]);
+
   // ---- Handlers ----
   const handleEnterLive = () => {
     setMode('live');
@@ -202,6 +247,7 @@ export default function HomePage() {
         {showCards && (
           <motion.div
             className="entry-cards"
+            ref={cardsRef}
             variants={cardsContainerVariants}
             initial="hidden"
             animate="visible"

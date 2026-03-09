@@ -168,6 +168,38 @@
   backdrop-filter: blur(6px);
   box-shadow: 0 20px 40px rgba(0,0,0,0.18);
   transition: transform 0.32s ease, box-shadow 0.32s ease, border-color 0.32s ease;
+
+  /* Magic Bento border glow vars */
+  --glow-x: 50%;
+  --glow-y: 50%;
+  --glow-intensity: 0;
+  --glow-radius: 250px;
+  --glow-color: 74, 222, 128;
+}
+
+/* --- Magic Bento border glow (mouse-tracking radial gradient) --- */
+.entry-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 3px;
+  background: radial-gradient(
+    var(--glow-radius) circle at var(--glow-x) var(--glow-y),
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.9)) 0%,
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.45)) 30%,
+    transparent 60%
+  );
+  border-radius: inherit;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .entry-card::before {
@@ -194,7 +226,9 @@
 
 .entry-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 24px 44px rgba(0,0,0,0.32);
+  box-shadow:
+    0 24px 44px rgba(0,0,0,0.32),
+    0 0 24px rgba(var(--glow-color), 0.12);
   border-color: rgba(255,255,255,0.2);
 }
 
@@ -259,6 +293,7 @@
 /* --- Replay card purple accent --- */
 .entry-card--replay {
   border-color: rgba(78,42,132,0.3);
+  --glow-color: 124, 58, 237;
 }
 
 .entry-card--replay:hover {
@@ -406,5 +441,9 @@
 
   .entry-card__btn::after {
     transition: none;
+  }
+
+  .entry-card::after {
+    display: none;
   }
 }
