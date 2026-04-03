@@ -9,7 +9,7 @@ const PAGE_SIZE = 1000;
  *
  * @param {function} buildQuery - A function that receives the supabase client and returns
  *   a query builder (everything EXCEPT .range()). Example:
- *     (sb) => sb.from("nfr26_signals").select("*").eq("session_id", 5).order("timestamp")
+ *     (sb) => sb.from("sd_readings").select("*").eq("session_id", "...").order("timestamp")
  * @returns {Promise<Array>} All rows concatenated.
  */
 export async function fetchAllRows(buildQuery) {
