@@ -39,11 +39,11 @@ export default function SignalPanel({
   const groupedAvailable = useMemo(() => {
     const activeNames = new Set(activeSignals.map((s) => s.name));
     const groups = {};
-    availableSignals.forEach(({ name, unit }) => {
-      if (activeNames.has(name)) return;
-      const u = unit || "unknown";
+    availableSignals.forEach((sig) => {
+      if (activeNames.has(sig.name)) return;
+      const u = sig.unit || "unknown";
       if (!groups[u]) groups[u] = [];
-      groups[u].push({ name, unit: u });
+      groups[u].push({ ...sig, unit: u });
     });
     return groups;
   }, [availableSignals, activeSignals]);
