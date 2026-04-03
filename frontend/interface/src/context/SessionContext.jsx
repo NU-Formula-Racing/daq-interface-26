@@ -34,45 +34,41 @@ function loadPersistedState() {
 }
 
 // ---------------------------------------------------------------------------
-// Helper: build start/end-of-day timestamps for a date string or Date
-// ---------------------------------------------------------------------------
-function dayRange(date) {
-  // If date is a string like "2026-02-14", append T00:00:00 so it's
-  // parsed in local time instead of UTC (date-only strings default to UTC).
-  const d = typeof date === "string" && !date.includes("T")
-    ? new Date(date + "T00:00:00")
-    : new Date(date);
-  const start = new Date(d);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(d);
-  end.setHours(23, 59, 59, 999);
-  return { start: start.toISOString(), end: end.toISOString() };
-}
-
-// ---------------------------------------------------------------------------
 // Provider
 // ---------------------------------------------------------------------------
 export function SessionProvider({ children }) {
   const persisted = useRef(loadPersistedState());
 
-  // --- State ---------------------------------------------------------------
+  // --- Core state -----------------------------------------------------------
   const [mode, setModeState] = useState(
     persisted.current?.mode === "replay" ? "replay" : "live"
   );
   const [sessionId, setSessionIdState] = useState(
-    persisted.current?.mode === "replay" ? persisted.current.sessionId ?? null : null
+    persisted.current?.mode === "replay"
+      ? persisted.current.sessionId ?? null
+      : null
   );
 
-  // SEPARATE data stores for live and replay
+  // Signal definitions catalog (loaded once on mount)
+  const [signalDefs, setSignalDefs] = useState(new Map()); // id -> {signal_name, source, unit}
+  const [signalDefsReady, setSignalDefsReady] = useState(false);
+
+  // Signals available in the current replay session
+  const [sessionSignals, setSessionSignals] = useState([]); // [{signal_id, signal_name, source, unit}]
+
+  // Separate data stores for live and replay
   const [liveSessionData, setLiveSessionData] = useState([]);
   const [replaySessionData, setReplaySessionData] = useState([]);
 
+  // availableSessions is now array of session objects: {id, started_at, ended_at, track, driver}
   const [availableSessions, setAvailableSessions] = useState([]);
   const [selectedDate, setSelectedDateState] = useState(
     persisted.current?.selectedDate ?? new Date().toISOString().split("T")[0]
   );
   const [replayPosition, setReplayPositionState] = useState(
-    persisted.current?.mode === "replay" ? persisted.current.replayPosition ?? 0 : null
+    persisted.current?.mode === "replay"
+      ? persisted.current.replayPosition ?? 0
+      : null
   );
   const [liveSignals, setLiveSignals] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -87,16 +83,19 @@ export function SessionProvider({ children }) {
   const channelRef = useRef(null);
   const sessionIdRef = useRef(sessionId);
   const modeRef = useRef(mode);
+  const signalDefsRef = useRef(signalDefs);
 
-  // Keep refs in sync
   useEffect(() => {
     sessionIdRef.current = sessionId;
   }, [sessionId]);
   useEffect(() => {
     modeRef.current = mode;
   }, [mode]);
+  useEffect(() => {
+    signalDefsRef.current = signalDefs;
+  }, [signalDefs]);
 
-  // --- localStorage persistence -------------------------------------------
+  // --- localStorage persistence ---------------------------------------------
   useEffect(() => {
     localStorage.setItem(
       "daqSession",
@@ -104,7 +103,30 @@ export function SessionProvider({ children }) {
     );
   }, [mode, sessionId, selectedDate, replayPosition]);
 
-  // --- Supabase helpers ----------------------------------------------------
+  // --- Load signal_definitions once on mount --------------------------------
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from("signal_definitions")
+        .select("id, signal_name, source, unit");
+      if (error) {
+        console.error("Failed to load signal_definitions:", error);
+        return;
+      }
+      const map = new Map();
+      for (const d of data) {
+        map.set(d.id, {
+          signal_name: d.signal_name,
+          source: d.source,
+          unit: d.unit,
+        });
+      }
+      setSignalDefs(map);
+      setSignalDefsReady(true);
+    })();
+  }, []);
+
+  // --- Supabase helpers -----------------------------------------------------
 
   const unsubscribe = useCallback(() => {
     if (channelRef.current) {
@@ -117,43 +139,48 @@ export function SessionProvider({ children }) {
   // LIVE MODE helpers
   // =========================================================================
 
-  /** Load today's signals for live mode. Returns the session_id found.
-   *  Only considers the car "live" if the most recent signal arrived
-   *  within the last 30 seconds. */
+  /** Load current rt_readings and resolve signal names via signalDefs. */
   const loadTodayLiveData = useCallback(async () => {
-    const { start, end } = dayRange(new Date());
-
     setIsLoading(true);
     try {
-      // For live mode, fetch today's data using direct query with pagination
-      // (RPC not needed here since live data is typically small and we need raw values)
-      const rows = await fetchAllRows((sb) =>
-        sb
-          .from("nfr26_signals")
-          .select("*")
-          .gte("timestamp", start)
-          .lte("timestamp", end)
-          .order("timestamp", { ascending: true })
-      ).catch((err) => {
-        console.error("Error loading today's live data:", err);
-        return [];
-      });
+      const { data: readings, error } = await supabase
+        .from("rt_readings")
+        .select("timestamp, signal_id, value")
+        .order("timestamp", { ascending: true });
+
+      if (error) {
+        console.error("Error loading rt_readings:", error);
+        setLiveSessionData([]);
+        return null;
+      }
+
+      const defs = signalDefsRef.current;
+      const rows = (readings || [])
+        .map((r) => {
+          const def = defs.get(r.signal_id);
+          if (!def) return null;
+          return {
+            timestamp: r.timestamp,
+            signal_name: def.signal_name,
+            value: r.value,
+            unit: def.unit,
+            source: def.source,
+          };
+        })
+        .filter(Boolean);
 
       setLiveSessionData(rows);
 
-      if (rows.length === 0) return null;
-
-      // Only report a live session if there is data from today
+      // Find today's latest session (if any) for display
       const today = new Date().toISOString().split("T")[0];
-      const newestRow = rows[rows.length - 1];
-      const newestDate = newestRow.timestamp.split("T")[0];
-      if (newestDate !== today) return null;
+      const { data: sessions } = await supabase
+        .from("sessions")
+        .select("id")
+        .eq("date", today)
+        .order("started_at", { ascending: false })
+        .limit(1);
 
-      // Derive session_id from the most recent row that has one
-      for (let i = rows.length - 1; i >= 0; i--) {
-        if (rows[i].session_id != null) return rows[i].session_id;
-      }
-      return null;
+      return sessions?.[0]?.id ?? null;
     } finally {
       setIsLoading(false);
     }
@@ -163,32 +190,22 @@ export function SessionProvider({ children }) {
     unsubscribe();
 
     const ch = supabase
-      .channel("session-signals-stream")
+      .channel("rt-signals-stream")
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "public",
-          table: "nfr26_signals",
+          table: "rt_readings",
         },
         (payload) => {
-          const row = payload.new;
+          const { signal_id, value, timestamp } = payload.new;
+          const def = signalDefsRef.current.get(signal_id);
+          if (!def) return;
 
-          // If the incoming row has a different session_id, auto-switch
-          if (
-            row.session_id != null &&
-            row.session_id !== sessionIdRef.current
-          ) {
-            setSessionIdState(row.session_id);
-          }
-
-          // Update liveSignals map
           setLiveSignals((prev) => ({
             ...prev,
-            [row.signal_name]: {
-              value: row.value,
-              timestamp: row.timestamp,
-            },
+            [def.signal_name]: { value, timestamp },
           }));
         }
       )
@@ -201,25 +218,43 @@ export function SessionProvider({ children }) {
   // REPLAY MODE helpers
   // =========================================================================
 
-  /** Load all signal rows for a session, paginating past the 1000-row server limit. */
+  /** Load bucketed overview data for a session (all signals, 1-second buckets). */
   const loadReplaySessionData = useCallback(async (sid) => {
     if (sid == null) {
       setReplaySessionData([]);
+      setSessionSignals([]);
       return;
     }
     setIsLoading(true);
     try {
+      // Fetch bucketed overview via RPC (paginated to handle large sessions)
       const rows = await fetchAllRows((sb) =>
-        sb
-          .from("nfr26_signals")
-          .select("*")
-          .eq("session_id", sid)
-          .order("timestamp", { ascending: true })
+        sb.rpc("get_session_overview", {
+          p_session_id: sid,
+          p_bucket_secs: 1,
+        })
       );
-      setReplaySessionData(rows);
+
+      // Shape matches old format: {timestamp, signal_name, value, unit, source}
+      const mapped = (rows || []).map((r) => ({
+        timestamp: r.timestamp,
+        signal_name: r.signal_name,
+        value: r.value,
+        unit: r.unit,
+        source: r.source,
+        session_id: sid,
+      }));
+      setReplaySessionData(mapped);
+
+      // Also fetch the distinct signals for this session
+      const { data: signals } = await supabase.rpc("get_session_signals", {
+        p_session_id: sid,
+      });
+      setSessionSignals(signals || []);
     } catch (err) {
       console.error("Error loading replay session data:", err);
       setReplaySessionData([]);
+      setSessionSignals([]);
     } finally {
       setIsLoading(false);
     }
@@ -227,37 +262,36 @@ export function SessionProvider({ children }) {
 
   /**
    * Replay mode: fetch available sessions for a given date, auto-select
-   * the first one, and load its data directly.
+   * the first one, and load its data.
    */
   const fetchSessionsForDate = useCallback(
     async (date) => {
-      const { start, end } = dayRange(date);
-
       setIsLoading(true);
       try {
-        const data = await fetchAllRows((sb) =>
-          sb
-            .from("nfr26_signals")
-            .select("session_id")
-            .gte("timestamp", start)
-            .lte("timestamp", end)
-            .order("session_id", { ascending: true })
-        );
+        const { data, error } = await supabase
+          .from("sessions")
+          .select("id, session_number, started_at, ended_at, track, driver")
+          .eq("date", date)
+          .order("started_at", { ascending: true });
 
-        // Filter out null session_ids in JS
-        const uniqueSessions = [
-          ...new Set(data.map((r) => r.session_id).filter((id) => id != null)),
-        ];
-        setAvailableSessions(uniqueSessions);
+        if (error) {
+          console.error("Error fetching sessions:", error);
+          setAvailableSessions([]);
+          setSessionIdState(null);
+          setReplaySessionData([]);
+          return;
+        }
 
-        // Auto-select first available session and load its data directly
-        if (uniqueSessions.length > 0) {
-          const sid = uniqueSessions[0];
-          setSessionIdState(sid);
-          await loadReplaySessionData(sid);
+        setAvailableSessions(data || []);
+
+        if (data && data.length > 0) {
+          const session = data[0];
+          setSessionIdState(session.id);
+          await loadReplaySessionData(session.id);
         } else {
           setSessionIdState(null);
           setReplaySessionData([]);
+          setSessionSignals([]);
         }
       } finally {
         setIsLoading(false);
@@ -269,34 +303,32 @@ export function SessionProvider({ children }) {
   // --- Fetch dates with data (for calendar highlights) --------------------
 
   const fetchDatesWithData = useCallback(async ({ start, end }) => {
-    // Check each day of the month individually with limit(1).
-    // This avoids the 1000-row default limit that caused dates to be missed
-    // when there are thousands of signal rows in a month.
-    const dates = new Set();
-    const queries = [];
-    const d = new Date(start);
-    const endDate = new Date(end);
+    // Extract date strings from ISO timestamps
+    const startDate =
+      typeof start === "string" && start.includes("T")
+        ? start.split("T")[0]
+        : start instanceof Date
+          ? start.toISOString().split("T")[0]
+          : start;
+    const endDate =
+      typeof end === "string" && end.includes("T")
+        ? end.split("T")[0]
+        : end instanceof Date
+          ? end.toISOString().split("T")[0]
+          : end;
 
-    while (d <= endDate) {
-      const dayStr = d.toISOString().split("T")[0];
-      const dayStart = `${dayStr}T00:00:00.000Z`;
-      const dayEnd = `${dayStr}T23:59:59.999Z`;
-      queries.push(
-        supabase
-          .from("nfr26_signals")
-          .select("timestamp")
-          .gte("timestamp", dayStart)
-          .lte("timestamp", dayEnd)
-          .limit(1)
-          .then(({ data }) => {
-            if (data?.length) dates.add(dayStr);
-          })
-      );
-      d.setDate(d.getDate() + 1);
+    const { data, error } = await supabase
+      .from("sessions")
+      .select("date")
+      .gte("date", startDate)
+      .lte("date", endDate);
+
+    if (error) {
+      console.error("Error fetching dates with data:", error);
+      return new Set();
     }
 
-    await Promise.all(queries);
-    return dates;
+    return new Set((data || []).map((r) => r.date));
   }, []);
 
   // --- Actions exposed via context -----------------------------------------
@@ -305,13 +337,15 @@ export function SessionProvider({ children }) {
     setModeState(newMode);
   }, []);
 
-  const setSessionId = useCallback((id) => {
-    setSessionIdState(id);
-    // In replay mode, load data directly (avoids stale state if id is same)
-    if (modeRef.current === "replay") {
-      loadReplaySessionData(id);
-    }
-  }, [loadReplaySessionData]);
+  const setSessionId = useCallback(
+    (id) => {
+      setSessionIdState(id);
+      if (modeRef.current === "replay") {
+        loadReplaySessionData(id);
+      }
+    },
+    [loadReplaySessionData]
+  );
 
   const setSelectedDate = useCallback((date) => {
     setSelectedDateState(date);
@@ -321,75 +355,122 @@ export function SessionProvider({ children }) {
     setReplayPositionState(pos);
   }, []);
 
-  /** Fetch raw (un-aggregated) signals for a time window via server-side RPC.
-   *  Used when the user zooms into a small range on the chart. */
-  const fetchSessionWindow = useCallback(async (sid, startIso, endIso) => {
-    if (sid == null) return [];
-    const { data, error } = await supabase.rpc("get_session_window", {
-      p_session_id: sid,
-      p_start: startIso,
-      p_end: endIso,
-    });
-    if (error) {
-      console.error("Error fetching session window:", error);
-      return [];
-    }
-    return (data ?? []).map((r) => ({
-      timestamp: r.timestamp,
-      signal_name: r.signal_name,
-      value: r.value,
-      unit: r.unit,
-      source: r.source,
-      session_id: sid,
-    }));
-  }, []);
-
-  /** Download ALL raw data for a session directly from Supabase as CSV */
-  const downloadFullSessionCsv = useCallback(async (sid, date) => {
-    if (sid == null) return;
-
-    const rows = await fetchAllRows((sb) =>
-      sb
-        .from("nfr26_signals")
-        .select("*")
-        .eq("session_id", sid)
-        .order("timestamp", { ascending: true })
-    );
-
-    if (rows.length === 0) return;
-
-    const signalNames = [...new Set(rows.map((r) => r.signal_name))].sort();
-    const timestamps = [...new Set(rows.map((r) => r.timestamp))].sort();
-
-    const header = ["timestamp", ...signalNames].join(",");
-    const csvRows = timestamps.map((ts) => {
-      const rowData = rows.filter((r) => r.timestamp === ts);
-      const values = signalNames.map((name) => {
-        const match = rowData.find((r) => r.signal_name === name);
-        return match ? match.value : "";
+  /** Fetch raw signal data for a time window (used by Graphs zoom).
+   *  Returns per-signal data in the old flat format. */
+  const fetchSignalWindow = useCallback(
+    async (sid, signalId, startIso, endIso) => {
+      if (sid == null || signalId == null) return [];
+      const { data, error } = await supabase.rpc("get_signal_window", {
+        p_session_id: sid,
+        p_signal_id: signalId,
+        p_start: startIso,
+        p_end: endIso,
       });
-      return [ts, ...values].join(",");
-    });
+      if (error) {
+        console.error("Error fetching signal window:", error);
+        return [];
+      }
+      const def = signalDefs.get(signalId);
+      return (data ?? []).map((r) => ({
+        timestamp: r.timestamp,
+        signal_name: def?.signal_name ?? `signal_${signalId}`,
+        value: r.value,
+        unit: def?.unit,
+        source: def?.source,
+        session_id: sid,
+      }));
+    },
+    [signalDefs]
+  );
 
-    const csv = [header, ...csvRows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `NFR_Session_${sid}_${date || "export"}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, []);
+  /** Fetch downsampled data for a single signal (used by Graphs). */
+  const fetchSignalDownsampled = useCallback(
+    async (sid, signalId, bucketSeconds = 1) => {
+      if (sid == null || signalId == null) return [];
+      const bucketInterval = `${bucketSeconds} seconds`;
+      const { data, error } = await supabase.rpc("get_signal_downsampled", {
+        p_session_id: sid,
+        p_signal_id: signalId,
+        p_bucket: bucketInterval,
+      });
+      if (error) {
+        console.error("Error fetching downsampled signal:", error);
+        return [];
+      }
+      const def = signalDefs.get(signalId);
+      return (data ?? []).map((r) => ({
+        timestamp: r.bucket,
+        signal_name: def?.signal_name ?? `signal_${signalId}`,
+        value: r.avg_value,
+        unit: def?.unit,
+        source: def?.source,
+      }));
+    },
+    [signalDefs]
+  );
+
+  /** Download ALL raw data for a session as CSV */
+  const downloadFullSessionCsv = useCallback(
+    async (sid, date) => {
+      if (sid == null) return;
+
+      const rows = await fetchAllRows((sb) =>
+        sb
+          .from("sd_readings")
+          .select("timestamp, signal_id, value")
+          .eq("session_id", sid)
+          .order("timestamp", { ascending: true })
+      );
+
+      if (rows.length === 0) return;
+
+      // Resolve signal names from signalDefs
+      const enriched = rows.map((r) => {
+        const def = signalDefs.get(r.signal_id);
+        return {
+          timestamp: r.timestamp,
+          signal_name: def?.signal_name || `signal_${r.signal_id}`,
+          value: r.value,
+        };
+      });
+
+      const signalNames = [
+        ...new Set(enriched.map((r) => r.signal_name)),
+      ].sort();
+      const timestamps = [
+        ...new Set(enriched.map((r) => r.timestamp)),
+      ].sort();
+
+      const header = ["timestamp", ...signalNames].join(",");
+      const csvRows = timestamps.map((ts) => {
+        const rowData = enriched.filter((r) => r.timestamp === ts);
+        const values = signalNames.map((name) => {
+          const match = rowData.find((r) => r.signal_name === name);
+          return match ? match.value : "";
+        });
+        return [ts, ...values].join(",");
+      });
+
+      const csv = [header, ...csvRows].join("\n");
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `NFR_Session_${date || "export"}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    },
+    [signalDefs]
+  );
 
   // --- Effects -------------------------------------------------------------
 
   // ---- LIVE MODE ----
   useEffect(() => {
-    if (mode !== "live") return;
+    if (mode !== "live" || !signalDefsReady) return;
     let cancelled = false;
 
     unsubscribe();
-    // Clear stale session immediately — only re-set if today's data exists
     setSessionIdState(null);
 
     (async () => {
@@ -404,7 +485,7 @@ export function SessionProvider({ children }) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode]);
+  }, [mode, signalDefsReady]);
 
   // ---- REPLAY MODE ----
   useEffect(() => {
@@ -431,14 +512,16 @@ export function SessionProvider({ children }) {
     // State
     mode,
     sessionId,
-    sessionData,          // unified: returns live or replay data based on mode
-    liveSessionData,      // live mode only
-    replaySessionData,    // replay mode only
+    sessionData,
+    liveSessionData,
+    replaySessionData,
     availableSessions,
     selectedDate,
     replayPosition,
     liveSignals,
     isLoading,
+    signalDefs,
+    sessionSignals,
 
     // Actions
     setMode,
@@ -447,7 +530,8 @@ export function SessionProvider({ children }) {
     setReplayPosition,
     fetchSessionsForDate,
     fetchDatesWithData,
-    fetchSessionWindow,
+    fetchSignalWindow,
+    fetchSignalDownsampled,
     downloadFullSessionCsv,
   };
 
