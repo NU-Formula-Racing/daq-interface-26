@@ -4,6 +4,11 @@ import { motion } from "framer-motion";
 import DatePicker from "@/components/DatePicker";
 import "./TopBar.css";
 
+function formatSessionLabel(session) {
+  const num = session.session_number != null ? session.session_number : "?";
+  return `Session #${num}`;
+}
+
 export default function SessionIndicator() {
   const {
     mode,
@@ -66,8 +71,6 @@ export default function SessionIndicator() {
           whiteSpace: "nowrap",
         }}
       >
-        <span>SESSION #{sessionId ?? "---"}</span>
-        <span style={{ margin: "0 6px" }}>&bull;</span>
         <span className="live-dot" />
         <span>LIVE</span>
       </motion.div>
@@ -91,15 +94,15 @@ export default function SessionIndicator() {
         <DatePicker value={selectedDate} onChange={setSelectedDate} />
         <select
           value={sessionId ?? ""}
-          onChange={(e) => setSessionId(Number(e.target.value))}
+          onChange={(e) => setSessionId(e.target.value)}
           style={inputStyle}
         >
           {availableSessions.length === 0 && (
             <option value="">No sessions</option>
           )}
-          {availableSessions.map((sid) => (
-            <option key={sid} value={sid}>
-              Session #{sid}
+          {availableSessions.map((session) => (
+            <option key={session.id} value={session.id}>
+              {formatSessionLabel(session)}
             </option>
           ))}
         </select>
