@@ -250,7 +250,13 @@ export function SessionProvider({ children }) {
       const { data: signals } = await supabase.rpc("get_session_signals", {
         p_session_id: sid,
       });
-      setSessionSignals(signals || []);
+
+      // Only keep signals that actually have data in this session
+      const signalNamesWithData = new Set(mapped.map((r) => r.signal_name));
+      const filteredSignals = (signals || []).filter((s) =>
+        signalNamesWithData.has(s.signal_name)
+      );
+      setSessionSignals(filteredSignals);
     } catch (err) {
       console.error("Error loading replay session data:", err);
       setReplaySessionData([]);
