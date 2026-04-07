@@ -8,7 +8,7 @@ export default function ModeToggle() {
   const handleClick = (newMode) => {
     if (newMode === mode) return;
     setMode(newMode);
-    navigate(newMode === "live" ? "/dashboard" : "/replay");
+    navigate(newMode === "live" ? "/dashboard" : "/graphs");
   };
 
   return (
