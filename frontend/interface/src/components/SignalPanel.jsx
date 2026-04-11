@@ -35,16 +35,23 @@ export default function SignalPanel({
     }
   }, [warning]);
 
-  // Group available signals by unit (excluding already-active signals)
+  // Group available signals by sender (excluding already-active signals)
   const groupedAvailable = useMemo(() => {
     const activeNames = new Set(activeSignals.map((s) => s.name));
     const groups = {};
-    availableSignals.forEach(({ name, unit }) => {
+    availableSignals.forEach(({ name, unit, sender }) => {
       if (activeNames.has(name)) return;
+      const s = sender || "unknown";
       const u = unit || "unknown";
-      if (!groups[u]) groups[u] = [];
-      groups[u].push({ name, unit: u });
+      if (!groups[s]) groups[s] = [];
+      groups[s].push({ name, unit: u, sender: s });
     });
+
+    // Ensure alphabetical signal order within each sender group.
+    Object.values(groups).forEach((signals) => {
+      signals.sort((a, b) => a.name.localeCompare(b.name));
+    });
+
     return groups;
   }, [availableSignals, activeSignals]);
 
@@ -77,6 +84,10 @@ export default function SignalPanel({
   };
 
   const hasAvailableSignals = Object.keys(groupedAvailable).length > 0;
+  const sortedGroupedEntries = useMemo(
+    () => Object.entries(groupedAvailable).sort(([a], [b]) => a.localeCompare(b)),
+    [groupedAvailable]
+  );
 
   return (
     <div className="signal-panel">
@@ -105,9 +116,9 @@ export default function SignalPanel({
 
         {dropdownOpen && hasAvailableSignals && (
           <div className="signal-dropdown">
-            {Object.entries(groupedAvailable).map(([unit, signals]) => (
-              <div key={unit} className="signal-dropdown-group">
-                <div className="signal-dropdown-group-label">{unit}</div>
+            {sortedGroupedEntries.map(([sender, signals]) => (
+              <div key={sender} className="signal-dropdown-group">
+                <div className="signal-dropdown-group-label">{sender}</div>
                 {signals.map((sig) => (
                   <button
                     key={sig.name}

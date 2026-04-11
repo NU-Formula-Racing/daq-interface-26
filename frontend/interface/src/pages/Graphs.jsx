@@ -43,16 +43,19 @@ function formatTime(isoStr) {
   });
 }
 
-/** Derive available signals (name + unit) from session data */
+/** Derive available signals (name + unit + sender) from session data */
 function deriveAvailableSignals(sessionData) {
   const map = new Map();
   for (const row of sessionData) {
     if (!map.has(row.signal_name)) {
-      map.set(row.signal_name, row.unit || "unknown");
+      map.set(row.signal_name, {
+        unit: row.unit || "unknown",
+        sender: row.source || "unknown",
+      });
     }
   }
   return Array.from(map.entries())
-    .map(([name, unit]) => ({ name, unit }))
+    .map(([name, meta]) => ({ name, unit: meta.unit, sender: meta.sender }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 

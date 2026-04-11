@@ -87,11 +87,14 @@ def main():
     if upload_to_db:
         print(f"Uploading to Supabase (session_id={session_id})\n")
 
-    # Build a lookup from signal name -> unit for each message
+    # Build lookups for per-signal metadata keyed by (frame_id, signal_name)
     signal_units = {}
+    signal_senders = {}
     for msg in decode_table.values():
+        sender = msg.sender or msg.name or "unknown"
         for sig in msg.signals:
             signal_units[(msg.frame_id, sig.name)] = sig.unit or ""
+            signal_senders[(msg.frame_id, sig.name)] = sender
 
     out_path = nfr_path.rsplit(".", 1)[0] + ".csv"
     db_batch = []
@@ -99,7 +102,7 @@ def main():
 
     with open(out_path, "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(["signal_name", "timestamp_ms", "value", "message_id", "message_name", "unit", "date", "start_time"])
+        writer.writerow(["signal_name", "timestamp_ms", "value", "message_id", "message_name", "sender", "unit", "date", "start_time"])
 
         for timestamp, frame_id, data in read_frames_from_file(nfr_path):
             decoded = decode_frame(frame_id, data, decode_table)
@@ -112,13 +115,14 @@ def main():
 
             for signal_name, value in decoded.items():
                 unit = signal_units.get((frame_id, signal_name), "")
-                writer.writerow([signal_name, timestamp, value, msg_id_hex, msg.name, unit, date_str, time_str])
+                sender = signal_senders.get((frame_id, signal_name), msg.name or "unknown")
+                writer.writerow([signal_name, timestamp, value, msg_id_hex, msg.name, sender, unit, date_str, time_str])
 
                 if supabase:
                     abs_time = start_dt + timedelta(milliseconds=timestamp)
                     db_batch.append({
                         "timestamp": abs_time.isoformat(),
-                        "source": msg.name,
+                        "source": sender,
                         "signal_name": signal_name,
                         "value": value,
                         "unit": unit,
