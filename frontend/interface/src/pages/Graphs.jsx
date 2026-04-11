@@ -43,6 +43,7 @@ function formatTime(isoStr) {
   });
 }
 
+<<<<<<< HEAD
 /** Derive available signals (name + unit + sender) from session data */
 function deriveAvailableSignals(sessionData) {
   const map = new Map();
@@ -59,56 +60,26 @@ function deriveAvailableSignals(sessionData) {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
+=======
+>>>>>>> 259bc57ec5f41f20fc2786778acafee1712d5981
 /**
- * Transform sessionData rows into Recharts-friendly array:
+ * Pivot per-signal data arrays into Recharts-friendly rows:
  * [{ timestamp, signal1: val, signal2: val, ... }, ...]
  */
-function roundTs(ts) {
-  return new Date(Math.round(new Date(ts).getTime() / 1000) * 1000).toISOString();
-}
-
-function transformChartData(sessionData, activeSignalNames, liveSignals, mode, useFullDetail = false) {
-  const nameSet = new Set(activeSignalNames);
-
-  // Group by timestamp — round to nearest second for overview, or use raw ms for detail
+function pivotSignalData(signalDataMap) {
   const tsMap = new Map();
-  for (const row of sessionData) {
-    if (!nameSet.has(row.signal_name)) continue;
-    const key = useFullDetail ? row.timestamp : roundTs(row.timestamp);
-    if (!tsMap.has(key)) {
-      tsMap.set(key, { timestamp: key });
+  for (const [signalName, rows] of signalDataMap.entries()) {
+    for (const row of rows) {
+      const key = row.timestamp;
+      if (!tsMap.has(key)) {
+        tsMap.set(key, { timestamp: key });
+      }
+      tsMap.get(key)[signalName] = Number(row.value);
     }
-    tsMap.get(key)[row.signal_name] = Number(row.value);
   }
-
-  const sorted = Array.from(tsMap.values()).sort(
+  return Array.from(tsMap.values()).sort(
     (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
   );
-
-  // In live mode, merge latest liveSignals as the newest point
-  if (mode === "live" && liveSignals) {
-    const livePoint = {};
-    let latestTs = null;
-    for (const sigName of activeSignalNames) {
-      if (liveSignals[sigName]) {
-        livePoint[sigName] = Number(liveSignals[sigName].value);
-        const ts = liveSignals[sigName].timestamp;
-        if (!latestTs || ts > latestTs) latestTs = ts;
-      }
-    }
-    if (latestTs && Object.keys(livePoint).length > 0) {
-      livePoint.timestamp = latestTs;
-      // Only append if it's newer than the last point
-      if (
-        sorted.length === 0 ||
-        new Date(latestTs) > new Date(sorted[sorted.length - 1].timestamp)
-      ) {
-        sorted.push(livePoint);
-      }
-    }
-  }
-
-  return sorted;
 }
 
 // ---------------------------------------------------------------------------
@@ -350,33 +321,41 @@ function TimelineSlider({ timestamps, replayPosition, setReplayPosition, mode })
 
 export default function Graphs() {
   const {
-    replaySessionData,
     sessionId,
     selectedDate,
     mode,
     replayPosition,
     setReplayPosition,
-    fetchSessionWindow,
+    sessionSignals,
+    fetchSignalDownsampled,
+    fetchSignalWindow,
   } = useSession();
 
   const isMobile = useIsMobile();
 
-  // Active signals state: [{ name, unit, color, visible }]
+  // Active signals state: [{ name, unit, color, visible, signal_id }]
   const [activeSignals, setActiveSignals] = useState([]);
-  // Track color index for assignment
   const [colorIndex, setColorIndex] = useState(0);
-  // Track Brush zoom range for progressive detail
   const [brushRange, setBrushRange] = useState(null);
 
-  // Derive available signals from replaySessionData
+  // Per-signal data store: Map<signal_name, [{timestamp, value}]>
+  const [signalDataMap, setSignalDataMap] = useState(new Map());
+
+  // Available signals from session (from context's get_session_signals)
   const availableSignals = useMemo(
-    () => deriveAvailableSignals(replaySessionData),
-    [replaySessionData]
+    () =>
+      sessionSignals.map((s) => ({
+        name: s.signal_name,
+        unit: s.unit || "unknown",
+        signal_id: s.signal_id,
+        source: s.source,
+      })),
+    [sessionSignals]
   );
 
-  // Add a signal
+  // Fetch downsampled data when a signal is added
   const handleAddSignal = useCallback(
-    (signal) => {
+    async (signal) => {
       setActiveSignals((prev) => {
         if (prev.find((s) => s.name === signal.name)) return prev;
         return [
@@ -386,81 +365,59 @@ export default function Graphs() {
             unit: signal.unit,
             color: CHART_COLORS[colorIndex % CHART_COLORS.length],
             visible: true,
+            signal_id: signal.signal_id,
           },
         ];
       });
       setColorIndex((i) => i + 1);
+
+      // Fetch data for this signal if not already loaded
+      if (!signalDataMap.has(signal.name) && sessionId && signal.signal_id) {
+        const data = await fetchSignalDownsampled(
+          sessionId,
+          signal.signal_id,
+          1
+        );
+        setSignalDataMap((prev) => new Map(prev).set(signal.name, data));
+      }
     },
-    [colorIndex]
+    [colorIndex, signalDataMap, sessionId, fetchSignalDownsampled]
   );
 
-  // Remove a signal
   const handleRemoveSignal = useCallback((name) => {
     setActiveSignals((prev) => prev.filter((s) => s.name !== name));
+    setSignalDataMap((prev) => {
+      const next = new Map(prev);
+      next.delete(name);
+      return next;
+    });
   }, []);
 
-  // Toggle visibility
   const handleToggleVisibility = useCallback((name) => {
     setActiveSignals((prev) =>
       prev.map((s) => (s.name === name ? { ...s, visible: !s.visible } : s))
     );
   }, []);
 
-  // CSV export for active + visible signals
-  const handleGraphsCsvDownload = useCallback(() => {
-    const visibleNames = activeSignals
-      .filter((s) => s.visible)
-      .map((s) => s.name);
-    if (visibleNames.length === 0 || !replaySessionData.length) return;
+  // Clear signal data when session changes
+  useEffect(() => {
+    setActiveSignals([]);
+    setSignalDataMap(new Map());
+    setColorIndex(0);
+    setBrushRange(null);
+  }, [sessionId]);
 
-    const nameSet = new Set(visibleNames);
-    const filtered = replaySessionData.filter((d) => nameSet.has(d.signal_name));
-
-    // Unique sorted timestamps
-    const timestamps = [...new Set(filtered.map((d) => d.timestamp))].sort();
-
-    // Build header
-    const sortedNames = [...visibleNames].sort();
-    const header = ["timestamp", ...sortedNames].join(",");
-
-    // Build rows - pivot data
-    const rows = timestamps.map((ts) => {
-      const rowData = filtered.filter((d) => d.timestamp === ts);
-      const values = sortedNames.map((name) => {
-        const match = rowData.find((d) => d.signal_name === name);
-        return match ? match.value : "";
-      });
-      return [ts, ...values].join(",");
-    });
-
-    const csv = [header, ...rows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `NFR_Graphs_${sessionId}_${selectedDate}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [activeSignals, replaySessionData, sessionId, selectedDate]);
-
-  // Build chart data
-  const activeSignalNames = useMemo(
-    () => activeSignals.map((s) => s.name),
-    [activeSignals]
-  );
-
-  // Overview: server already returns 1-second-bucketed data, just transform for Recharts
+  // Build overview chart data by pivoting per-signal data
   const overviewData = useMemo(
-    () => transformChartData(replaySessionData, activeSignalNames, null, "replay", true),
-    [replaySessionData, activeSignalNames]
+    () => pivotSignalData(signalDataMap),
+    [signalDataMap]
   );
 
-  // Zoom detail: when Brush selects a small window, fetch raw ms data from server
+  // Zoom detail: fetch raw data when Brush selects a small window
   const [detailData, setDetailData] = useState(null);
   const brushDebounce = useRef(null);
 
   useEffect(() => {
-    // Clear pending debounce on every brush change
     if (brushDebounce.current) clearTimeout(brushDebounce.current);
 
     if (!brushRange || !overviewData.length) {
@@ -477,22 +434,62 @@ export default function Graphs() {
       return;
     }
 
-    // Debounce the server fetch so we don't fire on every brush drag frame
     const startIso = overviewData[brushRange.startIndex]?.timestamp;
     const endIso = overviewData[brushRange.endIndex]?.timestamp;
 
+    const visibleSignals = activeSignals.filter((s) => s.visible);
+
     brushDebounce.current = setTimeout(async () => {
-      const rows = await fetchSessionWindow(sessionId, startIso, endIso);
-      const detailed = transformChartData(rows, activeSignalNames, null, "replay", true);
-      setDetailData(detailed);
+      // Fetch raw data for each visible signal in parallel
+      const results = await Promise.all(
+        visibleSignals.map(async (sig) => {
+          const data = await fetchSignalWindow(
+            sessionId,
+            sig.signal_id,
+            startIso,
+            endIso
+          );
+          return [sig.name, data];
+        })
+      );
+
+      const detailMap = new Map(results);
+      setDetailData(pivotSignalData(detailMap));
     }, 300);
 
     return () => {
       if (brushDebounce.current) clearTimeout(brushDebounce.current);
     };
-  }, [brushRange, overviewData, sessionId, activeSignalNames, fetchSessionWindow]);
+  }, [brushRange, overviewData, sessionId, activeSignals, fetchSignalWindow]);
 
   const chartData = detailData || overviewData;
+
+  // CSV export for active + visible signals
+  const handleGraphsCsvDownload = useCallback(() => {
+    const visibleNames = activeSignals
+      .filter((s) => s.visible)
+      .map((s) => s.name);
+    if (visibleNames.length === 0 || !chartData.length) return;
+
+    const sortedNames = [...visibleNames].sort();
+    const header = ["timestamp", ...sortedNames].join(",");
+
+    const rows = chartData.map((point) => {
+      const values = sortedNames.map((name) =>
+        point[name] != null ? point[name] : ""
+      );
+      return [point.timestamp, ...values].join(",");
+    });
+
+    const csv = [header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `NFR_Graphs_${selectedDate}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [activeSignals, chartData, selectedDate]);
 
   // Unique sorted timestamps for the slider
   const timestamps = useMemo(
@@ -502,7 +499,7 @@ export default function Graphs() {
 
   // Build Y-axis config: up to 3 unit types
   const unitAxes = useMemo(() => {
-    const unitSet = new Map(); // unit -> first signal color
+    const unitSet = new Map();
     for (const sig of activeSignals) {
       if (!sig.visible) continue;
       if (!unitSet.has(sig.unit)) {
@@ -516,19 +513,9 @@ export default function Graphs() {
       const yAxisId = `y-${unit}`;
 
       if (idx === 0) {
-        axes.push({
-          yAxisId,
-          unit,
-          orientation: "left",
-          color,
-        });
+        axes.push({ yAxisId, unit, orientation: "left", color });
       } else if (idx === 1) {
-        axes.push({
-          yAxisId,
-          unit,
-          orientation: "right",
-          color,
-        });
+        axes.push({ yAxisId, unit, orientation: "right", color });
       } else if (idx === 2) {
         axes.push({
           yAxisId,

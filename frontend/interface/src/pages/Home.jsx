@@ -177,7 +177,7 @@ export default function HomePage() {
   const handleOpenReplay = () => {
     setMode('replay');
     setCtxSelectedDate(selectedDate);
-    navigate('/replay');
+    navigate('/graphs');
   };
 
   return (

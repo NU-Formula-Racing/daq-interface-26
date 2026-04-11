@@ -292,41 +292,113 @@
   background: rgba(10, 10, 15, 0.98);
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 4px;
-  max-height: 320px;
-  overflow-y: auto;
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
   z-index: 100;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 
-.signal-dropdown::-webkit-scrollbar {
+/* Search input */
+
+.signal-search-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.signal-search-icon {
+  color: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.signal-search-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #f0f0f0;
+  letter-spacing: 0.02em;
+}
+
+.signal-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* Scrollable signal list */
+
+.signal-dropdown-list {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.signal-dropdown-list::-webkit-scrollbar {
   width: 5px;
 }
 
-.signal-dropdown::-webkit-scrollbar-track {
+.signal-dropdown-list::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.signal-dropdown::-webkit-scrollbar-thumb {
+.signal-dropdown-list::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.10);
   border-radius: 3px;
 }
 
+.signal-dropdown-empty {
+  padding: 16px 12px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* Collapsible group */
+
 .signal-dropdown-group {
-  padding: 4px 0;
+  padding: 0;
 }
 
 .signal-dropdown-group + .signal-dropdown-group {
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+.signal-dropdown-group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 10px 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.15s ease;
+}
+
+.signal-dropdown-group-header:hover {
+  color: rgba(255, 255, 255, 0.75);
+}
+
 .signal-dropdown-group-label {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.6rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.35);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  padding: 8px 12px 4px;
+}
+
+.signal-dropdown-group-count {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: rgba(255, 255, 255, 0.2);
+  margin-left: auto;
 }
 
 .signal-dropdown-item {
