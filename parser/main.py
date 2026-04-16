@@ -88,6 +88,7 @@ def main():
         sender = msg.sender or msg.name or "unknown"
         for sig in msg.signals:
             signal_units[(msg.frame_id, sig.name)] = sig.unit or ""
+            signal_senders[(msg.frame_id, sig.name)] = sender
 
     # ---- First pass: collect unique signals and find end timestamp ----------
     # This is fast (binary file, no network I/O) and lets us:
