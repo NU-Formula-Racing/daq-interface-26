@@ -43,25 +43,6 @@ function formatTime(isoStr) {
   });
 }
 
-<<<<<<< HEAD
-/** Derive available signals (name + unit + sender) from session data */
-function deriveAvailableSignals(sessionData) {
-  const map = new Map();
-  for (const row of sessionData) {
-    if (!map.has(row.signal_name)) {
-      map.set(row.signal_name, {
-        unit: row.unit || "unknown",
-        sender: row.source || "unknown",
-      });
-    }
-  }
-  return Array.from(map.entries())
-    .map(([name, meta]) => ({ name, unit: meta.unit, sender: meta.sender }))
-    .sort((a, b) => a.name.localeCompare(b.name));
-}
-
-=======
->>>>>>> 259bc57ec5f41f20fc2786778acafee1712d5981
 /**
  * Pivot per-signal data arrays into Recharts-friendly rows:
  * [{ timestamp, signal1: val, signal2: val, ... }, ...]
