@@ -40,7 +40,8 @@ export async function runMigrations(
     } catch (err) {
       await client.query('ROLLBACK');
       throw new Error(
-        `Migration ${file} failed: ${(err as Error).message}`
+        `Migration ${file} failed: ${(err as Error).message}`,
+        { cause: err }
       );
     }
   }
