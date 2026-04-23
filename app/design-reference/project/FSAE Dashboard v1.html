@@ -1,0 +1,187 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>NFR · FSAE Signal Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    html, body { margin: 0; padding: 0; background: #f0eee9; font-family: 'Inter', system-ui, sans-serif; color: #222; }
+    * { box-sizing: border-box; }
+    input, button { font-family: inherit; }
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="lib/signals.js"></script>
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="lib/widgets.jsx"></script>
+  <script type="text/babel" src="lib/shell.jsx"></script>
+  <script type="text/babel" src="lib/dir-dock.jsx"></script>
+  <script type="text/babel" src="lib/dir-console.jsx"></script>
+  <script type="text/babel" src="lib/dir-bench.jsx"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    // ─────────────────────────────────────────────────────────
+    // TWEAKS (persisted via __edit_mode protocol)
+    // ─────────────────────────────────────────────────────────
+    const TWEAKS_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "accent": "#4E2A84",
+      "graphStyle": "line",
+      "density": "comfortable"
+    }/*EDITMODE-END*/;
+
+    function useTweaks() {
+      const [t, setT] = React.useState(TWEAKS_DEFAULTS);
+      const [editing, setEditing] = React.useState(false);
+      React.useEffect(() => {
+        const onMsg = (e) => {
+          if (!e.data || typeof e.data !== 'object') return;
+          if (e.data.type === '__activate_edit_mode') setEditing(true);
+          if (e.data.type === '__deactivate_edit_mode') setEditing(false);
+        };
+        window.addEventListener('message', onMsg);
+        try { window.parent.postMessage({ type: '__edit_mode_available' }, '*'); } catch (e) {}
+        return () => window.removeEventListener('message', onMsg);
+      }, []);
+      const patch = (next) => {
+        setT((cur) => {
+          const merged = { ...cur, ...next };
+          try { window.parent.postMessage({ type: '__edit_mode_set_keys', edits: next }, '*'); } catch (e) {}
+          return merged;
+        });
+      };
+      return { tweaks: t, setTweak: patch, editing };
+    }
+
+    function TweaksPanel({ tweaks, onChange }) {
+      return (
+        <div style={{
+          position: 'fixed', bottom: 20, right: 20, zIndex: 1000,
+          width: 240, background: '#0e0f12', border: '1px solid rgba(255,255,255,0.14)',
+          fontFamily: '"JetBrains Mono", monospace', color: '#fff',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+        }}>
+          <div style={{ padding: '6px 10px', borderBottom: '1px solid rgba(255,255,255,0.08)', fontSize: 10, letterSpacing: 2, color: 'rgba(255,255,255,0.6)' }}>TWEAKS</div>
+          <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <TweakRow label="ACCENT">
+              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                {['#4E2A84','#8b5cf6','#e8a648','#6ee7b7','#7c9cff','#f25757'].map((c) => (
+                  <div key={c} onClick={() => onChange({ accent: c })}
+                    style={{ width: 22, height: 22, background: c, cursor: 'pointer',
+                      border: tweaks.accent === c ? '2px solid #fff' : '2px solid transparent' }} />
+                ))}
+              </div>
+            </TweakRow>
+            <TweakRow label="GRAPH">
+              <Seg options={[['line','LINE'],['area','AREA'],['step','STEP']]} value={tweaks.graphStyle} onChange={(v) => onChange({ graphStyle: v })} />
+            </TweakRow>
+            <TweakRow label="DENSITY">
+              <Seg options={[['compact','COMPACT'],['comfortable','COMFY']]} value={tweaks.density} onChange={(v) => onChange({ density: v })} />
+            </TweakRow>
+          </div>
+        </div>
+      );
+    }
+    function TweakRow({ label, children }) {
+      return (
+        <div>
+          <div style={{ fontSize: 9, letterSpacing: 1.5, color: 'rgba(255,255,255,0.5)', marginBottom: 5 }}>{label}</div>
+          {children}
+        </div>
+      );
+    }
+    function Seg({ options, value, onChange }) {
+      return (
+        <div style={{ display: 'flex', border: '1px solid rgba(255,255,255,0.1)' }}>
+          {options.map(([v, l]) => (
+            <button key={v} onClick={() => onChange(v)} style={{
+              flex: 1, padding: '4px 6px', border: 'none',
+              background: value === v ? 'rgba(139,92,246,0.2)' : 'transparent',
+              color: value === v ? '#fff' : 'rgba(255,255,255,0.5)',
+              fontFamily: '"JetBrains Mono", monospace', fontSize: 9, letterSpacing: 1, cursor: 'pointer',
+            }}>{l}</button>
+          ))}
+        </div>
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Global time model: each direction picks its own mode + t,
+    // but starts with shared defaults.
+    // ─────────────────────────────────────────────────────────
+    function useTimeController(initialMode = 'replay', initialT = 0.42) {
+      const [mode, setMode] = React.useState(initialMode);
+      const [t, setT] = React.useState(initialT);
+      React.useEffect(() => {
+        if (mode !== 'live') return;
+        let raf;
+        const tick = () => {
+          setT((cur) => Math.min(1, cur + 0.00008));
+          raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(raf);
+      }, [mode]);
+      return { mode, setMode, t, setT };
+    }
+
+    function Direction({ children, accent }) {
+      // override --accent locally so each artboard is isolated
+      return (
+        <div style={{ width: '100%', height: '100%', position: 'relative', ['--accent']: accent }}>
+          {children}
+        </div>
+      );
+    }
+
+    // Three artboards — each with its own time state so they're independently explorable.
+    function DockArtboard({ tweaks }) {
+      const { mode, setMode, t, setT } = useTimeController('replay', 0.42);
+      return <Direction accent={tweaks.accent}><DockDirection t={t} onT={setT} mode={mode} onMode={setMode} duration={1} density={tweaks.density} graphStyle={tweaks.graphStyle} /></Direction>;
+    }
+    function ConsoleArtboard({ tweaks }) {
+      const { mode, setMode, t, setT } = useTimeController('live', 0.55);
+      return <Direction accent={tweaks.accent}><ConsoleDirection t={t} onT={setT} mode={mode} onMode={setMode} duration={1} density={tweaks.density} graphStyle={tweaks.graphStyle} /></Direction>;
+    }
+    function BenchArtboard({ tweaks }) {
+      const { mode, setMode, t, setT } = useTimeController('replay', 0.33);
+      return <Direction accent={tweaks.accent}><BenchDirection t={t} onT={setT} mode={mode} onMode={setMode} duration={1} density={tweaks.density} graphStyle={tweaks.graphStyle} /></Direction>;
+    }
+
+    function App() {
+      const { tweaks, setTweak, editing } = useTweaks();
+      const AB_W = 1440, AB_H = 860;
+      return (
+        <>
+          <DesignCanvas>
+            <DCSection id="directions" title="NFR · DAQ Dashboard — three directions" subtitle="Dock · Console · Bench. Every widget can hold any type; signals feed from the same library. Live + Replay share the same layout.">
+              <DCArtboard id="dock" label="A · DOCK — library + grid" width={AB_W} height={AB_H}>
+                <DockArtboard tweaks={tweaks} />
+              </DCArtboard>
+              <DCArtboard id="console" label="B · CONSOLE — stacked tracks, shared cursor" width={AB_W} height={AB_H}>
+                <ConsoleArtboard tweaks={tweaks} />
+              </DCArtboard>
+              <DCArtboard id="bench" label="C · BENCH — palette + freeform canvas" width={AB_W} height={AB_H}>
+                <BenchArtboard tweaks={tweaks} />
+              </DCArtboard>
+            </DCSection>
+          </DesignCanvas>
+          {editing && <TweaksPanel tweaks={tweaks} onChange={setTweak} />}
+        </>
+      );
+    }
+
+    // wait for all babel scripts to finish
+    requestAnimationFrame(() => {
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    });
+  </script>
+</body>
+</html>

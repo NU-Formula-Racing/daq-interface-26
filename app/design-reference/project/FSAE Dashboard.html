@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>NFR · FSAE Signal Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    html, body, #root { margin: 0; padding: 0; height: 100%; background: #1e1f22; font-family: 'Inter', system-ui, sans-serif; color: #dfe1e5; overflow: hidden; }
+    * { box-sizing: border-box; }
+    input, button { font-family: inherit; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.16); }
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="lib/signals.js"></script>
+  <script type="text/babel" src="lib/widgets.jsx"></script>
+  <script type="text/babel" src="lib/shell.jsx"></script>
+  <script type="text/babel" src="lib/dir-dock.jsx"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const TWEAKS_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "accent": "#4E2A84",
+      "graphStyle": "line",
+      "density": "compact"
+    }/*EDITMODE-END*/;
+
+    function useTweaks() {
+      const [t, setT] = React.useState(TWEAKS_DEFAULTS);
+      const [editing, setEditing] = React.useState(false);
+      React.useEffect(() => {
+        const onMsg = (e) => {
+          if (!e.data || typeof e.data !== 'object') return;
+          if (e.data.type === '__activate_edit_mode') setEditing(true);
+          if (e.data.type === '__deactivate_edit_mode') setEditing(false);
+        };
+        window.addEventListener('message', onMsg);
+        try { window.parent.postMessage({ type: '__edit_mode_available' }, '*'); } catch (e) {}
+        return () => window.removeEventListener('message', onMsg);
+      }, []);
+      const patch = (next) => {
+        setT((cur) => {
+          const merged = { ...cur, ...next };
+          try { window.parent.postMessage({ type: '__edit_mode_set_keys', edits: next }, '*'); } catch (e) {}
+          return merged;
+        });
+      };
+      return { tweaks: t, setTweak: patch, editing };
+    }
+
+    function TweaksPanel({ tweaks, onChange }) {
+      return (
+        <div style={{
+          position: 'fixed', bottom: 56, right: 20, zIndex: 1000,
+          width: 240, background: '#2b2d30', border: '1px solid rgba(255,255,255,0.12)',
+          fontFamily: '"JetBrains Mono", monospace', color: '#dfe1e5',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+        }}>
+          <div style={{ padding: '6px 10px', borderBottom: '1px solid rgba(255,255,255,0.08)', fontSize: 10, letterSpacing: 2, color: 'rgba(255,255,255,0.6)' }}>TWEAKS</div>
+          <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div>
+              <div style={{ fontSize: 9, letterSpacing: 1.5, color: 'rgba(255,255,255,0.5)', marginBottom: 5 }}>ACCENT</div>
+              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                {['#7c6fde','#a78bfa','#f0a55c','#7ec98f','#8bb4ff','#e06c6c'].map((c) => (
+                  <div key={c} onClick={() => onChange({ accent: c })}
+                    style={{ width: 22, height: 22, background: c, cursor: 'pointer',
+                      border: tweaks.accent === c ? '2px solid #fff' : '2px solid transparent' }} />
+                ))}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 9, letterSpacing: 1.5, color: 'rgba(255,255,255,0.5)', marginBottom: 5 }}>GRAPH</div>
+              <Seg options={[['line','LINE'],['area','AREA'],['step','STEP']]} value={tweaks.graphStyle} onChange={(v) => onChange({ graphStyle: v })} />
+            </div>
+            <div>
+              <div style={{ fontSize: 9, letterSpacing: 1.5, color: 'rgba(255,255,255,0.5)', marginBottom: 5 }}>DENSITY</div>
+              <Seg options={[['compact','COMPACT'],['comfortable','COMFY']]} value={tweaks.density} onChange={(v) => onChange({ density: v })} />
+            </div>
+          </div>
+        </div>
+      );
+    }
+    function Seg({ options, value, onChange }) {
+      return (
+        <div style={{ display: 'flex', border: '1px solid rgba(255,255,255,0.1)' }}>
+          {options.map(([v, l]) => (
+            <button key={v} onClick={() => onChange(v)} style={{
+              flex: 1, padding: '4px 6px', border: 'none',
+              background: value === v ? 'rgba(167,139,250,0.22)' : 'transparent',
+              color: value === v ? '#dfe1e5' : '#9da0a8',
+              fontFamily: '"JetBrains Mono", monospace', fontSize: 9, letterSpacing: 1, cursor: 'pointer',
+            }}>{l}</button>
+          ))}
+        </div>
+      );
+    }
+
+    function useTimeController() {
+      const [mode, setMode] = React.useState(() => localStorage.getItem('nfr-mode') || 'replay');
+      const [t, setT] = React.useState(() => parseFloat(localStorage.getItem('nfr-t')) || 0.42);
+      React.useEffect(() => { localStorage.setItem('nfr-mode', mode); }, [mode]);
+      React.useEffect(() => {
+        const id = setTimeout(() => localStorage.setItem('nfr-t', String(t)), 200);
+        return () => clearTimeout(id);
+      }, [t]);
+      React.useEffect(() => {
+        if (mode !== 'live') return;
+        let raf;
+        const tick = () => {
+          setT((cur) => cur >= 1 ? 0 : cur + 0.00012);
+          raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(raf);
+      }, [mode]);
+      return { mode, setMode, t, setT };
+    }
+
+    function App() {
+      const { tweaks, setTweak, editing } = useTweaks();
+      const { mode, setMode, t, setT } = useTimeController();
+      return (
+        <>
+          <div style={{ width: '100vw', height: '100vh', ['--accent']: tweaks.accent }}>
+            <DockDirection t={t} onT={setT} mode={mode} onMode={setMode} duration={1}
+              density={tweaks.density} graphStyle={tweaks.graphStyle} />
+          </div>
+          {editing && <TweaksPanel tweaks={tweaks} onChange={setTweak} />}
+        </>
+      );
+    }
+
+    const mount = () => ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    if (document.readyState === 'complete') setTimeout(mount, 0);
+    else window.addEventListener('load', mount);
+  </script>
+</body>
+</html>
