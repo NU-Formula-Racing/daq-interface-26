@@ -68,7 +68,8 @@ def open_session(
     started_at: datetime | None = None,
 ) -> UUID:
     """Create a new session row and return its UUID."""
-    assert source in ("live", "sd_import"), f"invalid source: {source!r}"
+    if source not in ("live", "sd_import"):
+        raise ValueError(f"invalid source: {source!r}")
     with conn.cursor() as cur:
         cur.execute(
             "INSERT INTO sessions (date, started_at, source, source_file) "
