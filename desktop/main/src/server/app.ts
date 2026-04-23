@@ -1,6 +1,8 @@
 import Fastify, { type FastifyInstance } from 'fastify';
 import type pg from 'pg';
 import { getAppConfig, setAppConfig } from '../db/config.ts';
+import { registerSessionRoutes } from './routes/sessions.ts';
+import { registerSignalRoutes } from './routes/signals.ts';
 
 export interface BuildAppOptions {
   pool: pg.Pool;
@@ -21,6 +23,9 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
       return { ok: true };
     }
   );
+
+  registerSessionRoutes(app, opts.pool);
+  registerSignalRoutes(app, opts.pool);
 
   return app;
 }
