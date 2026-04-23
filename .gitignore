@@ -143,3 +143,5 @@ vite.config.ts.timestamp-*
 __pycache__/
 *.env
 *.claude
+# Git worktrees
+.worktrees/
