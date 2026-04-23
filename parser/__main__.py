@@ -1,8 +1,10 @@
 """CLI entrypoint for the NFR 26 parser.
 
-Usage:
-  python -m parser live --dbc <csv> --port <device> [--baud 9600]
-  python -m parser batch --dbc <csv> --file <nfr>
+Usage (invoke via the explicit script path; the module is a flat-layout
+package so `python -m parser` requires `PYTHONPATH=parser`):
+
+  python parser/__main__.py live  --dbc <csv> --port <device> [--baud 9600]
+  python parser/__main__.py batch --dbc <csv> --file <nfr>
 
 The DB connection string is read from the `NFR_DB_URL` environment variable
 (default: `postgres://postgres@localhost:5432/nfr_local`).
@@ -14,10 +16,15 @@ import os
 import sys
 from pathlib import Path
 
-from batch import run_batch_import
-from live import run_live
-from protocol import ProtocolEmitter
-from serial_source import serial_events
+# Make sibling modules (batch, live, protocol, ...) importable no matter
+# which cwd Python is launched from. The parser directory contains the
+# sibling modules with flat (non-package) imports.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from batch import run_batch_import  # noqa: E402
+from live import run_live  # noqa: E402
+from protocol import ProtocolEmitter  # noqa: E402
+from serial_source import serial_events  # noqa: E402
 
 
 DEFAULT_DSN = "postgres://postgres@localhost:5432/nfr_local"

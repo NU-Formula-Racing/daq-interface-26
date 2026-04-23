@@ -18,7 +18,10 @@ dev = [
 ]
 
 [tool.setuptools]
-py-modules = ["compile", "decode", "signalSpec"]
+py-modules = [
+  "compile", "decode", "signalSpec",
+  "db", "protocol", "nfr_reader", "batch", "live", "serial_source",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

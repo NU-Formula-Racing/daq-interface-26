@@ -47,13 +47,11 @@ class RunSummary:
 
 def _make_sig_lookups(decode_table):
     sender_lookup: dict[tuple[int, str], str] = {}
-    unit_lookup: dict[tuple[str, str], str] = {}
     defs: list[SignalDef] = []
     for msg in decode_table.values():
         sender = msg.sender or msg.name or "unknown"
         for sig in msg.signals:
             sender_lookup[(msg.frame_id, sig.name)] = sender
-            unit_lookup[(sender, sig.name)] = sig.unit or ""
             defs.append(
                 SignalDef(source=sender, signal_name=sig.name, unit=sig.unit or "")
             )
