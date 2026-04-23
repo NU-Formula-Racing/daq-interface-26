@@ -21,6 +21,7 @@ dev = [
 py-modules = [
   "compile", "decode", "signalSpec",
   "db", "protocol", "nfr_reader", "batch", "live", "serial_source",
+  "file_source",
 ]
 
 [tool.pytest.ini_options]

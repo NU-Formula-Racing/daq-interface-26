@@ -3,8 +3,9 @@
 Usage (invoke via the explicit script path; the module is a flat-layout
 package so `python -m parser` requires `PYTHONPATH=parser`):
 
-  python parser/__main__.py live  --dbc <csv> --port <device> [--baud 9600]
-  python parser/__main__.py batch --dbc <csv> --file <nfr>
+  python parser/__main__.py live   --dbc <csv> --port <device> [--baud 9600]
+  python parser/__main__.py batch  --dbc <csv> --file <nfr>
+  python parser/__main__.py replay --dbc <csv> --file <nfr> [--speed 1.0]
 
 The DB connection string is read from the `NFR_DB_URL` environment variable
 (default: `postgres://postgres@localhost:5432/nfr_local`).
@@ -16,12 +17,11 @@ import os
 import sys
 from pathlib import Path
 
-# Make sibling modules (batch, live, protocol, ...) importable no matter
-# which cwd Python is launched from. The parser directory contains the
-# sibling modules with flat (non-package) imports.
+# Make sibling modules importable regardless of cwd.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from batch import run_batch_import  # noqa: E402
+from file_source import file_events  # noqa: E402
 from live import run_live  # noqa: E402
 from protocol import ProtocolEmitter  # noqa: E402
 from serial_source import serial_events  # noqa: E402
@@ -43,6 +43,14 @@ def _build_parser() -> argparse.ArgumentParser:
     batch.add_argument("--dbc", required=True, type=Path)
     batch.add_argument("--file", required=True, type=Path)
 
+    replay = sub.add_parser(
+        "replay",
+        help="Replay an .nfr file through the live stack at a chosen speed.",
+    )
+    replay.add_argument("--dbc", required=True, type=Path)
+    replay.add_argument("--file", required=True, type=Path)
+    replay.add_argument("--speed", type=float, default=1.0)
+
     return p
 
 
@@ -63,6 +71,14 @@ def main(argv: list[str] | None = None) -> int:
         if args.mode == "batch":
             run_batch_import(
                 dsn=dsn, dbc_csv=args.dbc, nfr_file=args.file, emitter=emitter
+            )
+            return 0
+        if args.mode == "replay":
+            run_live(
+                dsn=dsn,
+                dbc_csv=args.dbc,
+                source=file_events(args.file, speed=args.speed),
+                emitter=emitter,
             )
             return 0
     except Exception as err:  # noqa: BLE001
