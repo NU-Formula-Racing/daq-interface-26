@@ -16,6 +16,11 @@ export async function bootstrapDatabase(
 ): Promise<BootstrapResult> {
   const client = new Client({ connectionString: opts.connectionString });
   await client.connect();
-  const applied = await runMigrations(client, opts.migrationsDir);
-  return { client, applied };
+  try {
+    const applied = await runMigrations(client, opts.migrationsDir);
+    return { client, applied };
+  } catch (err) {
+    await client.end().catch(() => {});
+    throw err;
+  }
 }

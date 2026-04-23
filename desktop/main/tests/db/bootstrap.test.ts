@@ -56,4 +56,32 @@ describe('bootstrapDatabase', () => {
       await second.client.end();
     }
   });
+
+  it('closes the client if migrations fail', async () => {
+    db = await createScratchDb();
+    const url = db.url;
+    await db.client.end();
+
+    // Point at a nonexistent directory so runMigrations throws on readdir.
+    await expect(
+      bootstrapDatabase({
+        connectionString: url,
+        migrationsDir: '/tmp/definitely-not-a-real-dir-bootstrap-test',
+      })
+    ).rejects.toThrow();
+
+    // If we got here without hanging, the client was closed. Additionally,
+    // verify no active connections remain on the scratch DB.
+    const { Client } = await import('pg');
+    const probe = new Client({ connectionString: url });
+    await probe.connect();
+    try {
+      const { rows } = await probe.query<{ c: string }>(
+        `SELECT count(*)::text AS c FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()`
+      );
+      expect(Number(rows[0].c)).toBe(0);
+    } finally {
+      await probe.end();
+    }
+  });
 });

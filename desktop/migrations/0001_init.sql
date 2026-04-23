@@ -47,3 +47,6 @@ CREATE TABLE app_config (
   data        JSONB NOT NULL DEFAULT '{}'::jsonb,
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Seed the singleton config row so callers never need ON CONFLICT upserts.
+INSERT INTO app_config (id) VALUES (1);

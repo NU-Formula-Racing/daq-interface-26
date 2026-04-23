@@ -81,10 +81,17 @@ describe('schema (after running all migrations)', () => {
   });
 
   it('enforces single-row app_config via CHECK (id=1)', async () => {
-    await db.client.query(`INSERT INTO app_config (id) VALUES (1) ON CONFLICT DO NOTHING`);
     await expect(
       db.client.query(`INSERT INTO app_config (id) VALUES (2)`)
     ).rejects.toThrow(/check constraint/i);
+  });
+
+  it('seeds the singleton app_config row', async () => {
+    const { rows } = await db.client.query<{ id: number }>(
+      `SELECT id FROM app_config`
+    );
+    expect(rows).toHaveLength(1);
+    expect(rows[0].id).toBe(1);
   });
 });
 
