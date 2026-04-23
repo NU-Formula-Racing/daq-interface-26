@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "daq-parser"
+version = "0.1.0"
+description = "NFR 26 DAQ CAN decoder + local Postgres uploader"
+requires-python = ">=3.11"
+dependencies = [
+  "psycopg[binary]>=3.2",
+  "pyserial>=3.5",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+]
+
+[tool.setuptools]
+py-modules = ["compile", "decode", "signalSpec"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q"

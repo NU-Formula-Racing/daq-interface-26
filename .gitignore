@@ -145,3 +145,7 @@ __pycache__/
 *.claude
 # Git worktrees
 .worktrees/
+parser/.venv/
+parser/*.egg-info/
+parser/__pycache__/
+parser/**/__pycache__/
