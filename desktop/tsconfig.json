@@ -12,5 +12,6 @@
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "include": ["main/**/*.ts", "vitest.config.ts"]
+  "include": ["main/**/*.ts", "vitest.config.ts"],
+  "exclude": ["main/src/electron-main.ts", "preload/**"]
 }
