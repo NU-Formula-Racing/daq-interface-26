@@ -29,7 +29,12 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
 
   app.get('/api/health', async () => ({ status: 'ok' }));
 
-  app.get('/api/config', async () => getAppConfig(opts.pool));
+  app.get('/api/config', async () => {
+    const cfg = await getAppConfig(opts.pool);
+    // Never expose auth secrets to API consumers (incl. broadcast peers).
+    const { authToken: _omit, ...safe } = cfg as Record<string, unknown>;
+    return safe;
+  });
 
   app.post<{ Body: Record<string, unknown> }>(
     '/api/config',

@@ -110,4 +110,39 @@ describe('WebSocket channels', () => {
       await pool.end();
     }
   });
+
+  it('rejects /ws/live connections without a valid token when auth is enabled', async () => {
+    db = await createScratchDb();
+    await runMigrations(db.client, MIGRATIONS_DIR);
+    const pool = new pg.Pool({ connectionString: db.url, max: 3 });
+    const parser = new FakeParser();
+
+    const app = await buildApp({
+      pool,
+      parser: parser as unknown as EventEmitter,
+      authToken: 'wssecret',
+    });
+    try {
+      // Test that auth hook protects /ws/live by verifying the onRequest hook
+      // rejects requests without the token. Since app.inject doesn't truly
+      // upgrade WebSockets, we test that the auth gate prevents the request.
+      const resWithoutToken = await app.inject({
+        method: 'GET',
+        url: '/ws/live',
+      });
+      expect(resWithoutToken.statusCode).toBe(401);
+
+      // With token via query param, the request is allowed past auth.
+      const resWithToken = await app.inject({
+        method: 'GET',
+        url: '/ws/live?key=wssecret',
+      });
+      // Will get 400 since inject can't complete the WebSocket upgrade,
+      // but the important part is auth allowed it (not 401).
+      expect(resWithToken.statusCode).not.toBe(401);
+    } finally {
+      await app.close();
+      await pool.end();
+    }
+  });
 });

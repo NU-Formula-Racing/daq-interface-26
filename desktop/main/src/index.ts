@@ -74,16 +74,21 @@ export async function run(opts: {
       dir: watchDir,
       pool,
       importer: async (file: string) => {
-        await new Promise<void>((resolve, reject) => {
-          const child = spawn(
-            PARSER_VENV_PY,
-            [PARSER_PY, 'batch', '--dbc', dbcCsv, '--file', file],
-            { env: { ...process.env, NFR_DB_URL: dsn }, stdio: 'inherit' }
-          );
-          child.on('close', (code) =>
-            code === 0 ? resolve() : reject(new Error(`parser batch exit ${code}`))
-          );
-        });
+        try {
+          await new Promise<void>((resolve, reject) => {
+            const child = spawn(
+              PARSER_VENV_PY,
+              [PARSER_PY, 'batch', '--dbc', dbcCsv, '--file', file],
+              { env: { ...process.env, NFR_DB_URL: dsn }, stdio: 'inherit' }
+            );
+            child.on('close', (code) =>
+              code === 0 ? resolve() : reject(new Error(`parser batch exit ${code}`))
+            );
+          });
+        } catch (err) {
+          console.error(`SD import failed for ${file}:`, err);
+          throw err; // rethrow so ImportQueue can still continue to next file
+        }
       },
     });
     await watcher.start();

@@ -63,4 +63,20 @@ describe('buildApp', () => {
       await app.close();
     }
   });
+
+  it('GET /api/config never returns the authToken key', async () => {
+    await pool.query(
+      `UPDATE app_config SET data = data || '{"authToken":"supersecret","watchDir":"/tmp"}'::jsonb WHERE id = 1`
+    );
+    const app = await buildApp({ pool });
+    try {
+      const res = await app.inject({ method: 'GET', url: '/api/config' });
+      expect(res.statusCode).toBe(200);
+      const body = res.json();
+      expect(body).toEqual({ watchDir: '/tmp' });
+      expect(body).not.toHaveProperty('authToken');
+    } finally {
+      await app.close();
+    }
+  });
 });
