@@ -1,0 +1,6 @@
+{
+  "PDM/bus_voltage": { "min": 11, "max": 14, "kind": "line" },
+  "BMS_SOE/soc": { "min": 0, "max": 100, "kind": "slow" },
+  "BMS_SOE/pack_voltage": { "min": 280, "max": 410, "kind": "line" },
+  "BMS_SOE/pack_current": { "min": -60, "max": 280, "kind": "line" }
+}
