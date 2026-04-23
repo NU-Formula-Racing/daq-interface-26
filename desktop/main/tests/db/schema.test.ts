@@ -87,3 +87,21 @@ describe('schema (after running all migrations)', () => {
     ).rejects.toThrow(/check constraint/i);
   });
 });
+
+describe('applying all migrations on a fresh DB', () => {
+  it('produces the expected migration log and callable RPCs', async () => {
+    const fresh = await createScratchDb();
+    try {
+      const applied = await runMigrations(fresh.client, MIGRATIONS_DIR);
+      expect(applied).toEqual(['0001_init', '0002_rpcs']);
+
+      // RPCs are callable (no rows for empty DB, but the call must succeed)
+      await fresh.client.query(`SELECT * FROM get_session_signals(gen_random_uuid())`);
+      await fresh.client.query(
+        `SELECT * FROM get_session_overview(gen_random_uuid(), 10)`
+      );
+    } finally {
+      await fresh.drop();
+    }
+  });
+});
