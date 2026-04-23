@@ -1820,7 +1820,452 @@ git commit -m "feat(desktop): token-based auth for broadcast mode"
 
 ---
 
-### Task 7: Entry point, Electron shell, manual smoke
+### Task 7: Parser replay mode (file → live-style source)
+
+**Purpose:** Let a user exercise the full live stack (auto-session, DB writes, `/ws/live` fan-out, dashboard UI) without a basestation plugged in, by replaying a pre-recorded `.nfr` log file at real-time (or sped-up) pacing. The live loop already consumes an abstract `SourceEvent` iterator; we just add a file-backed implementation and a new `replay` subcommand.
+
+**Files:**
+- Create: `parser/file_source.py`
+- Modify: `parser/__main__.py` (add `replay` subcommand)
+- Create: `parser/tests/test_file_source.py`
+- Create: `parser/tests/test_replay_integration.py`
+- Modify: `parser/pyproject.toml` (add `file_source` to `py-modules`)
+- Modify: `desktop/main/src/index.ts` (read `replayFile` + `replaySpeed` from config; choose parser argv accordingly)
+
+- [ ] **Step 1: Write failing tests for `file_source`**
+
+Create `parser/tests/test_file_source.py`:
+
+```python
+"""Tests for parser.file_source — .nfr file → SourceEvent stream."""
+from __future__ import annotations
+
+import struct
+import time
+from pathlib import Path
+
+from file_source import file_events
+from nfr_reader import HEADER_SIZE
+
+
+def _build_log(tmp_path: Path, frames: list[tuple[int, int, bytes]]) -> Path:
+    header = bytes([0] * 9) + struct.pack("<BBBB", 3, 4, 22, 26) + struct.pack(
+        "<BBBI", 12, 0, 0, 0
+    )
+    body = bytearray()
+    for ts_ms, frame_id, data in frames:
+        dlc = len(data)
+        body += struct.pack("<IIH", ts_ms, frame_id, dlc)
+        body += data + b"\x00" * (8 - dlc)
+    log = tmp_path / "LOG.NFR"
+    log.write_bytes(header + bytes(body))
+    return log
+
+
+def test_file_events_yields_connected_frames_disconnected(tmp_path: Path) -> None:
+    log = _build_log(tmp_path, [(0, 0x123, b"\x01"), (10, 0x456, b"\x02")])
+    events = list(file_events(log, speed=0.0))
+    kinds = [e.kind for e in events]
+    assert kinds == ["connected", "frame", "frame", "disconnected"]
+    assert events[1].frame_id == 0x123
+    assert events[1].ts_ms == 0
+    assert events[2].frame_id == 0x456
+    assert events[2].ts_ms == 10
+
+
+def test_file_events_at_speed_zero_has_no_delay(tmp_path: Path) -> None:
+    # 5 frames, 1 second apart if speed=1.0. With speed=0.0, should finish instantly.
+    frames = [(i * 1000, 0x123, b"\x01") for i in range(5)]
+    log = _build_log(tmp_path, frames)
+    start = time.monotonic()
+    events = list(file_events(log, speed=0.0))
+    elapsed = time.monotonic() - start
+    assert elapsed < 0.2
+    # connected + 5 frames + disconnected = 7
+    assert len(events) == 7
+
+
+def test_file_events_respects_speed_multiplier(tmp_path: Path) -> None:
+    # Two frames 500 ms apart at speed=10.0 → ~50 ms actual delay.
+    frames = [(0, 0x123, b"\x01"), (500, 0x123, b"\x02")]
+    log = _build_log(tmp_path, frames)
+    start = time.monotonic()
+    events = list(file_events(log, speed=10.0))
+    elapsed = time.monotonic() - start
+    # Expect roughly 50 ms. Allow generous bounds for CI variability.
+    assert 0.02 < elapsed < 0.5
+    assert len(events) == 4  # connected + 2 frames + disconnected
+```
+
+- [ ] **Step 2: Run — expect ImportError**
+
+```bash
+cd /Users/andrewxue/Documents/daq-interface-26/.worktrees/plan-1-db-migrations/parser
+.venv/bin/pytest tests/test_file_source.py -v
+```
+
+- [ ] **Step 3: Implement `parser/file_source.py`**
+
+```python
+"""Convert an .nfr log file into a SourceEvent stream with paced timestamps.
+
+Use this in place of `serial_source.serial_events` when testing the live
+stack without a basestation. Speed controls the playback rate:
+  - speed == 1.0  → real time (frames emerge at their recorded cadence)
+  - speed == 10.0 → 10x faster than real time
+  - speed == 0.0  → no delay (flood as fast as possible; good for CI smoke)
+"""
+from __future__ import annotations
+
+import time
+from pathlib import Path
+from typing import Iterator
+
+from live import SourceEvent
+from nfr_reader import iter_frames
+
+
+def file_events(path: Path, speed: float = 1.0) -> Iterator[SourceEvent]:
+    if speed < 0:
+        raise ValueError(f"speed must be >= 0, got {speed!r}")
+
+    yield SourceEvent(kind="connected", port=f"file://{path}")
+
+    prev_ts_ms: int | None = None
+    wall_start = time.monotonic()
+    first_ts_ms: int | None = None
+
+    for ts_ms, frame_id, data in iter_frames(path):
+        if speed > 0:
+            if first_ts_ms is None:
+                first_ts_ms = ts_ms
+            # Target wall-clock offset from wall_start for this frame.
+            target_offset = (ts_ms - first_ts_ms) / 1000.0 / speed
+            now_offset = time.monotonic() - wall_start
+            sleep_for = target_offset - now_offset
+            if sleep_for > 0:
+                time.sleep(sleep_for)
+        prev_ts_ms = ts_ms
+        yield SourceEvent(
+            kind="frame", ts_ms=ts_ms, frame_id=frame_id, data=data
+        )
+
+    yield SourceEvent(kind="disconnected")
+    _ = prev_ts_ms  # retained for clarity; value is available if callers want it later
+```
+
+- [ ] **Step 4: Run file_source tests — expect 3 passing**
+
+- [ ] **Step 5: Add `file_source` to `parser/pyproject.toml`**
+
+Change the `py-modules` list to:
+
+```toml
+py-modules = [
+  "compile", "decode", "signalSpec",
+  "db", "protocol", "nfr_reader", "batch", "live", "serial_source",
+  "file_source",
+]
+```
+
+Run `cd parser && .venv/bin/pip install -e .` to pick up the new module.
+
+- [ ] **Step 6: Extend `parser/__main__.py` with a `replay` subcommand**
+
+Edit the `_build_parser` function and `main` to add the new subcommand. The full updated file:
+
+```python
+"""CLI entrypoint for the NFR 26 parser.
+
+Usage (invoke via the explicit script path; the module is a flat-layout
+package so `python -m parser` requires `PYTHONPATH=parser`):
+
+  python parser/__main__.py live   --dbc <csv> --port <device> [--baud 9600]
+  python parser/__main__.py batch  --dbc <csv> --file <nfr>
+  python parser/__main__.py replay --dbc <csv> --file <nfr> [--speed 1.0]
+
+The DB connection string is read from the `NFR_DB_URL` environment variable
+(default: `postgres://postgres@localhost:5432/nfr_local`).
+"""
+from __future__ import annotations
+
+import argparse
+import os
+import sys
+from pathlib import Path
+
+# Make sibling modules importable regardless of cwd.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from batch import run_batch_import  # noqa: E402
+from file_source import file_events  # noqa: E402
+from live import run_live  # noqa: E402
+from protocol import ProtocolEmitter  # noqa: E402
+from serial_source import serial_events  # noqa: E402
+
+
+DEFAULT_DSN = "postgres://postgres@localhost:5432/nfr_local"
+
+
+def _build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(prog="parser")
+    sub = p.add_subparsers(dest="mode", required=True)
+
+    live = sub.add_parser("live", help="Read live frames from a serial port.")
+    live.add_argument("--dbc", required=True, type=Path)
+    live.add_argument("--port", required=True)
+    live.add_argument("--baud", type=int, default=9600)
+
+    batch = sub.add_parser("batch", help="Import a single .nfr log file.")
+    batch.add_argument("--dbc", required=True, type=Path)
+    batch.add_argument("--file", required=True, type=Path)
+
+    replay = sub.add_parser(
+        "replay",
+        help="Replay an .nfr file through the live stack at a chosen speed.",
+    )
+    replay.add_argument("--dbc", required=True, type=Path)
+    replay.add_argument("--file", required=True, type=Path)
+    replay.add_argument("--speed", type=float, default=1.0)
+
+    return p
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _build_parser().parse_args(argv)
+    dsn = os.environ.get("NFR_DB_URL", DEFAULT_DSN)
+    emitter = ProtocolEmitter(sys.stdout)
+
+    try:
+        if args.mode == "live":
+            run_live(
+                dsn=dsn,
+                dbc_csv=args.dbc,
+                source=serial_events(args.port, args.baud),
+                emitter=emitter,
+            )
+            return 0
+        if args.mode == "batch":
+            run_batch_import(
+                dsn=dsn, dbc_csv=args.dbc, nfr_file=args.file, emitter=emitter
+            )
+            return 0
+        if args.mode == "replay":
+            run_live(
+                dsn=dsn,
+                dbc_csv=args.dbc,
+                source=file_events(args.file, speed=args.speed),
+                emitter=emitter,
+            )
+            return 0
+    except Exception as err:  # noqa: BLE001
+        emitter.error(str(err))
+        return 1
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+```
+
+- [ ] **Step 7: Write end-to-end replay integration test**
+
+Create `parser/tests/test_replay_integration.py`:
+
+```python
+"""End-to-end: replay an .nfr file through run_live and verify DB state."""
+from __future__ import annotations
+
+import io
+import json
+import struct
+from pathlib import Path
+
+import psycopg
+
+from file_source import file_events
+from live import run_live
+from protocol import ProtocolEmitter
+
+
+DBC_CSV = """\
+Message ID,Message Name,Sender,Signal Name,Start Bit,Size (bits),Factor,Offset,Unit,Data Type
+0x123,PDM_Status,PDM,bus_v,0,16,0.01,0,V,Unsigned
+"""
+
+
+def _build_log(tmp_path: Path, frames: list[tuple[int, int, bytes]]) -> Path:
+    header = bytes([0] * 9) + struct.pack("<BBBB", 3, 4, 22, 26) + struct.pack(
+        "<BBBI", 12, 0, 0, 0
+    )
+    body = bytearray()
+    for ts_ms, frame_id, data in frames:
+        dlc = len(data)
+        body += struct.pack("<IIH", ts_ms, frame_id, dlc)
+        body += data + b"\x00" * (8 - dlc)
+    log = tmp_path / "REPLAY.NFR"
+    log.write_bytes(header + bytes(body))
+    return log
+
+
+def test_replay_drives_live_session_end_to_end(
+    scratch_db: str, tmp_path: Path
+) -> None:
+    dbc = tmp_path / "dbc.csv"
+    dbc.write_text(DBC_CSV)
+
+    # Three frames: bus_v = 10.00, 12.00, 14.00 V
+    log = _build_log(
+        tmp_path,
+        [
+            (0, 0x123, struct.pack("<H", 1000) + b"\x00" * 6),
+            (10, 0x123, struct.pack("<H", 1200) + b"\x00" * 6),
+            (20, 0x123, struct.pack("<H", 1400) + b"\x00" * 6),
+        ],
+    )
+
+    buf = io.StringIO()
+    emitter = ProtocolEmitter(buf)
+
+    summary = run_live(
+        dsn=scratch_db,
+        dbc_csv=dbc,
+        source=file_events(log, speed=0.0),
+        emitter=emitter,
+    )
+
+    assert summary.sessions_closed == 1
+    assert summary.rows_written == 3
+
+    with psycopg.connect(scratch_db) as conn:
+        sess = conn.execute(
+            "SELECT source, ended_at FROM sessions"
+        ).fetchone()
+        assert sess[0] == "live"
+        assert sess[1] is not None
+        sd = conn.execute("SELECT count(*) FROM sd_readings").fetchone()[0]
+        rt = conn.execute("SELECT count(*) FROM rt_readings").fetchone()[0]
+    assert sd == 3
+    assert rt == 0
+
+    events = [json.loads(l) for l in buf.getvalue().strip().splitlines()]
+    types = [e["type"] for e in events]
+    assert types[0] == "serial_status"
+    assert events[0]["state"] == "connected"
+    assert "session_started" in types
+    assert "frames" in types
+    assert "session_ended" in types
+    assert types[-1] == "serial_status"
+    assert events[-1]["state"] == "disconnected"
+```
+
+- [ ] **Step 8: Run full parser suite — expect 20 prior + 3 file_source + 1 replay = 24 passing**
+
+```bash
+cd /Users/andrewxue/Documents/daq-interface-26/.worktrees/plan-1-db-migrations/parser
+.venv/bin/pytest -v
+```
+
+- [ ] **Step 9: Manually smoke the replay CLI against a real fixture**
+
+```bash
+cd /Users/andrewxue/Documents/daq-interface-26/.worktrees/plan-1-db-migrations
+psql -h localhost -U postgres -c "DROP DATABASE IF EXISTS nfr_replay_smoke"
+psql -h localhost -U postgres -c "CREATE DATABASE nfr_replay_smoke"
+for f in desktop/migrations/*.sql; do
+  psql -h localhost -U postgres -d nfr_replay_smoke -f "$f"
+done
+
+NFR_DB_URL="postgres://postgres@localhost:5432/nfr_replay_smoke" \
+  parser/.venv/bin/python parser/__main__.py replay \
+    --dbc NFR26DBC.csv \
+    --file parser/testData/3-10-26/LOG_0002.NFR \
+    --speed 0.0
+
+psql -h localhost -U postgres -d nfr_replay_smoke -c \
+  "SELECT source, ended_at, (SELECT count(*) FROM sd_readings WHERE session_id = sessions.id) AS rows FROM sessions"
+psql -h localhost -U postgres -c "DROP DATABASE IF EXISTS nfr_replay_smoke"
+```
+
+Expected: one `live` session row with nonzero rows (20,322 matches the Plan 2 batch smoke).
+
+- [ ] **Step 10: Wire Plan 3 orchestrator to support replay via config**
+
+Modify `desktop/main/src/index.ts`. In the section that builds the parser command line, extend it to check for `replayFile` and `replaySpeed` in `app_config`:
+
+Current (from Task 7 → now Task 8):
+```ts
+  const serialPort = typeof cfg.serialPort === 'string' ? cfg.serialPort : null;
+  // ...
+  const parser = new ParserManager({
+    command: PARSER_VENV_PY,
+    args: serialPort
+      ? [PARSER_PY, 'live', '--dbc', dbcCsv, '--port', serialPort]
+      : [PARSER_PY, 'live', '--dbc', dbcCsv, '--port', '/dev/null-no-port-configured'],
+```
+
+Change to:
+```ts
+  const serialPort = typeof cfg.serialPort === 'string' ? cfg.serialPort : null;
+  const replayFile = typeof cfg.replayFile === 'string' ? cfg.replayFile : null;
+  const replaySpeed =
+    typeof cfg.replaySpeed === 'number' ? cfg.replaySpeed : 1.0;
+
+  const parserArgs = replayFile
+    ? [
+        PARSER_PY,
+        'replay',
+        '--dbc',
+        dbcCsv,
+        '--file',
+        replayFile,
+        '--speed',
+        String(replaySpeed),
+      ]
+    : serialPort
+      ? [PARSER_PY, 'live', '--dbc', dbcCsv, '--port', serialPort]
+      : [PARSER_PY, 'live', '--dbc', dbcCsv, '--port', '/dev/null-no-port-configured'];
+
+  const parser = new ParserManager({
+    command: PARSER_VENV_PY,
+    args: parserArgs,
+```
+
+Also: when `replayFile` is set, disable `restartOnExit` so the replay finishes cleanly instead of re-running in a loop. Change:
+
+```ts
+    restartOnExit: true,
+    restartDelayMs: 2_000,
+```
+
+to:
+
+```ts
+    restartOnExit: !replayFile,
+    restartDelayMs: 2_000,
+```
+
+- [ ] **Step 11: Run full desktop suite (no new desktop tests — orchestrator change is covered by existing bootstrapping flow)**
+
+```bash
+cd /Users/andrewxue/Documents/daq-interface-26/.worktrees/plan-1-db-migrations/desktop && npm test
+```
+
+All Plan 1–3 tests must remain green.
+
+- [ ] **Step 12: Commit**
+
+```bash
+cd /Users/andrewxue/Documents/daq-interface-26/.worktrees/plan-1-db-migrations
+git add parser/file_source.py parser/__main__.py parser/pyproject.toml \
+        parser/tests/test_file_source.py parser/tests/test_replay_integration.py \
+        desktop/main/src/index.ts
+git commit -m "feat(parser): add replay mode + orchestrator support via app_config"
+```
+
+---
+
+### Task 8: Entry point, Electron shell, manual smoke
 
 **Files:**
 - Create: `desktop/main/src/index.ts`
@@ -2049,10 +2494,11 @@ git commit -m "feat(desktop): headless server entry + Electron shell shim"
 
 ## Exit criteria for Plan 3
 
-- `cd desktop && npm test` passes with ~43 tests across all files.
+- `cd desktop && npm test` passes (~43 tests) and `cd parser && .venv/bin/pytest` passes (24 tests total, including 4 new for replay mode).
 - `tsx main/src/index.ts` boots a working server that: applies migrations, spawns the parser subprocess (or logs a benign error if no port configured), listens on `127.0.0.1:4444` by default, serves `/api/health`, `/api/sessions`, `/api/signals/:id/window`, `/api/live/status`, `/api/config`, and WS `/ws/live` + `/ws/events`.
 - `index.ts` reads `app_config.authToken` and, if non-null, enforces token auth on all `/api/*` and `/ws/*` requests (broadcast mode).
+- Setting `replayFile` (and optionally `replaySpeed`) in `app_config` swaps the parser to `replay` mode, driving the live stack from a canned `.nfr` file so the UI in Plan 4 can be reviewed without a basestation.
 - `FolderWatcher` enqueues and runs batch imports when configured.
 - `electron-main.ts` and `preload/preload.ts` are in the repo but not yet built; Plan 5 handles electron-builder wiring.
 
-Plan 4 (frontend data-layer refactor + FSAE dashboard port) builds against the REST+WS surface in Section/Task 2–4 and can run without any further desktop changes.
+Plan 4 (frontend data-layer refactor + FSAE dashboard port) builds against the REST+WS surface in Tasks 2–4 and can run without any further desktop changes.
