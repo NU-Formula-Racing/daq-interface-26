@@ -149,6 +149,9 @@ parser/.venv/
 parser/*.egg-info/
 parser/__pycache__/
 parser/**/__pycache__/
+parser/dist/
+parser/build/
+parser/*.spec
 
 # Local app (Vite scaffold)
 app/node_modules/
