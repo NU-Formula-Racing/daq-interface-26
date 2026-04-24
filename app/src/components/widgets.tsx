@@ -1,25 +1,10 @@
 // Shared widget renderers. Pure presentational — read from current time/data.
 // Each widget: <GraphWidget/>, <NumericWidget/>, <GaugeWidget/>, <BarWidget/>, <HeatmapWidget/>
 import React, { useRef, useState, useLayoutEffect } from 'react';
-import type { Signal, SignalCatalog } from '../signals/catalog.ts';
+import type { Signal } from '../signals/catalog.ts';
 import { useCatalog } from './SignalsProvider.tsx';
+import { useFrames } from './FramesContext.tsx';
 import { COLORS as W_COLORS } from './colors.ts';
-
-// ────────────────────────────────────────────────────────────
-// Stub sampling helpers. The original bundle used
-// window.SIGNALS.sampleSignal(sig, t0, t1, N) which produced a waveform.
-// Task 5 will swap these for frames.latest() / frames.range() calls.
-// For now we emit a flat line at the signal midpoint so the UI renders.
-// ────────────────────────────────────────────────────────────
-function stubSample(sig: Signal, N: number): number[] {
-  // TODO(plan4-task5): swap mock value for frames.range(sig.id, t0, t1, N)
-  const mid = sig.min + (sig.max - sig.min) * 0.5;
-  return new Array(N).fill(mid);
-}
-function stubValue(sig: Signal): number {
-  // TODO(plan4-task5): swap mock value for frames.latest(sig.id)
-  return sig.min + (sig.max - sig.min) * 0.5;
-}
 
 // ────────────────────────────────────────────────────────────
 // Graph — oscilloscope-style line/area/step
@@ -45,6 +30,7 @@ export function GraphWidget({
   zoom = null, onZoom, mode = 'replay',
 }: GraphWidgetProps) {
   const catalog = useCatalog();
+  const frames = useFrames();
   const wrap = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [size, setSize] = useState({ w: 320, h: 160 });
@@ -83,14 +69,30 @@ export function GraphWidget({
   const plotH = Math.max(10, size.h - padT - padB);
   const N = Math.max(40, Math.min(800, Math.round(plotW * 1.2)));
 
-  // Sample signals
+  // Sample signals — read real data from frames store. Normalize to length N
+  // by resampling/padding so the rest of the plotting math is unchanged.
+  const resampleToN = (values: number[], n: number): number[] => {
+    if (values.length === 0) return new Array(n).fill(0);
+    if (values.length === 1) return new Array(n).fill(values[0]);
+    const out = new Array(n);
+    const last = values.length - 1;
+    for (let i = 0; i < n; i++) {
+      const fx = (i / (n - 1)) * last;
+      const i0 = Math.floor(fx);
+      const i1 = Math.min(last, i0 + 1);
+      const f = fx - i0;
+      out[i] = values[i0] * (1 - f) + values[i1] * f;
+    }
+    return out;
+  };
   const series = signals.map((sid: any) => {
     const sig = catalog.byId(sid);
     if (!sig) return null;
-    // TODO(plan4-task5): swap mock value for frames.range(sig.id, t0, t1, N)
-    const data = stubSample(sig, N);
+    const raw = (frames?.series(sig.id) ?? []).map((r) => r.value);
+    if (raw.length === 0) return { sig, data: new Array(N).fill(0), empty: true };
+    const data = resampleToN(raw, N);
     return { sig, data };
-  }).filter(Boolean) as { sig: Signal; data: number[] }[];
+  }).filter(Boolean) as { sig: Signal; data: number[]; empty?: boolean }[];
 
   // Domain: use union of signal ranges if multiple, else signal's own min/max
   let dMin = Infinity, dMax = -Infinity;
@@ -372,12 +374,13 @@ export function GraphWidget({
 interface NumericWidgetProps { signal: any; t: number; compact?: boolean; }
 export function NumericWidget({ signal, compact = false }: NumericWidgetProps) {
   const catalog = useCatalog();
+  const frames = useFrames();
   const sig = catalog.byId(signal);
   if (!sig) return <EmptySlot label="No signal" />;
-  // TODO(plan4-task5): swap mock value for frames.latest(sig.id)
-  const v = stubValue(sig);
-  const pct = (v - sig.min) / (sig.max - sig.min);
-  const warn = pct > 0.85 || pct < 0.05;
+  const latest = frames?.latest(sig.id) ?? null;
+  const v = latest ? latest.value : null;
+  const pct = v != null ? (v - sig.min) / (sig.max - sig.min) : 0;
+  const warn = v != null && (pct > 0.85 || pct < 0.05);
 
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch', padding: compact ? '6px 12px' : '10px 18px', background: W_COLORS.bgInner }}>
@@ -386,7 +389,7 @@ export function NumericWidget({ signal, compact = false }: NumericWidgetProps) {
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 2 }}>
         <div style={{ fontFamily: '"JetBrains Mono", monospace', fontWeight: 500, fontSize: compact ? 28 : 42, color: warn ? W_COLORS.warn : W_COLORS.text, lineHeight: 1, letterSpacing: -1, fontVariantNumeric: 'tabular-nums' }}>
-          {v.toFixed(Math.abs(v) >= 100 ? 0 : Math.abs(v) >= 10 ? 1 : 2)}
+          {v != null ? v.toFixed(Math.abs(v) >= 100 ? 0 : Math.abs(v) >= 10 ? 1 : 2) : '—'}
         </div>
         <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 11, color: W_COLORS.textMute }}>{sig.unit}</div>
       </div>
@@ -407,6 +410,7 @@ export function NumericWidget({ signal, compact = false }: NumericWidgetProps) {
 interface GaugeWidgetProps { signal: any; t: number; }
 export function GaugeWidget({ signal }: GaugeWidgetProps) {
   const catalog = useCatalog();
+  const frames = useFrames();
   const sig = catalog.byId(signal);
 
   const wrap = useRef<HTMLDivElement>(null);
@@ -421,9 +425,9 @@ export function GaugeWidget({ signal }: GaugeWidgetProps) {
   }, []);
 
   if (!sig) return <EmptySlot label="No signal" />;
-  // TODO(plan4-task5): swap mock value for frames.latest(sig.id)
-  const v = stubValue(sig);
-  const pct = Math.max(0, Math.min(1, (v - sig.min) / (sig.max - sig.min)));
+  const latest = frames?.latest(sig.id) ?? null;
+  const v = latest ? latest.value : null;
+  const pct = v != null ? Math.max(0, Math.min(1, (v - sig.min) / (sig.max - sig.min))) : 0;
 
   const r = sz * 0.38;
   const cx = sz / 2, cy = sz / 2 + sz * 0.06;
@@ -454,7 +458,7 @@ export function GaugeWidget({ signal }: GaugeWidgetProps) {
             x2={cx + Math.cos(ta) * r2} y2={cy + Math.sin(ta) * r2} stroke={W_COLORS.textFaint} strokeWidth={1} />;
         })}
         <text x={cx} y={cy + 4} textAnchor="middle" fill={W_COLORS.text} fontSize={sz * 0.18} fontWeight={500} fontFamily='"JetBrains Mono", monospace' style={{ fontVariantNumeric: 'tabular-nums', letterSpacing: -1 }}>
-          {v.toFixed(Math.abs(v) >= 100 ? 0 : 1)}
+          {v != null ? v.toFixed(Math.abs(v) >= 100 ? 0 : 1) : '—'}
         </text>
         <text x={cx} y={cy + sz * 0.18} textAnchor="middle" fill={W_COLORS.textMute} fontSize={11} fontFamily='"JetBrains Mono", monospace'>
           {sig.unit}
@@ -470,23 +474,23 @@ export function GaugeWidget({ signal }: GaugeWidgetProps) {
 interface BarWidgetProps { signals?: any[]; t: number; orientation?: 'horizontal' | 'vertical'; }
 export function BarWidget({ signals = [] }: BarWidgetProps) {
   const catalog = useCatalog();
+  const frames = useFrames();
   const sigs = signals.map((id: any) => catalog.byId(id)).filter(Boolean) as Signal[];
   if (sigs.length === 0) return <EmptySlot label="No signal" />;
-  // TODO(plan4-task5): swap mock value for frames.latest(s.id)
-  const vals = sigs.map((s) => stubValue(s));
+  const vals = sigs.map((s) => frames?.latest(s.id)?.value ?? null);
 
   return (
     <div style={{ width: '100%', height: '100%', background: W_COLORS.bgInner, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10, justifyContent: 'center' }}>
       {sigs.map((s, i) => {
         const v = vals[i];
-        const pct = Math.max(0, Math.min(1, (v - s.min) / (s.max - s.min)));
-        const warn = pct > 0.85;
+        const pct = v != null ? Math.max(0, Math.min(1, (v - s.min) / (s.max - s.min))) : 0;
+        const warn = v != null && pct > 0.85;
         return (
           <div key={s.id} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: '"JetBrains Mono", monospace', fontSize: 10, color: W_COLORS.textMute }}>
               <span style={{ color: W_COLORS.text }}>{s.name}</span>
               <span style={{ fontVariantNumeric: 'tabular-nums', color: warn ? W_COLORS.warn : W_COLORS.text }}>
-                {v.toFixed(1)} <span style={{ color: W_COLORS.textFaint }}>{s.unit}</span>
+                {v != null ? v.toFixed(1) : '—'} <span style={{ color: W_COLORS.textFaint }}>{s.unit}</span>
               </span>
             </div>
             <div style={{ height: 10, background: 'rgba(255,255,255,0.04)', position: 'relative', overflow: 'hidden' }}>
@@ -509,10 +513,10 @@ export function BarWidget({ signals = [] }: BarWidgetProps) {
 interface HeatmapWidgetProps { signals?: any[]; t: number; layout?: string; }
 export function HeatmapWidget({ signals = [] }: HeatmapWidgetProps) {
   const catalog = useCatalog();
+  const frames = useFrames();
   // Expect 12 signals for tire4x3 (FL/FR/RL/RR × Inner/Middle/Outer)
   const sigs = signals.map((id: any) => catalog.byId(id)).filter(Boolean) as Signal[];
-  // TODO(plan4-task5): swap mock value for frames.latest(s.id)
-  const vals = sigs.map((s) => ({ s, v: stubValue(s) }));
+  const vals = sigs.map((s) => ({ s, v: frames?.latest(s.id)?.value ?? null }));
 
   const heatColor = (pct: number) => {
     // cold → cyan, mid → green, hot → amber → red
@@ -551,11 +555,19 @@ export function HeatmapWidget({ signals = [] }: HeatmapWidgetProps) {
             <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 10, color: W_COLORS.textMute, display: 'flex', justifyContent: 'space-between' }}>
               <span>{c.name}</span>
               <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                {(cells.reduce((a, x) => a + x.v, 0) / cells.length).toFixed(0)}°
+                {(() => {
+                  const nums = cells.map((x) => x.v).filter((v): v is number => v != null);
+                  return nums.length ? `${(nums.reduce((a, x) => a + x, 0) / nums.length).toFixed(0)}°` : '—';
+                })()}
               </span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 2, flex: 1 }}>
               {cells.map((cell, i) => {
+                if (cell.v == null) {
+                  return (
+                    <div key={i} style={{ background: 'rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"JetBrains Mono", monospace', fontSize: 11, color: W_COLORS.textFaint }}>—</div>
+                  );
+                }
                 const pct = (cell.v - cell.s.min) / (cell.s.max - cell.s.min);
                 return (
                   <div key={i} style={{ background: heatColor(Math.max(0, Math.min(1, pct))), display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"JetBrains Mono", monospace', fontSize: 11, color: '#0a0b0d', fontWeight: 600 }}>

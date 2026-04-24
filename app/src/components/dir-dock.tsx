@@ -12,6 +12,10 @@ import {
   WIDGET_TYPES,
 } from './widgets.tsx';
 import type { Signal } from '../signals/catalog.ts';
+import type { FramesStore } from '../hooks/useLiveFrames.ts';
+import { FramesCtx, useFrames } from './FramesContext.tsx';
+
+export { useFrames };
 
 const DOCK_STORAGE_KEY = 'nfr-dock-layout-v2';
 
@@ -48,9 +52,10 @@ interface DockDirectionProps {
   duration: number;
   density: string;
   graphStyle: 'line' | 'area' | 'step';
+  frames?: FramesStore;
 }
 
-export function DockDirection({ t, mode, onMode, onT, duration, density, graphStyle }: DockDirectionProps) {
+export function DockDirection({ t, mode, onMode, onT, duration, density, graphStyle, frames }: DockDirectionProps) {
   const [widgets, setWidgets] = useState<any[]>(loadLayout);
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
   const [focusedId, setFocusedId] = useState<string | null>(null);
@@ -172,6 +177,7 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
   void Math.max(12, ...widgets.map((w) => w.row + w.h - 1), (hoverCell?.row || 0) + (hoverCell?.h || 0) - 1);
 
   return (
+    <FramesCtx.Provider value={frames ?? null}>
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: SH_COLORS.bgInner, fontFamily: '"Inter", system-ui, sans-serif' }}>
       <TopBar mode={mode} onMode={onMode} title="NFR · DAQ" compact right={
         <>
@@ -364,6 +370,7 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
 
       <Timeline t={t} onChange={onT} duration={duration} mode={mode} compact />
     </div>
+    </FramesCtx.Provider>
   );
 }
 
@@ -495,17 +502,18 @@ function Row({ label, value }: { label: string; value: string }) {
 
 function SignalReadout({ sig }: { sig: any; t: number }) {
   const catalog = useCatalog();
+  const frames = useFrames();
   const s = catalog.byId(sig);
   if (!s) return null;
-  // TODO(plan4-task5): swap mock value for frames.latest(s.id)
-  const v = s.min + (s.max - s.min) * 0.5;
+  const latest = frames?.latest(s.id) ?? null;
+  const v = latest ? latest.value : null;
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0', borderBottom: `1px dashed ${SH_COLORS.border}` }}>
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, overflow: 'hidden' }}>
         <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
         <span style={{ color: SH_COLORS.text, fontSize: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
       </span>
-      <span style={{ color: SH_COLORS.text, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{v.toFixed(1)} <span style={{ color: SH_COLORS.textFaint }}>{s.unit}</span></span>
+      <span style={{ color: SH_COLORS.text, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{v != null ? v.toFixed(1) : '—'} <span style={{ color: SH_COLORS.textFaint }}>{s.unit}</span></span>
     </div>
   );
 }
