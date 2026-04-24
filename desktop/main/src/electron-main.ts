@@ -1,16 +1,22 @@
 /**
  * Electron main entry point. Boots the same server as `index.ts`, then
- * opens a BrowserWindow pointed at it. Kept minimal — we don't want
- * Electron-specific logic leaking into the headless server path.
+ * opens a BrowserWindow pointed at it.
  */
 import { app, BrowserWindow } from 'electron';
+import { join } from 'path';
 import { run } from './index.ts';
 
 let shutdownFn: (() => Promise<void>) | null = null;
 
 app.whenReady().then(async () => {
   try {
-    const booted = await run();
+    const resources = process.resourcesPath;
+    const booted = await run({
+      dbcCsv: join(resources, 'NFR26DBC.csv'),
+      migrationsDir: join(resources, 'migrations'),
+      parserBinary: join(resources, 'parser', 'parser'),
+      staticRoot: join(resources, 'app'),
+    });
     shutdownFn = booted.shutdown;
 
     const win = new BrowserWindow({

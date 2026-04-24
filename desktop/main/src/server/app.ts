@@ -22,6 +22,7 @@ export interface BuildAppOptions {
   logger?: boolean;
   cloudPusherFactory?: CloudPusherFactory;
   setupState?: SetupState;
+  staticRoot?: string;
 }
 
 export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> {
@@ -76,9 +77,14 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   }
 
   // Serve the built React app as a fallback for non-API, non-WS paths.
-  const __dirname = dirname(fileURLToPath(import.meta.url));
-  // From desktop/main/src/server/ up to repo root + app/dist
-  const staticRoot = resolve(__dirname, '..', '..', '..', '..', 'app', 'dist');
+  let staticRoot: string;
+  if (opts.staticRoot) {
+    staticRoot = opts.staticRoot;
+  } else {
+    // Dev fallback: from desktop/main/src/server/ up to repo root + app/dist
+    const __dirname = dirname(fileURLToPath(import.meta.url));
+    staticRoot = resolve(__dirname, '..', '..', '..', '..', 'app', 'dist');
+  }
 
   if (existsSync(staticRoot)) {
     await app.register(fastifyStatic, {

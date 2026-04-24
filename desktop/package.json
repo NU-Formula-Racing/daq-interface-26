@@ -7,7 +7,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "dev:server": "tsx main/src/index.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:main": "esbuild main/src/electron-main.ts --bundle --platform=node --format=cjs --outfile=main/dist/electron-main.cjs --external:electron --external:pg-native",
+    "package": "npm run build:main && electron-builder --mac dmg --publish=never"
   },
   "dependencies": {
     "@fastify/static": "^8.3.0",
@@ -22,10 +24,40 @@
     "@types/pg": "^8.11.10",
     "@types/supertest": "^6.0.2",
     "@types/ws": "^8.5.13",
+    "electron": "^34.5.8",
+    "electron-builder": "^25.1.8",
     "supertest": "^7.0.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8",
     "ws": "^8.18.0"
+  },
+  "main": "main/dist/electron-main.cjs",
+  "build": {
+    "appId": "com.nfr26.local",
+    "productName": "NFR Local",
+    "asar": true,
+    "files": [
+      "main/dist/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      { "from": "../app/dist", "to": "app" },
+      { "from": "migrations", "to": "migrations" },
+      { "from": "../parser/dist/parser-darwin-${arch}", "to": "parser" },
+      { "from": "../NFR26DBC.csv", "to": "NFR26DBC.csv" }
+    ],
+    "mac": {
+      "target": [{ "target": "dmg", "arch": ["arm64"] }],
+      "category": "public.app-category.developer-tools",
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    }
   }
 }

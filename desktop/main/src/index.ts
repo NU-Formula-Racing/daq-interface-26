@@ -24,6 +24,7 @@ export async function run(opts: {
   dbcCsv?: string;
   migrationsDir?: string;
   parserBinary?: string;
+  staticRoot?: string;
 } = {}) {
   const dsn =
     opts.dsn ??
@@ -33,6 +34,12 @@ export async function run(opts: {
   const port = opts.port ?? Number(process.env.NFR_BIND_PORT ?? '4444');
   const dbcCsv = opts.dbcCsv ?? join(REPO_ROOT, 'NFR26DBC.csv');
   const migrationsDir = opts.migrationsDir ?? MIGRATIONS_DIR;
+  const parserBinary =
+    opts.parserBinary ??
+    process.env.NFR_PARSER_BINARY ??
+    PARSER_VENV_PY;   // dev fallback: the venv's python interpreter
+  const parserIsPython =
+    parserBinary.endsWith('python') || parserBinary.endsWith('python3');
 
   let pool: pg.Pool | null = null;
   let parser: ParserManager | null = null;
@@ -60,14 +67,18 @@ export async function run(opts: {
       const replaySpeed =
         typeof cfg.replaySpeed === 'number' ? cfg.replaySpeed : 1.0;
 
-      const parserArgs = replayFile
-        ? [PARSER_PY, 'replay', '--dbc', dbcCsv, '--file', replayFile, '--speed', String(replaySpeed)]
+      const subcommandArgs = replayFile
+        ? ['replay', '--dbc', dbcCsv, '--file', replayFile, '--speed', String(replaySpeed)]
         : serialPort
-          ? [PARSER_PY, 'live', '--dbc', dbcCsv, '--port', serialPort]
-          : [PARSER_PY, 'live', '--dbc', dbcCsv, '--port', '/dev/null-no-port-configured'];
+          ? ['live', '--dbc', dbcCsv, '--port', serialPort]
+          : ['live', '--dbc', dbcCsv, '--port', '/dev/null-no-port-configured'];
+
+      const parserArgs = parserIsPython
+        ? [PARSER_PY, ...subcommandArgs]
+        : subcommandArgs;
 
       parser = new ParserManager({
-        command: PARSER_VENV_PY,
+        command: parserBinary,
         args: parserArgs,
         env: { ...process.env, NFR_DB_URL: dsn },
         restartOnExit: !replayFile,
@@ -82,9 +93,12 @@ export async function run(opts: {
           importer: async (file: string) => {
             try {
               await new Promise<void>((resolve, reject) => {
+                const batchArgs = parserIsPython
+                  ? [PARSER_PY, 'batch', '--dbc', dbcCsv, '--file', file]
+                  : ['batch', '--dbc', dbcCsv, '--file', file];
                 const child = spawn(
-                  PARSER_VENV_PY,
-                  [PARSER_PY, 'batch', '--dbc', dbcCsv, '--file', file],
+                  parserBinary,
+                  batchArgs,
                   { env: { ...process.env, NFR_DB_URL: dsn }, stdio: 'inherit' }
                 );
                 child.on('close', (code) =>
@@ -128,6 +142,7 @@ export async function run(opts: {
     parser: parser ?? undefined,
     authToken,
     setupState,
+    staticRoot: opts.staticRoot,
   });
   await app.listen({ port, host });
 
