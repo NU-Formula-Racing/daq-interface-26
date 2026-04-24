@@ -12,12 +12,14 @@ import { registerSessionRoutes } from './routes/sessions.ts';
 import { registerSignalRoutes } from './routes/signals.ts';
 import { registerWebSockets } from './ws.ts';
 import { registerLiveRoutes } from './routes/live.ts';
+import { registerSyncRoutes, type CloudPusherFactory } from './routes/sync.ts';
 
 export interface BuildAppOptions {
   pool: pg.Pool;
   parser?: EventEmitter;
   authToken?: string | null;
   logger?: boolean;
+  cloudPusherFactory?: CloudPusherFactory;
 }
 
 export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> {
@@ -50,6 +52,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
 
   registerSessionRoutes(app, opts.pool);
   registerSignalRoutes(app, opts.pool);
+  registerSyncRoutes(app, opts.pool, opts.cloudPusherFactory);
 
   // Serve the built React app as a fallback for non-API, non-WS paths.
   const __dirname = dirname(fileURLToPath(import.meta.url));
