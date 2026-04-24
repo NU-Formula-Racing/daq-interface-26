@@ -13,46 +13,67 @@ import { registerSignalRoutes } from './routes/signals.ts';
 import { registerWebSockets } from './ws.ts';
 import { registerLiveRoutes } from './routes/live.ts';
 import { registerSyncRoutes, type CloudPusherFactory } from './routes/sync.ts';
+import { registerSetupRoutes, type SetupState } from './routes/setup.ts';
 
 export interface BuildAppOptions {
-  pool: pg.Pool;
+  pool: pg.Pool | null;
   parser?: EventEmitter;
   authToken?: string | null;
   logger?: boolean;
   cloudPusherFactory?: CloudPusherFactory;
+  setupState?: SetupState;
 }
 
 export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> {
   const app = Fastify({ logger: opts.logger ?? false });
 
-  registerAuth(app, opts.authToken ?? null);
+  const setupState: SetupState = opts.setupState ?? {
+    status: opts.pool ? 'ok' : 'not_reachable',
+    lastError: null,
+  };
+  registerSetupRoutes(app, setupState);
 
-  await app.register(websocketPlugin);
-  if (opts.parser) {
-    registerWebSockets(app, opts.parser);
-    registerLiveRoutes(app, opts.parser);
+  // In degraded mode, block all /api/* and /ws/* except /api/setup/*.
+  if (!opts.pool) {
+    app.addHook('onRequest', async (req, reply) => {
+      if (req.url.startsWith('/api/setup/')) return;
+      if (req.url.startsWith('/api/') || req.url.startsWith('/ws/')) {
+        reply.code(503).send({ error: 'service_unavailable', reason: 'postgres unreachable' });
+      }
+    });
   }
 
-  app.get('/api/health', async () => ({ status: 'ok' }));
+  if (opts.pool) {
+    const pool = opts.pool;
+    registerAuth(app, opts.authToken ?? null);
 
-  app.get('/api/config', async () => {
-    const cfg = await getAppConfig(opts.pool);
-    // Never expose auth secrets to API consumers (incl. broadcast peers).
-    const { authToken: _omit, ...safe } = cfg as Record<string, unknown>;
-    return safe;
-  });
-
-  app.post<{ Body: Record<string, unknown> }>(
-    '/api/config',
-    async (req) => {
-      await setAppConfig(opts.pool, req.body ?? {});
-      return { ok: true };
+    await app.register(websocketPlugin);
+    if (opts.parser) {
+      registerWebSockets(app, opts.parser);
+      registerLiveRoutes(app, opts.parser);
     }
-  );
 
-  registerSessionRoutes(app, opts.pool);
-  registerSignalRoutes(app, opts.pool);
-  registerSyncRoutes(app, opts.pool, opts.cloudPusherFactory);
+    app.get('/api/health', async () => ({ status: 'ok' }));
+
+    app.get('/api/config', async () => {
+      const cfg = await getAppConfig(pool);
+      // Never expose auth secrets to API consumers (incl. broadcast peers).
+      const { authToken: _omit, ...safe } = cfg as Record<string, unknown>;
+      return safe;
+    });
+
+    app.post<{ Body: Record<string, unknown> }>(
+      '/api/config',
+      async (req) => {
+        await setAppConfig(pool, req.body ?? {});
+        return { ok: true };
+      }
+    );
+
+    registerSessionRoutes(app, pool);
+    registerSignalRoutes(app, pool);
+    registerSyncRoutes(app, pool, opts.cloudPusherFactory);
+  }
 
   // Serve the built React app as a fallback for non-API, non-WS paths.
   const __dirname = dirname(fileURLToPath(import.meta.url));

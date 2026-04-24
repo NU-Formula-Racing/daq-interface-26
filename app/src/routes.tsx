@@ -5,6 +5,7 @@ import Live from './pages/Live.tsx';
 import Sessions from './pages/Sessions.tsx';
 import Replay from './pages/Replay.tsx';
 import Settings from './pages/Settings.tsx';
+import Setup from './pages/Setup.tsx';
 
 export const router = createBrowserRouter([
   {
@@ -15,6 +16,7 @@ export const router = createBrowserRouter([
       { path: 'sessions', element: <Sessions /> },
       { path: 'sessions/:id', element: <Replay /> },
       { path: 'settings', element: <Settings /> },
+      { path: 'setup', element: <Setup /> },
     ],
   },
 ]);
