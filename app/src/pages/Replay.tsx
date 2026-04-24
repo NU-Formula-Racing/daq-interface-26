@@ -1,0 +1,87 @@
+import { useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { SignalsProvider } from '../components/SignalsProvider.tsx';
+import { DockDirection } from '../components/dir-dock.tsx';
+import { useOverview } from '../hooks/useOverview.ts';
+import { FramesStore, type FrameRow } from '../hooks/useLiveFrames.ts';
+import type { OverviewRow } from '../api/types.ts';
+
+function makeReplayStore(rows: OverviewRow[], t: number): FramesStore {
+  // Build a real FramesStore with a full push, then override latest/series based on t.
+  // The live FramesStore shape uses latest() + series(); for replay we provide
+  // a read-only façade that returns slices of the preloaded rows up to `t`.
+  const bySignal = new Map<number, FrameRow[]>();
+  for (const r of rows) {
+    const frame: FrameRow = {
+      ts: r.bucket,
+      signal_id: r.signal_id,
+      value: r.avg_value,
+    };
+    let arr = bySignal.get(r.signal_id);
+    if (!arr) {
+      arr = [];
+      bySignal.set(r.signal_id, arr);
+    }
+    arr.push(frame);
+  }
+  for (const arr of bySignal.values()) {
+    arr.sort((a, b) => a.ts.localeCompare(b.ts));
+  }
+
+  // Return an object that duck-types to FramesStore shape but ignores push/subscribe.
+  const cutoff = (arr: FrameRow[]) =>
+    Math.max(0, Math.min(arr.length - 1, Math.floor(t * arr.length)));
+
+  return {
+    push: () => {},
+    latest: (id: number) => {
+      const arr = bySignal.get(id);
+      if (!arr || arr.length === 0) return null;
+      return arr[cutoff(arr)] ?? null;
+    },
+    series: (id: number) => {
+      const arr = bySignal.get(id);
+      if (!arr || arr.length === 0) return [];
+      return arr.slice(0, cutoff(arr) + 1);
+    },
+    getVersion: () => 0,
+    subscribe: () => () => {},
+  } as unknown as FramesStore;
+}
+
+export default function Replay() {
+  const { id } = useParams<{ id: string }>();
+  const { detail, rows, loading, error } = useOverview(id!, 1);
+  const [t, setT] = useState(1);
+
+  const store = useMemo(() => makeReplayStore(rows, t), [rows, t]);
+
+  if (loading) {
+    return <div className="p-6 font-mono text-xs text-[color:var(--color-text-faint)]">LOADING…</div>;
+  }
+  if (error) {
+    return <div className="p-6 font-mono text-xs text-red-400">ERROR: {error}</div>;
+  }
+
+  return (
+    <SignalsProvider>
+      <div className="h-full flex flex-col">
+        <div className="h-7 px-4 flex items-center gap-3 border-b border-[color:var(--color-border)] font-mono text-[11px] tracking-widest text-[color:var(--color-text-mute)] shrink-0">
+          REPLAY · {detail?.track ?? '—'} · {detail?.driver ?? '—'} · {rows.length} rows
+        </div>
+        <div className="flex-1 min-h-0">
+          <DockDirection
+            t={t}
+            onT={setT}
+            mode="replay"
+            onMode={() => {}}
+            duration={1}
+            density="compact"
+            graphStyle="line"
+            frames={store}
+          />
+        </div>
+      </div>
+    </SignalsProvider>
+  );
+}
