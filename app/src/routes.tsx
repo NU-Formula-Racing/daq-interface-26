@@ -4,6 +4,7 @@ import { Placeholder } from './pages/Placeholder.tsx';
 import Live from './pages/Live.tsx';
 import Sessions from './pages/Sessions.tsx';
 import Replay from './pages/Replay.tsx';
+import Settings from './pages/Settings.tsx';
 
 export const router = createBrowserRouter([
   {
@@ -13,7 +14,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Live /> },
       { path: 'sessions', element: <Sessions /> },
       { path: 'sessions/:id', element: <Replay /> },
-      { path: 'settings', element: <Placeholder title="Settings" /> },
+      { path: 'settings', element: <Settings /> },
     ],
   },
 ]);
