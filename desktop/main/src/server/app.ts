@@ -2,6 +2,10 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import type pg from 'pg';
 import type { EventEmitter } from 'events';
 import websocketPlugin from '@fastify/websocket';
+import { dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
+import fastifyStatic from '@fastify/static';
+import { existsSync } from 'fs';
 import { registerAuth } from './auth.ts';
 import { getAppConfig, setAppConfig } from '../db/config.ts';
 import { registerSessionRoutes } from './routes/sessions.ts';
@@ -46,6 +50,42 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
 
   registerSessionRoutes(app, opts.pool);
   registerSignalRoutes(app, opts.pool);
+
+  // Serve the built React app as a fallback for non-API, non-WS paths.
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  // From desktop/main/src/server/ up to repo root + app/dist
+  const staticRoot = resolve(__dirname, '..', '..', '..', '..', 'app', 'dist');
+
+  if (existsSync(staticRoot)) {
+    await app.register(fastifyStatic, {
+      root: staticRoot,
+      prefix: '/',
+      wildcard: false,
+      setHeaders: (reply: any) => {
+        reply.setHeader('Cache-Control', 'no-cache');
+      },
+    });
+    // Client-side router fallback: any non-/api, non-/ws path returns index.html.
+    app.setNotFoundHandler((req, reply) => {
+      if (req.url.startsWith('/api/') || req.url.startsWith('/ws/')) {
+        reply.code(404).send({ error: 'not_found' });
+        return;
+      }
+      reply.sendFile('index.html');
+    });
+  } else {
+    app.setNotFoundHandler((req, reply) => {
+      if (req.url.startsWith('/api/') || req.url.startsWith('/ws/')) {
+        reply.code(404).send({ error: 'not_found' });
+        return;
+      }
+      reply
+        .type('text/html')
+        .send(
+          `<!doctype html><h1>NFR UI not built</h1><p>Run <code>cd app && npm run build</code>.</p>`,
+        );
+    });
+  }
 
   return app;
 }

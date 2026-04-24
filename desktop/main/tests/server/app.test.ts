@@ -64,6 +64,37 @@ describe('buildApp', () => {
     }
   });
 
+  it('GET / returns either the built UI or the "not built" fallback (never 500)', async () => {
+    const app = await buildApp({ pool });
+    try {
+      const res = await app.inject({ method: 'GET', url: '/' });
+      expect([200, 404]).toContain(res.statusCode);
+    } finally {
+      await app.close();
+    }
+  });
+
+  it('Non-API paths fall through to index.html (client-side router)', async () => {
+    const app = await buildApp({ pool });
+    try {
+      const res = await app.inject({ method: 'GET', url: '/sessions/abc' });
+      // If dist exists: 200 + html. If not: 200 + notice html.
+      expect([200]).toContain(res.statusCode);
+    } finally {
+      await app.close();
+    }
+  });
+
+  it('Unknown /api/ paths still 404 rather than fall through to index.html', async () => {
+    const app = await buildApp({ pool });
+    try {
+      const res = await app.inject({ method: 'GET', url: '/api/nonexistent' });
+      expect(res.statusCode).toBe(404);
+    } finally {
+      await app.close();
+    }
+  });
+
   it('GET /api/config never returns the authToken key', async () => {
     await pool.query(
       `UPDATE app_config SET data = data || '{"authToken":"supersecret","watchDir":"/tmp"}'::jsonb WHERE id = 1`
