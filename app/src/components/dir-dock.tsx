@@ -204,6 +204,7 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
   const nfrFolderRef = useRef<HTMLInputElement>(null);
   const [dbcStatus, setDbcStatus] = useState<string>('');
   const [nfrStatus, setNfrStatus] = useState<string>('');
+  const [nfrModalOpen, setNfrModalOpen] = useState(false);
   const onPickDbc = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     e.target.value = '';
@@ -320,8 +321,7 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
               style={{ display: 'none' }}
               onChange={onPickNfr}
             />
-            <button onClick={() => nfrFileRef.current?.click()} style={smallBtn()} title="Import one or more .nfr files">↑ NFR FILE</button>
-            <button onClick={() => nfrFolderRef.current?.click()} style={smallBtn()} title="Import every .nfr inside a folder">↑ NFR FOLDER</button>
+            <button onClick={() => setNfrModalOpen(true)} style={smallBtn()} title="Import .nfr files">↑ IMPORT NFR</button>
             <span style={{ width: 1, height: 12, background: SH_COLORS.border, margin: '0 4px' }} />
             {dbcStatus && (
               <span style={{ color: SH_COLORS.textMute, fontSize: 9, marginRight: 4 }}>{dbcStatus}</span>
@@ -546,6 +546,77 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
       </div>
 
       <Timeline t={t} onChange={onT} duration={duration} mode={mode} compact />
+
+      {nfrModalOpen && (
+        <div
+          onClick={() => setNfrModalOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 100,
+            background: 'rgba(0,0,0,0.6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              minWidth: 380, maxWidth: '90vw',
+              background: SH_COLORS.bg,
+              border: `1px solid ${SH_COLORS.border}`,
+              boxShadow: '0 12px 48px rgba(0,0,0,0.6)',
+              fontFamily: '"JetBrains Mono", monospace',
+              color: SH_COLORS.text,
+            }}
+          >
+            <div style={{
+              padding: '10px 14px',
+              borderBottom: `1px solid ${SH_COLORS.border}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+              <span style={{ fontSize: 10, letterSpacing: 1.5, color: SH_COLORS.textFaint }}>
+                IMPORT .NFR
+              </span>
+              <span
+                onClick={() => setNfrModalOpen(false)}
+                style={{ color: SH_COLORS.textFaint, cursor: 'pointer', userSelect: 'none' }}
+              >×</span>
+            </div>
+            <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ fontSize: 11, color: SH_COLORS.textMute, lineHeight: 1.5 }}>
+                Pick one or more .nfr binaries, or point at a folder. Each file becomes
+                a session in the database.
+              </div>
+              <button
+                onClick={() => { setNfrModalOpen(false); nfrFileRef.current?.click(); }}
+                style={{
+                  ...smallBtn(),
+                  padding: '10px 12px',
+                  textAlign: 'left',
+                  fontSize: 11,
+                }}
+              >
+                <div style={{ fontWeight: 600, letterSpacing: 1 }}>SINGLE FILE</div>
+                <div style={{ fontSize: 10, color: SH_COLORS.textMute, marginTop: 2 }}>
+                  Pick one or more .nfr files (multi-select)
+                </div>
+              </button>
+              <button
+                onClick={() => { setNfrModalOpen(false); nfrFolderRef.current?.click(); }}
+                style={{
+                  ...smallBtn(),
+                  padding: '10px 12px',
+                  textAlign: 'left',
+                  fontSize: 11,
+                }}
+              >
+                <div style={{ fontWeight: 600, letterSpacing: 1 }}>FOLDER</div>
+                <div style={{ fontSize: 10, color: SH_COLORS.textMute, marginTop: 2 }}>
+                  Pick a directory; every .nfr inside gets imported
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </FramesCtx.Provider>
   );
