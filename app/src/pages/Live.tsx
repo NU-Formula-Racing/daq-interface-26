@@ -13,6 +13,30 @@ export default function Live() {
   const [mode, setMode] = useState<'live' | 'replay'>('live');
   const rafRef = useRef<number | null>(null);
 
+  // Track wall-clock elapsed time since the current session started so the
+  // bottom timer reads real session duration. Reset on session id change.
+  const sessionStartRef = useRef<number | null>(null);
+  const [elapsedSecs, setElapsedSecs] = useState(0);
+
+  useEffect(() => {
+    if (status.session_id) {
+      sessionStartRef.current = Date.now();
+      setElapsedSecs(0);
+    } else {
+      sessionStartRef.current = null;
+      setElapsedSecs(0);
+    }
+  }, [status.session_id]);
+
+  useEffect(() => {
+    if (!status.session_id) return;
+    const id = setInterval(() => {
+      if (sessionStartRef.current == null) return;
+      setElapsedSecs((Date.now() - sessionStartRef.current) / 1000);
+    }, 100);
+    return () => clearInterval(id);
+  }, [status.session_id]);
+
   useEffect(() => {
     if (mode !== 'live') return;
     const tick = () => {
@@ -42,7 +66,7 @@ export default function Live() {
           onT={handleT}
           mode={mode}
           onMode={setMode}
-          duration={1}
+          durationSecs={elapsedSecs}
           density="compact"
           graphStyle="line"
           frames={frames}

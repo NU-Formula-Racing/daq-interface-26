@@ -57,6 +57,14 @@ export default function Replay() {
 
   const store = useMemo(() => makeReplayStore(rows, t), [rows, t]);
 
+  // Total session duration in seconds — bucket timestamps span the full window.
+  const durationSecs = useMemo(() => {
+    if (rows.length < 2) return 0;
+    const first = new Date(rows[0].bucket).getTime();
+    const last = new Date(rows[rows.length - 1].bucket).getTime();
+    return Math.max(0, (last - first) / 1000);
+  }, [rows]);
+
   if (loading) {
     return <div className="p-6 font-mono text-xs text-[color:var(--color-text-faint)]">LOADING…</div>;
   }
@@ -72,7 +80,7 @@ export default function Replay() {
           onT={setT}
           mode="replay"
           onMode={(m) => { if (m === 'live') navigate('/'); }}
-          duration={1}
+          durationSecs={durationSecs}
           density="compact"
           graphStyle="line"
           frames={store}

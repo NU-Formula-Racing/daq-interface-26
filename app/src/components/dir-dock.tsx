@@ -71,13 +71,14 @@ interface DockDirectionProps {
   onT: (t: number) => void;
   mode: 'live' | 'replay';
   onMode: (m: 'live' | 'replay') => void;
-  duration: number;
+  /** Total session duration in seconds (drives the bottom timer). */
+  durationSecs: number;
   density: string;
   graphStyle: 'line' | 'area' | 'step';
   frames?: FramesStore;
 }
 
-export function DockDirection({ t, mode, onMode, onT, duration, density, graphStyle, frames, exportHref }: DockDirectionProps) {
+export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref }: DockDirectionProps) {
   const [widgets, setWidgets] = useState<any[]>(loadLayout);
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
   const [focusedId, setFocusedId] = useState<string | null>(null);
@@ -548,7 +549,7 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
         })()}
       </div>
 
-      <Timeline t={t} onChange={onT} duration={duration} mode={mode} compact />
+      <Timeline t={t} onChange={onT} durationSecs={durationSecs} mode={mode} compact />
 
       {nfrModalOpen && (
         <div

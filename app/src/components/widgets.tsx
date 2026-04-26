@@ -825,20 +825,21 @@ export function SignalPicker({ onPick, selected = [], compact = false, filter = 
 interface TimelineProps {
   t: number;
   onChange: (t: number) => void;
-  duration?: number;
+  /** Total session length, in seconds. */
+  durationSecs?: number;
   mode?: 'live' | 'replay';
   compact?: boolean;
 }
-export function Timeline({ t, onChange, duration = 1, mode, compact }: TimelineProps) {
+export function Timeline({ t, onChange, durationSecs = 0, mode, compact }: TimelineProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [hoverX, setHoverX] = useState<number | null>(null);
-  const [hoverT, setHoverT] = useState(0);
+  const [hoverFrac, setHoverFrac] = useState(0);
 
   const onDown = (e: any) => {
     const rect = ref.current!.getBoundingClientRect();
     const move = (ev: any) => {
       const x = ((ev.clientX || ev.touches?.[0]?.clientX) - rect.left) / rect.width;
-      onChange(Math.max(0, Math.min(1, x)) * duration);
+      onChange(Math.max(0, Math.min(1, x)));
     };
     move(e);
     const up = () => { document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up); };
@@ -849,24 +850,18 @@ export function Timeline({ t, onChange, duration = 1, mode, compact }: TimelineP
     const rect = ref.current!.getBoundingClientRect();
     const x = (e.clientX - rect.left);
     setHoverX(x);
-    setHoverT((x / rect.width) * duration);
+    setHoverFrac(x / rect.width);
   };
 
-  const pct = (t / duration) * 100;
+  const pct = t * 100;
 
-  // Event markers (pseudo laps / flags) — deterministic
-  const markers = React.useMemo(() => {
-    const out: { pos: number; label: string; kind: 'lap' | 'warn' | 'info' }[] = [];
-    for (let i = 1; i <= 6; i++) out.push({ pos: i / 7, label: `L${i}`, kind: 'lap' });
-    out.push({ pos: 0.28, label: 'FAULT', kind: 'warn' });
-    out.push({ pos: 0.62, label: 'PIT', kind: 'info' });
-    return out;
-  }, []);
-
-  const fmt = (tt: number) => {
-    const m = Math.floor(tt * 60) % 60;
-    const s = Math.floor(tt * 3600) % 60;
-    const ms = Math.floor((tt * 3600 * 1000) % 1000);
+  // Format `secs` as MM:SS.mmm, padding minutes if longer than 60.
+  const fmt = (secs: number) => {
+    if (!isFinite(secs) || secs < 0) secs = 0;
+    const totalMs = Math.floor(secs * 1000);
+    const m = Math.floor(totalMs / 60_000);
+    const s = Math.floor((totalMs % 60_000) / 1000);
+    const ms = totalMs % 1000;
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(ms).padStart(3, '0')}`;
   };
 
@@ -877,7 +872,7 @@ export function Timeline({ t, onChange, duration = 1, mode, compact }: TimelineP
     }}>
       <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 11, color: mode === 'live' ? SH_COLORS.ok : SH_COLORS.textMute, letterSpacing: 0.5, minWidth: 90, display: 'flex', alignItems: 'center', gap: 6 }}>
         <span style={{ width: 7, height: 7, borderRadius: '50%', background: mode === 'live' ? SH_COLORS.ok : SH_COLORS.accentBright, boxShadow: `0 0 6px ${mode === 'live' ? SH_COLORS.ok : SH_COLORS.accentBright}` }} />
-        {mode === 'live' ? 'LIVE' : 'REPLAY'} · {fmt(t)}
+        {mode === 'live' ? 'LIVE' : 'REPLAY'} · {fmt(t * durationSecs)}
       </div>
 
       <div
@@ -891,13 +886,6 @@ export function Timeline({ t, onChange, duration = 1, mode, compact }: TimelineP
         <div style={{ position: 'absolute', left: 0, right: 0, top: '50%', height: 2, background: 'rgba(255,255,255,0.08)', transform: 'translateY(-50%)' }} />
         {/* Played portion */}
         <div style={{ position: 'absolute', left: 0, width: `${pct}%`, top: '50%', height: 2, background: SH_COLORS.accentBright, transform: 'translateY(-50%)', boxShadow: `0 0 4px ${SH_COLORS.accentBright}` }} />
-        {/* Markers */}
-        {markers.map((m, i) => (
-          <div key={i} style={{ position: 'absolute', left: `${m.pos * 100}%`, top: 3, bottom: 3, transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-            <div style={{ width: 1, height: '100%', background: m.kind === 'warn' ? SH_COLORS.err : m.kind === 'info' ? SH_COLORS.warn : 'rgba(255,255,255,0.2)' }} />
-            <span style={{ position: 'absolute', top: -12, fontFamily: '"JetBrains Mono", monospace', fontSize: 8, color: m.kind === 'warn' ? SH_COLORS.err : m.kind === 'info' ? SH_COLORS.warn : SH_COLORS.textFaint, letterSpacing: 0.5 }}>{m.label}</span>
-          </div>
-        ))}
         {/* Playhead */}
         <div style={{ position: 'absolute', left: `${pct}%`, top: 0, bottom: 0, width: 2, background: SH_COLORS.accentBright, transform: 'translateX(-50%)', pointerEvents: 'none' }}>
           <div style={{ position: 'absolute', top: '50%', left: '50%', width: 10, height: 10, borderRadius: '50%', background: SH_COLORS.accentBright, transform: 'translate(-50%,-50%)', boxShadow: `0 0 8px ${SH_COLORS.accentBright}` }} />
@@ -905,13 +893,13 @@ export function Timeline({ t, onChange, duration = 1, mode, compact }: TimelineP
         {/* Hover tooltip */}
         {hoverX !== null && (
           <div style={{ position: 'absolute', left: hoverX, bottom: '100%', transform: 'translateX(-50%)', marginBottom: 4, background: SH_COLORS.bgInner, border: `1px solid ${SH_COLORS.border}`, padding: '2px 6px', fontFamily: '"JetBrains Mono", monospace', fontSize: 10, color: SH_COLORS.text, pointerEvents: 'none', whiteSpace: 'nowrap' }}>
-            {fmt(hoverT)}
+            {fmt(hoverFrac * durationSecs)}
           </div>
         )}
       </div>
 
       <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 10, color: SH_COLORS.textFaint }}>
-        {fmt(duration)}
+        {fmt(durationSecs)}
       </div>
     </div>
   );
