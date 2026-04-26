@@ -1072,9 +1072,11 @@ interface TopBarProps {
   right?: React.ReactNode;
   /** Slot for extra navigation, rendered immediately after the LIVE/REPLAY toggle. */
   nav?: React.ReactNode;
+  /** Replaces the hardcoded date + session label with a custom node when set. */
+  sessionSlot?: React.ReactNode;
   compact?: boolean;
 }
-export function TopBar({ mode, onMode, title = 'NFR · DAQ', session = 'Session #17', date = '2026-04-21', right, nav, compact }: TopBarProps) {
+export function TopBar({ mode, onMode, title = 'NFR · DAQ', session = 'Session #17', date = '2026-04-21', right, nav, sessionSlot, compact }: TopBarProps) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 12,
@@ -1107,8 +1109,12 @@ export function TopBar({ mode, onMode, title = 'NFR · DAQ', session = 'Session 
 
       <div style={{ flex: 1 }} />
 
-      <span style={{ color: SH_COLORS.textMute, fontSize: 10 }}>{date}</span>
-      <span style={{ color: SH_COLORS.text, fontSize: 10, padding: '3px 8px', border: `1px solid ${SH_COLORS.border}`, borderRadius: 2 }}>{session} ▾</span>
+      {sessionSlot ?? (
+        <>
+          <span style={{ color: SH_COLORS.textMute, fontSize: 10 }}>{date}</span>
+          <span style={{ color: SH_COLORS.text, fontSize: 10, padding: '3px 8px', border: `1px solid ${SH_COLORS.border}`, borderRadius: 2 }}>{session} ▾</span>
+        </>
+      )}
       {right}
     </div>
   );

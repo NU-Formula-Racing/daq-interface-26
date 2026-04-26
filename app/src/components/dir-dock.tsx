@@ -1,7 +1,9 @@
 // Direction 1 v2: DOCK — full-bleed prototype.
 // Widgets live in a 12-col grid; draggable + resizable. Layout persists to localStorage.
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { apiGet } from '../api/client.ts';
+import type { Session } from '../api/types.ts';
 import { useCatalog } from './SignalsProvider.tsx';
 import { COLORS as SH_COLORS } from './colors.ts';
 import {
@@ -284,6 +286,7 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
         onMode={onMode}
         title="NFR · DAQ"
         compact
+        sessionSlot={<SessionPicker />}
         nav={
           <button
             onClick={() => navigate('/settings')}
@@ -880,6 +883,120 @@ function SignalReadout({ sig }: { sig: any; t: number }) {
         <span style={{ color: SH_COLORS.text, fontSize: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
       </span>
       <span style={{ color: SH_COLORS.text, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{v != null ? v.toFixed(1) : '—'} <span style={{ color: SH_COLORS.textFaint }}>{s.unit}</span></span>
+    </div>
+  );
+}
+
+function SessionPicker() {
+  const navigate = useNavigate();
+  const params = useParams();
+  const currentId = params.id ?? null;
+
+  const [open, setOpen] = useState(false);
+  const [sessions, setSessions] = useState<Session[] | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    apiGet<Session[]>('/api/sessions')
+      .then(setSessions)
+      .catch(() => setSessions([]));
+  }, [open]);
+
+  // Re-fetch when navigation lands on a new session id so the dropdown
+  // reflects the freshest data when reopened.
+  useEffect(() => {
+    if (open) {
+      apiGet<Session[]>('/api/sessions').then(setSessions).catch(() => {});
+    }
+  }, [currentId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const current = sessions?.find((s) => s.id === currentId);
+  const label = currentId
+    ? current
+      ? `${new Date(current.started_at).toLocaleDateString()} · ${currentId.slice(0, 8)}`
+      : currentId.slice(0, 8)
+    : 'Select session';
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          ...smallBtn(),
+          color: SH_COLORS.text,
+          padding: '4px 10px',
+        }}
+      >
+        {label} ▾
+      </button>
+      {open && (
+        <>
+          <div
+            onClick={() => setOpen(false)}
+            style={{ position: 'fixed', inset: 0, zIndex: 50 }}
+          />
+          <div style={{
+            position: 'absolute', top: 'calc(100% + 4px)', right: 0,
+            width: 360, maxHeight: 380, overflow: 'auto',
+            background: SH_COLORS.bg,
+            border: `1px solid ${SH_COLORS.border}`,
+            zIndex: 51,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.55)',
+          }}>
+            {sessions === null ? (
+              <div style={{ padding: 12, fontFamily: '"JetBrains Mono", monospace', fontSize: 10, color: SH_COLORS.textFaint }}>
+                Loading…
+              </div>
+            ) : sessions.length === 0 ? (
+              <div style={{ padding: 12, fontFamily: '"JetBrains Mono", monospace', fontSize: 10, color: SH_COLORS.textFaint }}>
+                No sessions
+              </div>
+            ) : (
+              sessions.map((s) => {
+                const active = s.id === currentId;
+                return (
+                  <div
+                    key={s.id}
+                    onClick={() => {
+                      navigate(`/sessions/${s.id}`);
+                      setOpen(false);
+                    }}
+                    style={{
+                      padding: '8px 12px',
+                      borderBottom: `1px solid ${SH_COLORS.border}`,
+                      cursor: 'pointer',
+                      background: active ? 'rgba(167,139,250,0.12)' : 'transparent',
+                      fontFamily: '"JetBrains Mono", monospace',
+                      fontSize: 10,
+                      color: SH_COLORS.text,
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                      <span>{new Date(s.started_at).toLocaleString()}</span>
+                      <span style={{
+                        color: s.source === 'live' ? SH_COLORS.ok : SH_COLORS.accentBright,
+                        fontSize: 9, letterSpacing: 1, textTransform: 'uppercase',
+                      }}>
+                        {s.source}
+                      </span>
+                    </div>
+                    <div style={{
+                      marginTop: 2,
+                      color: SH_COLORS.textMute,
+                      fontSize: 9,
+                      display: 'flex', gap: 8,
+                    }}>
+                      <span>{s.id.slice(0, 8)}</span>
+                      {s.track && <span>· {s.track}</span>}
+                      {s.driver && <span>· {s.driver}</span>}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
