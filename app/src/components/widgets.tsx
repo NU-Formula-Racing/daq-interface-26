@@ -423,26 +423,38 @@ export function NumericWidget({ signal, compact = false }: NumericWidgetProps) {
   if (!sig) return <EmptySlot label="No signal" />;
   const latest = frames?.latest(sig.id) ?? null;
   const v = latest ? latest.value : null;
-  const pct = v != null ? (v - sig.min) / (sig.max - sig.min) : 0;
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch', padding: compact ? '6px 12px' : '10px 18px', background: W_COLORS.bgInner }}>
-      <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 10, color: W_COLORS.textFaint, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+    <div style={{
+      width: '100%', height: '100%',
+      display: 'flex', flexDirection: 'column', justifyContent: 'center',
+      padding: compact ? '12px 16px' : '18px 22px',
+      background: W_COLORS.bgInner,
+    }}>
+      <div style={{
+        fontFamily: '"Inter", system-ui, sans-serif',
+        fontSize: 11, color: W_COLORS.textMute, letterSpacing: 1.5,
+        textTransform: 'uppercase', fontWeight: 400,
+      }}>
         {sig.name}
       </div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 2 }}>
-        <div style={{ fontFamily: '"JetBrains Mono", monospace', fontWeight: 500, fontSize: compact ? 28 : 42, color: W_COLORS.text, lineHeight: 1, letterSpacing: -1, fontVariantNumeric: 'tabular-nums' }}>
-          {v != null ? v.toFixed(Math.abs(v) >= 100 ? 0 : Math.abs(v) >= 10 ? 1 : 2) : '—'}
+      <div style={{
+        fontFamily: '"Inter", system-ui, sans-serif',
+        fontWeight: 300, fontSize: compact ? 44 : 64,
+        color: W_COLORS.text, lineHeight: 1.05, letterSpacing: -2,
+        fontVariantNumeric: 'tabular-nums', marginTop: 4,
+      }}>
+        {v != null ? v.toFixed(Math.abs(v) >= 100 ? 0 : Math.abs(v) >= 10 ? 1 : 2) : '—'}
+      </div>
+      {sig.unit && (
+        <div style={{
+          fontFamily: '"Inter", system-ui, sans-serif',
+          fontSize: 11, color: W_COLORS.textMute, letterSpacing: 1.5,
+          textTransform: 'uppercase', marginTop: 4, fontWeight: 400,
+        }}>
+          {sig.unit}
         </div>
-        <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 11, color: W_COLORS.textMute }}>{sig.unit}</div>
-      </div>
-      {/* Spark range bar */}
-      <div style={{ height: 3, background: 'rgba(255,255,255,0.05)', marginTop: 8, position: 'relative' }}>
-        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, pct * 100))}%`, background: sig.color }} />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2, fontFamily: '"JetBrains Mono", monospace', fontSize: 9, color: W_COLORS.textFaint }}>
-        <span>{sig.min}</span><span>{sig.max}</span>
-      </div>
+      )}
     </div>
   );
 }
