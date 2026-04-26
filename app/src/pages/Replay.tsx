@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { SignalsProvider } from '../components/SignalsProvider.tsx';
 import { DockDirection } from '../components/dir-dock.tsx';
 import { useOverview } from '../hooks/useOverview.ts';
@@ -51,6 +51,7 @@ function makeReplayStore(rows: OverviewRow[], t: number): FramesStore {
 
 export default function Replay() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { rows, loading, error } = useOverview(id!, 1);
   const [t, setT] = useState(1);
 
@@ -70,7 +71,7 @@ export default function Replay() {
           t={t}
           onT={setT}
           mode="replay"
-          onMode={() => {}}
+          onMode={(m) => { if (m === 'live') navigate('/'); }}
           duration={1}
           density="compact"
           graphStyle="line"
