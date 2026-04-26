@@ -424,7 +424,6 @@ export function NumericWidget({ signal, compact = false }: NumericWidgetProps) {
   const latest = frames?.latest(sig.id) ?? null;
   const v = latest ? latest.value : null;
   const pct = v != null ? (v - sig.min) / (sig.max - sig.min) : 0;
-  const warn = v != null && (pct > 0.85 || pct < 0.05);
 
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch', padding: compact ? '6px 12px' : '10px 18px', background: W_COLORS.bgInner }}>
@@ -432,14 +431,14 @@ export function NumericWidget({ signal, compact = false }: NumericWidgetProps) {
         {sig.name}
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 2 }}>
-        <div style={{ fontFamily: '"JetBrains Mono", monospace', fontWeight: 500, fontSize: compact ? 28 : 42, color: warn ? W_COLORS.warn : W_COLORS.text, lineHeight: 1, letterSpacing: -1, fontVariantNumeric: 'tabular-nums' }}>
+        <div style={{ fontFamily: '"JetBrains Mono", monospace', fontWeight: 500, fontSize: compact ? 28 : 42, color: W_COLORS.text, lineHeight: 1, letterSpacing: -1, fontVariantNumeric: 'tabular-nums' }}>
           {v != null ? v.toFixed(Math.abs(v) >= 100 ? 0 : Math.abs(v) >= 10 ? 1 : 2) : '—'}
         </div>
         <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 11, color: W_COLORS.textMute }}>{sig.unit}</div>
       </div>
       {/* Spark range bar */}
       <div style={{ height: 3, background: 'rgba(255,255,255,0.05)', marginTop: 8, position: 'relative' }}>
-        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, pct * 100))}%`, background: warn ? W_COLORS.warn : sig.color }} />
+        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, pct * 100))}%`, background: sig.color }} />
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2, fontFamily: '"JetBrains Mono", monospace', fontSize: 9, color: W_COLORS.textFaint }}>
         <span>{sig.min}</span><span>{sig.max}</span>
@@ -484,8 +483,7 @@ export function GaugeWidget({ signal }: GaugeWidgetProps) {
     return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
   };
 
-  const warn = pct > 0.85;
-  const color = warn ? W_COLORS.warn : sig.color;
+  const color = sig.color;
 
   return (
     <div ref={wrap} style={{ width: '100%', height: '100%', background: W_COLORS.bgInner, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 4, position: 'relative' }}>
@@ -528,17 +526,16 @@ export function BarWidget({ signals = [] }: BarWidgetProps) {
       {sigs.map((s, i) => {
         const v = vals[i];
         const pct = v != null ? Math.max(0, Math.min(1, (v - s.min) / (s.max - s.min))) : 0;
-        const warn = v != null && pct > 0.85;
         return (
           <div key={s.id} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: '"JetBrains Mono", monospace', fontSize: 10, color: W_COLORS.textMute }}>
               <span style={{ color: W_COLORS.text }}>{s.name}</span>
-              <span style={{ fontVariantNumeric: 'tabular-nums', color: warn ? W_COLORS.warn : W_COLORS.text }}>
+              <span style={{ fontVariantNumeric: 'tabular-nums', color: W_COLORS.text }}>
                 {v != null ? v.toFixed(1) : '—'} <span style={{ color: W_COLORS.textFaint }}>{s.unit}</span>
               </span>
             </div>
             <div style={{ height: 10, background: 'rgba(255,255,255,0.04)', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct * 100}%`, background: warn ? W_COLORS.warn : s.color, transition: 'width 80ms linear' }} />
+              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct * 100}%`, background: s.color, transition: 'width 80ms linear' }} />
               {/* segment ticks */}
               {[0.25, 0.5, 0.75].map((f) => (
                 <div key={f} style={{ position: 'absolute', left: `${f * 100}%`, top: 0, bottom: 0, width: 1, background: 'rgba(0,0,0,0.4)' }} />
