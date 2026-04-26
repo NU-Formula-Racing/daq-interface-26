@@ -88,18 +88,62 @@ export function GraphWidget({
   const series = signals.map((sid: any) => {
     const sig = catalog.byId(sid);
     if (!sig) return null;
-    const raw = (frames?.series(sig.id) ?? []).map((r) => r.value);
-    if (raw.length === 0) return { sig, data: new Array(N).fill(0), empty: true };
-    const data = resampleToN(raw, N);
+    const allRaw = (frames?.series(sig.id) ?? []).map((r) => r.value);
+    if (allRaw.length === 0) return { sig, data: new Array(N).fill(0), empty: true };
+
+    // Decide which slice of the buffer to render.
+    // - Live: rolling window — last `win` fraction of the buffer ending at "now".
+    //   We treat `t === 1` as latest. Show last `win * bufferLen` points (clamped).
+    // - Replay/paused: window ends at `t * bufferLen`, length `win * bufferLen`.
+    const len = allRaw.length;
+    const winLen = Math.max(8, Math.floor(len * win));
+    let start: number, end: number;
+    if (mode === 'live') {
+      end = len;
+      start = Math.max(0, len - winLen);
+    } else {
+      end = Math.max(1, Math.min(len, Math.floor(t * len)));
+      start = Math.max(0, end - winLen);
+    }
+    const sliced = allRaw.slice(start, end);
+    if (sliced.length === 0) return { sig, data: new Array(N).fill(0), empty: true };
+    const data = resampleToN(sliced, N);
     return { sig, data };
   }).filter(Boolean) as { sig: Signal; data: number[]; empty?: boolean }[];
 
-  // Domain: use union of signal ranges if multiple, else signal's own min/max
+  // Domain: prefer customized catalog ranges; fall back to data range with 5% pad
   let dMin = Infinity, dMax = -Infinity;
-  if (series.length === 0) { dMin = 0; dMax = 1; }
-  else if (series.length === 1) { dMin = series[0].sig.min; dMax = series[0].sig.max; }
-  else {
-    for (const s of series) { dMin = Math.min(dMin, s.sig.min); dMax = Math.max(dMax, s.sig.max); }
+  if (series.length === 0) {
+    dMin = 0; dMax = 1;
+  } else {
+    const isDefaultRange = (sig: { min: number; max: number }) =>
+      sig.min === 0 && sig.max === 1;
+
+    for (const s of series) {
+      if (s.empty) continue;
+      if (isDefaultRange(s.sig)) {
+        let lo = Infinity, hi = -Infinity;
+        for (const v of s.data) {
+          if (v < lo) lo = v;
+          if (v > hi) hi = v;
+        }
+        if (lo === Infinity) { lo = 0; hi = 1; }
+        if (hi === lo) {
+          lo -= 0.5;
+          hi += 0.5;
+        } else {
+          const pad = (hi - lo) * 0.05;
+          lo -= pad;
+          hi += pad;
+        }
+        dMin = Math.min(dMin, lo);
+        dMax = Math.max(dMax, hi);
+      } else {
+        dMin = Math.min(dMin, s.sig.min);
+        dMax = Math.max(dMax, s.sig.max);
+      }
+    }
+    if (dMin === Infinity) { dMin = 0; dMax = 1; }
   }
   const dSpan = dMax - dMin || 1;
 
