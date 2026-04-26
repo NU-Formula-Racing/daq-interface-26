@@ -51,7 +51,7 @@ function makeReplayStore(rows: OverviewRow[], t: number): FramesStore {
 
 export default function Replay() {
   const { id } = useParams<{ id: string }>();
-  const { detail, rows, loading, error } = useOverview(id!, 1);
+  const { rows, loading, error } = useOverview(id!, 1);
   const [t, setT] = useState(1);
 
   const store = useMemo(() => makeReplayStore(rows, t), [rows, t]);
@@ -66,22 +66,17 @@ export default function Replay() {
   return (
     <SignalsProvider>
       <div className="h-full flex flex-col">
-        <div className="h-7 px-4 flex items-center gap-3 border-b border-[color:var(--color-border)] font-mono text-[11px] tracking-widest text-[color:var(--color-text-mute)] shrink-0">
-          REPLAY · {detail?.track ?? '—'} · {detail?.driver ?? '—'} · {rows.length} rows
-        </div>
-        <div className="flex-1 min-h-0">
-          <DockDirection
-            t={t}
-            onT={setT}
-            mode="replay"
-            onMode={() => {}}
-            duration={1}
-            density="compact"
-            graphStyle="line"
-            frames={store}
-            exportHref={id ? `/api/sessions/${id}/export.csv` : null}
-          />
-        </div>
+        <DockDirection
+          t={t}
+          onT={setT}
+          mode="replay"
+          onMode={() => {}}
+          duration={1}
+          density="compact"
+          graphStyle="line"
+          frames={store}
+          exportHref={id ? `/api/sessions/${id}/export.csv` : null}
+        />
       </div>
     </SignalsProvider>
   );
