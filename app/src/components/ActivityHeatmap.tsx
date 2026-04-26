@@ -12,9 +12,10 @@ interface ActivityResponse {
   days: DayCount[];
 }
 
-const CELL = 12;
-const GAP = 3;
+const CELL = 16;
+const GAP = 6;
 const DAYS = 7;
+const LABEL_COL = 56;
 
 const COLORS = [
   '#1e1f22',   // 0 sessions
@@ -104,7 +105,7 @@ export function ActivityHeatmap() {
   }, [data, year]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '4px 6px' }}>
       <span style={{
         fontFamily: '"JetBrains Mono", monospace',
         fontSize: 11, color: 'rgba(255,255,255,0.6)',
@@ -115,12 +116,12 @@ export function ActivityHeatmap() {
       {/* Header: day-of-week labels */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: `42px repeat(${DAYS}, ${CELL}px)`,
+        gridTemplateColumns: `${LABEL_COL}px repeat(${DAYS}, ${CELL}px)`,
         columnGap: GAP,
         fontFamily: '"JetBrains Mono", monospace',
-        fontSize: 9,
-        color: 'rgba(255,255,255,0.4)',
-        marginBottom: 2,
+        fontSize: 10,
+        color: 'rgba(255,255,255,0.5)',
+        marginBottom: 6,
       }}>
         <span />
         {DOW.map((d, i) => (
@@ -135,16 +136,16 @@ export function ActivityHeatmap() {
             key={wi}
             style={{
               display: 'grid',
-              gridTemplateColumns: `42px repeat(${DAYS}, ${CELL}px)`,
+              gridTemplateColumns: `${LABEL_COL}px repeat(${DAYS}, ${CELL}px)`,
               columnGap: GAP,
               alignItems: 'center',
             }}
           >
             <span style={{
               fontFamily: '"JetBrains Mono", monospace',
-              fontSize: 9,
-              color: 'rgba(255,255,255,0.55)',
-              letterSpacing: 1,
+              fontSize: 10,
+              color: 'rgba(255,255,255,0.65)',
+              letterSpacing: 1.5,
             }}>
               {wk.monthBoundary !== null ? MONTHS[wk.monthBoundary] : ''}
             </span>
