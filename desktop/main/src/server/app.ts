@@ -17,6 +17,7 @@ import { registerExportRoutes } from './routes/export.ts';
 import { registerSetupRoutes, type SetupState } from './routes/setup.ts';
 import { registerDbcRoutes } from './routes/dbc.ts';
 import { registerDbAdminRoutes } from './routes/db_admin.ts';
+import { registerImportRoutes, type ImportResult } from './routes/import.ts';
 
 export interface BuildAppOptions {
   pool: pg.Pool | null;
@@ -29,6 +30,7 @@ export interface BuildAppOptions {
   dbcStorePath?: string;
   onDbcChanged?: () => Promise<void>;
   dsn?: string;
+  onImport?: (filename: string, body: Buffer) => Promise<ImportResult>;
 }
 
 export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> {
@@ -37,6 +39,11 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   app.addContentTypeParser(
     ['text/csv', 'text/plain', 'application/sql'],
     { parseAs: 'string' },
+    (_req, body, done) => done(null, body),
+  );
+  app.addContentTypeParser(
+    'application/octet-stream',
+    { parseAs: 'buffer' },
     (_req, body, done) => done(null, body),
   );
 
@@ -96,6 +103,9 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     }
     if (opts.dsn) {
       registerDbAdminRoutes(app, { pool: opts.pool, dsn: opts.dsn });
+    }
+    if (opts.onImport) {
+      registerImportRoutes(app, { onImport: opts.onImport });
     }
   }
 

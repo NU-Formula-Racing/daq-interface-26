@@ -200,7 +200,10 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
 
   const navigate = useNavigate();
   const fileRef = useRef<HTMLInputElement>(null);
+  const nfrFileRef = useRef<HTMLInputElement>(null);
+  const nfrFolderRef = useRef<HTMLInputElement>(null);
   const [dbcStatus, setDbcStatus] = useState<string>('');
+  const [nfrStatus, setNfrStatus] = useState<string>('');
   const onPickDbc = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     e.target.value = '';
@@ -222,6 +225,54 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
     } catch (err) {
       setDbcStatus(`Error: ${String(err)}`);
     }
+  };
+
+  const onPickNfr = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    e.target.value = '';
+    if (!fileList || fileList.length === 0) return;
+
+    // Filter to .nfr files only (case-insensitive). Folder picks include
+    // every file inside; user only wants the binary logs.
+    const all = Array.from(fileList);
+    const nfrs = all.filter((f) => /\.nfr$/i.test(f.name));
+    if (nfrs.length === 0) {
+      setNfrStatus('No .nfr files found in selection');
+      setTimeout(() => setNfrStatus(''), 4000);
+      return;
+    }
+
+    let succeeded = 0;
+    let failed = 0;
+    let totalRows = 0;
+    for (let i = 0; i < nfrs.length; i++) {
+      const f = nfrs[i];
+      setNfrStatus(`Importing ${i + 1}/${nfrs.length} · ${f.name}`);
+      try {
+        const buf = await f.arrayBuffer();
+        const res = await fetch('/api/import/nfr', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/octet-stream',
+            'X-Filename': f.name,
+          },
+          body: buf,
+        });
+        if (!res.ok) {
+          failed++;
+          continue;
+        }
+        const body = (await res.json()) as { row_count?: number };
+        succeeded++;
+        totalRows += body.row_count ?? 0;
+      } catch {
+        failed++;
+      }
+    }
+    setNfrStatus(
+      `Imported ${succeeded}/${nfrs.length} · ${totalRows.toLocaleString()} rows${failed > 0 ? ` · ${failed} failed` : ''}`,
+    );
+    setTimeout(() => setNfrStatus(''), 8000);
   };
 
   return (
@@ -248,6 +299,30 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
         }
         right={
           <>
+            {nfrStatus && (
+              <span style={{ color: SH_COLORS.textMute, fontSize: 9, marginRight: 4 }}>{nfrStatus}</span>
+            )}
+            <input
+              ref={nfrFileRef}
+              type="file"
+              accept=".nfr,.NFR,application/octet-stream"
+              multiple
+              style={{ display: 'none' }}
+              onChange={onPickNfr}
+            />
+            <input
+              ref={nfrFolderRef}
+              type="file"
+              // @ts-expect-error — non-standard but supported in Chromium/Safari/FF
+              webkitdirectory=""
+              directory=""
+              multiple
+              style={{ display: 'none' }}
+              onChange={onPickNfr}
+            />
+            <button onClick={() => nfrFileRef.current?.click()} style={smallBtn()} title="Import one or more .nfr files">↑ NFR FILE</button>
+            <button onClick={() => nfrFolderRef.current?.click()} style={smallBtn()} title="Import every .nfr inside a folder">↑ NFR FOLDER</button>
+            <span style={{ width: 1, height: 12, background: SH_COLORS.border, margin: '0 4px' }} />
             {dbcStatus && (
               <span style={{ color: SH_COLORS.textMute, fontSize: 9, marginRight: 4 }}>{dbcStatus}</span>
             )}

@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { mkdirSync, writeFileSync } from 'fs';
 import pg from 'pg';
 import { bootstrapDatabase } from './db/bootstrap.ts';
 import { createPool } from './db/pool.ts';
@@ -8,6 +9,7 @@ import { buildApp } from './server/app.ts';
 import { ParserManager } from './parser/manager.ts';
 import { FolderWatcher } from './watcher/watcher.ts';
 import type { SetupState } from './server/routes/setup.ts';
+import type { ImportResult } from './server/routes/import.ts';
 import { spawn } from 'child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -17,6 +19,7 @@ const PARSER_DIR = join(REPO_ROOT, 'parser');
 const PARSER_PY = join(PARSER_DIR, '__main__.py');
 const PARSER_VENV_PY = join(PARSER_DIR, '.venv', 'bin', 'python');
 const DBC_STORE_PATH = join(REPO_ROOT, 'parser', 'active-dbc.csv');
+const NFR_UPLOADS_DIR = join(REPO_ROOT, 'parser', 'uploads');
 
 export async function run(opts: {
   dsn?: string;
@@ -167,6 +170,54 @@ export async function run(opts: {
     parser.start();
   };
 
+  const runBatchImport = async (filename: string, body: Buffer): Promise<ImportResult> => {
+    if (!pool) return { session_id: null, row_count: 0, error: 'database not ready' };
+    mkdirSync(NFR_UPLOADS_DIR, { recursive: true });
+    const safeName = filename.replace(/[^A-Za-z0-9._-]/g, '_');
+    const target = join(NFR_UPLOADS_DIR, `${Date.now()}-${safeName}`);
+    writeFileSync(target, body);
+
+    const cfgNow = await getAppConfig(pool);
+    const importDbc = typeof cfgNow.dbcPath === 'string' ? cfgNow.dbcPath : dbcCsv;
+    const subArgs = ['batch', '--dbc', importDbc, '--file', target];
+    const args = parserIsPython ? [PARSER_PY, ...subArgs] : subArgs;
+
+    return new Promise<ImportResult>((resolve) => {
+      const child = spawn(parserBinary, args, {
+        env: { ...process.env, NFR_DB_URL: dsn },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      let stdout = '';
+      let stderr = '';
+      child.stdout.on('data', (d) => { stdout += String(d); });
+      child.stderr.on('data', (d) => { stderr += String(d); });
+      child.on('close', (code) => {
+        if (code !== 0) {
+          resolve({
+            session_id: null,
+            row_count: 0,
+            error: `parser exit ${code}: ${stderr.slice(0, 500)}`,
+          });
+          return;
+        }
+        let sessionId: string | null = null;
+        let rowCount = 0;
+        for (const line of stdout.trim().split('\n')) {
+          try {
+            const ev = JSON.parse(line);
+            if (ev?.type === 'session_ended') {
+              sessionId = ev.session_id ?? null;
+              rowCount = ev.row_count ?? 0;
+            }
+          } catch {
+            /* ignore non-JSON lines */
+          }
+        }
+        resolve({ session_id: sessionId, row_count: rowCount });
+      });
+    });
+  };
+
   const app = await buildApp({
     pool,
     parser: parser ?? undefined,
@@ -176,6 +227,7 @@ export async function run(opts: {
     dbcStorePath: DBC_STORE_PATH,
     onDbcChanged: restartParser,
     dsn,
+    onImport: runBatchImport,
   });
   await app.listen({ port, host });
 
