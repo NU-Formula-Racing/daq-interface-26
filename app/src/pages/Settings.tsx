@@ -48,14 +48,31 @@ export default function Settings() {
     }
   };
 
-  const onExport = () => {
-    // Token handling: if /api/* is auth-gated, the token already lives in
-    // localStorage and the client builds a `?key=` URL. Use the same path.
+  const tokenParam = (() => {
     const key =
       new URLSearchParams(window.location.search).get('key') ??
       localStorage.getItem('nfr_api_token');
-    const url = key ? `/api/db/export?key=${encodeURIComponent(key)}` : '/api/db/export';
+    return key ? `key=${encodeURIComponent(key)}` : '';
+  })();
+
+  const onExport = () => {
+    const url = tokenParam ? `/api/db/export?${tokenParam}` : '/api/db/export';
     window.location.href = url;
+  };
+
+  const onArchive = (format: 'csv' | 'sql') => {
+    if (format === 'sql') {
+      onExport();
+      return;
+    }
+    const params = new URLSearchParams();
+    if (olderThan) params.set('olderThan', new Date(olderThan).toISOString());
+    if (tokenParam) {
+      const [k, v] = tokenParam.split('=');
+      params.set(k, decodeURIComponent(v));
+    }
+    const qs = params.toString();
+    window.location.href = `/api/db/export-range.csv${qs ? `?${qs}` : ''}`;
   };
 
   const onImportPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,6 +140,7 @@ export default function Settings() {
         <Section title="Clear data">
           <p className="text-[11px] text-[color:var(--color-text-mute)]">
             Delete sessions and their readings. Signal catalog and config are preserved.
+            Download an archive first if you want to keep this data offline.
           </p>
           <label className="flex flex-col gap-1">
             <span className="text-[10px] tracking-widest text-[color:var(--color-text-mute)]">
@@ -135,13 +153,35 @@ export default function Settings() {
               className="bg-[color:var(--color-panel)] border border-[color:var(--color-border)] px-2 py-1 text-[color:var(--color-text)]"
             />
           </label>
-          <button
-            onClick={onClear}
-            disabled={busy !== null}
-            className="px-3 py-1.5 bg-red-700/30 text-red-200 border border-red-700/50 tracking-widest text-[11px] disabled:opacity-50 hover:bg-red-700/50"
-          >
-            {busy === 'clear' ? 'Clearing…' : olderThan ? `Clear before ${olderThan}` : 'Clear all data'}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => onArchive('csv')}
+              disabled={busy !== null}
+              className="px-3 py-1.5 border border-[color:var(--color-border)] tracking-widest text-[11px] disabled:opacity-50 hover:bg-[color:var(--color-panel)]"
+              title="Download a CSV of every reading in the targeted range"
+            >
+              ↓ Archive as CSV
+            </button>
+            <button
+              onClick={() => onArchive('sql')}
+              disabled={busy !== null}
+              className="px-3 py-1.5 border border-[color:var(--color-border)] tracking-widest text-[11px] disabled:opacity-50 hover:bg-[color:var(--color-panel)]"
+              title="Download a SQL dump of the entire database (no time filter)"
+            >
+              ↓ Archive as SQL
+            </button>
+            <button
+              onClick={onClear}
+              disabled={busy !== null}
+              className="px-3 py-1.5 bg-red-700/30 text-red-200 border border-red-700/50 tracking-widest text-[11px] disabled:opacity-50 hover:bg-red-700/50"
+            >
+              {busy === 'clear' ? 'Clearing…' : olderThan ? `Clear before ${olderThan}` : 'Clear all data'}
+            </button>
+          </div>
+          <p className="text-[10px] text-[color:var(--color-text-faint)]">
+            CSV honors the date filter. SQL is always a full database backup (use the
+            Export section below for the same file with no clear pending).
+          </p>
         </Section>
 
         <Section title="Export database">

@@ -116,6 +116,89 @@ export function registerDbAdminRoutes(app: FastifyInstance, deps: DbAdminDeps) {
   });
 
   /**
+   * GET /api/db/export-range.csv?olderThan=ISO
+   * Streams a CSV containing every reading whose session falls in the
+   * targeted range, joined with session metadata + signal info. Without
+   * `olderThan` it returns the entire DB. Use this BEFORE calling /api/db/clear
+   * with the same range to keep an offline archive.
+   */
+  app.get<{ Querystring: { olderThan?: string } }>(
+    '/api/db/export-range.csv',
+    async (req, reply) => {
+      const olderThan = req.query.olderThan;
+      const stamp = new Date().toISOString().slice(0, 10);
+      const filename = olderThan
+        ? `nfr-archive-before-${olderThan.slice(0, 10)}-${stamp}.csv`
+        : `nfr-archive-all-${stamp}.csv`;
+      reply.header('Content-Type', 'text/csv; charset=utf-8');
+      reply.header(
+        'Content-Disposition',
+        `attachment; filename="${filename}"`,
+      );
+
+      const params: any[] = [];
+      let where = '';
+      if (olderThan) {
+        where = 'WHERE s.started_at < $1::timestamptz';
+        params.push(olderThan);
+      }
+      const { rows } = await deps.pool.query<{
+        session_id: string;
+        session_started_at: Date;
+        session_ended_at: Date | null;
+        track: string | null;
+        driver: string | null;
+        car: string | null;
+        ts: Date;
+        source: string;
+        signal_name: string;
+        unit: string | null;
+        value: string;
+      }>(
+        `SELECT s.id AS session_id, s.started_at AS session_started_at,
+                s.ended_at AS session_ended_at, s.track, s.driver, s.car,
+                r.ts, sd.source, sd.signal_name, sd.unit, r.value
+         FROM sessions s
+         JOIN (
+           SELECT ts, session_id, signal_id, value FROM sd_readings
+           UNION ALL
+           SELECT ts, session_id, signal_id, value FROM rt_readings
+         ) r ON r.session_id = s.id
+         JOIN signal_definitions sd ON sd.id = r.signal_id
+         ${where}
+         ORDER BY s.started_at, r.ts`,
+        params,
+      );
+
+      const esc = (s: string) =>
+        s.includes(',') || s.includes('"') || s.includes('\n')
+          ? `"${s.replace(/"/g, '""')}"`
+          : s;
+      const parts: string[] = [
+        'session_id,session_started_at,session_ended_at,track,driver,car,ts,source,signal_name,unit,value\n',
+      ];
+      for (const r of rows) {
+        parts.push(
+          [
+            r.session_id,
+            r.session_started_at.toISOString(),
+            r.session_ended_at ? r.session_ended_at.toISOString() : '',
+            esc(r.track ?? ''),
+            esc(r.driver ?? ''),
+            esc(r.car ?? ''),
+            r.ts.toISOString(),
+            esc(r.source),
+            esc(r.signal_name),
+            esc(r.unit ?? ''),
+            String(r.value),
+          ].join(',') + '\n',
+        );
+      }
+      return parts.join('');
+    },
+  );
+
+  /**
    * GET /api/db/stats — quick counts so the Settings UI can show what's there.
    */
   app.get('/api/db/stats', async () => {
