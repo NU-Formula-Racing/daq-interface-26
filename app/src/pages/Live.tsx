@@ -13,29 +13,18 @@ export default function Live() {
   const [mode, setMode] = useState<'live' | 'replay'>('live');
   const rafRef = useRef<number | null>(null);
 
-  // Track wall-clock elapsed time since the current session started so the
-  // bottom timer reads real session duration. Reset on session id change.
-  const sessionStartRef = useRef<number | null>(null);
-  const [elapsedSecs, setElapsedSecs] = useState(0);
-
+  // Reset the frames buffer (and its first/latest timestamps) every time a
+  // new session starts so the bottom timer reflects this session only.
   useEffect(() => {
-    if (status.session_id) {
-      sessionStartRef.current = Date.now();
-      setElapsedSecs(0);
-    } else {
-      sessionStartRef.current = null;
-      setElapsedSecs(0);
-    }
-  }, [status.session_id]);
+    frames.reset();
+  }, [status.session_id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (!status.session_id) return;
-    const id = setInterval(() => {
-      if (sessionStartRef.current == null) return;
-      setElapsedSecs((Date.now() - sessionStartRef.current) / 1000);
-    }, 100);
-    return () => clearInterval(id);
-  }, [status.session_id]);
+  // Duration = (latest frame ts) − (first frame ts). Updates as frames flow.
+  const first = frames.firstTs();
+  const last = frames.latestTs();
+  const elapsedSecs = first && last
+    ? Math.max(0, (new Date(last).getTime() - new Date(first).getTime()) / 1000)
+    : 0;
 
   useEffect(() => {
     if (mode !== 'live') return;

@@ -18,6 +18,8 @@ export class FramesStore {
   private listeners = new Set<() => void>();
   private bufferSize: number;
   private version = 0;
+  private _firstTs: string | null = null;
+  private _latestTs: string | null = null;
 
   constructor(opts: FramesStoreOptions = {}) {
     this.bufferSize = opts.bufferSize ?? 300;
@@ -33,6 +35,9 @@ export class FramesStore {
       }
       buf.push(r);
       if (buf.length > this.bufferSize) buf.shift();
+
+      if (this._firstTs === null || r.ts < this._firstTs) this._firstTs = r.ts;
+      if (this._latestTs === null || r.ts > this._latestTs) this._latestTs = r.ts;
     }
     this.version++;
     for (const l of this.listeners) l();
@@ -44,6 +49,26 @@ export class FramesStore {
 
   series(signalId: number): FrameRow[] {
     return this.ringBySignal.get(signalId) ?? [];
+  }
+
+  /** ISO timestamp of the very first frame seen since the last reset(). */
+  firstTs(): string | null {
+    return this._firstTs;
+  }
+
+  /** ISO timestamp of the most recent frame seen. */
+  latestTs(): string | null {
+    return this._latestTs;
+  }
+
+  /** Drop everything — call when a new session starts. */
+  reset(): void {
+    this.ringBySignal.clear();
+    this.latestBySignal.clear();
+    this._firstTs = null;
+    this._latestTs = null;
+    this.version++;
+    for (const l of this.listeners) l();
   }
 
   getVersion(): number {
