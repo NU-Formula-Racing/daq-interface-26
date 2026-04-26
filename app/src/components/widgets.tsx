@@ -86,7 +86,7 @@ export function GraphWidget({
     return out;
   };
   const series = signals.map((sid: any) => {
-    const sig = catalog.byId(sid);
+    const sig = catalog.resolve(sid);
     if (!sig) return null;
     const allRaw = (frames?.series(sig.id) ?? []).map((r) => r.value);
     if (allRaw.length === 0) return { sig, data: new Array(N).fill(0), empty: true };
@@ -419,7 +419,7 @@ interface NumericWidgetProps { signal: any; t: number; compact?: boolean; }
 export function NumericWidget({ signal, compact = false }: NumericWidgetProps) {
   const catalog = useCatalog();
   const frames = useFrames();
-  const sig = catalog.byId(signal);
+  const sig = catalog.resolve(signal);
   if (!sig) return <EmptySlot label="No signal" />;
   const latest = frames?.latest(sig.id) ?? null;
   const v = latest ? latest.value : null;
@@ -466,7 +466,7 @@ interface GaugeWidgetProps { signal: any; t: number; }
 export function GaugeWidget({ signal }: GaugeWidgetProps) {
   const catalog = useCatalog();
   const frames = useFrames();
-  const sig = catalog.byId(signal);
+  const sig = catalog.resolve(signal);
 
   const wrap = useRef<HTMLDivElement>(null);
   const [sz, setSz] = useState(160);
@@ -529,7 +529,7 @@ interface BarWidgetProps { signals?: any[]; t: number; orientation?: 'horizontal
 export function BarWidget({ signals = [] }: BarWidgetProps) {
   const catalog = useCatalog();
   const frames = useFrames();
-  const sigs = signals.map((id: any) => catalog.byId(id)).filter(Boolean) as Signal[];
+  const sigs = signals.map((id: any) => catalog.resolve(id)).filter(Boolean) as Signal[];
   if (sigs.length === 0) return <EmptySlot label="No signal" />;
   const vals = sigs.map((s) => frames?.latest(s.id)?.value ?? null);
 
@@ -568,7 +568,7 @@ export function HeatmapWidget({ signals = [] }: HeatmapWidgetProps) {
   const catalog = useCatalog();
   const frames = useFrames();
   // Expect 12 signals for tire4x3 (FL/FR/RL/RR × Inner/Middle/Outer)
-  const sigs = signals.map((id: any) => catalog.byId(id)).filter(Boolean) as Signal[];
+  const sigs = signals.map((id: any) => catalog.resolve(id)).filter(Boolean) as Signal[];
   const vals = sigs.map((s) => ({ s, v: frames?.latest(s.id)?.value ?? null }));
 
   const heatColor = (pct: number) => {
@@ -666,7 +666,7 @@ interface SignalChipProps {
 }
 export function SignalChip({ sigId, onRemove, onClick, active, size = 'sm' }: SignalChipProps) {
   const catalog = useCatalog();
-  const sig = catalog.byId(sigId);
+  const sig = catalog.resolve(sigId);
   if (!sig) return null;
   const pad = size === 'xs' ? '2px 6px' : '3px 8px';
   const fs = size === 'xs' ? 10 : 11;

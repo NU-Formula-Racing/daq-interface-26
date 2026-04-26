@@ -23,15 +23,33 @@ const DOCK_STORAGE_KEY = 'nfr-dock-layout-v2';
 // Our real catalog uses numeric ids from signal_definitions.id. If those names don't
 // resolve, widgets render their EmptySlot fallback — which is the intended smoke
 // behavior for this task.
+// Default layout for the user's NFR 26 DBC. Signals are referenced by name
+// (resolved via catalog.resolve at render time) so the layout survives DBC
+// changes as long as the names match.
 const DEFAULT_LAYOUT: any[] = [
-  { id: 'w1', type: 'graph',   signals: ['Inverter_RPM', 'APPS1_Throttle'], window: 0.05, col: 1, row: 1, w: 8, h: 3 },
-  { id: 'w2', type: 'gauge',   signals: ['HV_Battery_SOC'],                              col: 9, row: 1, w: 4, h: 3 },
-  { id: 'w3', type: 'graph',   signals: ['Motor_Temperature', 'IGBT_Temperature', 'Coolant_Temp_Out'], window: 0.08, col: 1, row: 4, w: 5, h: 3 },
-  { id: 'w4', type: 'numeric', signals: ['Vehicle_Speed'],                               col: 6, row: 4, w: 2, h: 3 },
-  { id: 'w5', type: 'numeric', signals: ['Inverter_Torque'],                             col: 8, row: 4, w: 2, h: 3 },
-  { id: 'w6', type: 'bar',     signals: ['Tire_Pressure_FL','Tire_Pressure_FR','Tire_Pressure_RL','Tire_Pressure_RR'], col: 10, row: 4, w: 3, h: 3 },
-  { id: 'w7', type: 'heatmap', signals: ['Tire_Temp_FL_Inner','Tire_Temp_FL_Middle','Tire_Temp_FL_Outer','Tire_Temp_FR_Inner','Tire_Temp_FR_Middle','Tire_Temp_FR_Outer','Tire_Temp_RL_Inner','Tire_Temp_RL_Middle','Tire_Temp_RL_Outer','Tire_Temp_RR_Inner','Tire_Temp_RR_Middle','Tire_Temp_RR_Outer'], col: 1, row: 7, w: 6, h: 4 },
-  { id: 'w8', type: 'graph',   signals: ['Brake_Pressure_Front', 'Brake_Pressure_Rear'], window: 0.05, col: 7, row: 7, w: 6, h: 4 },
+  // Row 1 — four numerics: temperature, RPM, voltage, SOC
+  { id: 'w1', type: 'numeric', signals: ['Battery_Temperature'], col: 1,  row: 1, w: 3, h: 3 },
+  { id: 'w2', type: 'numeric', signals: ['Rear Inverter/RPM'],   col: 4,  row: 1, w: 3, h: 3 },
+  { id: 'w3', type: 'numeric', signals: ['Battery_Voltage'],     col: 7,  row: 1, w: 3, h: 3 },
+  { id: 'w4', type: 'numeric', signals: ['BMS_SOC'],             col: 10, row: 1, w: 3, h: 3 },
+
+  // Row 2 — two graphs
+  { id: 'w5', type: 'graph',
+    signals: ['Battery_Voltage', 'Battery_Temperature'],
+    window: 0.05, col: 1, row: 4, w: 6, h: 4 },
+  { id: 'w6', type: 'graph',
+    signals: ['Front-Left-Inverter/RPM', 'Front-Right-Inverter/RPM', 'Rear Inverter/RPM'],
+    window: 0.05, col: 7, row: 4, w: 6, h: 4 },
+
+  // Row 3 — tire heatmap (FL/FR/BL/BR × 3 of 8 thermocouples each)
+  { id: 'w7', type: 'heatmap',
+    signals: [
+      'FL_Tire_Temp_0', 'FL_Tire_Temp_3', 'FL_Tire_Temp_7',
+      'FR_Tire_Temp_0', 'FR_Tire_Temp_3', 'FR_Tire_Temp_7',
+      'BL_Tire_Temp_0', 'BL_Tire_Temp_3', 'BL_Tire_Temp_7',
+      'BR_Tire_Temp_0', 'BR_Tire_Temp_3', 'BR_Tire_Temp_7',
+    ],
+    col: 1, row: 8, w: 12, h: 4 },
 ];
 
 function loadLayout(): any[] {
@@ -547,7 +565,7 @@ function DockSignalPicker({ selected, onPick, favorites, onToggleFav, onCollapse
               ★ FAVORITES · {favorites.length}
             </div>
             {favorites.map((id) => {
-              const s = catalog.byId(id); if (!s) return null;
+              const s = catalog.resolve(id); if (!s) return null;
               return <SigRow key={id} s={s} selected={selected === id} fav onPick={onPick} onToggleFav={onToggleFav} />;
             })}
           </div>
@@ -624,7 +642,7 @@ function Row({ label, value }: { label: string; value: string }) {
 function SignalReadout({ sig }: { sig: any; t: number }) {
   const catalog = useCatalog();
   const frames = useFrames();
-  const s = catalog.byId(sig);
+  const s = catalog.resolve(sig);
   if (!s) return null;
   const latest = frames?.latest(s.id) ?? null;
   const v = latest ? latest.value : null;

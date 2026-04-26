@@ -27,6 +27,10 @@ export interface SignalCatalog {
   ALL: Signal[];
   GROUPS: SignalGroup[];
   byId: (id: number) => Signal | null;
+  byName: (name: string) => Signal | null;
+  /** Accepts a numeric id OR a string. Strings can be `"signal_name"` or
+   *  `"Source/signal_name"` — first match wins. */
+  resolve: (idOrName: number | string) => Signal | null;
 }
 
 interface OverlayEntry {
@@ -74,10 +78,31 @@ export function buildCatalog(defs: SignalDefinition[]): SignalCatalog {
   );
 
   const byIdMap = new Map(signals.map((s) => [s.id, s] as const));
+  const byNameMap = new Map<string, Signal>();
+  for (const s of signals) {
+    const lname = s.name.toLowerCase();
+    if (!byNameMap.has(lname)) byNameMap.set(lname, s);
+    byNameMap.set(`${s.group}/${s.name}`.toLowerCase(), s);
+  }
+
+  const byName = (q: string): Signal | null =>
+    byNameMap.get(q.toLowerCase()) ?? null;
+
+  const resolve = (x: number | string): Signal | null => {
+    if (typeof x === 'number') return byIdMap.get(x) ?? null;
+    if (typeof x === 'string') {
+      const asNum = Number(x);
+      if (!Number.isNaN(asNum) && byIdMap.has(asNum)) return byIdMap.get(asNum)!;
+      return byName(x);
+    }
+    return null;
+  };
 
   return {
     ALL: signals,
     GROUPS,
     byId: (id) => byIdMap.get(id) ?? null,
+    byName,
+    resolve,
   };
 }
