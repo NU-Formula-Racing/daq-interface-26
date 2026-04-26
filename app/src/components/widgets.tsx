@@ -1070,9 +1070,11 @@ interface TopBarProps {
   session?: string;
   date?: string;
   right?: React.ReactNode;
+  /** Slot for extra navigation, rendered immediately after the LIVE/REPLAY toggle. */
+  nav?: React.ReactNode;
   compact?: boolean;
 }
-export function TopBar({ mode, onMode, title = 'NFR · DAQ', session = 'Session #17', date = '2026-04-21', right, compact }: TopBarProps) {
+export function TopBar({ mode, onMode, title = 'NFR · DAQ', session = 'Session #17', date = '2026-04-21', right, nav, compact }: TopBarProps) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 12,
@@ -1100,6 +1102,8 @@ export function TopBar({ mode, onMode, title = 'NFR · DAQ', session = 'Session 
           </button>
         ))}
       </div>
+
+      {nav}
 
       <div style={{ flex: 1 }} />
 

@@ -1,11 +1,13 @@
 // Direction 1 v2: DOCK — full-bleed prototype.
 // Widgets live in a 12-col grid; draggable + resizable. Layout persists to localStorage.
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCatalog } from './SignalsProvider.tsx';
 import { COLORS as SH_COLORS } from './colors.ts';
 import {
   SignalChip,
   Timeline,
+  TopBar,
   WidgetShell,
   WidgetIcon,
   WIDGET_TYPES,
@@ -196,9 +198,71 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
   // maxRow retained for parity with the original even if unused in JSX.
   void Math.max(12, ...widgets.map((w) => w.row + w.h - 1), (hoverCell?.row || 0) + (hoverCell?.h || 0) - 1);
 
+  const navigate = useNavigate();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [dbcStatus, setDbcStatus] = useState<string>('');
+  const onPickDbc = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    e.target.value = '';
+    if (!f) return;
+    setDbcStatus('Uploading…');
+    try {
+      const text = await f.text();
+      const res = await fetch('/api/dbc/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/csv' },
+        body: text,
+      });
+      if (!res.ok) {
+        setDbcStatus(`Failed: ${(await res.text()).slice(0, 60)}`);
+        return;
+      }
+      setDbcStatus('Reloading…');
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (err) {
+      setDbcStatus(`Error: ${String(err)}`);
+    }
+  };
+
   return (
     <FramesCtx.Provider value={frames ?? null}>
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: SH_COLORS.bgInner, fontFamily: '"Inter", system-ui, sans-serif' }}>
+      <TopBar
+        mode={mode}
+        onMode={onMode}
+        title="NFR · DAQ"
+        compact
+        nav={
+          <button
+            onClick={() => navigate('/settings')}
+            title="Settings"
+            style={{
+              ...smallBtn(),
+              padding: '4px 8px',
+              fontSize: 14,
+              lineHeight: 1,
+            }}
+          >
+            ⚙
+          </button>
+        }
+        right={
+          <>
+            {dbcStatus && (
+              <span style={{ color: SH_COLORS.textMute, fontSize: 9, marginRight: 4 }}>{dbcStatus}</span>
+            )}
+            <input ref={fileRef} type="file" accept=".csv,text/csv" style={{ display: 'none' }} onChange={onPickDbc} />
+            <button onClick={() => fileRef.current?.click()} style={smallBtn()} title="Upload a new DBC CSV">↑ DBC</button>
+            <button onClick={resetLayout} style={smallBtn()} title="Reset layout to default">⟲ RESET</button>
+            {exportHref ? (
+              <a href={exportHref} download style={{ ...smallBtn(), textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }} title="Export current session as CSV">↓ EXPORT</a>
+            ) : (
+              <button style={{ ...smallBtn(), opacity: 0.4, cursor: 'not-allowed' }} title="No active session" disabled>↓ EXPORT</button>
+            )}
+          </>
+        }
+      />
+
       <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
         {/* Left rail — collapsible + resizable */}
         {railOpen ? (
@@ -243,13 +307,6 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
                 <WidgetIcon kind={wt.icon} /> <span style={{ marginLeft: 4 }}>+ {wt.label}</span>
               </button>
             ))}
-            <span style={{ width: 1, height: 14, background: SH_COLORS.border, margin: '0 4px' }} />
-            <button onClick={resetLayout} style={smallBtn()} title="Reset layout to default">⟲ RESET</button>
-            {exportHref ? (
-              <a href={exportHref} download style={{ ...smallBtn(), textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }} title="Export current session as CSV">↓ EXPORT</a>
-            ) : (
-              <button style={{ ...smallBtn(), opacity: 0.4, cursor: 'not-allowed' }} title="No active session" disabled>↓ EXPORT</button>
-            )}
           </div>
 
           {/* Grid */}
