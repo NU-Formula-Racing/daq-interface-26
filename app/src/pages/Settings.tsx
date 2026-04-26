@@ -109,8 +109,8 @@ export default function Settings() {
 
   return (
     <div className="p-8 overflow-auto h-full font-mono text-xs text-[color:var(--color-text)]">
-      <div className="flex flex-wrap gap-10 items-start">
-        <div className="max-w-2xl space-y-6 flex-1 min-w-[420px]">
+      <div className="flex gap-10 items-start">
+        <div className="space-y-6 flex-1 min-w-0 max-w-2xl">
         <Link
           to="/"
           className="inline-flex items-center gap-2 text-[10px] tracking-widest text-[color:var(--color-text-mute)] hover:text-[color:var(--color-text)]"
@@ -228,7 +228,7 @@ export default function Settings() {
           )}
         </div>
 
-        <div className="space-y-6 flex-shrink-0" style={{ minWidth: 760 }}>
+        <div className="space-y-6 flex-shrink-0">
           <Section title="Activity">
             <ActivityHeatmap />
           </Section>

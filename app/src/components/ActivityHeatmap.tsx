@@ -12,9 +12,8 @@ interface ActivityResponse {
   days: DayCount[];
 }
 
-const CELL = 12;
-const GAP = 3;
-const WEEKS = 53;
+const CELL = 11;
+const GAP = 2;
 const DAYS = 7;
 
 // Five-step ramp from "no activity" to "very busy" — accent purple at the top.
@@ -36,60 +35,81 @@ function bucket(count: number): number {
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+function isoDate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 export function ActivityHeatmap() {
   const [data, setData] = useState<ActivityResponse | null>(null);
 
+  // Fetch the current year's data. Server defaults are last-53-weeks; we
+  // pass explicit `from`/`to` so the response matches the rendered range.
+  const year = new Date().getFullYear();
   useEffect(() => {
-    apiGet<ActivityResponse>('/api/db/activity').then(setData).catch(() => setData(null));
-  }, []);
+    apiGet<ActivityResponse>('/api/db/activity', {
+      from: `${year}-01-01`,
+      to: `${year}-12-31`,
+    })
+      .then(setData)
+      .catch(() => setData(null));
+  }, [year]);
 
-  // Build a 53-week × 7-day grid ending today, with each cell tagged with its
-  // ISO date and session count. Empty days get count=0.
-  const grid = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    // End column = current week. Snap to Saturday so the last column is always full.
-    const endOfWeek = new Date(today);
-    endOfWeek.setDate(today.getDate() + (6 - today.getDay()));
-    const start = new Date(endOfWeek);
-    start.setDate(start.getDate() - (WEEKS * DAYS - 1));
+  // Build the calendar grid:
+  //   - First column = the Sunday on/before Jan 1 of the current year
+  //   - Last column = the Saturday on/after Dec 31 of the current year
+  //   - Cells outside [Jan 1, Dec 31] are rendered as empty placeholders.
+  const { grid, monthLabels } = useMemo(() => {
+    const yearStart = new Date(year, 0, 1);
+    const yearEnd = new Date(year, 11, 31);
+
+    const firstSunday = new Date(yearStart);
+    firstSunday.setDate(firstSunday.getDate() - firstSunday.getDay());
+    const lastSaturday = new Date(yearEnd);
+    lastSaturday.setDate(lastSaturday.getDate() + (6 - lastSaturday.getDay()));
+
+    const totalDays =
+      Math.round((lastSaturday.getTime() - firstSunday.getTime()) / 86_400_000) + 1;
+    const weeks = totalDays / DAYS;
 
     const counts = new Map<string, number>();
-    if (data) {
-      for (const d of data.days) counts.set(d.day, d.sessions);
-    }
+    if (data) for (const d of data.days) counts.set(d.day, d.sessions);
 
-    const cells: { date: Date; day: string; count: number }[][] = [];
-    for (let w = 0; w < WEEKS; w++) {
-      const week: { date: Date; day: string; count: number }[] = [];
+    const cells: { date: Date; day: string; count: number; inYear: boolean }[][] = [];
+    for (let w = 0; w < weeks; w++) {
+      const week: { date: Date; day: string; count: number; inYear: boolean }[] = [];
       for (let d = 0; d < DAYS; d++) {
-        const idx = w * DAYS + d;
-        const date = new Date(start);
-        date.setDate(start.getDate() + idx);
-        const iso = date.toISOString().slice(0, 10);
-        week.push({ date, day: iso, count: counts.get(iso) ?? 0 });
+        const date = new Date(firstSunday);
+        date.setDate(firstSunday.getDate() + w * DAYS + d);
+        const iso = isoDate(date);
+        const inYear = date.getFullYear() === year;
+        week.push({ date, day: iso, count: inYear ? counts.get(iso) ?? 0 : 0, inYear });
       }
       cells.push(week);
     }
-    return cells;
-  }, [data]);
 
-  // Month labels — show a label when the first day of the week is in a new month.
-  const monthLabels = useMemo(() => {
+    // Month labels — show on the first week where Sunday is in a new month
+    // AND that month is the year we're rendering.
     const seen = new Set<number>();
-    return grid.map((week, wi) => {
-      const m = week[0].date.getMonth();
+    const labels = cells.map((week, wi) => {
+      const first = week.find((c) => c.inYear);
+      if (!first) return { wi, label: '' };
+      const m = first.date.getMonth();
       if (seen.has(m)) return { wi, label: '' };
       seen.add(m);
-      // Skip showing "Jan" twice if the year starts mid-grid; the Set guards that.
       return { wi, label: MONTHS[m] };
     });
-  }, [grid]);
+
+    return { grid: cells, monthLabels: labels };
+  }, [data, year]);
 
   const totalSessions = useMemo(
     () => grid.flat().reduce((acc, c) => acc + c.count, 0),
     [grid],
   );
+  const totalWeeks = grid.length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -98,28 +118,28 @@ export function ActivityHeatmap() {
         fontFamily: '"JetBrains Mono", monospace',
       }}>
         <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>
-          {totalSessions.toLocaleString()} sessions in the last year
+          {totalSessions.toLocaleString()} sessions in {year}
         </span>
       </div>
 
-      {/* Grid */}
       <div style={{ display: 'inline-flex', flexDirection: 'column', gap: 4 }}>
         {/* Month labels row */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(${WEEKS}, ${CELL}px)`,
+          gridTemplateColumns: `repeat(${totalWeeks}, ${CELL}px)`,
           columnGap: GAP,
           fontFamily: '"JetBrains Mono", monospace',
           fontSize: 9,
           color: 'rgba(255,255,255,0.5)',
           height: 12,
+          paddingLeft: 14, // align with cells (after dow column)
         }}>
           {monthLabels.map((m) => (
             <span key={m.wi} style={{ whiteSpace: 'nowrap' }}>{m.label}</span>
           ))}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
           {/* Day-of-week labels */}
           <div style={{
             display: 'grid',
@@ -128,7 +148,6 @@ export function ActivityHeatmap() {
             fontFamily: '"JetBrains Mono", monospace',
             fontSize: 9,
             color: 'rgba(255,255,255,0.4)',
-            paddingTop: 1,
           }}>
             {['', 'M', '', 'W', '', 'F', ''].map((l, i) => (
               <span key={i} style={{ height: CELL, lineHeight: `${CELL}px` }}>{l}</span>
@@ -138,20 +157,28 @@ export function ActivityHeatmap() {
           {/* Cells */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: `repeat(${WEEKS}, ${CELL}px)`,
+            gridTemplateColumns: `repeat(${totalWeeks}, ${CELL}px)`,
             gridAutoFlow: 'column',
             columnGap: GAP,
             rowGap: GAP,
           }}>
             {grid.flat().map((cell) => {
-              const inFuture = cell.date > new Date();
+              if (!cell.inYear) {
+                // Placeholder so column alignment stays correct, but invisible.
+                return (
+                  <div
+                    key={cell.day}
+                    style={{ width: CELL, height: CELL, background: 'transparent' }}
+                  />
+                );
+              }
               return (
                 <div
                   key={cell.day}
                   title={`${cell.day} — ${cell.count} session${cell.count === 1 ? '' : 's'}`}
                   style={{
                     width: CELL, height: CELL,
-                    background: inFuture ? 'transparent' : COLORS[bucket(cell.count)],
+                    background: COLORS[bucket(cell.count)],
                     borderRadius: 2,
                     border: cell.count === 0 ? '1px solid rgba(255,255,255,0.04)' : 'none',
                   }}
