@@ -106,7 +106,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     await app.register(fastifyStatic, {
       root: staticRoot,
       prefix: '/',
-      wildcard: false,
+      wildcard: true,
       setHeaders: (reply: any) => {
         reply.setHeader('Cache-Control', 'no-cache');
       },
