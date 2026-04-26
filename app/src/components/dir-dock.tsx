@@ -8,7 +8,6 @@ import {
   Timeline,
   WidgetShell,
   WidgetIcon,
-  TopBar,
   WIDGET_TYPES,
 } from './widgets.tsx';
 import type { Signal } from '../signals/catalog.ts';
@@ -200,17 +199,6 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
   return (
     <FramesCtx.Provider value={frames ?? null}>
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: SH_COLORS.bgInner, fontFamily: '"Inter", system-ui, sans-serif' }}>
-      <TopBar mode={mode} onMode={onMode} title="NFR · DAQ" compact right={
-        <>
-          <button onClick={resetLayout} style={smallBtn()}>⟲ RESET</button>
-          {exportHref ? (
-            <a href={exportHref} download style={{ ...smallBtn(), textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>↓ EXPORT</a>
-          ) : (
-            <button style={{ ...smallBtn(), opacity: 0.4, cursor: 'not-allowed' }} title="No active session" disabled>↓ EXPORT</button>
-          )}
-        </>
-      } />
-
       <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
         {/* Left rail — collapsible + resizable */}
         {railOpen ? (
@@ -255,6 +243,13 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
                 <WidgetIcon kind={wt.icon} /> <span style={{ marginLeft: 4 }}>+ {wt.label}</span>
               </button>
             ))}
+            <span style={{ width: 1, height: 14, background: SH_COLORS.border, margin: '0 4px' }} />
+            <button onClick={resetLayout} style={smallBtn()} title="Reset layout to default">⟲ RESET</button>
+            {exportHref ? (
+              <a href={exportHref} download style={{ ...smallBtn(), textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }} title="Export current session as CSV">↓ EXPORT</a>
+            ) : (
+              <button style={{ ...smallBtn(), opacity: 0.4, cursor: 'not-allowed' }} title="No active session" disabled>↓ EXPORT</button>
+            )}
           </div>
 
           {/* Grid */}

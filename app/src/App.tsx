@@ -1,10 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { apiGet } from './api/client.ts';
+import { useLiveStatus } from './hooks/useLiveStatus.ts';
+import { NFRMark } from './components/widgets.tsx';
+
+const NAV: Array<[string, string]> = [
+  ['/', 'LIVE'],
+  ['/sessions', 'SESSIONS'],
+  ['/settings', 'SETTINGS'],
+];
 
 export default function App() {
   const nav = useNavigate();
   const loc = useLocation();
+  const status = useLiveStatus();
   const fileRef = useRef<HTMLInputElement>(null);
   const [dbcStatus, setDbcStatus] = useState<string>('');
 
@@ -43,55 +52,97 @@ export default function App() {
     }
   };
 
+  const liveDot =
+    status.basestation === 'connected' ? '#7ec98f' : '#e06c6c';
+  const liveText =
+    status.basestation === 'connected'
+      ? status.session_id
+        ? `RECORDING · ${status.session_id.slice(0, 8)}`
+        : 'CONNECTED'
+      : 'DISCONNECTED';
+
   return (
     <div className="h-full flex flex-col">
-      <header className="h-10 flex items-center gap-4 px-4 border-b border-[color:var(--color-border)]">
-        <span className="font-mono text-xs tracking-widest text-[color:var(--color-text-mute)]">
-          NFR · LOCAL
-        </span>
-        <nav className="flex gap-2 text-xs font-mono">
-          {[
-            ['/', 'LIVE'],
-            ['/sessions', 'SESSIONS'],
-            ['/settings', 'SETTINGS'],
-          ].map(([to, label]) => (
+      <header
+        style={{
+          display: 'flex', alignItems: 'center', gap: 16,
+          padding: '8px 16px',
+          background: '#1e1f22',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          fontFamily: '"JetBrains Mono", monospace',
+          fontSize: 11, flexShrink: 0,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <NFRMark />
+          <span style={{ color: '#dfe1e5', letterSpacing: 1.2, fontWeight: 600 }}>
+            NFR · DAQ
+          </span>
+        </div>
+
+        <nav style={{ display: 'flex', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 2, overflow: 'hidden' }}>
+          {NAV.map(([to, label]) => (
             <NavLink
               key={to}
               to={to}
               end={to === '/'}
-              className={({ isActive }) =>
-                `px-2 py-1 rounded-sm ${
-                  isActive
-                    ? 'bg-[color:var(--color-accent)]/30 text-[color:var(--color-text)]'
-                    : 'text-[color:var(--color-text-mute)] hover:text-[color:var(--color-text)]'
-                }`
-              }
+              style={({ isActive }) => ({
+                padding: '4px 12px',
+                background: isActive ? 'rgba(167,139,250,0.18)' : 'transparent',
+                color: isActive ? '#dfe1e5' : 'rgba(255,255,255,0.5)',
+                fontFamily: '"JetBrains Mono", monospace',
+                fontSize: 10, letterSpacing: 1, cursor: 'pointer',
+                textTransform: 'uppercase', textDecoration: 'none',
+              })}
             >
               {label}
             </NavLink>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-3">
-          {dbcStatus && (
-            <span className="font-mono text-[10px] text-[color:var(--color-text-mute)]">{dbcStatus}</span>
+
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'rgba(255,255,255,0.6)' }}>
+          <span style={{
+            width: 6, height: 6, borderRadius: '50%', background: liveDot,
+            boxShadow: status.basestation === 'connected' ? `0 0 6px ${liveDot}` : 'none',
+          }} />
+          <span style={{ fontSize: 10, letterSpacing: 1 }}>{liveText}</span>
+          {status.port && status.basestation === 'connected' && (
+            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', marginLeft: 4 }}>
+              {status.port.length > 50 ? '…' + status.port.slice(-47) : status.port}
+            </span>
           )}
-          <input
-            ref={fileRef}
-            type="file"
-            accept=".csv,text/csv"
-            style={{ display: 'none' }}
-            onChange={onPickFile}
-          />
-          <button
-            onClick={() => fileRef.current?.click()}
-            className="px-2 py-1 text-xs font-mono tracking-widest text-[color:var(--color-text-mute)] hover:text-[color:var(--color-text)] border border-[color:var(--color-border)]"
-            title="Upload a new DBC CSV"
-          >
-            📄 IMPORT DBC
-          </button>
-        </div>
+        </span>
+
+        <span style={{ flex: 1 }} />
+
+        {dbcStatus && (
+          <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10 }}>{dbcStatus}</span>
+        )}
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".csv,text/csv"
+          style={{ display: 'none' }}
+          onChange={onPickFile}
+        />
+        <button
+          onClick={() => fileRef.current?.click()}
+          style={{
+            padding: '4px 10px',
+            background: 'transparent',
+            border: '1px solid rgba(255,255,255,0.08)',
+            color: 'rgba(255,255,255,0.6)',
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: 10, letterSpacing: 1, cursor: 'pointer',
+            textTransform: 'uppercase',
+          }}
+          title="Upload a new DBC CSV"
+        >
+          ↑ IMPORT DBC
+        </button>
       </header>
-      <main className="flex-1 min-h-0">
+
+      <main style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <Outlet />
       </main>
     </div>
