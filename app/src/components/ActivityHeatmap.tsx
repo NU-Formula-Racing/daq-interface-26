@@ -104,15 +104,15 @@ export function ActivityHeatmap() {
     return { weeks: out, totalSessions: total };
   }, [data, year]);
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '4px 6px' }}>
-      <span style={{
-        fontFamily: '"JetBrains Mono", monospace',
-        fontSize: 11, color: 'rgba(255,255,255,0.6)',
-      }}>
-        {totalSessions.toLocaleString()} sessions in {year}
-      </span>
+  // Split into two columns at the first July week so months 1-6 land left,
+  // 7-12 land right. Falls back to a midpoint split if July isn't reached.
+  const splitIndex = useMemo(() => {
+    const idx = weeks.findIndex((w) => w.monthBoundary === 6); // July = month index 6
+    return idx > 0 ? idx : Math.ceil(weeks.length / 2);
+  }, [weeks]);
 
+  const renderColumn = (wks: typeof weeks, keyPrefix: string) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {/* Header: day-of-week labels */}
       <div style={{
         display: 'grid',
@@ -121,7 +121,6 @@ export function ActivityHeatmap() {
         fontFamily: '"JetBrains Mono", monospace',
         fontSize: 10,
         color: 'rgba(255,255,255,0.5)',
-        marginBottom: 6,
       }}>
         <span />
         {DOW.map((d, i) => (
@@ -129,11 +128,10 @@ export function ActivityHeatmap() {
         ))}
       </div>
 
-      {/* Weeks — one row each */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
-        {weeks.map((wk, wi) => (
+        {wks.map((wk, wi) => (
           <div
-            key={wi}
+            key={`${keyPrefix}-${wi}`}
             style={{
               display: 'grid',
               gridTemplateColumns: `${LABEL_COL}px repeat(${DAYS}, ${CELL}px)`,
@@ -173,6 +171,22 @@ export function ActivityHeatmap() {
             })}
           </div>
         ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '4px 6px' }}>
+      <span style={{
+        fontFamily: '"JetBrains Mono", monospace',
+        fontSize: 11, color: 'rgba(255,255,255,0.6)',
+      }}>
+        {totalSessions.toLocaleString()} sessions in {year}
+      </span>
+
+      <div style={{ display: 'flex', gap: 28, alignItems: 'flex-start' }}>
+        {renderColumn(weeks.slice(0, splitIndex), 'h1')}
+        {renderColumn(weeks.slice(splitIndex), 'h2')}
       </div>
 
       {/* Legend */}
