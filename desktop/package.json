@@ -8,7 +8,7 @@
     "test:watch": "vitest",
     "dev:server": "tsx main/src/index.ts",
     "typecheck": "tsc --noEmit",
-    "build:main": "esbuild main/src/electron-main.ts --bundle --platform=node --format=cjs --outfile=main/dist/electron-main.cjs --external:electron --external:pg-native",
+    "build:main": "node build/build-main.js",
     "package": "npm run build:main && electron-builder --mac dmg --publish=never"
   },
   "dependencies": {
