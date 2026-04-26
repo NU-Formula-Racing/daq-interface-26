@@ -54,6 +54,7 @@ export default function Live() {
             density="compact"
             graphStyle="line"
             frames={frames}
+            exportHref={status.session_id ? `/api/sessions/${status.session_id}/export.csv` : null}
           />
         </div>
       </div>

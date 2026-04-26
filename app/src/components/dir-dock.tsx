@@ -63,6 +63,7 @@ function loadLayout(): any[] {
 }
 
 interface DockDirectionProps {
+  exportHref?: string | null;
   t: number;
   onT: (t: number) => void;
   mode: 'live' | 'replay';
@@ -73,7 +74,7 @@ interface DockDirectionProps {
   frames?: FramesStore;
 }
 
-export function DockDirection({ t, mode, onMode, onT, duration, density, graphStyle, frames }: DockDirectionProps) {
+export function DockDirection({ t, mode, onMode, onT, duration, density, graphStyle, frames, exportHref }: DockDirectionProps) {
   const [widgets, setWidgets] = useState<any[]>(loadLayout);
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
   const [focusedId, setFocusedId] = useState<string | null>(null);
@@ -202,7 +203,11 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
       <TopBar mode={mode} onMode={onMode} title="NFR · DAQ" compact right={
         <>
           <button onClick={resetLayout} style={smallBtn()}>⟲ RESET</button>
-          <button style={smallBtn()}>↓ EXPORT</button>
+          {exportHref ? (
+            <a href={exportHref} download style={{ ...smallBtn(), textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>↓ EXPORT</a>
+          ) : (
+            <button style={{ ...smallBtn(), opacity: 0.4, cursor: 'not-allowed' }} title="No active session" disabled>↓ EXPORT</button>
+          )}
         </>
       } />
 

@@ -13,6 +13,7 @@ import { registerSignalRoutes } from './routes/signals.ts';
 import { registerWebSockets } from './ws.ts';
 import { registerLiveRoutes } from './routes/live.ts';
 import { registerSyncRoutes, type CloudPusherFactory } from './routes/sync.ts';
+import { registerExportRoutes } from './routes/export.ts';
 import { registerSetupRoutes, type SetupState } from './routes/setup.ts';
 import { registerDbcRoutes } from './routes/dbc.ts';
 
@@ -82,6 +83,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
 
     registerSessionRoutes(app, pool);
     registerSignalRoutes(app, pool);
+    registerExportRoutes(app, pool);
     registerSyncRoutes(app, pool, opts.cloudPusherFactory);
     if (opts.dbcStorePath && opts.onDbcChanged) {
       registerDbcRoutes(app, {

@@ -79,6 +79,7 @@ export default function Replay() {
             density="compact"
             graphStyle="line"
             frames={store}
+            exportHref={id ? `/api/sessions/${id}/export.csv` : null}
           />
         </div>
       </div>
