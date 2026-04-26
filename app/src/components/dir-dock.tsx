@@ -906,6 +906,9 @@ function SessionPicker() {
     d.setDate(1);
     return d;
   });
+  // Track whether we've auto-jumped the cursor for this open session so we
+  // don't override the user's manual ‹ › navigation.
+  const autoJumpedRef = useRef(false);
 
   useEffect(() => {
     if (!open) return;
@@ -920,8 +923,27 @@ function SessionPicker() {
 
   // Reset drill-in state on close.
   useEffect(() => {
-    if (!open) setSelectedDate(null);
+    if (!open) {
+      setSelectedDate(null);
+      autoJumpedRef.current = false;
+    }
   }, [open]);
+
+  // First time we have sessions for this open session, jump the cursor to the
+  // latest month that contains an sd_import session (so users land on data).
+  useEffect(() => {
+    if (!open || autoJumpedRef.current || sessions === null) return;
+    const sd = sessions.filter((s) => s.source === 'sd_import');
+    if (sd.length === 0) {
+      autoJumpedRef.current = true;
+      return;
+    }
+    const latest = sd.reduce((acc, s) => (s.date > acc ? s.date : acc), sd[0].date);
+    // latest is YYYY-MM-DD
+    const [y, m] = latest.split('-').map((x) => parseInt(x, 10));
+    if (y && m) setCursor(new Date(y, m - 1, 1));
+    autoJumpedRef.current = true;
+  }, [open, sessions]);
 
   // Filter to SD imports only — live sessions are excluded from the picker.
   const sdSessions = useMemo(
