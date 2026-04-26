@@ -948,7 +948,6 @@ interface WidgetShellProps {
 }
 export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick }: WidgetShellProps) {
   const [typeOpen, setTypeOpen] = useState(false);
-  const [sigOpen, setSigOpen] = useState(false);
   const compact = density === 'compact';
 
   const renderBody = () => {
@@ -961,8 +960,6 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
       default: return <EmptySlot label="Pick a type" />;
     }
   };
-
-  const multi = widget.type === 'graph' || widget.type === 'bar' || widget.type === 'heatmap';
 
   return (
     <div style={{
@@ -982,7 +979,7 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
       }}>
         {/* Type selector */}
         <div style={{ position: 'relative' }}>
-          <button onClick={(e) => { e.stopPropagation(); setTypeOpen((o) => !o); setSigOpen(false); }} style={headerBtn()}>
+          <button onClick={(e) => { e.stopPropagation(); setTypeOpen((o) => !o); }} style={headerBtn()}>
             <WidgetIcon kind={WIDGET_TYPES.find((x) => x.id === widget.type)?.icon} />
             <span>{(widget.type as string).toUpperCase()}</span>
             <span style={{ opacity: 0.5 }}>▾</span>
@@ -1005,9 +1002,9 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
         {/* Signal chips */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 1, overflow: 'hidden', flexWrap: 'nowrap' }}>
           {widget.signals.length === 0 && (
-            <button onClick={(e) => { e.stopPropagation(); setSigOpen(true); setTypeOpen(false); }} style={{ ...headerBtn(), color: SH_COLORS.textMute }}>
-              + signal
-            </button>
+            <span style={{ color: SH_COLORS.textFaint, fontSize: 10, fontStyle: 'italic', padding: '2px 5px' }}>
+              (focus to add signal)
+            </span>
           )}
           {widget.signals.slice(0, compact ? 2 : 4).map((sid: any) => (
             <SignalChip key={sid} sigId={sid} size="xs"
@@ -1016,37 +1013,10 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
           {widget.signals.length > (compact ? 2 : 4) && (
             <span style={{ color: SH_COLORS.textMute, fontSize: 10 }}>+{widget.signals.length - (compact ? 2 : 4)}</span>
           )}
-          {widget.signals.length > 0 && (
-            <button onClick={(e) => { e.stopPropagation(); setSigOpen(true); setTypeOpen(false); }}
-              style={{ ...headerBtn(), padding: '2px 5px', color: SH_COLORS.textMute }} title={multi ? 'Add signal' : 'Change signal'}>
-              {multi ? '+' : '↔'}
-            </button>
-          )}
         </div>
 
         {onRemove && (
           <button onClick={(e) => { e.stopPropagation(); onRemove(); }} style={{ ...headerBtn(), color: SH_COLORS.textFaint, padding: '2px 5px' }} title="Remove">×</button>
-        )}
-
-        {/* Signal picker popover */}
-        {sigOpen && (
-          <>
-            <div onClick={() => setSigOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 50 }} />
-            <div style={{ position: 'absolute', top: '100%', left: 0, width: 280, maxWidth: '90vw', height: 360, zIndex: 51, boxShadow: '0 8px 24px rgba(0,0,0,0.5)', border: `1px solid ${SH_COLORS.border}`, background: SH_COLORS.bg }}>
-              <SignalPicker
-                selected={widget.signals}
-                onPick={(sid) => {
-                  if (multi) {
-                    if (widget.signals.includes(sid)) return;
-                    onChange({ ...widget, signals: [...widget.signals, sid] });
-                  } else {
-                    onChange({ ...widget, signals: [sid] });
-                    setSigOpen(false);
-                  }
-                }}
-              />
-            </div>
-          </>
         )}
       </div>
 

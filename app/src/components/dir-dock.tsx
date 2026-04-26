@@ -59,6 +59,8 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
   const [widgets, setWidgets] = useState<any[]>(loadLayout);
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
   const [focusedId, setFocusedId] = useState<string | null>(null);
+  const [inspectorQuery, setInspectorQuery] = useState('');
+  useEffect(() => { setInspectorQuery(''); }, [focusedId]);
   const [favorites, setFavorites] = useState<any[]>(() => {
     try { return JSON.parse(localStorage.getItem('nfr-favs') || '[]'); } catch { return []; }
   });
@@ -305,11 +307,36 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
                 <Row label="GRID" value={`${w.col},${w.row} · ${w.w}×${w.h}`} />
                 <div>
                   <div style={{ marginBottom: 5, letterSpacing: 1.2 }}>SIGNALS</div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 6 }}>
+                    {w.signals.length === 0 && (
+                      <span style={{ fontSize: 9, color: SH_COLORS.textFaint, fontStyle: 'italic' }}>
+                        none — search below to add
+                      </span>
+                    )}
                     {w.signals.map((s: any) => (
-                      <SignalChip key={s} sigId={s} size="xs" onRemove={() => patch(w.id, { ...w, signals: w.signals.filter((x: any) => x !== s) })} />
+                      <SignalChip
+                        key={s}
+                        sigId={s}
+                        size="xs"
+                        onRemove={() => patch(w.id, { signals: w.signals.filter((x: any) => x !== s) })}
+                      />
                     ))}
                   </div>
+                  <InspectorSignalAdder
+                    widget={w}
+                    query={inspectorQuery}
+                    onQueryChange={setInspectorQuery}
+                    onAdd={(sid) => {
+                      const multi = w.type === 'graph' || w.type === 'bar' || w.type === 'heatmap';
+                      if (multi) {
+                        if (w.signals.includes(sid)) return;
+                        patch(w.id, { signals: [...w.signals, sid] });
+                      } else {
+                        patch(w.id, { signals: [sid] });
+                      }
+                      setInspectorQuery('');
+                    }}
+                  />
                 </div>
                 {w.type === 'graph' && (
                   <>
@@ -371,6 +398,100 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
       <Timeline t={t} onChange={onT} duration={duration} mode={mode} compact />
     </div>
     </FramesCtx.Provider>
+  );
+}
+
+function InspectorSignalAdder({
+  widget,
+  query,
+  onQueryChange,
+  onAdd,
+}: {
+  widget: any;
+  query: string;
+  onQueryChange: (q: string) => void;
+  onAdd: (sid: any) => void;
+}) {
+  const catalog = useCatalog();
+  const q = query.trim().toLowerCase();
+  const matches = q
+    ? catalog.ALL.filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.groupName.toLowerCase().includes(q),
+      ).slice(0, 8)
+    : [];
+
+  return (
+    <div>
+      <input
+        value={query}
+        onChange={(e) => onQueryChange(e.target.value)}
+        placeholder="Search signals to add…"
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '5px 8px',
+          background: SH_COLORS.bgInner,
+          border: `1px solid ${SH_COLORS.border}`,
+          color: SH_COLORS.text,
+          fontFamily: '"JetBrains Mono", monospace',
+          fontSize: 10,
+          outline: 'none',
+          borderRadius: 2,
+        }}
+      />
+      {matches.length > 0 && (
+        <div
+          style={{
+            marginTop: 4,
+            border: `1px solid ${SH_COLORS.border}`,
+            background: SH_COLORS.bgInner,
+            maxHeight: 220,
+            overflow: 'auto',
+          }}
+        >
+          {matches.map((s) => {
+            const already = widget.signals.includes(s.id);
+            return (
+              <div
+                key={s.id}
+                onClick={() => {
+                  if (already) return;
+                  onAdd(s.id);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '4px 8px',
+                  cursor: already ? 'default' : 'pointer',
+                  opacity: already ? 0.4 : 1,
+                  borderBottom: `1px solid ${SH_COLORS.border}`,
+                  fontFamily: '"JetBrains Mono", monospace',
+                  fontSize: 10,
+                  color: SH_COLORS.text,
+                }}
+              >
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: s.color,
+                    boxShadow: `0 0 4px ${s.color}`,
+                    flexShrink: 0,
+                  }}
+                />
+                <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
+                <span style={{ color: SH_COLORS.textFaint, fontSize: 9 }}>{s.groupName}</span>
+                {already && <span style={{ color: SH_COLORS.textFaint, fontSize: 9 }}>added</span>}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
 
