@@ -580,38 +580,62 @@ export function DockDirection({ t, mode, onMode, onT, duration, density, graphSt
                 style={{ color: SH_COLORS.textFaint, cursor: 'pointer', userSelect: 'none' }}
               >×</span>
             </div>
-            <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ fontSize: 11, color: SH_COLORS.textMute, lineHeight: 1.5 }}>
-                Pick one or more .nfr binaries, or point at a folder. Each file becomes
-                a session in the database.
+            <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
+              <div style={{
+                fontSize: 12, color: SH_COLORS.textMute, lineHeight: 1.6,
+                fontFamily: '"Inter", system-ui, sans-serif',
+                marginBottom: 4,
+              }}>
+                Pick one or more .nfr binaries, or point at a folder. Each
+                file becomes a session in the database.
               </div>
               <button
                 onClick={() => { setNfrModalOpen(false); nfrFileRef.current?.click(); }}
                 style={{
-                  ...smallBtn(),
-                  padding: '10px 12px',
+                  display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+                  gap: 6, padding: '16px 18px',
+                  background: 'transparent',
+                  border: `1px solid ${SH_COLORS.border}`,
+                  borderRadius: 2,
+                  color: SH_COLORS.text,
                   textAlign: 'left',
-                  fontSize: 11,
+                  cursor: 'pointer',
+                  fontFamily: '"JetBrains Mono", monospace',
                 }}
               >
-                <div style={{ fontWeight: 600, letterSpacing: 1 }}>SINGLE FILE</div>
-                <div style={{ fontSize: 10, color: SH_COLORS.textMute, marginTop: 2 }}>
-                  Pick one or more .nfr files (multi-select)
-                </div>
+                <span style={{ fontSize: 16, fontWeight: 600, letterSpacing: 2 }}>SINGLE FILE</span>
+                <span style={{
+                  fontSize: 11, color: SH_COLORS.textMute,
+                  fontFamily: '"Inter", system-ui, sans-serif',
+                  textTransform: 'none',
+                  letterSpacing: 0,
+                }}>
+                  Pick one or more .nfr files
+                </span>
               </button>
               <button
                 onClick={() => { setNfrModalOpen(false); nfrFolderRef.current?.click(); }}
                 style={{
-                  ...smallBtn(),
-                  padding: '10px 12px',
+                  display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+                  gap: 6, padding: '16px 18px',
+                  background: 'transparent',
+                  border: `1px solid ${SH_COLORS.border}`,
+                  borderRadius: 2,
+                  color: SH_COLORS.text,
                   textAlign: 'left',
-                  fontSize: 11,
+                  cursor: 'pointer',
+                  fontFamily: '"JetBrains Mono", monospace',
                 }}
               >
-                <div style={{ fontWeight: 600, letterSpacing: 1 }}>FOLDER</div>
-                <div style={{ fontSize: 10, color: SH_COLORS.textMute, marginTop: 2 }}>
+                <span style={{ fontSize: 16, fontWeight: 600, letterSpacing: 2 }}>FOLDER</span>
+                <span style={{
+                  fontSize: 11, color: SH_COLORS.textMute,
+                  fontFamily: '"Inter", system-ui, sans-serif',
+                  textTransform: 'none',
+                  letterSpacing: 0,
+                }}>
                   Pick a directory; every .nfr inside gets imported
-                </div>
+                </span>
               </button>
             </div>
           </div>
