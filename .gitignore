@@ -156,3 +156,4 @@ parser/*.spec
 # Local app (Vite scaffold)
 app/node_modules/
 app/dist/
+parser/active-dbc.csv
