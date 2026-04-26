@@ -175,6 +175,7 @@ export async function run(opts: {
     staticRoot: opts.staticRoot,
     dbcStorePath: DBC_STORE_PATH,
     onDbcChanged: restartParser,
+    dsn,
   });
   await app.listen({ port, host });
 

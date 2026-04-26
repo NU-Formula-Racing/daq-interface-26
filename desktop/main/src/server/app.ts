@@ -16,6 +16,7 @@ import { registerSyncRoutes, type CloudPusherFactory } from './routes/sync.ts';
 import { registerExportRoutes } from './routes/export.ts';
 import { registerSetupRoutes, type SetupState } from './routes/setup.ts';
 import { registerDbcRoutes } from './routes/dbc.ts';
+import { registerDbAdminRoutes } from './routes/db_admin.ts';
 
 export interface BuildAppOptions {
   pool: pg.Pool | null;
@@ -27,13 +28,14 @@ export interface BuildAppOptions {
   staticRoot?: string;
   dbcStorePath?: string;
   onDbcChanged?: () => Promise<void>;
+  dsn?: string;
 }
 
 export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> {
   const app = Fastify({ logger: opts.logger ?? false });
 
   app.addContentTypeParser(
-    ['text/csv', 'text/plain'],
+    ['text/csv', 'text/plain', 'application/sql'],
     { parseAs: 'string' },
     (_req, body, done) => done(null, body),
   );
@@ -91,6 +93,9 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
         storePath: opts.dbcStorePath,
         onDbcChanged: opts.onDbcChanged,
       });
+    }
+    if (opts.dsn) {
+      registerDbAdminRoutes(app, { pool: opts.pool, dsn: opts.dsn });
     }
   }
 
