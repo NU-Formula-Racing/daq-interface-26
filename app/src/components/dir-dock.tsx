@@ -910,16 +910,15 @@ function SessionPicker() {
   // don't override the user's manual ‹ › navigation.
   const autoJumpedRef = useRef(false);
 
+  // Fetch sessions whenever (a) the dropdown opens, or (b) the current
+  // session id changes — including on initial mount when an id is in the
+  // URL. This keeps the label able to resolve `id → date` immediately.
   useEffect(() => {
-    if (!open) return;
+    if (!open && currentId === null) return;
     apiGet<Session[]>('/api/sessions')
       .then(setSessions)
       .catch(() => setSessions([]));
-  }, [open]);
-
-  useEffect(() => {
-    if (open) apiGet<Session[]>('/api/sessions').then(setSessions).catch(() => {});
-  }, [currentId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, currentId]);
 
   // Reset drill-in state on close.
   useEffect(() => {
