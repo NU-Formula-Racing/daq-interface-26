@@ -225,4 +225,38 @@ export function registerDbAdminRoutes(app: FastifyInstance, deps: DbAdminDeps) {
       database_size: r.size,
     };
   });
+
+  /**
+   * GET /api/db/activity?from=YYYY-MM-DD&to=YYYY-MM-DD
+   *
+   * Per-day session counts in the requested range (default: last 53 weeks).
+   * Used by the Settings page to render a GitHub-style activity heatmap.
+   */
+  app.get<{ Querystring: { from?: string; to?: string } }>(
+    '/api/db/activity',
+    async (req) => {
+      const today = new Date();
+      const defaultFrom = new Date(today);
+      defaultFrom.setDate(defaultFrom.getDate() - 371); // ~53 weeks
+      const from = req.query.from ?? defaultFrom.toISOString().slice(0, 10);
+      const to = req.query.to ?? today.toISOString().slice(0, 10);
+
+      const { rows } = await deps.pool.query<{
+        day: string;
+        sessions: string;
+      }>(
+        `SELECT date::text AS day, count(*)::text AS sessions
+         FROM sessions
+         WHERE date >= $1::date AND date <= $2::date
+         GROUP BY date
+         ORDER BY date`,
+        [from, to],
+      );
+      return {
+        from,
+        to,
+        days: rows.map((r) => ({ day: r.day, sessions: Number(r.sessions) })),
+      };
+    },
+  );
 }

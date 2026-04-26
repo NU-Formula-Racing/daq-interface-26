@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiGet, apiPost } from '../api/client.ts';
+import { ActivityHeatmap } from '../components/ActivityHeatmap.tsx';
 
 interface DbStats {
   sessions: number;
@@ -108,7 +109,8 @@ export default function Settings() {
 
   return (
     <div className="p-8 overflow-auto h-full font-mono text-xs text-[color:var(--color-text)]">
-      <div className="max-w-2xl space-y-6">
+      <div className="flex flex-wrap gap-10 items-start">
+        <div className="max-w-2xl space-y-6 flex-1 min-w-[420px]">
         <Link
           to="/"
           className="inline-flex items-center gap-2 text-[10px] tracking-widest text-[color:var(--color-text-mute)] hover:text-[color:var(--color-text)]"
@@ -219,11 +221,18 @@ export default function Settings() {
           </button>
         </Section>
 
-        {message && (
-          <div className="text-[11px] text-[color:var(--color-text-mute)] border border-[color:var(--color-border)] px-3 py-2">
-            {message}
-          </div>
-        )}
+          {message && (
+            <div className="text-[11px] text-[color:var(--color-text-mute)] border border-[color:var(--color-border)] px-3 py-2">
+              {message}
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-6 flex-shrink-0" style={{ minWidth: 760 }}>
+          <Section title="Activity">
+            <ActivityHeatmap />
+          </Section>
+        </div>
       </div>
     </div>
   );
