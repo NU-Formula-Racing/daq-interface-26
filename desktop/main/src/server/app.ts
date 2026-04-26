@@ -14,6 +14,7 @@ import { registerWebSockets } from './ws.ts';
 import { registerLiveRoutes } from './routes/live.ts';
 import { registerSyncRoutes, type CloudPusherFactory } from './routes/sync.ts';
 import { registerSetupRoutes, type SetupState } from './routes/setup.ts';
+import { registerDbcRoutes } from './routes/dbc.ts';
 
 export interface BuildAppOptions {
   pool: pg.Pool | null;
@@ -23,10 +24,18 @@ export interface BuildAppOptions {
   cloudPusherFactory?: CloudPusherFactory;
   setupState?: SetupState;
   staticRoot?: string;
+  dbcStorePath?: string;
+  onDbcChanged?: () => Promise<void>;
 }
 
 export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> {
   const app = Fastify({ logger: opts.logger ?? false });
+
+  app.addContentTypeParser(
+    ['text/csv', 'text/plain'],
+    { parseAs: 'string' },
+    (_req, body, done) => done(null, body),
+  );
 
   const setupState: SetupState = opts.setupState ?? {
     status: opts.pool ? 'ok' : 'not_reachable',
@@ -74,6 +83,13 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     registerSessionRoutes(app, pool);
     registerSignalRoutes(app, pool);
     registerSyncRoutes(app, pool, opts.cloudPusherFactory);
+    if (opts.dbcStorePath && opts.onDbcChanged) {
+      registerDbcRoutes(app, {
+        pool,
+        storePath: opts.dbcStorePath,
+        onDbcChanged: opts.onDbcChanged,
+      });
+    }
   }
 
   // Serve the built React app as a fallback for non-API, non-WS paths.

@@ -16,6 +16,7 @@ const MIGRATIONS_DIR = join(__dirname, '..', '..', 'migrations');
 const PARSER_DIR = join(REPO_ROOT, 'parser');
 const PARSER_PY = join(PARSER_DIR, '__main__.py');
 const PARSER_VENV_PY = join(PARSER_DIR, '.venv', 'bin', 'python');
+const DBC_STORE_PATH = join(REPO_ROOT, 'parser', 'active-dbc.csv');
 
 export async function run(opts: {
   dsn?: string;
@@ -66,12 +67,14 @@ export async function run(opts: {
       const replayFile = typeof cfg.replayFile === 'string' ? cfg.replayFile : null;
       const replaySpeed =
         typeof cfg.replaySpeed === 'number' ? cfg.replaySpeed : 1.0;
+      const cfgDbc = typeof cfg.dbcPath === 'string' ? cfg.dbcPath : null;
+      const effectiveDbc = cfgDbc ?? dbcCsv;
 
       const subcommandArgs = replayFile
-        ? ['replay', '--dbc', dbcCsv, '--file', replayFile, '--speed', String(replaySpeed)]
+        ? ['replay', '--dbc', effectiveDbc, '--file', replayFile, '--speed', String(replaySpeed)]
         : serialPort
-          ? ['live', '--dbc', dbcCsv, '--port', serialPort]
-          : ['live', '--dbc', dbcCsv, '--port', '/dev/null-no-port-configured'];
+          ? ['live', '--dbc', effectiveDbc, '--port', serialPort]
+          : ['live', '--dbc', effectiveDbc, '--port', '/dev/null-no-port-configured'];
 
       const parserArgs = parserIsPython
         ? [PARSER_PY, ...subcommandArgs]
@@ -94,8 +97,8 @@ export async function run(opts: {
             try {
               await new Promise<void>((resolve, reject) => {
                 const batchArgs = parserIsPython
-                  ? [PARSER_PY, 'batch', '--dbc', dbcCsv, '--file', file]
-                  : ['batch', '--dbc', dbcCsv, '--file', file];
+                  ? [PARSER_PY, 'batch', '--dbc', effectiveDbc, '--file', file]
+                  : ['batch', '--dbc', effectiveDbc, '--file', file];
                 const child = spawn(
                   parserBinary,
                   batchArgs,
@@ -137,12 +140,41 @@ export async function run(opts: {
     return result;
   };
 
+  const restartParser = async () => {
+    if (!parser || !pool) return;
+    const cfgNow = await getAppConfig(pool);
+    const newDbc = typeof cfgNow.dbcPath === 'string' ? cfgNow.dbcPath : dbcCsv;
+    const replayFileNow = typeof cfgNow.replayFile === 'string' ? cfgNow.replayFile : null;
+    const replaySpeedNow = typeof cfgNow.replaySpeed === 'number' ? cfgNow.replaySpeed : 1.0;
+    const serialPortNow = typeof cfgNow.serialPort === 'string' ? cfgNow.serialPort : null;
+
+    const newSubArgs = replayFileNow
+      ? ['replay', '--dbc', newDbc, '--file', replayFileNow, '--speed', String(replaySpeedNow)]
+      : serialPortNow
+        ? ['live', '--dbc', newDbc, '--port', serialPortNow]
+        : ['live', '--dbc', newDbc, '--port', '/dev/null-no-port-configured'];
+
+    const newArgs = parserIsPython ? [PARSER_PY, ...newSubArgs] : newSubArgs;
+
+    await parser.stop();
+    parser = new ParserManager({
+      command: parserBinary,
+      args: newArgs,
+      env: { ...process.env, NFR_DB_URL: dsn },
+      restartOnExit: !replayFileNow,
+      restartDelayMs: 2_000,
+    });
+    parser.start();
+  };
+
   const app = await buildApp({
     pool,
     parser: parser ?? undefined,
     authToken,
     setupState,
     staticRoot: opts.staticRoot,
+    dbcStorePath: DBC_STORE_PATH,
+    onDbcChanged: restartParser,
   });
   await app.listen({ port, host });
 
