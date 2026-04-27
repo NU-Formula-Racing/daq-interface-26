@@ -1,6 +1,9 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useReducedMotion } from 'framer-motion';
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/style.css';
+import { startOfMonth, endOfMonth, format, parse } from 'date-fns';
 import { useSession } from '@/context/SessionContext';
 import useIsMobile from '@/hooks/useIsMobile';
 import CircuitBoard from '@/components/CircuitBoard';
@@ -228,8 +231,13 @@ const HudButton = ({ children, accent = ACCENT, onClick, full = true, size = 'lg
   );
 };
 
-const DateField = ({ value, onChange, accent = ACCENT, options }) => {
+const DateField = ({ value, onChange, accent = ACCENT }) => {
+  const { fetchDatesWithData } = useSession();
   const [open, setOpen] = useState(false);
+  const [datesWithData, setDatesWithData] = useState(new Set());
+  const [displayMonth, setDisplayMonth] = useState(() =>
+    value ? parse(value, 'yyyy-MM-dd', new Date()) : new Date(),
+  );
   const ref = useRef(null);
 
   useEffect(() => {
@@ -240,8 +248,29 @@ const DateField = ({ value, onChange, accent = ACCENT, options }) => {
     return () => document.removeEventListener('mousedown', onDoc);
   }, []);
 
+  const loadDatesForMonth = useCallback(
+    async (month) => {
+      const start = startOfMonth(month).toISOString();
+      const end = endOfMonth(month).toISOString();
+      const dates = await fetchDatesWithData({ start, end });
+      setDatesWithData(dates);
+    },
+    [fetchDatesWithData],
+  );
+
+  useEffect(() => {
+    if (open) loadDatesForMonth(displayMonth);
+  }, [open, displayMonth, loadDatesForMonth]);
+
+  const selected = value ? parse(value, 'yyyy-MM-dd', new Date()) : undefined;
+
+  const handleSelect = (date) => {
+    if (date) onChange(format(date, 'yyyy-MM-dd'));
+    setOpen(false);
+  };
+
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
+    <div ref={ref} style={{ position: 'relative' }} className="home-datefield">
       <button
         onClick={() => setOpen((v) => !v)}
         style={{
@@ -262,7 +291,7 @@ const DateField = ({ value, onChange, accent = ACCENT, options }) => {
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ color: accent, fontSize: 9, letterSpacing: '0.2em' }}>DATE</span>
-          <span>{value}</span>
+          <span>{value || 'Select…'}</span>
         </span>
         <span style={{ color: 'rgba(180,200,220,0.55)', fontSize: 9 }}>{open ? '▴' : '▾'}</span>
       </button>
@@ -274,45 +303,28 @@ const DateField = ({ value, onChange, accent = ACCENT, options }) => {
             top: 'calc(100% + 4px)',
             left: 0,
             right: 0,
+            minWidth: 280,
             background: 'rgba(10, 14, 20, 0.98)',
             border: `1px solid ${hexToRgba(accent, 0.3)}`,
             zIndex: 5,
-            maxHeight: 220,
-            overflow: 'auto',
+            padding: 10,
             fontFamily: 'var(--mono)',
             fontSize: 12,
             boxShadow: `0 12px 30px -10px ${hexToRgba(accent, 0.25)}`,
           }}
         >
-          {options.map((opt) => (
-            <button
-              key={opt.date}
-              onClick={() => {
-                onChange(opt.date);
-                setOpen(false);
-              }}
-              style={{
-                display: 'flex',
-                width: '100%',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '9px 12px',
-                background: opt.date === value ? hexToRgba(accent, 0.08) : 'transparent',
-                color: opt.date === value ? accent : 'rgba(220,230,240,0.85)',
-                border: 'none',
-                borderBottom: '1px solid rgba(120,140,160,0.08)',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = hexToRgba(accent, 0.06))}
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = opt.date === value ? hexToRgba(accent, 0.08) : 'transparent')
-              }
-            >
-              <span>{opt.date}</span>
-              <span style={{ color: 'rgba(180,200,220,0.45)', fontSize: 10 }}>{opt.meta}</span>
-            </button>
-          ))}
+          <DayPicker
+            mode="single"
+            selected={selected}
+            onSelect={handleSelect}
+            month={displayMonth}
+            onMonthChange={setDisplayMonth}
+            modifiers={{
+              hasData: (day) => datesWithData.has(format(day, 'yyyy-MM-dd')),
+            }}
+            modifiersClassNames={{ hasData: 'day-has-data' }}
+            style={{ '--rdp-accent-color': accent }}
+          />
         </div>
       )}
     </div>
@@ -461,19 +473,7 @@ export default function HomePage() {
   const isMobile = useIsMobile();
   const reduceMotion = useReducedMotion();
 
-  const sessions = useMemo(
-    () => [
-      { date: '2026-04-27', meta: 'PRACTICE' },
-      { date: '2026-04-19', meta: 'QUALI' },
-      { date: '2026-04-11', meta: 'TEST' },
-      { date: '2026-03-28', meta: 'RACE' },
-      { date: '2026-03-14', meta: 'TEST' },
-      { date: '2026-02-24', meta: 'PRACTICE' },
-    ],
-    []
-  );
-
-  const [date, setDate] = useState(sessions[0].date);
+  const [date, setDate] = useState(() => format(new Date(), 'yyyy-MM-dd'));
   const [liveHover, setLiveHover] = useState(false);
   const [replayHover, setReplayHover] = useState(false);
 
@@ -561,7 +561,7 @@ export default function HomePage() {
             </div>
 
             <div style={{ marginBottom: 14 }}>
-              <DateField value={date} onChange={setDate} accent={accent} options={sessions} />
+              <DateField value={date} onChange={setDate} accent={accent} />
             </div>
 
             <HudButton accent={accent} onClick={handleOpenReplay}>Open</HudButton>

@@ -61,6 +61,78 @@
 
 .home-cards-grid > * { min-width: 0; }
 
+/* DayPicker theme inside the home DateField popover */
+.home-datefield .rdp-root {
+  --rdp-accent-color: #a78bfa;
+  --rdp-accent-background-color: rgba(167, 139, 250, 0.18);
+  --rdp-day-height: 32px;
+  --rdp-day-width: 32px;
+  --rdp-day_button-height: 30px;
+  --rdp-day_button-width: 30px;
+  font-family: var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.75rem;
+  color: rgba(220, 230, 240, 0.85);
+}
+.home-datefield .rdp-month_caption {
+  font-weight: 500;
+  font-size: 0.8rem;
+  color: rgba(220, 230, 240, 0.92);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.home-datefield .rdp-button_previous,
+.home-datefield .rdp-button_next {
+  color: rgba(180, 200, 220, 0.55);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.home-datefield .rdp-button_previous:hover,
+.home-datefield .rdp-button_next:hover {
+  color: #a78bfa;
+}
+.home-datefield .rdp-weekday {
+  color: rgba(180, 200, 220, 0.4);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.home-datefield .rdp-day_button {
+  border: none;
+  background: transparent;
+  color: rgba(220, 230, 240, 0.78);
+  cursor: pointer;
+  border-radius: 4px;
+}
+.home-datefield .rdp-day_button:hover {
+  background: rgba(167, 139, 250, 0.1);
+  color: #f1f5f9;
+}
+.home-datefield .rdp-selected .rdp-day_button {
+  background: rgba(167, 139, 250, 0.28);
+  color: #f1f5f9;
+}
+.home-datefield .rdp-today .rdp-day_button {
+  outline: 1px solid rgba(167, 139, 250, 0.45);
+  outline-offset: -1px;
+}
+.home-datefield .rdp-outside .rdp-day_button {
+  color: rgba(220, 230, 240, 0.18);
+}
+.home-datefield .rdp-day { position: relative; }
+.home-datefield .day-has-data::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #a78bfa;
+  box-shadow: 0 0 6px #a78bfa;
+}
+
 @media (max-width: 720px) {
   .home-content {
     padding: 28px 16px 40px;
