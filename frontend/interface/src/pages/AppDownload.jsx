@@ -76,27 +76,32 @@ const TerminalCard = ({ label, index, accent = ACCENT, children, notch = 18 }) =
         <div style={{ padding: `28px 28px ${notch + 12}px` }}>{children}</div>
       </div>
 
-      <svg
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
-        preserveAspectRatio="none"
-      >
-        <line
-          x1={`calc(100% - ${notch}px)`}
-          y1="0"
-          x2="100%"
-          y2={notch}
-          stroke="rgba(180,200,220,0.45)"
-          strokeWidth="1"
-        />
-        <line
-          x1="0"
-          y1={`calc(100% - ${notch}px)`}
-          x2={notch}
-          y2="100%"
-          stroke="rgba(180,200,220,0.45)"
-          strokeWidth="1"
-        />
-      </svg>
+      <span
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: `calc(100% - ${notch}px)`,
+          width: notch * 1.4142,
+          height: 1,
+          background: 'rgba(180,200,220,0.45)',
+          transformOrigin: '0 0',
+          transform: 'rotate(45deg)',
+          pointerEvents: 'none',
+        }}
+      />
+      <span
+        style={{
+          position: 'absolute',
+          top: `calc(100% - ${notch}px)`,
+          left: 0,
+          width: notch * 1.4142,
+          height: 1,
+          background: 'rgba(180,200,220,0.45)',
+          transformOrigin: '0 0',
+          transform: 'rotate(45deg)',
+          pointerEvents: 'none',
+        }}
+      />
     </div>
   );
 };
