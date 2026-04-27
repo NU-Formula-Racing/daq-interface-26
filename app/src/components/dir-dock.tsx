@@ -245,14 +245,16 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
   } | null>(null);
 
   const onPickNfr = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileList = e.target.files;
+    // Snapshot the files BEFORE resetting the input — `e.target.files` is a
+    // live FileList that gets cleared when we set the value to ''.
+    const picked = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = '';
-    if (!fileList || fileList.length === 0) return;
+    if (picked.length === 0) return;
 
-    const nfrs = Array.from(fileList).filter((f) => /\.nfr$/i.test(f.name));
+    const nfrs = picked.filter((f) => /\.nfr$/i.test(f.name));
     if (nfrs.length === 0) {
-      setNfrStatus('No .nfr files found in selection');
-      setTimeout(() => setNfrStatus(''), 4000);
+      setNfrStatus(`No .nfr files in selection (${picked.map((f) => f.name).join(', ')})`);
+      setTimeout(() => setNfrStatus(''), 8000);
       return;
     }
 
