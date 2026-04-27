@@ -1,11 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
-import { Placeholder } from './pages/Placeholder.tsx';
 import Live from './pages/Live.tsx';
 import Sessions from './pages/Sessions.tsx';
 import Replay from './pages/Replay.tsx';
 import Settings from './pages/Settings.tsx';
 import Setup from './pages/Setup.tsx';
+import StorageSetup from './pages/StorageSetup.tsx';
 
 export const router = createBrowserRouter([
   {
@@ -17,6 +17,7 @@ export const router = createBrowserRouter([
       { path: 'sessions/:id', element: <Replay /> },
       { path: 'settings', element: <Settings /> },
       { path: 'setup', element: <Setup /> },
+      { path: 'storage-setup', element: <StorageSetup /> },
     ],
   },
 ]);

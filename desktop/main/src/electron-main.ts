@@ -2,11 +2,23 @@
  * Electron main entry point. Boots the same server as `index.ts`, then
  * opens a BrowserWindow pointed at it.
  */
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import { join } from 'path';
 import { run } from './index.ts';
 
 let shutdownFn: (() => Promise<void>) | null = null;
+
+ipcMain.handle('pick-folder', async () => {
+  const res = await dialog.showOpenDialog({
+    properties: ['openDirectory', 'createDirectory'],
+  });
+  return {
+    canceled: res.canceled,
+    path: res.canceled || res.filePaths.length === 0 ? null : res.filePaths[0],
+  };
+});
+
+ipcMain.handle('user-data-path', () => app.getPath('userData'));
 
 app.whenReady().then(async () => {
   try {

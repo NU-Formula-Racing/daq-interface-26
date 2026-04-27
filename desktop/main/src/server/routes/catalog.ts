@@ -16,6 +16,17 @@ export interface CatalogDeps {
 }
 
 export function registerCatalogRoutes(app: FastifyInstance, deps: CatalogDeps): void {
+  app.get<{ Querystring: { path?: string } }>('/api/db/probe', async (req, reply) => {
+    const p = req.query.path;
+    if (!p || typeof p !== 'string') {
+      reply.code(400);
+      return { error: 'path query parameter required' };
+    }
+    const exists = existsSync(p);
+    const hasPgVersion = exists && existsSync(join(p, 'PG_VERSION'));
+    return { exists, hasPgVersion };
+  });
+
   app.get('/api/db/catalog', async () => {
     const cat = await loadCatalog(deps.catalogPath);
     const entries = cat.entries.map((e) => ({
