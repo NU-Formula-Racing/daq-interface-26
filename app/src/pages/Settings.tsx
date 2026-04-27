@@ -4,6 +4,7 @@ import { apiGet, apiPost } from '../api/client.ts';
 import { ActivityHeatmap } from '../components/ActivityHeatmap.tsx';
 import { Storage } from '../components/Storage.tsx';
 import { Broadcast } from '../components/Broadcast.tsx';
+import { Uninstall } from '../components/Uninstall.tsx';
 
 interface DbStats {
   sessions: number;
@@ -228,6 +229,8 @@ export default function Settings() {
             {busy === 'import' ? 'Importing…' : '↑ Upload backup'}
           </button>
         </Section>
+
+        <Uninstall />
 
           {message && (
             <div className="text-[11px] text-[color:var(--color-text-mute)] border border-[color:var(--color-border)] px-3 py-2">

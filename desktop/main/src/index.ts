@@ -384,6 +384,15 @@ export async function run(opts: {
     onImport: runBatchImport,
     catalogDeps,
     broadcastDeps,
+    uninstallDeps: {
+      catalogPath,
+      userDataDir,
+      signalQuit: () => {
+        // Use a non-zero code so the Electron relaunch override (which only
+        // catches code 0) lets the process die instead of restarting.
+        process.exit(99);
+      },
+    },
   });
   await app.listen({ port, host });
 

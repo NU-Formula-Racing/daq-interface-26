@@ -20,6 +20,7 @@ import { registerDbAdminRoutes } from './routes/db_admin.ts';
 import { registerImportRoutes, type ImportResult } from './routes/import.ts';
 import { registerCatalogRoutes, type CatalogDeps } from './routes/catalog.ts';
 import { registerBroadcastRoutes, type BroadcastDeps } from './routes/broadcast.ts';
+import { registerUninstallRoutes, type UninstallDeps } from './routes/uninstall.ts';
 
 export interface BuildAppOptions {
   pool: pg.Pool | null;
@@ -35,6 +36,7 @@ export interface BuildAppOptions {
   onImport?: (filename: string, body: Buffer) => Promise<ImportResult>;
   catalogDeps?: CatalogDeps;
   broadcastDeps?: BroadcastDeps;
+  uninstallDeps?: UninstallDeps;
 }
 
 export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> {
@@ -63,6 +65,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
       if (req.url.startsWith('/api/setup/')) return;
       if (req.url.startsWith('/api/db/catalog')) return;
       if (req.url.startsWith('/api/db/probe')) return;
+      if (req.url.startsWith('/api/uninstall')) return;
       if (req.url.startsWith('/api/') || req.url.startsWith('/ws/')) {
         reply.code(503).send({ error: 'service_unavailable', reason: 'postgres unreachable' });
       }
@@ -71,6 +74,9 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
 
   if (opts.catalogDeps) {
     registerCatalogRoutes(app, opts.catalogDeps);
+  }
+  if (opts.uninstallDeps) {
+    registerUninstallRoutes(app, opts.uninstallDeps);
   }
 
   if (opts.pool) {
