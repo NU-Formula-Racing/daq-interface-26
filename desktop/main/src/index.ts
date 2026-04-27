@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { mkdirSync, writeFileSync } from 'fs';
+import { tmpdir } from 'os';
 import pg from 'pg';
 import { bootstrapDatabase } from './db/bootstrap.ts';
 import { createPool } from './db/pool.ts';
@@ -19,7 +20,11 @@ const PARSER_DIR = join(REPO_ROOT, 'parser');
 const PARSER_PY = join(PARSER_DIR, '__main__.py');
 const PARSER_VENV_PY = join(PARSER_DIR, '.venv', 'bin', 'python');
 const DBC_STORE_PATH = join(REPO_ROOT, 'parser', 'active-dbc.csv');
-const NFR_UPLOADS_DIR = join(REPO_ROOT, 'parser', 'uploads');
+// Staging area for uploaded .nfr files. Inside an installed `.app` the
+// Resources/ directory is often read-only, so use the OS temp dir which is
+// always writable and good enough — files are ingested into Postgres
+// immediately and the temp copy is no longer needed.
+const NFR_UPLOADS_DIR = join(tmpdir(), 'nfr-uploads');
 
 export async function run(opts: {
   dsn?: string;

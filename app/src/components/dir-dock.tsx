@@ -231,27 +231,51 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
     }
   };
 
+  // Overlay state — shown during NFR import so the user has clear progress feedback.
+  const [importState, setImportState] = useState<{
+    open: boolean;
+    total: number;
+    index: number;
+    currentFile: string;
+    succeeded: number;
+    failed: number;
+    totalRows: number;
+    errors: string[];
+    done: boolean;
+  } | null>(null);
+
   const onPickNfr = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
     e.target.value = '';
     if (!fileList || fileList.length === 0) return;
 
-    // Filter to .nfr files only (case-insensitive). Folder picks include
-    // every file inside; user only wants the binary logs.
-    const all = Array.from(fileList);
-    const nfrs = all.filter((f) => /\.nfr$/i.test(f.name));
+    const nfrs = Array.from(fileList).filter((f) => /\.nfr$/i.test(f.name));
     if (nfrs.length === 0) {
       setNfrStatus('No .nfr files found in selection');
       setTimeout(() => setNfrStatus(''), 4000);
       return;
     }
 
+    setImportState({
+      open: true,
+      total: nfrs.length,
+      index: 0,
+      currentFile: nfrs[0].name,
+      succeeded: 0,
+      failed: 0,
+      totalRows: 0,
+      errors: [],
+      done: false,
+    });
+
     let succeeded = 0;
     let failed = 0;
     let totalRows = 0;
+    const errors: string[] = [];
+
     for (let i = 0; i < nfrs.length; i++) {
       const f = nfrs[i];
-      setNfrStatus(`Importing ${i + 1}/${nfrs.length} · ${f.name}`);
+      setImportState((s) => s && { ...s, index: i, currentFile: f.name });
       try {
         const buf = await f.arrayBuffer();
         const res = await fetch('/api/import/nfr', {
@@ -262,17 +286,24 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
           },
           body: buf,
         });
-        if (!res.ok) {
+        const body = await res.json().catch(() => ({} as any));
+        if (!res.ok || body?.error) {
           failed++;
-          continue;
+          errors.push(`${f.name}: ${body?.error ?? `HTTP ${res.status}`}`);
+        } else {
+          succeeded++;
+          totalRows += body.row_count ?? 0;
         }
-        const body = (await res.json()) as { row_count?: number };
-        succeeded++;
-        totalRows += body.row_count ?? 0;
-      } catch {
+      } catch (err) {
         failed++;
+        errors.push(`${f.name}: ${String(err)}`);
       }
+      setImportState((s) =>
+        s && { ...s, succeeded, failed, totalRows, errors: [...errors] },
+      );
     }
+
+    setImportState((s) => s && { ...s, done: true, index: nfrs.length });
     setNfrStatus(
       `Imported ${succeeded}/${nfrs.length} · ${totalRows.toLocaleString()} rows${failed > 0 ? ` · ${failed} failed` : ''}`,
     );
@@ -550,6 +581,117 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
       </div>
 
       <Timeline t={t} onChange={onT} durationSecs={durationSecs} mode={mode} compact />
+
+      {importState?.open && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 110,
+            background: 'rgba(0,0,0,0.7)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+          onClick={() => {
+            if (importState.done) setImportState(null);
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              minWidth: 480, maxWidth: '90vw',
+              background: SH_COLORS.bg,
+              border: `1px solid ${SH_COLORS.border}`,
+              boxShadow: '0 12px 48px rgba(0,0,0,0.6)',
+              fontFamily: '"JetBrains Mono", monospace',
+              color: SH_COLORS.text,
+            }}
+          >
+            <div style={{
+              padding: '12px 16px',
+              borderBottom: `1px solid ${SH_COLORS.border}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+              <span style={{ fontSize: 11, letterSpacing: 1.5, color: SH_COLORS.textFaint }}>
+                {importState.done ? 'IMPORT COMPLETE' : 'IMPORTING…'}
+              </span>
+              {importState.done && (
+                <span
+                  onClick={() => setImportState(null)}
+                  style={{ color: SH_COLORS.textFaint, cursor: 'pointer', userSelect: 'none' }}
+                >×</span>
+              )}
+            </div>
+
+            <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ fontSize: 13, color: SH_COLORS.text, fontFamily: '"Inter", system-ui, sans-serif' }}>
+                {importState.done
+                  ? 'Done.'
+                  : <>Processing <strong>{importState.currentFile}</strong></>}
+              </div>
+
+              {/* Progress bar */}
+              <div style={{
+                height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden',
+              }}>
+                <div style={{
+                  height: '100%',
+                  width: `${(Math.min(importState.index + (importState.done ? 1 : 0), importState.total) / importState.total) * 100}%`,
+                  background: importState.failed > 0 && importState.done
+                    ? '#e08a5a'
+                    : SH_COLORS.accentBright,
+                  transition: 'width 200ms ease',
+                }} />
+              </div>
+
+              <div style={{
+                display: 'flex', justifyContent: 'space-between',
+                fontSize: 11, color: SH_COLORS.textMute,
+              }}>
+                <span>
+                  {Math.min(importState.index + (importState.done ? 1 : 0), importState.total)}
+                  {' / '}
+                  {importState.total} files
+                </span>
+                <span>
+                  {importState.totalRows.toLocaleString()} rows
+                </span>
+              </div>
+
+              {importState.errors.length > 0 && (
+                <div style={{
+                  marginTop: 6, padding: 10,
+                  background: 'rgba(242,87,87,0.08)',
+                  border: '1px solid rgba(242,87,87,0.3)',
+                  borderRadius: 2,
+                  fontSize: 10, color: '#f4a8a8', maxHeight: 160, overflow: 'auto',
+                }}>
+                  <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                    {importState.failed} failure{importState.failed === 1 ? '' : 's'}:
+                  </div>
+                  {importState.errors.map((err, i) => (
+                    <div key={i} style={{ marginTop: 2, wordBreak: 'break-word' }}>· {err}</div>
+                  ))}
+                </div>
+              )}
+
+              {importState.done && (
+                <button
+                  onClick={() => setImportState(null)}
+                  style={{
+                    marginTop: 4, padding: '8px 14px',
+                    background: 'transparent',
+                    border: `1px solid ${SH_COLORS.border}`,
+                    color: SH_COLORS.text,
+                    fontFamily: '"JetBrains Mono", monospace',
+                    fontSize: 11, letterSpacing: 1.5, cursor: 'pointer',
+                    alignSelf: 'flex-end',
+                  }}
+                >
+                  CLOSE
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {nfrModalOpen && (
         <div
