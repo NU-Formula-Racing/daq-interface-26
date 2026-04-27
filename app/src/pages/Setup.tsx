@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { apiGet, apiPost } from '../api/client.ts';
 
 interface Status {
-  pg: 'ok' | 'not_reachable';
+  pg: 'ok' | 'not_reachable' | 'storage_disconnected';
   lastError: string | null;
 }
 
 export default function Setup() {
+  const nav = useNavigate();
   const [status, setStatus] = useState<Status>({ pg: 'not_reachable', lastError: null });
   const [retrying, setRetrying] = useState(false);
   const [message, setMessage] = useState<string>('');
@@ -17,6 +19,14 @@ export default function Setup() {
     const id = setInterval(tick, 2000);
     return () => clearInterval(id);
   }, []);
+
+  // If the server reports "no active database", that's a fresh-install
+  // condition — send the user straight to the storage picker.
+  useEffect(() => {
+    if (status.lastError && /no active database/i.test(status.lastError)) {
+      nav('/storage-setup', { replace: true });
+    }
+  }, [status.lastError, nav]);
 
   useEffect(() => {
     if (status.pg === 'ok') {
@@ -38,29 +48,37 @@ export default function Setup() {
     }
   };
 
+  const headline =
+    status.pg === 'storage_disconnected'
+      ? 'STORAGE DISCONNECTED'
+      : 'DATABASE UNREACHABLE';
+
+  const explainer =
+    status.pg === 'storage_disconnected'
+      ? 'The drive holding your active database is no longer connected. Plug it back in and click RETRY, or choose a different location for a clean install.'
+      : 'The embedded Postgres server failed to start. Try again, or pick a new storage location for a clean install.';
+
   return (
     <div className="h-full flex items-center justify-center p-8 font-mono text-[color:var(--color-text)]">
       <div className="max-w-lg w-full space-y-6">
-        <h1 className="text-lg tracking-widest">NFR · SETUP REQUIRED</h1>
-        <div className="text-xs text-[color:var(--color-text-mute)] space-y-2">
-          <p>The NFR local app needs a running PostgreSQL server on <code>localhost:5432</code> with a trust connection for the <code>postgres</code> user.</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li><strong>macOS:</strong> install <a className="underline" href="https://postgresapp.com/" target="_blank" rel="noreferrer">Postgres.app</a> and launch it. The default install creates a <code>postgres</code> superuser with no password.</li>
-            <li><strong>Windows:</strong> download the installer from <a className="underline" href="https://www.postgresql.org/download/windows/" target="_blank" rel="noreferrer">postgresql.org</a>. Keep the default port 5432 and remember the password for <code>postgres</code>.</li>
-            <li><strong>Linux:</strong> <code>sudo apt install postgresql</code> (or the equivalent for your distro), then <code>sudo -u postgres psql</code> to verify.</li>
-          </ul>
-          <p>After Postgres is running, click RETRY below.</p>
-        </div>
+        <h1 className="text-lg tracking-widest">NFR · {headline}</h1>
+        <p className="text-xs text-[color:var(--color-text-mute)] leading-relaxed">{explainer}</p>
         {status.lastError && (
-          <pre className="text-[10px] text-[color:var(--color-text-faint)] whitespace-pre-wrap">{status.lastError}</pre>
+          <pre className="text-[10px] text-[color:var(--color-text-faint)] whitespace-pre-wrap border border-[color:var(--color-border)] p-2">{status.lastError}</pre>
         )}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={retry}
             disabled={retrying}
             className="px-3 py-1.5 bg-[color:var(--color-accent)] text-white text-[11px] tracking-widest disabled:opacity-50"
           >
             {retrying ? 'RETRYING…' : 'RETRY'}
+          </button>
+          <button
+            onClick={() => nav('/storage-setup')}
+            className="px-3 py-1.5 border border-[color:var(--color-border)] text-[11px] tracking-widest hover:bg-[color:var(--color-panel)]"
+          >
+            CHOOSE NEW LOCATION (CLEAN INSTALL)
           </button>
           <span className="text-[11px] text-[color:var(--color-text-mute)]">{message}</span>
         </div>
