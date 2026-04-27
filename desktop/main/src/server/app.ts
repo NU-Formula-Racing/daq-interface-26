@@ -62,6 +62,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     app.addHook('onRequest', async (req, reply) => {
       if (req.url.startsWith('/api/setup/')) return;
       if (req.url.startsWith('/api/db/catalog')) return;
+      if (req.url.startsWith('/api/db/probe')) return;
       if (req.url.startsWith('/api/') || req.url.startsWith('/ws/')) {
         reply.code(503).send({ error: 'service_unavailable', reason: 'postgres unreachable' });
       }
