@@ -18,6 +18,7 @@ import { registerSetupRoutes, type SetupState } from './routes/setup.ts';
 import { registerDbcRoutes } from './routes/dbc.ts';
 import { registerDbAdminRoutes } from './routes/db_admin.ts';
 import { registerImportRoutes, type ImportResult } from './routes/import.ts';
+import { registerCatalogRoutes, type CatalogDeps } from './routes/catalog.ts';
 
 export interface BuildAppOptions {
   pool: pg.Pool | null;
@@ -31,6 +32,7 @@ export interface BuildAppOptions {
   onDbcChanged?: () => Promise<void>;
   dsn?: string;
   onImport?: (filename: string, body: Buffer) => Promise<ImportResult>;
+  catalogDeps?: CatalogDeps;
 }
 
 export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> {
@@ -53,14 +55,19 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   };
   registerSetupRoutes(app, setupState);
 
-  // In degraded mode, block all /api/* and /ws/* except /api/setup/*.
+  // In degraded mode, block all /api/* and /ws/* except /api/setup/* and /api/db/catalog*.
   if (!opts.pool) {
     app.addHook('onRequest', async (req, reply) => {
       if (req.url.startsWith('/api/setup/')) return;
+      if (req.url.startsWith('/api/db/catalog')) return;
       if (req.url.startsWith('/api/') || req.url.startsWith('/ws/')) {
         reply.code(503).send({ error: 'service_unavailable', reason: 'postgres unreachable' });
       }
     });
+  }
+
+  if (opts.catalogDeps) {
+    registerCatalogRoutes(app, opts.catalogDeps);
   }
 
   if (opts.pool) {
