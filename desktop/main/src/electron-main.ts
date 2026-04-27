@@ -65,7 +65,11 @@ app.whenReady().then(async () => {
     mainWindow = new BrowserWindow({
       width: 1400,
       height: 900,
-      webPreferences: { contextIsolation: true, nodeIntegration: false },
+      webPreferences: {
+        contextIsolation: true,
+        nodeIntegration: false,
+        preload: join(__dirname, 'preload.cjs'),
+      },
     });
     await mainWindow.loadURL(`http://${booted.host}:${booted.port}`);
   } catch (err) {

@@ -21,3 +21,13 @@ await build({
   },
   logLevel: 'info',
 });
+
+await build({
+  entryPoints: ['preload/preload.ts'],
+  outfile: 'main/dist/preload.cjs',
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  external: ['electron'],
+  logLevel: 'info',
+});
