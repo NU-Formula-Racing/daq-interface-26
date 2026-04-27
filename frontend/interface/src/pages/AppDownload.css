@@ -5,25 +5,28 @@
   z-index: 1;
   width: 100%;
   min-height: 100vh;
-  overflow: hidden;
+  min-height: 100dvh;
   isolation: isolate;
   color: #e2e8f0;
   font-family: var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  overflow-x: hidden;
 }
 
 .appdl-content {
   position: relative;
   z-index: 1;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 60px 40px;
+  box-sizing: border-box;
 }
 
 .appdl-vignette {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.85) 100%);
   pointer-events: none;
@@ -31,16 +34,16 @@
 }
 
 .appdl-scanlines {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background-image: repeating-linear-gradient(to bottom, rgba(255,255,255,0.012) 0 1px, transparent 1px 3px);
   pointer-events: none;
-  mix-blend-mode: overlay;
   z-index: 0;
 }
 
 @media (max-width: 720px) {
   .appdl-content {
-    padding: 40px 22px;
+    padding: 28px 16px 40px;
+    justify-content: flex-start;
   }
 }

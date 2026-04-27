@@ -316,8 +316,9 @@ const DateField = ({ value, onChange, accent = ACCENT, options }) => {
 // ---------- Header ----------
 
 const Header = ({ accent }) => (
-  <div style={{ textAlign: 'center', marginBottom: 56 }}>
+  <div style={{ textAlign: 'center', marginBottom: 56, width: '100%' }}>
     <div
+      className="home-tagline"
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -337,6 +338,7 @@ const Header = ({ accent }) => (
     </div>
 
     <h1
+      className="home-h1"
       style={{
         fontFamily: 'var(--mono)',
         fontWeight: 500,
@@ -346,12 +348,14 @@ const Header = ({ accent }) => (
         margin: 0,
         lineHeight: 1.0,
         textShadow: `0 0 40px ${hexToRgba(accent, 0.12)}`,
+        wordBreak: 'break-word',
       }}
     >
       NFR DAQ INTERFACE
     </h1>
 
     <div
+      className="home-kicker"
       style={{
         marginTop: 14,
         fontFamily: 'var(--mono)',
@@ -486,7 +490,18 @@ export default function HomePage() {
 
   return (
     <div className="home-wrapper">
-      <CircuitBoard mobile={isMobile} />
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: 'none',
+          background: 'radial-gradient(ellipse at 50% 50%, #0a0e16 0%, #050709 80%)',
+        }}
+      >
+        <CircuitBoard mobile={isMobile} />
+      </div>
 
       <div className="home-vignette" aria-hidden="true" />
       <div className="home-scanlines" aria-hidden="true" />

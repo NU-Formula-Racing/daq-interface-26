@@ -196,7 +196,18 @@ export default function AppDownload() {
 
   return (
     <div className="appdl-wrapper">
-      <CircuitBoard mobile={isMobile} />
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: 'none',
+          background: 'radial-gradient(ellipse at 50% 50%, #0a0e16 0%, #050709 80%)',
+        }}
+      >
+        <CircuitBoard mobile={isMobile} />
+      </div>
 
       <div className="appdl-vignette" aria-hidden="true" />
       <div className="appdl-scanlines" aria-hidden="true" />
