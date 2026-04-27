@@ -1,4 +1,4 @@
-import { spawn, spawnSync, type ChildProcessWithoutNullStreams } from 'child_process';
+import { spawn, spawnSync, type ChildProcess } from 'child_process';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import path, { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
@@ -20,8 +20,9 @@ export function postgresBinDir(): string {
   // From bundled app: <resources>/postgres-bin/macos-arm64
   // From dev: desktop/build/postgres-bin/macos-arm64
   let candidate: string;
-  if (process.resourcesPath) {
-    candidate = join(process.resourcesPath, 'postgres-bin', 'macos-arm64');
+  const resourcesPath = (process as NodeJS.Process & { resourcesPath?: string }).resourcesPath;
+  if (resourcesPath) {
+    candidate = join(resourcesPath, 'postgres-bin', 'macos-arm64');
   } else {
     const here = dirname(fileURLToPath(import.meta.url));
     candidate = resolve(here, '..', '..', '..', 'build', 'postgres-bin', 'macos-arm64');
@@ -35,7 +36,7 @@ export function postgresBinDir(): string {
 }
 
 export class PostgresManager {
-  private child: ChildProcessWithoutNullStreams | null = null;
+  private child: ChildProcess | null = null;
   private opts: Required<PostgresManagerOptions>;
 
   constructor(opts: PostgresManagerOptions) {
@@ -111,7 +112,7 @@ export class PostgresManager {
 
     const STDERR_CAP = 2048;
     let stderrBuf = '';
-    child.stderr.on('data', (d) => {
+    child.stderr!.on('data', (d) => {
       const s = d.toString();
       process.stderr.write(`[postgres] ${s}`);
       if (stderrBuf.length < STDERR_CAP) {
