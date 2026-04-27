@@ -54,7 +54,7 @@ export async function run(opts: {
   staticRoot?: string;
   userDataDir?: string;
 } = {}) {
-  const host = opts.host ?? process.env.NFR_BIND_HOST ?? '127.0.0.1';
+  const defaultHost = opts.host ?? process.env.NFR_BIND_HOST ?? '127.0.0.1';
   const port = opts.port ?? Number(process.env.NFR_BIND_PORT ?? '4444');
   const dbcCsv = opts.dbcCsv ?? join(REPO_ROOT, 'NFR26DBC.csv');
   const migrationsDir = opts.migrationsDir ?? MIGRATIONS_DIR;
@@ -349,6 +349,29 @@ export async function run(opts: {
     },
   };
 
+  // Resolve broadcast host BEFORE app.listen by reading app_config (if reachable).
+  let broadcastEnabled = false;
+  if (pool) {
+    try {
+      const cfg = await getAppConfig(pool);
+      broadcastEnabled = cfg.broadcastEnabled === true;
+    } catch {
+      broadcastEnabled = false;
+    }
+  }
+  const host = broadcastEnabled ? '0.0.0.0' : defaultHost;
+
+  const broadcastDeps = pool
+    ? {
+        configPool: pool,
+        signalRestart: () => {
+          setTimeout(() => process.exit(0), 500);
+        },
+        port,
+        host,
+      }
+    : undefined;
+
   const app = await buildApp({
     pool,
     parser: parser ?? undefined,
@@ -360,6 +383,7 @@ export async function run(opts: {
     dsn: dsn ?? undefined,
     onImport: runBatchImport,
     catalogDeps,
+    broadcastDeps,
   });
   await app.listen({ port, host });
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { apiGet, apiPost } from '../api/client.ts';
 import { ActivityHeatmap } from '../components/ActivityHeatmap.tsx';
 import { Storage } from '../components/Storage.tsx';
+import { Broadcast } from '../components/Broadcast.tsx';
 
 interface DbStats {
   sessions: number;
@@ -122,6 +123,8 @@ export default function Settings() {
         <h1 className="text-sm tracking-widest text-[color:var(--color-text)] uppercase">Database</h1>
 
         <Storage />
+
+        <Broadcast />
 
         <h2 className="text-[11px] tracking-widest text-[color:var(--color-text-mute)] uppercase pt-2">Database tools</h2>
 

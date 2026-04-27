@@ -19,6 +19,7 @@ import { registerDbcRoutes } from './routes/dbc.ts';
 import { registerDbAdminRoutes } from './routes/db_admin.ts';
 import { registerImportRoutes, type ImportResult } from './routes/import.ts';
 import { registerCatalogRoutes, type CatalogDeps } from './routes/catalog.ts';
+import { registerBroadcastRoutes, type BroadcastDeps } from './routes/broadcast.ts';
 
 export interface BuildAppOptions {
   pool: pg.Pool | null;
@@ -33,6 +34,7 @@ export interface BuildAppOptions {
   dsn?: string;
   onImport?: (filename: string, body: Buffer) => Promise<ImportResult>;
   catalogDeps?: CatalogDeps;
+  broadcastDeps?: BroadcastDeps;
 }
 
 export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> {
@@ -113,6 +115,9 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     }
     if (opts.onImport) {
       registerImportRoutes(app, { onImport: opts.onImport });
+    }
+    if (opts.broadcastDeps) {
+      registerBroadcastRoutes(app, opts.broadcastDeps);
     }
   }
 
