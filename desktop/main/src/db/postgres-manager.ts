@@ -1,6 +1,6 @@
 import { spawn, spawnSync, type ChildProcessWithoutNullStreams } from 'child_process';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { dirname, join, resolve } from 'path';
+import path, { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 export interface PostgresManagerOptions {
@@ -19,12 +19,19 @@ const PG_MAJOR = '17';
 export function postgresBinDir(): string {
   // From bundled app: <resources>/postgres-bin/macos-arm64
   // From dev: desktop/build/postgres-bin/macos-arm64
+  let candidate: string;
   if (process.resourcesPath) {
-    const packaged = join(process.resourcesPath, 'postgres-bin', 'macos-arm64');
-    if (existsSync(packaged)) return packaged;
+    candidate = join(process.resourcesPath, 'postgres-bin', 'macos-arm64');
+  } else {
+    const here = dirname(fileURLToPath(import.meta.url));
+    candidate = resolve(here, '..', '..', '..', 'build', 'postgres-bin', 'macos-arm64');
   }
-  const here = dirname(fileURLToPath(import.meta.url));
-  return resolve(here, '..', '..', '..', 'build', 'postgres-bin', 'macos-arm64');
+  if (!existsSync(candidate)) {
+    throw new Error(
+      'embedded Postgres binaries not found at ' + candidate + ' — only macos-arm64 is currently vendored',
+    );
+  }
+  return candidate;
 }
 
 export class PostgresManager {
@@ -95,31 +102,55 @@ export class PostgresManager {
     const binPostgres = join(this.opts.binDir, 'bin', 'postgres');
     const env = { ...process.env, ...this.libEnv() };
 
-    this.child = spawn(
+    const child = spawn(
       binPostgres,
       ['-D', this.opts.dataDir, '-p', String(this.opts.port)],
       { env, stdio: ['ignore', 'pipe', 'pipe'] },
     );
+    this.child = child;
 
-    this.child.stderr.on('data', (d) => process.stderr.write(`[postgres] ${d}`));
-    this.child.on('exit', (code, sig) => {
+    const STDERR_CAP = 2048;
+    let stderrBuf = '';
+    child.stderr.on('data', (d) => {
+      const s = d.toString();
+      process.stderr.write(`[postgres] ${s}`);
+      if (stderrBuf.length < STDERR_CAP) {
+        stderrBuf = (stderrBuf + s).slice(-STDERR_CAP);
+      }
+    });
+    child.on('exit', (code, sig) => {
       if (code !== 0 && code !== null) {
         console.error(`postgres exited unexpectedly code=${code} signal=${sig}`);
       }
-      this.child = null;
+      if (this.child === child) this.child = null;
     });
 
     // Wait for pg_isready
     const binReady = join(this.opts.binDir, 'bin', 'pg_isready');
     const deadline = Date.now() + 20_000;
     while (Date.now() < deadline) {
+      // If exit handler nulled this.child, the process died during startup.
+      if (this.child === null) {
+        throw new Error(
+          `postgres exited during startup${stderrBuf ? `: ${stderrBuf.trim()}` : ''}`,
+        );
+      }
       const r = spawnSync(binReady, ['-h', '127.0.0.1', '-p', String(this.opts.port)], {
         env, stdio: 'pipe',
       });
       if (r.status === 0) return;
       await new Promise((r) => setTimeout(r, 200));
     }
-    throw new Error('postgres did not become ready within 20s');
+
+    // Timed out — kill the child before throwing.
+    if (this.child === child && child.exitCode === null) {
+      child.kill('SIGTERM');
+      await new Promise((r) => setTimeout(r, 2_000));
+      if (child.exitCode === null) child.kill('SIGKILL');
+    }
+    throw new Error(
+      `postgres did not become ready within 20s${stderrBuf ? `: ${stderrBuf.trim()}` : ''}`,
+    );
   }
 
   async stop(): Promise<void> {
@@ -142,9 +173,12 @@ export class PostgresManager {
   }
 
   private libEnv(): NodeJS.ProcessEnv {
+    const libDir = join(this.opts.binDir, 'lib');
+    const dyld = process.env.DYLD_LIBRARY_PATH ?? '';
+    const ld = process.env.LD_LIBRARY_PATH ?? '';
     return {
-      DYLD_LIBRARY_PATH: join(this.opts.binDir, 'lib'),
-      LD_LIBRARY_PATH: join(this.opts.binDir, 'lib'),
+      DYLD_LIBRARY_PATH: dyld ? `${libDir}${path.delimiter}${dyld}` : libDir,
+      LD_LIBRARY_PATH: ld ? `${libDir}${path.delimiter}${ld}` : libDir,
     };
   }
 }
