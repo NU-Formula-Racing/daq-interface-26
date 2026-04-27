@@ -45,7 +45,8 @@
       { "from": "../app/dist", "to": "app" },
       { "from": "migrations", "to": "migrations" },
       { "from": "../parser/dist/parser-darwin-${arch}", "to": "parser" },
-      { "from": "../NFR26DBC.csv", "to": "NFR26DBC.csv" }
+      { "from": "../NFR26DBC.csv", "to": "NFR26DBC.csv" },
+      { "from": "build/postgres-bin/macos-arm64", "to": "postgres-bin/macos-arm64" }
     ],
     "mac": {
       "target": [{ "target": "dmg", "arch": ["arm64"] }],
