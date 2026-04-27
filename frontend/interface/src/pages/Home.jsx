@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useReducedMotion } from 'framer-motion';
 import { DayPicker } from 'react-day-picker';
@@ -238,15 +239,42 @@ const DateField = ({ value, onChange, accent = ACCENT }) => {
   const [displayMonth, setDisplayMonth] = useState(() =>
     value ? parse(value, 'yyyy-MM-dd', new Date()) : new Date(),
   );
-  const ref = useRef(null);
+  const [popoverStyle, setPopoverStyle] = useState({});
+  const triggerRef = useRef(null);
+  const popoverRef = useRef(null);
+
+  // Position the portaled popover under the trigger using fixed coords.
+  useEffect(() => {
+    if (!open || !triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    const popWidth = Math.max(rect.width, 300);
+    let left = rect.left;
+    if (left + popWidth > window.innerWidth - 8) {
+      left = window.innerWidth - popWidth - 8;
+    }
+    if (left < 8) left = 8;
+    setPopoverStyle({
+      position: 'fixed',
+      top: rect.bottom + 6,
+      left,
+      width: popWidth,
+    });
+  }, [open]);
 
   useEffect(() => {
+    if (!open) return;
     const onDoc = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+      const inTrigger = triggerRef.current && triggerRef.current.contains(e.target);
+      const inPop = popoverRef.current && popoverRef.current.contains(e.target);
+      if (!inTrigger && !inPop) setOpen(false);
     };
     document.addEventListener('mousedown', onDoc);
-    return () => document.removeEventListener('mousedown', onDoc);
-  }, []);
+    document.addEventListener('touchstart', onDoc);
+    return () => {
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('touchstart', onDoc);
+    };
+  }, [open]);
 
   const loadDatesForMonth = useCallback(
     async (month) => {
@@ -270,8 +298,9 @@ const DateField = ({ value, onChange, accent = ACCENT }) => {
   };
 
   return (
-    <div ref={ref} style={{ position: 'relative' }} className="home-datefield">
+    <div style={{ position: 'relative' }} className="home-datefield">
       <button
+        ref={triggerRef}
         onClick={() => setOpen((v) => !v)}
         style={{
           width: '100%',
@@ -296,37 +325,37 @@ const DateField = ({ value, onChange, accent = ACCENT }) => {
         <span style={{ color: 'rgba(180,200,220,0.55)', fontSize: 9 }}>{open ? '▴' : '▾'}</span>
       </button>
 
-      {open && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 'calc(100% + 4px)',
-            left: 0,
-            right: 0,
-            minWidth: 280,
-            background: 'rgba(10, 14, 20, 0.98)',
-            border: `1px solid ${hexToRgba(accent, 0.3)}`,
-            zIndex: 5,
-            padding: 10,
-            fontFamily: 'var(--mono)',
-            fontSize: 12,
-            boxShadow: `0 12px 30px -10px ${hexToRgba(accent, 0.25)}`,
-          }}
-        >
-          <DayPicker
-            mode="single"
-            selected={selected}
-            onSelect={handleSelect}
-            month={displayMonth}
-            onMonthChange={setDisplayMonth}
-            modifiers={{
-              hasData: (day) => datesWithData.has(format(day, 'yyyy-MM-dd')),
+      {open &&
+        createPortal(
+          <div
+            ref={popoverRef}
+            className="home-datefield home-datefield-popover"
+            style={{
+              ...popoverStyle,
+              background: 'rgba(10, 14, 20, 0.98)',
+              border: `1px solid ${hexToRgba(accent, 0.3)}`,
+              zIndex: 1000,
+              padding: 10,
+              fontFamily: 'var(--mono)',
+              fontSize: 12,
+              boxShadow: `0 12px 30px -10px ${hexToRgba(accent, 0.25)}`,
             }}
-            modifiersClassNames={{ hasData: 'day-has-data' }}
-            style={{ '--rdp-accent-color': accent }}
-          />
-        </div>
-      )}
+          >
+            <DayPicker
+              mode="single"
+              selected={selected}
+              onSelect={handleSelect}
+              month={displayMonth}
+              onMonthChange={setDisplayMonth}
+              modifiers={{
+                hasData: (day) => datesWithData.has(format(day, 'yyyy-MM-dd')),
+              }}
+              modifiersClassNames={{ hasData: 'day-has-data' }}
+              style={{ '--rdp-accent-color': accent }}
+            />
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };
