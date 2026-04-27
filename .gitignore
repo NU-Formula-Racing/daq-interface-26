@@ -157,3 +157,9 @@ parser/*.spec
 app/node_modules/
 app/dist/
 parser/active-dbc.csv
+
+# macOS metadata
+.DS_Store
+
+# Local NFR upload staging
+parser/uploads/
