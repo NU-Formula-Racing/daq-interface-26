@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { mkdirSync, writeFileSync } from 'fs';
-import { tmpdir } from 'os';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { homedir, tmpdir } from 'os';
 import pg from 'pg';
 import { bootstrapDatabase } from './db/bootstrap.ts';
 import { createPool } from './db/pool.ts';
@@ -9,8 +9,11 @@ import { getAppConfig } from './db/config.ts';
 import { buildApp } from './server/app.ts';
 import { ParserManager } from './parser/manager.ts';
 import { FolderWatcher } from './watcher/watcher.ts';
+import { PostgresManager, postgresBinDir } from './db/postgres-manager.ts';
+import { loadCatalog } from './db/catalog.ts';
 import type { SetupState } from './server/routes/setup.ts';
 import type { ImportResult } from './server/routes/import.ts';
+import type { CatalogDeps } from './server/routes/catalog.ts';
 import { spawn } from 'child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -26,6 +29,20 @@ const DBC_STORE_PATH = join(REPO_ROOT, 'parser', 'active-dbc.csv');
 // immediately and the temp copy is no longer needed.
 const NFR_UPLOADS_DIR = join(tmpdir(), 'nfr-uploads');
 
+const EMBEDDED_PG_PORT = 5499;
+const EMBEDDED_PG_USER = 'nfr';
+const EMBEDDED_PG_DATABASE = 'postgres';
+
+function isNfrDataDirSync(path: string): boolean {
+  const versionFile = join(path, 'PG_VERSION');
+  if (!existsSync(versionFile)) return false;
+  try {
+    return readFileSync(versionFile, 'utf-8').trim() === '17';
+  } catch {
+    return false;
+  }
+}
+
 export async function run(opts: {
   dsn?: string;
   port?: number;
@@ -34,11 +51,8 @@ export async function run(opts: {
   migrationsDir?: string;
   parserBinary?: string;
   staticRoot?: string;
+  userDataDir?: string;
 } = {}) {
-  const dsn =
-    opts.dsn ??
-    process.env.NFR_DB_URL ??
-    'postgres://postgres@localhost:5432/nfr_local';
   const host = opts.host ?? process.env.NFR_BIND_HOST ?? '127.0.0.1';
   const port = opts.port ?? Number(process.env.NFR_BIND_PORT ?? '4444');
   const dbcCsv = opts.dbcCsv ?? join(REPO_ROOT, 'NFR26DBC.csv');
@@ -50,10 +64,23 @@ export async function run(opts: {
   const parserIsPython =
     parserBinary.endsWith('python') || parserBinary.endsWith('python3');
 
+  const userDataDir =
+    opts.userDataDir ??
+    process.env.NFR_USER_DATA_DIR ??
+    join(homedir(), '.nfr-local');
+  const catalogPath = join(userDataDir, 'nfr-catalog.json');
+
+  // Dev/test override: if NFR_DB_URL is explicitly set (or opts.dsn passed in)
+  // we skip the catalog/embedded-Postgres flow and use that DSN directly.
+  // This is what the scratch-DB test harness uses.
+  const envDsnOverride = opts.dsn ?? process.env.NFR_DB_URL ?? null;
+
   let pool: pg.Pool | null = null;
   let parser: ParserManager | null = null;
   let watcher: FolderWatcher | null = null;
   let authToken: string | null = null;
+  let pgManager: PostgresManager | null = null;
+  let dsn: string | null = null;
 
   const setupState: SetupState = {
     status: 'not_reachable',
@@ -62,12 +89,44 @@ export async function run(opts: {
 
   const tryBoot = async (): Promise<{ ok: boolean; error?: string }> => {
     try {
+      // Resolve dsn for this boot attempt
+      let bootDsn: string;
+      if (envDsnOverride) {
+        bootDsn = envDsnOverride;
+      } else {
+        // Read catalog and decide what to do
+        const cat = await loadCatalog(catalogPath);
+        if (cat.active === null) {
+          setupState.status = 'not_reachable';
+          setupState.lastError = 'no active database — choose or create one';
+          return { ok: false, error: setupState.lastError };
+        }
+        if (!isNfrDataDirSync(cat.active)) {
+          setupState.status = 'not_reachable';
+          setupState.lastError = `active database not reachable: ${cat.active}`;
+          return { ok: false, error: setupState.lastError };
+        }
+
+        // Spin up embedded Postgres against the active data dir.
+        pgManager = new PostgresManager({
+          binDir: postgresBinDir(),
+          dataDir: cat.active,
+          port: EMBEDDED_PG_PORT,
+          superuser: EMBEDDED_PG_USER,
+        });
+        await pgManager.ensureInitialized();
+        await pgManager.start();
+        bootDsn = pgManager.url(EMBEDDED_PG_DATABASE);
+      }
+
       const boot = await bootstrapDatabase({
-        connectionString: dsn,
+        connectionString: bootDsn,
         migrationsDir,
       });
       await boot.client.end();
-      pool = createPool({ connectionString: dsn });
+      pool = createPool({ connectionString: bootDsn });
+      dsn = bootDsn;
+
       const cfg = await getAppConfig(pool);
       authToken = typeof cfg.authToken === 'string' ? cfg.authToken : null;
       const serialPort = typeof cfg.serialPort === 'string' ? cfg.serialPort : null;
@@ -91,7 +150,7 @@ export async function run(opts: {
       parser = new ParserManager({
         command: parserBinary,
         args: parserArgs,
-        env: { ...process.env, NFR_DB_URL: dsn },
+        env: { ...process.env, NFR_DB_URL: bootDsn },
         restartOnExit: !replayFile,
         restartDelayMs: 2_000,
       });
@@ -110,7 +169,7 @@ export async function run(opts: {
                 const child = spawn(
                   parserBinary,
                   batchArgs,
-                  { env: { ...process.env, NFR_DB_URL: dsn }, stdio: 'inherit' }
+                  { env: { ...process.env, NFR_DB_URL: bootDsn }, stdio: 'inherit' }
                 );
                 child.on('close', (code) =>
                   code === 0 ? resolve() : reject(new Error(`parser batch exit ${code}`))
@@ -132,6 +191,12 @@ export async function run(opts: {
       setupState.status = 'not_reachable';
       setupState.lastError = (err as Error).message;
       console.error('boot failed:', (err as Error).message);
+      // If the embedded Postgres started but bootstrap/etc failed, stop it so
+      // the next attempt isn't fighting a stale process.
+      if (pgManager) {
+        try { await pgManager.stop(); } catch { /* ignore */ }
+        pgManager = null;
+      }
       return { ok: false, error: (err as Error).message };
     }
   };
@@ -149,7 +214,7 @@ export async function run(opts: {
   };
 
   const restartParser = async () => {
-    if (!parser || !pool) return;
+    if (!parser || !pool || !dsn) return;
     const cfgNow = await getAppConfig(pool);
     const newDbc = typeof cfgNow.dbcPath === 'string' ? cfgNow.dbcPath : dbcCsv;
     const replayFileNow = typeof cfgNow.replayFile === 'string' ? cfgNow.replayFile : null;
@@ -176,7 +241,7 @@ export async function run(opts: {
   };
 
   const runBatchImport = async (filename: string, body: Buffer): Promise<ImportResult> => {
-    if (!pool) return { session_id: null, row_count: 0, error: 'database not ready' };
+    if (!pool || !dsn) return { session_id: null, row_count: 0, error: 'database not ready' };
     mkdirSync(NFR_UPLOADS_DIR, { recursive: true });
     const safeName = filename.replace(/[^A-Za-z0-9._-]/g, '_');
     const target = join(NFR_UPLOADS_DIR, `${Date.now()}-${safeName}`);
@@ -186,10 +251,11 @@ export async function run(opts: {
     const importDbc = typeof cfgNow.dbcPath === 'string' ? cfgNow.dbcPath : dbcCsv;
     const subArgs = ['batch', '--dbc', importDbc, '--file', target];
     const args = parserIsPython ? [PARSER_PY, ...subArgs] : subArgs;
+    const importDsn = dsn;
 
     return new Promise<ImportResult>((resolve) => {
       const child = spawn(parserBinary, args, {
-        env: { ...process.env, NFR_DB_URL: dsn },
+        env: { ...process.env, NFR_DB_URL: importDsn },
         stdio: ['ignore', 'pipe', 'pipe'],
       });
       let stdout = '';
@@ -223,6 +289,24 @@ export async function run(opts: {
     });
   };
 
+  const catalogDeps: CatalogDeps = {
+    catalogPath,
+    initializeDataDir: async (path: string) => {
+      const mgr = new PostgresManager({
+        binDir: postgresBinDir(),
+        dataDir: path,
+        port: EMBEDDED_PG_PORT,
+        superuser: EMBEDDED_PG_USER,
+      });
+      await mgr.ensureInitialized();
+      // Don't start it — orchestrator will own the lifecycle on next boot.
+    },
+    isNfrDataDir: async (path: string) => isNfrDataDirSync(path),
+    signalRestart: () => {
+      setTimeout(() => process.exit(0), 500);
+    },
+  };
+
   const app = await buildApp({
     pool,
     parser: parser ?? undefined,
@@ -231,8 +315,9 @@ export async function run(opts: {
     staticRoot: opts.staticRoot,
     dbcStorePath: DBC_STORE_PATH,
     onDbcChanged: restartParser,
-    dsn,
+    dsn: dsn ?? undefined,
     onImport: runBatchImport,
+    catalogDeps,
   });
   await app.listen({ port, host });
 
@@ -241,6 +326,9 @@ export async function run(opts: {
     if (watcher) await watcher.stop();
     await app.close();
     if (pool) await pool.end();
+    if (pgManager) {
+      try { await pgManager.stop(); } catch { /* ignore */ }
+    }
   };
 
   process.once('SIGINT', shutdown);
