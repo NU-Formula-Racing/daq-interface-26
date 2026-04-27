@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 
 export interface SetupState {
-  status: 'ok' | 'not_reachable';
+  status: 'ok' | 'not_reachable' | 'storage_disconnected';
   lastError: string | null;
   retry?: () => Promise<{ ok: boolean; error?: string }>;
 }

@@ -11,6 +11,7 @@ import { ParserManager } from './parser/manager.ts';
 import { FolderWatcher } from './watcher/watcher.ts';
 import { PostgresManager, postgresBinDir } from './db/postgres-manager.ts';
 import { loadCatalog } from './db/catalog.ts';
+import { VolumeWatcher } from './db/volume-watcher.ts';
 import type { SetupState } from './server/routes/setup.ts';
 import type { ImportResult } from './server/routes/import.ts';
 import type { CatalogDeps } from './server/routes/catalog.ts';
@@ -81,6 +82,8 @@ export async function run(opts: {
   let authToken: string | null = null;
   let pgManager: PostgresManager | null = null;
   let dsn: string | null = null;
+  let volumeWatcher: VolumeWatcher | null = null;
+  let activeDataDir: string | null = null;
 
   const setupState: SetupState = {
     status: 'not_reachable',
@@ -88,6 +91,10 @@ export async function run(opts: {
   };
 
   const tryBoot = async (): Promise<{ ok: boolean; error?: string }> => {
+    if (volumeWatcher) {
+      volumeWatcher.stop();
+      volumeWatcher = null;
+    }
     try {
       // Resolve dsn for this boot attempt
       let bootDsn: string;
@@ -117,6 +124,7 @@ export async function run(opts: {
         await pgManager.ensureInitialized();
         await pgManager.start();
         bootDsn = pgManager.url(EMBEDDED_PG_DATABASE);
+        activeDataDir = cat.active;
       }
 
       const boot = await bootstrapDatabase({
@@ -186,6 +194,36 @@ export async function run(opts: {
 
       setupState.status = 'ok';
       setupState.lastError = null;
+
+      // Watch the active data dir so an unplugged external drive surfaces
+      // as a clean UI state instead of letting Postgres crash unattended.
+      if (pool && activeDataDir) {
+        const watchedPath = activeDataDir;
+        volumeWatcher = new VolumeWatcher({
+          path: watchedPath,
+          onDisconnect: () => {
+            console.error(`data drive disconnected: ${watchedPath}`);
+            (async () => {
+              if (parser) {
+                try { await parser.stop(); } catch { /* best effort */ }
+                parser = null;
+              }
+              if (pgManager) {
+                try { await pgManager.stop(); } catch { /* best effort */ }
+                pgManager = null;
+              }
+              if (pool) {
+                try { await pool.end(); } catch { /* best effort */ }
+                pool = null;
+              }
+              setupState.status = 'storage_disconnected';
+              setupState.lastError = 'data drive disconnected: ' + watchedPath;
+            })();
+          },
+        });
+        volumeWatcher.start();
+      }
+
       return { ok: true };
     } catch (err) {
       setupState.status = 'not_reachable';
@@ -196,6 +234,10 @@ export async function run(opts: {
       if (pgManager) {
         try { await pgManager.stop(); } catch { /* ignore */ }
         pgManager = null;
+      }
+      if (volumeWatcher) {
+        volumeWatcher.stop();
+        volumeWatcher = null;
       }
       return { ok: false, error: (err as Error).message };
     }
@@ -322,6 +364,7 @@ export async function run(opts: {
   await app.listen({ port, host });
 
   const shutdown = async () => {
+    if (volumeWatcher) volumeWatcher.stop();
     if (parser) await parser.stop();
     if (watcher) await watcher.stop();
     await app.close();
