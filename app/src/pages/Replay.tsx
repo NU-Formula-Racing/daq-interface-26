@@ -35,14 +35,16 @@ function makeReplayStore(rows: OverviewRow[], t: number): FramesStore {
   return {
     push: () => {},
     latest: (id: number) => {
+      // Numeric / gauge widgets read latest() to show the value at the current
+      // scrub position — keep the cutoff behavior here.
       const arr = bySignal.get(id);
       if (!arr || arr.length === 0) return null;
       return arr[cutoff(arr)] ?? null;
     },
     series: (id: number) => {
-      const arr = bySignal.get(id);
-      if (!arr || arr.length === 0) return [];
-      return arr.slice(0, cutoff(arr) + 1);
+      // Graph widgets want the entire session, regardless of scrub position.
+      // The scrubber moves a cursor dot; it doesn't trim the visible series.
+      return bySignal.get(id) ?? [];
     },
     getVersion: () => 0,
     subscribe: () => () => {},
