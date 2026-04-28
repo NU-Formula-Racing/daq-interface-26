@@ -48,7 +48,7 @@ You open the app. Electron starts the local server. The server boots embedded Po
 ```
 cd app && npm install && npm run dev      # frontend dev server on :5173
 cd desktop && npm install                 # install electron deps
-cd parser && python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+cd parser && python -m venv .venv && source .venv/bin/activate && pip install -e .
 ```
 
 Then in the desktop folder run the orchestrator pointed at a Postgres you already have, or build the dmg with `npm run package` to get the standalone app.
