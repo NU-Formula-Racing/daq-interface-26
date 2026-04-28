@@ -1,0 +1,123 @@
+name: Build releases
+
+# Triggers:
+#   - push of a tag like v0.2.0  -> build all platforms and attach to a GitHub Release
+#   - manual dispatch from the Actions tab -> build all platforms and upload as artifacts (no release)
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      # Don't cancel other platforms if one fails. We want partial builds to still upload.
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14            # Apple silicon runner
+            platform: darwin-arm64
+            artifact_glob: 'desktop/release/*.dmg'
+          - os: ubuntu-latest
+            platform: linux-x86_64
+            artifact_glob: 'desktop/release/*.AppImage'
+          - os: windows-latest
+            platform: windows-amd64
+            artifact_glob: 'desktop/release/*.exe'
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # ---- Parser binary (PyInstaller) ----
+      # PyInstaller can't cross-compile, so each runner builds its own.
+      - name: Build parser binary (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          cd parser
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -e .
+          pip install pyinstaller
+          ./build.sh
+
+      - name: Build parser binary (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          cd parser
+          python -m venv .venv
+          .\.venv\Scripts\Activate.ps1
+          pip install -e .
+          pip install pyinstaller
+          .\.venv\Scripts\pyinstaller.exe `
+            --onefile --name parser `
+            --hidden-import psycopg_binary `
+            --hidden-import serial `
+            --hidden-import serial.tools.list_ports `
+            --distpath dist\parser-windows-amd64 `
+            __main__.py
+
+      # ---- Frontend ----
+      - name: Build frontend
+        shell: bash
+        run: |
+          cd app
+          npm ci
+          npm run build
+
+      # ---- Desktop deps ----
+      - name: Install desktop deps
+        shell: bash
+        run: |
+          cd desktop
+          npm ci
+
+      # ---- TODO: vendor Postgres binaries for Linux / Windows ----
+      # macOS: binaries are already committed under desktop/build/postgres-bin/macos-arm64/.
+      # Linux:   need to fetch a Postgres 17 build into desktop/build/postgres-bin/linux-x64/
+      # Windows: need to fetch a Postgres 17 zip into desktop/build/postgres-bin/windows-x64/
+      # See README "TODO: cross-platform Postgres" for the manual steps. Until those steps
+      # are wired up, the Linux and Windows jobs below will fail at `npm run package`.
+      - name: Note about embedded Postgres
+        if: runner.os != 'macOS'
+        shell: bash
+        run: |
+          echo "::warning::Embedded Postgres binaries are not yet vendored for ${{ matrix.platform }}."
+          echo "::warning::This job will fail until desktop/build/postgres-bin/<platform>/ is populated."
+
+      # ---- Package ----
+      - name: Package app
+        shell: bash
+        run: |
+          cd desktop
+          npm run package
+
+      # ---- Upload as workflow artifact (always) ----
+      - name: Upload build artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nfrInterface-${{ matrix.platform }}
+          path: ${{ matrix.artifact_glob }}
+          if-no-files-found: warn
+
+      # ---- Attach to the GitHub Release (only for tag pushes) ----
+      - name: Upload to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.artifact_glob }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
