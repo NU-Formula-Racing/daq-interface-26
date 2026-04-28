@@ -245,10 +245,12 @@ export function GraphWidget({
     return data[i0] * (1 - f) + data[i1] * f;
   };
 
-  // Legend data: name, current val, cursor val, color
+  // Legend data: value at the cursor (scrubber or hover). For live mode with no
+  // explicit playhead, fall back to the most recent sample so the legend stays
+  // populated.
   const legend = series.map((s) => ({
     sig: s.sig,
-    current: s.data[N - 1],
+    current: cursorVisible ? valueAt(s.data, cursorFrac) : s.data[N - 1],
     cursor: cursorVisible ? valueAt(s.data, cursorFrac) : null,
   }));
 
