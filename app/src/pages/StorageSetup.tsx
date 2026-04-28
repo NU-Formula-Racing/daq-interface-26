@@ -140,7 +140,7 @@ export default function StorageSetup() {
       <div className="max-w-xl w-full border border-[color:var(--color-border)] bg-[color:var(--color-panel)] p-8 space-y-6">
         <h1 className="text-lg tracking-widest uppercase">Choose where to store your data</h1>
         <p className="text-xs text-[color:var(--color-text-mute)] leading-relaxed">
-          NFR Local needs a place to keep your sessions and signals. You can use
+          nfrInterface needs a place to keep your sessions and signals. You can use
           the default location or pick a folder (e.g. on an external drive).
         </p>
 

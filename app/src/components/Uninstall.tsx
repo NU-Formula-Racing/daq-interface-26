@@ -35,7 +35,7 @@ export function Uninstall() {
           All databases and app data have been deleted. The app will quit shortly.
         </p>
         <p className="text-[11px] text-[color:var(--color-text-mute)] leading-relaxed">
-          To finish removing NFR Local, drag <code>NFR Local.app</code> from
+          To finish removing nfrInterface, drag <code>nfrInterface.app</code> from
           /Applications to the Trash.
         </p>
       </fieldset>

@@ -34,8 +34,8 @@
   },
   "main": "main/dist/electron-main.cjs",
   "build": {
-    "appId": "com.nfr26.local",
-    "productName": "NFR Local",
+    "appId": "com.nfr26.nfrinterface",
+    "productName": "nfrInterface",
     "asar": true,
     "files": [
       "main/dist/**/*",
@@ -49,6 +49,7 @@
       { "from": "build/postgres-bin/macos-arm64", "to": "postgres-bin/macos-arm64" }
     ],
     "mac": {
+      "icon": "build/icon.icns",
       "target": [{ "target": "dmg", "arch": ["arm64"] }],
       "category": "public.app-category.developer-tools",
       "entitlements": "build/entitlements.mac.plist",
