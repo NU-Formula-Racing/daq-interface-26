@@ -44,3 +44,9 @@
     font-size: 20px !important;
   }
 }
+
+@keyframes frwin-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+.frwin-pulse { animation: frwin-pulse 1.4s ease-in-out infinite; }

@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import FRWindow from '../components/FRWindow.jsx';
 import './AppDownload.css';
 
 // Editorial palette (cream / Northwestern purple)
@@ -274,24 +275,8 @@ export default function AppDownload() {
           <p style={{ fontSize: 17, lineHeight: 1.6, color: E_MUTED, maxWidth: 720, margin: '0 0 24px' }}>
             Each panel reads a named signal. Add graphs, gauges, numerics, bars, heatmaps {'\u2014'} drag to resize, click the {'\u00D7'} to remove. Layouts persist between sessions.
           </p>
-          <div
-            style={{
-              width: '100%',
-              maxWidth: 1080,
-              aspectRatio: '1080 / 560',
-              background: '#1a1816',
-              borderRadius: 8,
-              border: `1px solid ${E_RULE}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'rgba(255,255,255,0.4)',
-              fontFamily: MONO_E,
-              fontSize: 11,
-              letterSpacing: 1.5,
-            }}
-          >
-            [DASHBOARD PREVIEW]
+          <div className="appdl-frwindow-wrap" style={{ width: '100%', maxWidth: 1080 }}>
+            <FRWindow />
           </div>
         </Chapter>
 
