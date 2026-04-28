@@ -529,23 +529,6 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                   <>
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, letterSpacing: 1.2 }}>
-                        <span>WINDOW</span>
-                        <span style={{ color: SH_COLORS.text }}>
-                          {w.window >= 1 ? 'ALL' : `${Math.round((w.window || 0.05) * 3600)}s`}
-                        </span>
-                      </div>
-                      <input type="range" min={0.01} max={1} step={0.01} value={Math.min(1, w.window || 0.05)}
-                        onChange={(e) => patch(w.id, { window: +e.target.value })}
-                        style={{ width: '100%', accentColor: SH_COLORS.accentBright }} />
-                      <div style={{ display: 'flex', gap: 4, marginTop: 5 }}>
-                        <SegBtn active={(w.window || 0.05) <= 0.02} onClick={() => patch(w.id, { window: 0.02 })}>60s</SegBtn>
-                        <SegBtn active={Math.abs((w.window || 0.05) - 0.05) < 0.001} onClick={() => patch(w.id, { window: 0.05 })}>3m</SegBtn>
-                        <SegBtn active={Math.abs((w.window || 0.05) - 0.17) < 0.02} onClick={() => patch(w.id, { window: 0.17 })}>10m</SegBtn>
-                        <SegBtn active={w.window >= 1} onClick={() => patch(w.id, { window: 1 })}>ALL</SegBtn>
-                      </div>
-                    </div>
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, letterSpacing: 1.2 }}>
                         <span>ZOOM</span>
                         <span style={{ color: w.zoom ? SH_COLORS.accentBright : SH_COLORS.textFaint }}>
                           {w.zoom ? `${Math.round(w.zoom[0]*3600)}s → ${Math.round(w.zoom[1]*3600)}s` : 'OFF'}
