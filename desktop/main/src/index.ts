@@ -22,7 +22,9 @@ const REPO_ROOT = join(__dirname, '..', '..', '..');
 const MIGRATIONS_DIR = join(__dirname, '..', '..', 'migrations');
 const PARSER_DIR = join(REPO_ROOT, 'parser');
 const PARSER_PY = join(PARSER_DIR, '__main__.py');
-const PARSER_VENV_PY = join(PARSER_DIR, '.venv', 'bin', 'python');
+const PARSER_VENV_PY = process.platform === 'win32'
+  ? join(PARSER_DIR, '.venv', 'Scripts', 'python.exe')
+  : join(PARSER_DIR, '.venv', 'bin', 'python');
 const DBC_STORE_PATH = join(REPO_ROOT, 'parser', 'active-dbc.csv');
 // Staging area for uploaded .nfr files. Inside an installed `.app` the
 // Resources/ directory is often read-only, so use the OS temp dir which is

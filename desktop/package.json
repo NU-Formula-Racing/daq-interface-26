@@ -44,7 +44,7 @@
     "extraResources": [
       { "from": "../app/dist", "to": "app" },
       { "from": "migrations", "to": "migrations" },
-      { "from": "../parser/dist/parser-darwin-${arch}", "to": "parser" },
+      { "from": "../parser/dist/parser", "to": "parser" },
       { "from": "../NFR26DBC.csv", "to": "NFR26DBC.csv" },
       { "from": "build/postgres-bin/macos-arm64", "to": "postgres-bin/macos-arm64" },
       { "from": "build/postgres-bin/linux-x64", "to": "postgres-bin/linux-x64" },

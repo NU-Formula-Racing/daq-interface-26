@@ -56,7 +56,7 @@ app.whenReady().then(async () => {
     const booted = await run({
       dbcCsv: join(resources, 'NFR26DBC.csv'),
       migrationsDir: join(resources, 'migrations'),
-      parserBinary: join(resources, 'parser', 'parser'),
+      parserBinary: join(resources, 'parser', process.platform === 'win32' ? 'parser.exe' : 'parser'),
       staticRoot: join(resources, 'app'),
       userDataDir: app.getPath('userData'),
     });

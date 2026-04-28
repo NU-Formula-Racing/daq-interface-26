@@ -61,13 +61,7 @@ jobs:
           .\.venv\Scripts\Activate.ps1
           pip install -e .
           pip install pyinstaller
-          .\.venv\Scripts\pyinstaller.exe `
-            --onefile --name parser `
-            --hidden-import psycopg_binary `
-            --hidden-import serial `
-            --hidden-import serial.tools.list_ports `
-            --distpath dist\parser-windows-amd64 `
-            __main__.py
+          .\build.ps1
 
       # ---- Frontend ----
       - name: Build frontend
@@ -84,20 +78,9 @@ jobs:
           cd desktop
           npm ci
 
-      # ---- TODO: vendor Postgres binaries for Linux / Windows ----
-      # macOS: binaries are already committed under desktop/build/postgres-bin/macos-arm64/.
-      # Linux:   need to fetch a Postgres 17 build into desktop/build/postgres-bin/linux-x64/
-      # Windows: need to fetch a Postgres 17 zip into desktop/build/postgres-bin/windows-x64/
-      # See README "TODO: cross-platform Postgres" for the manual steps. Until those steps
-      # are wired up, the Linux and Windows jobs below will fail at `npm run package`.
-      - name: Note about embedded Postgres
-        if: runner.os != 'macOS'
-        shell: bash
-        run: |
-          echo "::warning::Embedded Postgres binaries are not yet vendored for ${{ matrix.platform }}."
-          echo "::warning::This job will fail until desktop/build/postgres-bin/<platform>/ is populated."
-
       # ---- Package ----
+      # Postgres binaries for all three platforms are vendored under
+      # desktop/build/postgres-bin/{macos-arm64,linux-x64,windows-x64}/.
       - name: Package app
         shell: bash
         run: |
