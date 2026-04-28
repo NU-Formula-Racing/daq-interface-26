@@ -1,6 +1,9 @@
 import type { FastifyInstance } from 'fastify';
 import type pg from 'pg';
 import { spawn } from 'child_process';
+import { existsSync } from 'fs';
+import { join } from 'path';
+import { postgresBinDir } from '../../db/postgres-manager.ts';
 
 interface DbAdminDeps {
   pool: pg.Pool;
@@ -42,13 +45,21 @@ export function registerDbAdminRoutes(app: FastifyInstance, deps: DbAdminDeps) {
    * and re-imports it on another machine that has the same schema migrations.
    */
   app.get('/api/db/export', async (req, reply) => {
+    const exe = process.platform === 'win32' ? 'pg_dump.exe' : 'pg_dump';
+    const pgDump = join(postgresBinDir(), 'bin', exe);
+    if (!existsSync(pgDump)) {
+      reply.code(501);
+      return reply.send({
+        error: 'pg_dump not available in this build (Linux ships zonky minimal binaries without pg_dump)',
+      });
+    }
     reply.raw.setHeader('Content-Type', 'application/sql; charset=utf-8');
     reply.raw.setHeader(
       'Content-Disposition',
       `attachment; filename="nfr-backup-${new Date().toISOString().slice(0, 10)}.sql"`,
     );
     const child = spawn(
-      'pg_dump',
+      pgDump,
       ['--data-only', '--column-inserts', '--no-owner', '--no-privileges', deps.dsn],
       { stdio: ['ignore', 'pipe', 'pipe'] },
     );

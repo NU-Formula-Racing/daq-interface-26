@@ -2,6 +2,7 @@ import { spawn, spawnSync, type ChildProcess } from 'child_process';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import path, { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
+import pg from 'pg';
 
 export interface PostgresManagerOptions {
   /** Absolute path to the directory holding `bin/`, `lib/`, `share/`. */
@@ -17,20 +18,20 @@ export interface PostgresManagerOptions {
 const PG_MAJOR = '17';
 
 export function postgresBinDir(): string {
-  // From bundled app: <resources>/postgres-bin/macos-arm64
-  // From dev: desktop/build/postgres-bin/macos-arm64
-  let candidate: string;
+  const platDir =
+    process.platform === 'win32' ? 'windows-x64'
+    : process.platform === 'linux' ? 'linux-x64'
+    : 'macos-arm64';
+  // Packaged: <resources>/postgres-bin/<plat>
   const resourcesPath = (process as NodeJS.Process & { resourcesPath?: string }).resourcesPath;
   if (resourcesPath) {
-    candidate = join(resourcesPath, 'postgres-bin', 'macos-arm64');
-  } else {
-    const here = dirname(fileURLToPath(import.meta.url));
-    candidate = resolve(here, '..', '..', '..', 'build', 'postgres-bin', 'macos-arm64');
+    const packaged = join(resourcesPath, 'postgres-bin', platDir);
+    if (existsSync(packaged)) return packaged;
   }
+  const here = dirname(fileURLToPath(import.meta.url));
+  const candidate = resolve(here, '..', '..', '..', 'build', 'postgres-bin', platDir);
   if (!existsSync(candidate)) {
-    throw new Error(
-      'embedded Postgres binaries not found at ' + candidate + ' — only macos-arm64 is currently vendored',
-    );
+    throw new Error('embedded Postgres binaries not found at ' + candidate);
   }
   return candidate;
 }
@@ -59,7 +60,7 @@ export class PostgresManager {
   async ensureInitialized(): Promise<void> {
     if (await this.isInitialized()) return;
 
-    const binInitdb = join(this.opts.binDir, 'bin', 'initdb');
+    const binInitdb = this.binPath('initdb');
     const env = { ...process.env, ...this.libEnv() };
 
     const res = spawnSync(
@@ -100,7 +101,7 @@ export class PostgresManager {
       );
     }
 
-    const binPostgres = join(this.opts.binDir, 'bin', 'postgres');
+    const binPostgres = this.binPath('postgres');
     const env = { ...process.env, ...this.libEnv() };
 
     const child = spawn(
@@ -126,8 +127,7 @@ export class PostgresManager {
       if (this.child === child) this.child = null;
     });
 
-    // Wait for pg_isready
-    const binReady = join(this.opts.binDir, 'bin', 'pg_isready');
+    // Wait for readiness via TCP probe (Linux zonky binaries don't ship pg_isready).
     const deadline = Date.now() + 20_000;
     while (Date.now() < deadline) {
       // If exit handler nulled this.child, the process died during startup.
@@ -136,11 +136,19 @@ export class PostgresManager {
           `postgres exited during startup${stderrBuf ? `: ${stderrBuf.trim()}` : ''}`,
         );
       }
-      const r = spawnSync(binReady, ['-h', '127.0.0.1', '-p', String(this.opts.port)], {
-        env, stdio: 'pipe',
+      const probe = new pg.Client({
+        connectionString: `postgres://${this.opts.superuser}@127.0.0.1:${this.opts.port}/postgres`,
+        connectionTimeoutMillis: 1000,
       });
-      if (r.status === 0) return;
-      await new Promise((r) => setTimeout(r, 200));
+      try {
+        await probe.connect();
+        await probe.end();
+        return;
+      } catch {
+        // not ready yet
+        try { await probe.end(); } catch { /* ignore */ }
+      }
+      await new Promise((r) => setTimeout(r, 250));
     }
 
     // Timed out — kill the child before throwing.
@@ -173,6 +181,10 @@ export class PostgresManager {
     return `postgres://${this.opts.superuser}@127.0.0.1:${this.opts.port}/${database}`;
   }
 
+  private binPath(name: string): string {
+    return join(this.opts.binDir, 'bin', process.platform === 'win32' ? `${name}.exe` : name);
+  }
+
   private libEnv(): NodeJS.ProcessEnv {
     const libDir = join(this.opts.binDir, 'lib');
     const dyld = process.env.DYLD_LIBRARY_PATH ?? '';
@@ -180,6 +192,8 @@ export class PostgresManager {
     return {
       DYLD_LIBRARY_PATH: dyld ? `${libDir}${path.delimiter}${dyld}` : libDir,
       LD_LIBRARY_PATH: ld ? `${libDir}${path.delimiter}${ld}` : libDir,
+      LC_ALL: 'C.UTF-8',
+      LANG: 'C.UTF-8',
     };
   }
 }

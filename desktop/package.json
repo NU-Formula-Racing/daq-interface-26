@@ -46,7 +46,9 @@
       { "from": "migrations", "to": "migrations" },
       { "from": "../parser/dist/parser-darwin-${arch}", "to": "parser" },
       { "from": "../NFR26DBC.csv", "to": "NFR26DBC.csv" },
-      { "from": "build/postgres-bin/macos-arm64", "to": "postgres-bin/macos-arm64" }
+      { "from": "build/postgres-bin/macos-arm64", "to": "postgres-bin/macos-arm64" },
+      { "from": "build/postgres-bin/linux-x64", "to": "postgres-bin/linux-x64" },
+      { "from": "build/postgres-bin/windows-x64", "to": "postgres-bin/windows-x64" }
     ],
     "mac": {
       "icon": "build/icon.icns",
@@ -56,6 +58,15 @@
       "entitlementsInherit": "build/entitlements.mac.plist",
       "hardenedRuntime": false,
       "gatekeeperAssess": false
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "target": ["AppImage"],
+      "category": "Development"
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": ["nsis"]
     },
     "directories": {
       "buildResources": "build",
