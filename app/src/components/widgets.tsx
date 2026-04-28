@@ -57,11 +57,9 @@ export function GraphWidget({
     t0 = Math.max(0, t - win);
     if (t1 - t0 < win * 0.5) { t0 = 0; t1 = Math.max(win, t1); }
   } else {
-    // Replay: stable window. Anchor to floor(t/win)*win so scrubbing doesn't shrink.
-    const w = win;
-    t0 = Math.max(0, Math.floor(t / w) * w);
-    t1 = Math.min(1, t0 + w);
-    if (t1 >= 1) { t1 = 1; t0 = Math.max(0, t1 - w); }
+    // Replay: show the entire session. The scrubber just moves the cursor.
+    t0 = 0;
+    t1 = 1;
   }
 
   const padL = compact ? 32 : 40, padR = 8, padT = compact ? 18 : 22, padB = compact ? 16 : 20;
@@ -93,17 +91,20 @@ export function GraphWidget({
 
     // Decide which slice of the buffer to render.
     // - Live: rolling window — last `win` fraction of the buffer ending at "now".
-    //   We treat `t === 1` as latest. Show last `win * bufferLen` points (clamped).
-    // - Replay/paused: window ends at `t * bufferLen`, length `win * bufferLen`.
+    // - Zoomed (either mode): the zoom range maps to a fraction of the buffer.
+    // - Replay (no zoom): full buffer; the scrubber just moves the cursor.
     const len = allRaw.length;
     const winLen = Math.max(8, Math.floor(len * win));
     let start: number, end: number;
-    if (mode === 'live') {
+    if (zoom && zoom.length === 2) {
+      start = Math.max(0, Math.floor(zoom[0] * len));
+      end = Math.max(start + 1, Math.min(len, Math.ceil(zoom[1] * len)));
+    } else if (mode === 'live') {
       end = len;
       start = Math.max(0, len - winLen);
     } else {
-      end = Math.max(1, Math.min(len, Math.floor(t * len)));
-      start = Math.max(0, end - winLen);
+      start = 0;
+      end = len;
     }
     const sliced = allRaw.slice(start, end);
     if (sliced.length === 0) return { sig, data: new Array(N).fill(0), empty: true };
@@ -333,8 +334,8 @@ export function GraphWidget({
                 style={{ filter: `drop-shadow(0 0 3px ${color}55)` }} />
               {/* End dot (current) */}
               <circle cx={x(N - 1)} cy={y(s.data[N - 1])} r={2.5} fill={color} />
-              {/* Cursor dot */}
-              {cursorVisible && hoverFrac !== null && (
+              {/* Cursor dot — follows the playhead `t` (or hover when present) */}
+              {cursorVisible && (
                 <circle cx={cursorX} cy={y(valueAt(s.data, cursorFrac))} r={3} fill={W_COLORS.bgInner} stroke={color} strokeWidth={1.5} />
               )}
             </g>
