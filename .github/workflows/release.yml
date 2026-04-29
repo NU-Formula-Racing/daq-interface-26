@@ -24,7 +24,7 @@ jobs:
             artifact_glob: 'desktop/release/*.AppImage'
           - os: windows-latest
             platform: windows-amd64
-            artifact_glob: 'desktop/release/*.exe'
+            artifact_glob: 'desktop/release/*.zip'
 
     runs-on: ${{ matrix.os }}
 
