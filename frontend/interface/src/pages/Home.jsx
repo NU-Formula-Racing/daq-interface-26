@@ -482,7 +482,7 @@ const Header = ({ accent }) => (
         wordBreak: 'break-word',
       }}
     >
-      NFR DAQ Interface
+      NFR <span style={{ fontStyle: 'italic', color: '#4E2A84' }}>Interface</span>
     </h1>
 
     <div
