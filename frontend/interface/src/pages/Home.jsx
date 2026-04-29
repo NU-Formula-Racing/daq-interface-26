@@ -362,6 +362,91 @@ const DateField = ({ value, onChange, accent = ACCENT }) => {
 
 // ---------- Header ----------
 
+const SimpleCard = ({ label, accent = ACCENT, online, children }) => (
+  <div
+    style={{
+      background: 'rgba(15, 18, 25, 0.65)',
+      border: '1px solid rgba(255, 255, 255, 0.08)',
+      borderRadius: 12,
+      padding: 24,
+      backdropFilter: 'blur(8px)',
+      WebkitBackdropFilter: 'blur(8px)',
+      display: 'flex',
+      flexDirection: 'column',
+    }}
+  >
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 12,
+      }}
+    >
+      <span
+        style={{
+          fontFamily: "'Instrument Serif', serif",
+          fontSize: 24,
+          color: '#f1f5f9',
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {label}
+      </span>
+      {online !== undefined && (
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontFamily: 'var(--mono, "JetBrains Mono", monospace)',
+            fontSize: 10,
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            color: online ? accent : 'rgba(180, 200, 220, 0.5)',
+          }}
+        >
+          <StatusDot color={online ? accent : '#64748b'} online={online} size={6} />
+          {online ? 'Live' : 'Offline'}
+        </span>
+      )}
+    </div>
+    {children}
+  </div>
+);
+
+const SimpleButton = ({ children, accent = ACCENT, onClick }) => {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        width: '100%',
+        padding: '12px 18px',
+        background: hover ? accent : hexToRgba(accent, 0.12),
+        color: hover ? '#0a0c12' : '#f1f5f9',
+        border: `1px solid ${hexToRgba(accent, hover ? 1 : 0.4)}`,
+        borderRadius: 8,
+        fontFamily: "'Inter', system-ui, sans-serif",
+        fontSize: 14,
+        fontWeight: 500,
+        letterSpacing: '0.02em',
+        cursor: 'pointer',
+        transition: 'background 160ms ease, color 160ms ease, border-color 160ms ease',
+      }}
+    >
+      {children}
+      <span style={{ fontSize: 14, opacity: hover ? 1 : 0.6 }}>{'\u2192'}</span>
+    </button>
+  );
+};
+
 const Header = ({ accent }) => (
   <div style={{ textAlign: 'center', marginBottom: 56, width: '100%' }}>
     <div
@@ -380,25 +465,24 @@ const Header = ({ accent }) => (
     >
       <span style={{ width: 28, height: 1, background: 'rgba(180,200,220,0.25)' }} />
       <span style={{ color: accent }}>NFR · DAQ</span>
-      <span>v2.4.1</span>
       <span style={{ width: 28, height: 1, background: 'rgba(180,200,220,0.25)' }} />
     </div>
 
     <h1
       className="home-h1"
       style={{
-        fontFamily: 'var(--mono)',
-        fontWeight: 500,
-        fontSize: 'clamp(34px, 5.6vw, 72px)',
-        letterSpacing: '0.04em',
+        fontFamily: "'Instrument Serif', serif",
+        fontWeight: 400,
+        fontSize: 'clamp(56px, 9vw, 132px)',
+        letterSpacing: '-0.02em',
         color: '#f1f5f9',
         margin: 0,
-        lineHeight: 1.0,
+        lineHeight: 0.95,
         textShadow: `0 0 40px ${hexToRgba(accent, 0.12)}`,
         wordBreak: 'break-word',
       }}
     >
-      NFR DAQ INTERFACE
+      NFR DAQ Interface
     </h1>
 
     <div
@@ -545,56 +629,22 @@ export default function HomePage() {
         <Header accent={accent} />
 
         <div className="home-cards-grid">
-          <TerminalCard
-            label="01 · Live"
-            index="//STREAM"
-            status={online ? 'CONNECTED' : 'OFFLINE'}
-            statusOnline={online}
-            accent={accent}
-            active={liveHover}
-            onMouseEnter={() => setLiveHover(true)}
-            onMouseLeave={() => setLiveHover(false)}
-          >
-            <div
-              style={{
-                fontFamily: 'var(--mono)',
-                fontSize: 13,
-                color: 'rgba(220, 230, 240, 0.85)',
-                lineHeight: 1.5,
-                marginBottom: 28,
-              }}
-            >
-              Stream real-time CAN &amp; sensor data
-            </div>
-            <HudButton accent={accent} onClick={handleEnterLive}>Enter</HudButton>
-          </TerminalCard>
+          <SimpleCard label="Live" accent={accent} online={online}>
+            <p style={{ fontSize: 14, color: 'rgba(220, 230, 240, 0.7)', lineHeight: 1.5, margin: '0 0 24px' }}>
+              Stream real-time CAN and sensor data.
+            </p>
+            <SimpleButton accent={accent} onClick={handleEnterLive}>Enter</SimpleButton>
+          </SimpleCard>
 
-          <TerminalCard
-            label="02 · Replay"
-            index="//ARCHIVE"
-            accent={accent}
-            active={replayHover}
-            onMouseEnter={() => setReplayHover(true)}
-            onMouseLeave={() => setReplayHover(false)}
-          >
-            <div
-              style={{
-                fontFamily: 'var(--mono)',
-                fontSize: 13,
-                color: 'rgba(220, 230, 240, 0.85)',
-                lineHeight: 1.5,
-                marginBottom: 14,
-              }}
-            >
-              Analyze past drive sessions
-            </div>
-
-            <div style={{ marginBottom: 14 }}>
+          <SimpleCard label="Replay" accent={accent}>
+            <p style={{ fontSize: 14, color: 'rgba(220, 230, 240, 0.7)', lineHeight: 1.5, margin: '0 0 16px' }}>
+              Analyze past drive sessions.
+            </p>
+            <div style={{ marginBottom: 16 }}>
               <DateField value={date} onChange={setDate} accent={accent} />
             </div>
-
-            <HudButton accent={accent} onClick={handleOpenReplay}>Open</HudButton>
-          </TerminalCard>
+            <SimpleButton accent={accent} onClick={handleOpenReplay}>Open</SimpleButton>
+          </SimpleCard>
         </div>
 
         <LocalAppRow accent={accent} onClick={() => navigate('/app')} />
