@@ -33,7 +33,10 @@ function ENav({ issue = 'A FIELD GUIDE', onBack }) {
         gap: 28,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+      <div
+        onClick={onBack}
+        style={{ display: 'flex', alignItems: 'baseline', gap: 8, cursor: 'pointer' }}
+      >
         <span style={{ fontFamily: SERIF, fontSize: 26, fontStyle: 'italic', color: E_PURPLE, lineHeight: 1 }}>NFR</span>
         <span style={{ fontFamily: SERIF, fontSize: 26, color: E_INK, lineHeight: 1 }}>interface</span>
       </div>
