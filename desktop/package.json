@@ -1,6 +1,6 @@
 {
   "name": "daq-desktop",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "private": true,
   "type": "module",
   "scripts": {
@@ -60,18 +60,6 @@
       {
         "from": "../NFR26DBC.csv",
         "to": "NFR26DBC.csv"
-      },
-      {
-        "from": "build/postgres-bin/macos-arm64",
-        "to": "postgres-bin/macos-arm64"
-      },
-      {
-        "from": "build/postgres-bin/linux-x64",
-        "to": "postgres-bin/linux-x64"
-      },
-      {
-        "from": "build/postgres-bin/windows-x64",
-        "to": "postgres-bin/windows-x64"
       }
     ],
     "mac": {
@@ -88,19 +76,37 @@
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
       "hardenedRuntime": false,
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "extraResources": [
+        {
+          "from": "build/postgres-bin/macos-arm64",
+          "to": "postgres-bin/macos-arm64"
+        }
+      ]
     },
     "linux": {
       "icon": "build/icon.png",
       "target": [
         "AppImage"
       ],
-      "category": "Development"
+      "category": "Development",
+      "extraResources": [
+        {
+          "from": "build/postgres-bin/linux-x64",
+          "to": "postgres-bin/linux-x64"
+        }
+      ]
     },
     "win": {
       "icon": "build/icon.ico",
       "target": [
         "zip"
+      ],
+      "extraResources": [
+        {
+          "from": "build/postgres-bin/windows-x64",
+          "to": "postgres-bin/windows-x64"
+        }
       ]
     },
     "directories": {
