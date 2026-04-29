@@ -1,154 +1,61 @@
-# CAN Signal Decoder Architecture
+# parser
 
-This project implements a **runtime CAN signal decoder** driven by a DBC-style CSV file.
-The system compiles signal definitions once at startup and decodes incoming CAN frames efficiently at runtime.
+The Python program that reads CAN data off the car (or out of saved files) and writes it into Postgres.
 
----
+## What it does
 
-## Overview
+1. Loads a DBC-style CSV (`NFR26DBC.csv`) that describes every CAN message on the bus and the signals packed into each frame.
+2. Compiles the CSV into an in-memory decode table at startup.
+3. Reads frames from a source: a USB-serial port (live mode), a `.nfr` log file (batch mode), or a `.nfr` file replayed at chosen speed (replay mode).
+4. Decodes each frame into named signal values and inserts them into Postgres.
 
-The system is split into **compile-time** and **runtime** phases:
+## Modes
 
-1. **Compile-time**:
-   Parse and validate the CSV signal definitions and convert them into an efficient in-memory decoding table.
+The parser is invoked by the desktop app as a subprocess with one of three subcommands:
 
-2. **Runtime**:
-   Read CAN frames from a stream, look up the corresponding message definition, extract signal bits, and compute physical values.
+- `live --dbc <csv> --port <serial>` — read frames from a serial port at 500 Hz, decode, and write to Postgres in real time. Also emits one JSON line per frame on stdout so the desktop app can stream them to the browser over a WebSocket.
+- `batch --dbc <csv> --file <nfr>` — read a binary `.nfr` log from the SD card on the car, decode every frame, and insert as one session you can scrub through later.
+- `replay --dbc <csv> --file <nfr> --speed <x>` — same as batch but paced at real time (or `<x>` times faster) so the live UI animates while ingesting.
 
-This separation ensures fast, deterministic decoding and clean extensibility.
+## Files
 
----
+- `__main__.py` — CLI entry point (parses subcommand and dispatches)
+- `compile.py` — turns the CSV into a decode table
+- `signalSpec.py` — small data classes for SignalSpec / MessageSpec
+- `decode.py` — runtime bit slicing + scale/offset application
+- `nfr_reader.py` / `protocol.py` — read the binary `.nfr` log format
+- `serial_source.py` / `file_source.py` — abstractions over the input
+- `db.py` — Postgres writer (uses `psycopg`)
+- `live.py` / `batch.py` — wire the pieces together for each mode
+- `build.sh` / `build.ps1` — produce a single-file binary via PyInstaller
 
-## Architecture
+## Local development
 
 ```
-DBC CSV
-  ↓
-compile.py   (compile-time validation & normalization)
-  ↓
-spec.py      (data models: SignalSpec, MessageSpec)
-  ↓
-decode.py    (runtime decoding engine)
-  ↑
-stream.py    (CAN/log/socket frame source)
+python -m venv .venv
+source .venv/bin/activate           # Windows: .\.venv\Scripts\Activate.ps1
+pip install -e ".[dev]"
+pytest                              # run the test suite
 ```
 
----
+To run against a Postgres you have locally:
 
-## Module Responsibilities
-
-### `spec.py`
-
-Defines the domain models used throughout the system.
-A CAN **message** is a group of **signals**
-
-* `SignalSpec`
-
-  * Signal name
-  * Start bit (absolute)
-  * Bit length
-  * Signed/unsigned
-  * Scale and offset
-
-* `MessageSpec`
-
-  * CAN frame ID
-  * Message name
-  * List of `SignalSpec`
-
-This module contains **no I/O and no runtime logic**.
-
----
-
-### `compile.py`
-
-Compile-time logic that converts the CSV into executable decoding metadata.
-
-Responsibilities:
-
-* Parse CSV rows
-* Carry forward message IDs
-* Normalize data types (signed/unsigned)
-* Validate signal bounds and overlaps
-* Group signals by message ID
-
-Output:
-
-```python
-decode_table: dict[int, MessageSpec]
+```
+NFR_DB_URL=postgres://postgres@localhost:5432/nfr_local \
+python -m . live --dbc ../NFR26DBC.csv --port /dev/tty.usbserial-XXXX
 ```
 
-This code runs once at startup and may fail loudly if the CSV is invalid.
+## Building a single-file binary
 
----
-
-### `decode.py`
-
-Runtime decoding engine.
-
-Responsibilities:
-
-* Accept `(frame_id, data_bytes)`
-* Look up the corresponding `MessageSpec`
-* Extract bit slices using absolute start bits
-* Apply signed conversion, scale, and offset
-* Return decoded signal values
-
-This module is:
-
-* Stateless
-* Fast
-* Side-effect free
-
----
-
-### `stream.py`
-
-Input layer that provides raw CAN frames.
-
-Responsibilities:
-
-* Read frames from a CAN bus, log file, socket, or replay source
-* Yield `(timestamp, frame_id, data_bytes)`
-
-This module knows nothing about signal definitions or decoding.
-
----
-
-## Runtime Flow
-
-```python
-decode_table = compile_csv("dbc.csv")
-
-for timestamp, frame_id, data in stream:
-    values = decode_frame(frame_id, data, decode_table)
-    consume(values)
+```
+./build.sh        # macOS or Linux
+.\build.ps1       # Windows
 ```
 
----
+Output: `dist/parser/parser` (or `parser.exe`). The desktop app picks this up automatically when it packages.
 
-## Design Principles
+## Notes
 
-* Absolute bit positions eliminate runtime endianness concerns
-* All structural validation happens at compile time
-* Runtime decoding is simple bit slicing and math
-* Input sources are fully decoupled from decoding logic
-
----
-
-## When to Use Jupyter
-
-Jupyter notebooks used for:
-
-* Exploring the CSV
-* Visualizing bit layouts
-* Performing sanity checks
-
-Decoding logic and runtime code should live exclusively in Python modules.
-
----
-
-## Summary
-
-This architecture treats the CSV as source code, the compiler as a validator, and the decoder as a lightweight execution engine.
-The result is a fast, maintainable, and extensible CAN signal decoding system.
+- Decoding is stateless: same input frame always produces the same output. Anything observable (DB writes, stdout) lives outside the decode functions so the bit math stays easy to test.
+- Bit positions in the CSV are absolute and big-endian, so endianness conversion is not a runtime concern.
+- All structural validation (overlapping signals, bad bit ranges) happens once at compile time; the runtime path is straight bit slicing and scale/offset arithmetic.

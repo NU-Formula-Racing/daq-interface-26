@@ -1,32 +1,53 @@
-# Packaging the NFR Local app
+# Packaging nfrInterface
 
-Prerequisites on your build machine:
-- Plans 1–4 + Plan 5 Tasks 1–3 complete (cloud sync, setup screen, PyInstaller binary).
-- `app/dist/` built via `cd app && npm run build`.
-- `parser/dist/parser-<platform>-<arch>/parser` built via `cd parser && ./build.sh`.
-- Node 20+, npm 10+, Xcode Command Line Tools.
+This folder holds the build inputs that electron-builder needs:
 
-Build the installer:
+- `icon.png` / `icon.icns` / `icon.ico` — the app icon for each OS
+- `entitlements.mac.plist` — macOS entitlements file
+- `build-main.js` — esbuild script that bundles the Electron main + preload
+- `postgres-bin/` — vendored Postgres 17 binaries for each supported platform
 
-    cd desktop
-    npm run package
+## Building
 
-Output: `desktop/release/NFR Local-<version>-<arch>.dmg`.
+Prerequisites:
+- Node 20+ and npm 10+
+- Python 3.11+
+- For macOS: Xcode Command Line Tools
 
-First-build note: electron-builder will download the Electron runtime (~90 MB)
-on its first run. Subsequent builds are cached.
+Step by step:
 
-## What's inside the `.dmg`
+```
+# 1. Build the React frontend
+cd app && npm install && npm run build
 
-- `NFR Local.app/Contents/Resources/app/` — built React UI
-- `.../Resources/migrations/` — SQL migrations applied on first launch
-- `.../Resources/parser/parser` — the PyInstaller-bundled parser binary
-- `.../Resources/NFR26DBC.csv` — default CAN signal definitions
+# 2. Build the parser binary for this OS
+cd parser
+python -m venv .venv
+source .venv/bin/activate    # on Windows: .\.venv\Scripts\Activate.ps1
+pip install -e . pyinstaller
+./build.sh                   # on Windows: .\build.ps1
 
-## Install + first launch
+# 3. Package the desktop app
+cd desktop && npm install && npm run package
+```
 
-1. Open the `.dmg`, drag `NFR Local.app` to `/Applications`.
-2. First launch: right-click → Open (bypasses Gatekeeper for the unsigned build).
-3. If Postgres isn't running, the UI shows the setup page with install
-   instructions. Start Postgres.app, click RETRY. App reloads to the Live
-   dashboard.
+Output ends up in `desktop/release/`:
+- macOS: `nfrInterface-<version>-arm64.dmg`
+- Linux: `nfrInterface-<version>.AppImage`
+- Windows: `nfrInterface <version>.exe` (portable)
+
+The first build downloads the Electron runtime (~90 MB). After that it is cached.
+
+## What's inside the installer
+
+- `<resources>/app/` — the built React UI (static files)
+- `<resources>/migrations/` — SQL migrations applied on first launch
+- `<resources>/parser/parser` (or `parser.exe`) — PyInstaller binary
+- `<resources>/postgres-bin/<platform>/` — embedded Postgres for that OS
+- `<resources>/NFR26DBC.csv` — default CAN signal definitions
+
+The user does not need to install Postgres or Python; everything is bundled.
+
+## Cross-platform builds
+
+Each platform has to package itself because the Postgres and parser binaries are native code. Use the GitHub Actions workflow at `.github/workflows/release.yml` — push a tag like `v0.4.0` and it produces all three installers in parallel and attaches them to the matching release.
