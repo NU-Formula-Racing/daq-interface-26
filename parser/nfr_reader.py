@@ -37,10 +37,14 @@ def read_header(path: Path) -> HeaderInfo:
     _weekday, month, day, year = struct.unpack_from("<BBBB", raw, 9)
     hours, minutes, seconds, subseconds = struct.unpack_from("<BBBI", raw, 13)
     date_str = f"20{year:02d}-{month:02d}-{day:02d}"
-    start_dt = datetime(
-        2000 + year, month, day, hours, minutes, seconds,
-        subseconds * 1000, tzinfo=timezone.utc,
+    # The car's RTC has no timezone — its wall-clock fields are whatever local
+    # time the team set. Treat them as naive local on the importing machine
+    # and convert to UTC for storage. (datetime.astimezone() on a naive value
+    # presumes the system local timezone.)
+    naive = datetime(
+        2000 + year, month, day, hours, minutes, seconds, subseconds * 1000,
     )
+    start_dt = naive.astimezone(timezone.utc)
     return HeaderInfo(date=date_str, start_time=start_dt)
 
 

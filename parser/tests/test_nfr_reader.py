@@ -34,7 +34,11 @@ def test_read_header_decodes_date_and_start_dt(tmp_path: Path) -> None:
     log = _build_log(tmp_path, [])
     info = read_header(log)
     assert info.date == "2026-04-22"
-    assert info.start_time == datetime(2026, 4, 22, 12, 0, tzinfo=timezone.utc)
+    # RTC fields are interpreted as naive local time and converted to UTC.
+    # Compare against the same conversion path so the test stays correct on
+    # any machine timezone.
+    expected = datetime(2026, 4, 22, 12, 0).astimezone(timezone.utc)
+    assert info.start_time == expected
 
 
 def test_iter_frames_yields_every_frame_in_order(tmp_path: Path) -> None:
