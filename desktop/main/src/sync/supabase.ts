@@ -122,9 +122,18 @@ export function supabaseCloudPusher(
         value: r.value,
       }));
       const CHUNK = 500;
+      // Use upsert with ignoreDuplicates so retries after a partial failure
+      // don't create duplicate readings. The cloud has a UNIQUE constraint
+      // on (session_id, ts, signal_id); ON CONFLICT DO NOTHING is the
+      // idempotent behavior we want.
       for (let i = 0; i < rows.length; i += CHUNK) {
-        const { error } = await client.from('sd_readings').insert(rows.slice(i, i + CHUNK));
-        if (error) throw new Error(`readings insert failed: ${error.message}`);
+        const { error } = await client
+          .from('sd_readings')
+          .upsert(rows.slice(i, i + CHUNK), {
+            onConflict: 'session_id,ts,signal_id',
+            ignoreDuplicates: true,
+          });
+        if (error) throw new Error(`readings upsert failed: ${error.message}`);
       }
     },
   };

@@ -14,12 +14,26 @@ Emits progress via a `ProtocolEmitter`; callers choose the stream.
 """
 from __future__ import annotations
 
+import hashlib
 from datetime import timedelta
 from pathlib import Path
 from typing import Iterable
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import psycopg
+
+# Stable namespace for deriving session UUIDs from .nfr file content. Two
+# devices that import the same file get the same session_id, so cloud sync
+# deduplicates automatically. Generated once and frozen — do not change.
+_NFR_SESSION_NAMESPACE = UUID("8c4b2f6e-3a91-4d20-9c7e-1a5f8b9d2c33")
+
+
+def session_id_from_file(nfr_file: Path) -> UUID:
+    h = hashlib.sha256()
+    with open(nfr_file, "rb") as f:
+        for chunk in iter(lambda: f.read(64 * 1024), b""):
+            h.update(chunk)
+    return uuid5(_NFR_SESSION_NAMESPACE, h.hexdigest())
 
 from compile import compile_csv
 from db import (
@@ -80,12 +94,30 @@ def run_batch_import(
                 for (src, name, unit) in signals_seen
             ],
         )
+        deterministic_id = session_id_from_file(nfr_file)
         session_id = open_session(
             conn,
             source="sd_import",
             source_file=str(nfr_file),
             started_at=header.start_time,
+            session_id=deterministic_id,
         )
+
+        # If this exact file has been imported before, the session row already
+        # exists and so do its readings — skip the COPY pass and report the
+        # existing session as "ended" with whatever count is in the table.
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT count(*) FROM sd_readings WHERE session_id = %s",
+                (str(session_id),),
+            )
+            (existing_rows,) = cur.fetchone()
+        if existing_rows > 0:
+            emitter.session_started(str(session_id), source="sd_import")
+            emitter.import_progress(str(nfr_file), pct=100)
+            emitter.session_ended(str(session_id), row_count=int(existing_rows))
+            return session_id
+
         emitter.session_started(str(session_id), source="sd_import")
 
         next_progress_threshold = PROGRESS_STEP_PCT

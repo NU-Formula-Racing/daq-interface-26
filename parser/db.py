@@ -66,21 +66,40 @@ def open_session(
     *,
     source_file: str | None = None,
     started_at: datetime | None = None,
+    session_id: UUID | None = None,
 ) -> UUID:
-    """Create a new session row and return its UUID."""
+    """Create a new session row and return its UUID.
+
+    If `session_id` is provided, it's used as the row's id (and ON CONFLICT
+    DO NOTHING means re-importing the same file twice resolves to the same
+    existing row instead of creating a duplicate). Otherwise a random UUID
+    is assigned by the database.
+    """
     if source not in ("live", "sd_import"):
         raise ValueError(f"invalid source: {source!r}")
     with conn.cursor() as cur:
-        cur.execute(
-            "INSERT INTO sessions (date, started_at, source, source_file) "
-            "VALUES (COALESCE(%s::date, CURRENT_DATE), "
-            "        COALESCE(%s, now()), %s, %s) "
-            "RETURNING id",
-            (started_at, started_at, source, source_file),
-        )
-        (session_id,) = cur.fetchone()
+        if session_id is None:
+            cur.execute(
+                "INSERT INTO sessions (date, started_at, source, source_file) "
+                "VALUES (COALESCE(%s::date, CURRENT_DATE), "
+                "        COALESCE(%s, now()), %s, %s) "
+                "RETURNING id",
+                (started_at, started_at, source, source_file),
+            )
+            (row_id,) = cur.fetchone()
+        else:
+            cur.execute(
+                "INSERT INTO sessions (id, date, started_at, source, source_file) "
+                "VALUES (%s, COALESCE(%s::date, CURRENT_DATE), "
+                "        COALESCE(%s, now()), %s, %s) "
+                "ON CONFLICT (id) DO NOTHING "
+                "RETURNING id",
+                (str(session_id), started_at, started_at, source, source_file),
+            )
+            row = cur.fetchone()
+            row_id = row[0] if row is not None else session_id
     conn.commit()
-    return session_id
+    return row_id
 
 
 def insert_rt_batch(
