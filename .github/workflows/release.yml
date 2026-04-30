@@ -104,5 +104,29 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ matrix.artifact_glob }}
+          body: |
+            ## Install
+
+            ### macOS
+            The app is unsigned, so Gatekeeper will block it on first launch
+            with "damaged" or "unverified developer." After dragging the app
+            to Applications, run this once in Terminal to clear the
+            quarantine attribute:
+
+            ```
+            xattr -dr com.apple.quarantine "/Applications/nfrInterface.app"
+            ```
+
+            Then open the app normally.
+
+            ### Windows
+            Right-click the downloaded `.zip` → **Properties** → check
+            **Unblock** before extracting (otherwise SmartScreen will block
+            `nfrInterface.exe` on launch). Extract the zip and run
+            `nfrInterface.exe` from inside.
+
+            ### Linux
+            Make the AppImage executable (`chmod +x nfrInterface-*.AppImage`)
+            and run it.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
