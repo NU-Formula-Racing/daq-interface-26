@@ -25,7 +25,6 @@ const PARSER_PY = join(PARSER_DIR, '__main__.py');
 const PARSER_VENV_PY = process.platform === 'win32'
   ? join(PARSER_DIR, '.venv', 'Scripts', 'python.exe')
   : join(PARSER_DIR, '.venv', 'bin', 'python');
-const DBC_STORE_PATH = join(REPO_ROOT, 'parser', 'active-dbc.csv');
 // Staging area for uploaded .nfr files. Inside an installed `.app` the
 // Resources/ directory is often read-only, so use the OS temp dir which is
 // always writable and good enough — files are ingested into Postgres
@@ -71,7 +70,12 @@ export async function run(opts: {
     opts.userDataDir ??
     process.env.NFR_USER_DATA_DIR ??
     join(homedir(), '.nfr-local');
+  mkdirSync(userDataDir, { recursive: true });
   const catalogPath = join(userDataDir, 'nfr-catalog.json');
+  // User-uploaded DBC lives under userData so it's writable in installed
+  // builds (the app bundle's Resources dir is read-only on macOS, requires
+  // admin under Program Files on Windows, and is RO inside an AppImage).
+  const dbcStorePath = join(userDataDir, 'active-dbc.csv');
 
   // Dev/test override: if NFR_DB_URL is explicitly set (or opts.dsn passed in)
   // we skip the catalog/embedded-Postgres flow and use that DSN directly.
@@ -380,7 +384,7 @@ export async function run(opts: {
     authToken,
     setupState,
     staticRoot: opts.staticRoot,
-    dbcStorePath: DBC_STORE_PATH,
+    dbcStorePath,
     onDbcChanged: restartParser,
     dsn: dsn ?? undefined,
     onImport: runBatchImport,
