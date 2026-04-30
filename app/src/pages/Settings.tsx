@@ -4,6 +4,7 @@ import { apiGet, apiPost } from '../api/client.ts';
 import { ActivityHeatmap } from '../components/ActivityHeatmap.tsx';
 import { Storage } from '../components/Storage.tsx';
 import { Broadcast } from '../components/Broadcast.tsx';
+import { CloudSync } from '../components/CloudSync.tsx';
 import { Uninstall } from '../components/Uninstall.tsx';
 
 interface DbStats {
@@ -126,6 +127,8 @@ export default function Settings() {
         <Storage />
 
         <Broadcast />
+
+        <CloudSync />
 
         <h2 className="text-[11px] tracking-widest text-[color:var(--color-text-mute)] uppercase pt-2">Database tools</h2>
 

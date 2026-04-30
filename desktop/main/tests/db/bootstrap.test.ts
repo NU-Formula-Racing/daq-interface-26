@@ -26,7 +26,7 @@ describe('bootstrapDatabase', () => {
       migrationsDir: MIGRATIONS_DIR,
     });
     try {
-      expect(applied).toEqual(['0001_init', '0002_rpcs']);
+      expect(applied).toEqual(['0001_init', '0002_rpcs', '0003_fix_sd_import_tz']);
       const { rows } = await client.query(
         `SELECT table_name FROM information_schema.tables WHERE table_name='sessions'`
       );

@@ -29,12 +29,14 @@ describe('POST /api/sync/push', () => {
     await db.drop();
   });
 
-  it('returns 400 when Supabase credentials are not configured', async () => {
+  it('returns 400 when no cloud backend is configured', async () => {
     const app = await buildApp({ pool });
     try {
       const res = await app.inject({ method: 'POST', url: '/api/sync/push' });
       expect(res.statusCode).toBe(400);
-      expect(res.json()).toMatchObject({ error: expect.stringMatching(/supabase/i) });
+      expect(res.json()).toMatchObject({
+        error: expect.stringMatching(/not configured/i),
+      });
     } finally {
       await app.close();
     }
@@ -42,7 +44,9 @@ describe('POST /api/sync/push', () => {
 
   it('pushes via the injected pusher factory and marks sessions synced', async () => {
     await pool.query(
-      `UPDATE app_config SET data = data || '{"supabaseUrl":"https://ex.supabase.co","supabaseAnonKey":"k"}'::jsonb WHERE id = 1`,
+      `UPDATE app_config SET data = data ||
+         '{"cloudBackend":"supabase","supabaseUrl":"https://ex.supabase.co","supabaseAnonKey":"k"}'::jsonb
+       WHERE id = 1`,
     );
     const pushedSessions: string[] = [];
     const app = await buildApp({

@@ -100,7 +100,7 @@ describe('applying all migrations on a fresh DB', () => {
     const fresh = await createScratchDb();
     try {
       const applied = await runMigrations(fresh.client, MIGRATIONS_DIR);
-      expect(applied).toEqual(['0001_init', '0002_rpcs']);
+      expect(applied).toEqual(['0001_init', '0002_rpcs', '0003_fix_sd_import_tz']);
 
       // RPCs are callable (no rows for empty DB, but the call must succeed)
       await fresh.client.query(`SELECT * FROM get_session_signals(gen_random_uuid())`);
