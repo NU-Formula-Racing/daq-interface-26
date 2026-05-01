@@ -17,6 +17,7 @@ interface SyncStatus {
 interface PushResult {
   pushed: number;
   failed: number;
+  errors: Array<{ sessionId: string; message: string }>;
 }
 
 const PLACEHOLDER_SET = '••••• (set)';
@@ -84,7 +85,12 @@ export function CloudSync() {
     setBusy('push');
     try {
       const res = await apiPost<PushResult>('/api/sync/push', {});
-      flashInfo(`Pushed ${res.pushed} session(s); ${res.failed} failed.`);
+      const summary = `Pushed ${res.pushed} session(s); ${res.failed} failed.`;
+      if (res.failed > 0 && res.errors?.length) {
+        flashError(`${summary} ${res.errors[0].message}`);
+      } else {
+        flashInfo(summary);
+      }
       refresh();
     } catch (err) {
       flashError(`Sync failed: ${String(err)}`);

@@ -8,30 +8,32 @@ describe('pushSessionsToCloud', () => {
       markSynced: vi.fn(async () => {}),
     };
     const pusher: CloudPusher = {
+      pushSignals: vi.fn(async () => new Map()),
       pushSession: vi.fn(async () => {}),
       pushReadings: vi.fn(async () => {}),
     };
 
     const result = await pushSessionsToCloud(reader, pusher);
-    expect(result).toEqual({ pushed: 0, failed: 0 });
+    expect(result).toEqual({ pushed: 0, failed: 0, errors: [] });
     expect(pusher.pushSession).not.toHaveBeenCalled();
   });
 
   it('pushes each unsynced session and marks it synced', async () => {
     const reader: LocalReader = {
       unsynced: vi.fn(async () => [
-        { id: 's1', row: { date: 'x' }, readings: [{ ts: '2026-04-22T12:00:00Z', signal_id: 1, value: 9.9 }] },
-        { id: 's2', row: {}, readings: [] },
+        { id: 's1', row: { date: 'x' }, signals: [], readings: [{ ts: '2026-04-22T12:00:00Z', signal_id: 1, value: 9.9 }] },
+        { id: 's2', row: {}, signals: [], readings: [] },
       ]),
       markSynced: vi.fn(async () => {}),
     };
     const pusher: CloudPusher = {
+      pushSignals: vi.fn(async () => new Map()),
       pushSession: vi.fn(async () => {}),
       pushReadings: vi.fn(async () => {}),
     };
 
     const result = await pushSessionsToCloud(reader, pusher);
-    expect(result).toEqual({ pushed: 2, failed: 0 });
+    expect(result).toEqual({ pushed: 2, failed: 0, errors: [] });
     expect(pusher.pushSession).toHaveBeenCalledTimes(2);
     expect(pusher.pushReadings).toHaveBeenCalledTimes(2);
     expect(reader.markSynced).toHaveBeenCalledWith('s1');
@@ -41,8 +43,8 @@ describe('pushSessionsToCloud', () => {
   it('continues on per-session push failures and reports counts', async () => {
     const reader: LocalReader = {
       unsynced: vi.fn(async () => [
-        { id: 'good', row: {}, readings: [] },
-        { id: 'bad', row: {}, readings: [] },
+        { id: 'good', row: {}, signals: [], readings: [] },
+        { id: 'bad', row: {}, signals: [], readings: [] },
       ]),
       markSynced: vi.fn(async () => {}),
     };
@@ -54,7 +56,7 @@ describe('pushSessionsToCloud', () => {
     };
 
     const result = await pushSessionsToCloud(reader, pusher);
-    expect(result).toEqual({ pushed: 1, failed: 1 });
+    expect(result).toMatchObject({ pushed: 1, failed: 1 });
     expect(reader.markSynced).toHaveBeenCalledTimes(1);
     expect(reader.markSynced).toHaveBeenCalledWith('good');
   });

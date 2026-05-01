@@ -20,6 +20,36 @@ export function postgresCloudPusher(connectionString: string): CloudPusher & {
   });
 
   return {
+    async pushSignals(defs) {
+      const map = new Map<number, number>();
+      if (defs.length === 0) return map;
+      const params: unknown[] = [];
+      const tuples = defs.map((d, i) => {
+        const base = i * 4;
+        params.push(d.source, d.signal_name, d.unit, d.description);
+        return `($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4})`;
+      });
+      const sql =
+        `INSERT INTO signal_definitions (source, signal_name, unit, description) ` +
+        `VALUES ${tuples.join(', ')} ` +
+        `ON CONFLICT (source, signal_name) DO UPDATE SET ` +
+        `  unit = EXCLUDED.unit, description = EXCLUDED.description ` +
+        `RETURNING id, source, signal_name`;
+      const { rows } = await pool.query<{
+        id: number;
+        source: string;
+        signal_name: string;
+      }>(sql, params);
+      const cloudByKey = new Map<string, number>();
+      for (const r of rows) {
+        cloudByKey.set(`${r.source}\u0000${r.signal_name}`, r.id);
+      }
+      for (const d of defs) {
+        const cid = cloudByKey.get(`${d.source}\u0000${d.signal_name}`);
+        if (cid !== undefined) map.set(d.local_id, cid);
+      }
+      return map;
+    },
     async pushSession(sessionId, row) {
       const cols = ['id', ...Object.keys(row)];
       const vals = [sessionId, ...Object.values(row)];

@@ -52,6 +52,7 @@ describe('POST /api/sync/push', () => {
     const app = await buildApp({
       pool,
       cloudPusherFactory: () => ({
+        pushSignals: async () => new Map(),
         pushSession: async (id: string) => {
           pushedSessions.push(id);
         },
