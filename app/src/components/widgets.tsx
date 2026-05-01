@@ -416,6 +416,156 @@ export function GraphWidget({
 }
 
 // ────────────────────────────────────────────────────────────
+// G-G plot — fixed scatter of lateral vs longitudinal acceleration
+// from the IMU. Not customizable: signals are hard-wired to the
+// X_/Y_Axis_Acceleration_Uncompensated channels off message 0x550.
+// ────────────────────────────────────────────────────────────
+interface GgPlotWidgetProps {
+  t: number;
+  mode?: 'live' | 'replay';
+  compact?: boolean;
+  window?: number;
+  zoom?: [number, number] | null;
+}
+
+const GG_RANGE_G = 2.5; // axis spans -GG_RANGE_G..+GG_RANGE_G in g
+const GRAVITY = 9.80665;
+
+export function GgPlotWidget({
+  t: _t,
+  mode = 'replay',
+  compact = false,
+  window: win = 0.05,
+  zoom = null,
+}: GgPlotWidgetProps) {
+  const catalog = useCatalog();
+  const frames = useFrames();
+  const wrap = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ w: 320, h: 240 });
+
+  useLayoutEffect(() => {
+    if (!wrap.current) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) setSize({ w: e.contentRect.width, h: e.contentRect.height });
+    });
+    ro.observe(wrap.current);
+    return () => ro.disconnect();
+  }, []);
+
+  const latSig = catalog.byName('Y_Axis_Acceleration_Uncompensated');
+  const lonSig = catalog.byName('X_Axis_Acceleration_Uncompensated');
+
+  if (!latSig || !lonSig) {
+    return <EmptySlot label="IMU acceleration signals not in catalog" />;
+  }
+  const lat = frames?.series(latSig.id) ?? [];
+  const lon = frames?.series(lonSig.id) ?? [];
+  const len = Math.min(lat.length, lon.length);
+
+  // The two channels come off the same CAN message so their ring buffers
+  // advance in lockstep — pair by index.
+  let start = 0;
+  let end = len;
+  if (zoom) {
+    start = Math.max(0, Math.floor(zoom[0] * len));
+    end = Math.max(start + 1, Math.min(len, Math.ceil(zoom[1] * len)));
+  } else if (mode === 'live') {
+    const winLen = Math.max(8, Math.floor(len * win));
+    start = Math.max(0, len - winLen);
+  }
+
+  // Plot geometry. Square, axes centered.
+  const pad = compact ? 22 : 30;
+  const plot = Math.max(40, Math.min(size.w, size.h) - pad * 2);
+  const cx = size.w / 2;
+  const cy = size.h / 2;
+  const half = plot / 2;
+  const scale = half / GG_RANGE_G;
+
+  const points: Array<{ x: number; y: number; recent: boolean }> = [];
+  for (let i = start; i < end; i++) {
+    const xg = lat[i].value / GRAVITY;
+    // Y axis: positive = forward accel (motorsport convention puts braking
+    // at the bottom). The sensor's +X is car-forward, so flip sign for
+    // screen Y so accel goes up.
+    const yg = -lon[i].value / GRAVITY;
+    const recent = i >= end - 30;
+    points.push({
+      x: cx + xg * scale,
+      y: cy + yg * scale,
+      recent,
+    });
+  }
+
+  // Friction-circle reference rings at 0.5g, 1g, 1.5g, 2g.
+  const rings = [0.5, 1.0, 1.5, 2.0].filter((g) => g <= GG_RANGE_G);
+
+  return (
+    <div
+      ref={wrap}
+      style={{
+        position: 'relative',
+        flex: 1,
+        minWidth: 0,
+        minHeight: 0,
+        overflow: 'hidden',
+      }}
+    >
+      <svg width="100%" height="100%" viewBox={`0 0 ${size.w} ${size.h}`}>
+        {/* Reference rings */}
+        {rings.map((g) => (
+          <circle
+            key={g}
+            cx={cx}
+            cy={cy}
+            r={g * scale}
+            fill="none"
+            stroke={g === 1.0 ? W_COLORS.gridMid : W_COLORS.grid}
+            strokeWidth={g === 1.0 ? 1 : 0.5}
+            strokeDasharray={g === 1.0 ? '' : '2 3'}
+          />
+        ))}
+        {/* Crosshair axes */}
+        <line x1={cx - half} y1={cy} x2={cx + half} y2={cy} stroke={W_COLORS.grid} strokeWidth={0.5} />
+        <line x1={cx} y1={cy - half} x2={cx} y2={cy + half} stroke={W_COLORS.grid} strokeWidth={0.5} />
+        {/* Bounding square */}
+        <rect
+          x={cx - half}
+          y={cy - half}
+          width={plot}
+          height={plot}
+          fill="none"
+          stroke={W_COLORS.border}
+          strokeWidth={0.5}
+        />
+        {/* Trail points */}
+        {points.map((p, i) => (
+          <circle
+            key={i}
+            cx={p.x}
+            cy={p.y}
+            r={p.recent ? 1.6 : 1}
+            fill={p.recent ? W_COLORS.accent : W_COLORS.text}
+            opacity={p.recent ? 0.95 : 0.25}
+          />
+        ))}
+        {/* Axis labels */}
+        <text x={cx + half - 2} y={cy - 4} textAnchor="end" fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
+          LAT (g)
+        </text>
+        <text x={cx + 4} y={cy - half + 10} fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
+          LON (g)
+        </text>
+        {/* Scale labels on inner ring */}
+        <text x={cx + 1 * scale + 2} y={cy + 9} fontSize={8} fill={W_COLORS.textFaint} fontFamily="monospace">
+          1g
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────
 // Numeric readout
 // ────────────────────────────────────────────────────────────
 interface NumericWidgetProps { signal: any; t: number; compact?: boolean; }
@@ -917,6 +1067,7 @@ export const WIDGET_TYPES = [
   { id: 'gauge', label: 'GAUGE', icon: 'gauge' },
   { id: 'bar', label: 'BAR', icon: 'bar' },
   { id: 'heatmap', label: 'HEATMAP', icon: 'heat' },
+  { id: 'gg', label: 'G-G', icon: 'gg' },
 ];
 
 export function WidgetIcon({ kind, size = 10 }: { kind?: string; size?: number }) {
@@ -928,6 +1079,7 @@ export function WidgetIcon({ kind, size = 10 }: { kind?: string; size?: number }
     case 'gauge': return <svg {...common} viewBox="0 0 10 10"><path d="M2 8 A3 3 0 0 1 8 8"/><line x1="5" y1="8" x2="7" y2="4"/></svg>;
     case 'bar': return <svg {...common} viewBox="0 0 10 10"><rect x="1" y="4" width="8" height="1.5"/><rect x="1" y="7" width="5" height="1.5"/></svg>;
     case 'heat': return <svg {...common} viewBox="0 0 10 10" fill="currentColor" stroke="none"><rect x="1" y="1" width="3" height="3"/><rect x="5" y="1" width="3" height="3" opacity="0.6"/><rect x="1" y="5" width="3" height="3" opacity="0.4"/><rect x="5" y="5" width="3" height="3" opacity="0.8"/></svg>;
+    case 'gg': return <svg {...common} viewBox="0 0 10 10"><circle cx="5" cy="5" r="3.5"/><line x1="5" y1="1.5" x2="5" y2="8.5"/><line x1="1.5" y1="5" x2="8.5" y2="5"/></svg>;
     default: return null;
   }
 }
@@ -957,6 +1109,7 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
       case 'gauge': return <GaugeWidget signal={widget.signals[0]} t={t} />;
       case 'bar': return <BarWidget signals={widget.signals} t={t} />;
       case 'heatmap': return <HeatmapWidget signals={widget.signals} t={t} />;
+      case 'gg': return <GgPlotWidget t={t} mode={mode} window={widget.window || 0.05} compact={compact} zoom={widget.zoom || null} />;
       default: return <EmptySlot label="Pick a type" />;
     }
   };
@@ -999,19 +1152,27 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
 
         <div style={{ width: 1, height: 12, background: SH_COLORS.border }} />
 
-        {/* Signal chips */}
+        {/* Signal chips. Suppressed for fixed-signal widgets like g-g. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 1, overflow: 'hidden', flexWrap: 'nowrap' }}>
-          {widget.signals.length === 0 && (
+          {widget.type === 'gg' ? (
             <span style={{ color: SH_COLORS.textFaint, fontSize: 10, fontStyle: 'italic', padding: '2px 5px' }}>
-              (focus to add signal)
+              IMU lateral × longitudinal (fixed)
             </span>
-          )}
-          {widget.signals.slice(0, compact ? 2 : 4).map((sid: any) => (
-            <SignalChip key={sid} sigId={sid} size="xs"
-              onRemove={() => onChange({ ...widget, signals: widget.signals.filter((x: any) => x !== sid) })} />
-          ))}
-          {widget.signals.length > (compact ? 2 : 4) && (
-            <span style={{ color: SH_COLORS.textMute, fontSize: 10 }}>+{widget.signals.length - (compact ? 2 : 4)}</span>
+          ) : (
+            <>
+              {widget.signals.length === 0 && (
+                <span style={{ color: SH_COLORS.textFaint, fontSize: 10, fontStyle: 'italic', padding: '2px 5px' }}>
+                  (focus to add signal)
+                </span>
+              )}
+              {widget.signals.slice(0, compact ? 2 : 4).map((sid: any) => (
+                <SignalChip key={sid} sigId={sid} size="xs"
+                  onRemove={() => onChange({ ...widget, signals: widget.signals.filter((x: any) => x !== sid) })} />
+              ))}
+              {widget.signals.length > (compact ? 2 : 4) && (
+                <span style={{ color: SH_COLORS.textMute, fontSize: 10 }}>+{widget.signals.length - (compact ? 2 : 4)}</span>
+              )}
+            </>
           )}
         </div>
 
