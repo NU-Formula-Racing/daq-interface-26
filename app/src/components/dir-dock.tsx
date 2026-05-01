@@ -128,7 +128,8 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
       id, type,
       signals: multiTypes.includes(type) ? [sig] : [sig],
       window: 0.05, col: 1, row: lastRow + 1,
-      w: type === 'numeric' ? 3 : type === 'gauge' ? 4 : 6, h: 3,
+      w: type === 'numeric' ? 3 : type === 'gauge' ? 4 : type === 'gg' ? 5 : 6,
+      h: type === 'gg' ? 7 : 3,
     }]);
     setFocusedId(id);
   };
