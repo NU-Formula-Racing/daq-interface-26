@@ -458,7 +458,7 @@ export function GgPlotWidget({
   const n = Math.min(xs.length, ys.length);
 
   // Pad / plot box
-  const PAD = 28;
+  const PAD = 8;
   const plotW = Math.max(20, size.w - PAD * 2);
   const plotH = Math.max(20, size.h - PAD * 2);
   const side = Math.min(plotW, plotH);
