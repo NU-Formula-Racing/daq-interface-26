@@ -457,43 +457,44 @@ export function GgPlotWidget({
   const ys = ySig && frames ? frames.series(ySig.id) : [];
   const n = Math.min(xs.length, ys.length);
 
-  // Pad / plot box
+  // Plot fills the widget rectangle. Each axis gets an independent symmetric
+  // fit around its own midpoint with a 1 m/s² floor so a static plot doesn't
+  // collapse to a single dot.
   const PAD = 8;
   const plotW = Math.max(20, size.w - PAD * 2);
   const plotH = Math.max(20, size.h - PAD * 2);
-  const side = Math.min(plotW, plotH);
+  const x0 = PAD;
+  const y0 = PAD;
   const cx = size.w / 2;
   const cy = size.h / 2;
-  const half = side / 2;
 
-  // Min/max fitting from data, symmetric. Floor at 1 m/s^2 so a static plot
-  // doesn't collapse to a single point. Reuses computed extents from the
-  // sample loop below.
-  let lo = Infinity;
-  let hi = -Infinity;
+  let xLo = Infinity, xHi = -Infinity;
+  let yLo = Infinity, yHi = -Infinity;
   for (let i = 0; i < n; i++) {
     const xv = xs[i].value;
     const yv = ys[i].value;
-    if (xv < lo) lo = xv; if (xv > hi) hi = xv;
-    if (yv < lo) lo = yv; if (yv > hi) hi = yv;
+    if (xv < xLo) xLo = xv; if (xv > xHi) xHi = xv;
+    if (yv < yLo) yLo = yv; if (yv > yHi) yHi = yv;
   }
-  if (!isFinite(lo) || !isFinite(hi)) { lo = -1; hi = 1; }
-  const span = Math.max(2, hi - lo);
-  const mid = (hi + lo) / 2;
-  const range = span / 2;
-  const toScreenX = (v: number) => cx + ((v - mid) / range) * half;
-  const toScreenY = (v: number) => cy - ((v - mid) / range) * half;
+  if (!isFinite(xLo) || !isFinite(xHi)) { xLo = -1; xHi = 1; }
+  if (!isFinite(yLo) || !isFinite(yHi)) { yLo = -1; yHi = 1; }
+  const xMid = (xHi + xLo) / 2;
+  const yMid = (yHi + yLo) / 2;
+  const xRange = Math.max(1, (xHi - xLo) / 2);
+  const yRange = Math.max(1, (yHi - yLo) / 2);
+  const toScreenX = (v: number) => cx + ((v - xMid) / xRange) * (plotW / 2);
+  const toScreenY = (v: number) => cy - ((v - yMid) / yRange) * (plotH / 2);
 
   return (
     <div
       ref={wrap}
       style={{ position: 'relative', flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}
     >
-      <svg width="100%" height="100%" viewBox={`0 0 ${size.w} ${size.h}`} preserveAspectRatio="xMidYMid meet">
-        {/* axes */}
-        <line x1={cx - half} y1={cy} x2={cx + half} y2={cy} stroke={W_COLORS.gridMid} strokeWidth={0.5} />
-        <line x1={cx} y1={cy - half} x2={cx} y2={cy + half} stroke={W_COLORS.gridMid} strokeWidth={0.5} />
-        <rect x={cx - half} y={cy - half} width={side} height={side} fill="none" stroke={W_COLORS.border} strokeWidth={0.5} />
+      <svg width="100%" height="100%" viewBox={`0 0 ${size.w} ${size.h}`} preserveAspectRatio="none">
+        {/* axes (cross at the midpoint of each fit) */}
+        <line x1={x0} y1={cy} x2={x0 + plotW} y2={cy} stroke={W_COLORS.gridMid} strokeWidth={0.5} />
+        <line x1={cx} y1={y0} x2={cx} y2={y0 + plotH} stroke={W_COLORS.gridMid} strokeWidth={0.5} />
+        <rect x={x0} y={y0} width={plotW} height={plotH} fill="none" stroke={W_COLORS.border} strokeWidth={0.5} />
 
         {/* points */}
         {Array.from({ length: n }, (_, i) => {
@@ -510,16 +511,16 @@ export function GgPlotWidget({
           );
         })}
         {/* axis labels (m/s^2) */}
-        <text x={cx + half - 2} y={cy - 4} textAnchor="end" fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
-          X · {hi.toFixed(1)}
+        <text x={x0 + plotW - 2} y={cy - 4} textAnchor="end" fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
+          X · ±{xRange.toFixed(1)}
         </text>
-        <text x={cx + 4} y={cy - half + 10} fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
-          Y · {hi.toFixed(1)}
+        <text x={cx + 4} y={y0 + 10} fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
+          Y · ±{yRange.toFixed(1)}
         </text>
 
         {/* status badge */}
-        <text x={cx} y={cy + half - 6} textAnchor="middle" fontSize={9} fill={W_COLORS.textFaint} fontFamily="monospace">
-          {!xSig || !ySig ? 'IMU signals not found' : `${n} pts · range ±${range.toFixed(1)} m/s²`}
+        <text x={cx} y={y0 + plotH - 6} textAnchor="middle" fontSize={9} fill={W_COLORS.textFaint} fontFamily="monospace">
+          {!xSig || !ySig ? 'IMU signals not found' : `${n} pts`}
         </text>
       </svg>
     </div>
