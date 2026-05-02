@@ -430,10 +430,10 @@ interface GgPlotWidgetProps {
 
 export function GgPlotWidget({
   t: _t,
-  mode = 'replay',
-  compact = false,
-  window: win = 0.05,
-  zoom = null,
+  mode: _mode = 'replay',
+  compact: _compact = false,
+  window: _win = 0.05,
+  zoom: _zoom = null,
 }: GgPlotWidgetProps) {
   const catalog = useCatalog();
   const frames = useFrames();
@@ -446,7 +446,6 @@ export function GgPlotWidget({
       for (const e of entries) setSize({ w: e.contentRect.width, h: e.contentRect.height });
     });
     ro.observe(wrap.current);
-    // Seed from initial size in case ResizeObserver doesn't fire immediately.
     const r = wrap.current.getBoundingClientRect();
     if (r.width > 0 && r.height > 0) setSize({ w: r.width, h: r.height });
     return () => ro.disconnect();
@@ -454,118 +453,74 @@ export function GgPlotWidget({
 
   const xSig = catalog.byName('X_Axis_Acceleration_Uncompensated');
   const ySig = catalog.byName('Y_Axis_Acceleration_Uncompensated');
-  const GRAVITY = 9.80665;
-  const MIN_HALF = 2; // floor on the half-range so rings stay visible
+  const xs = xSig && frames ? frames.series(xSig.id) : [];
+  const ys = ySig && frames ? frames.series(ySig.id) : [];
+  const n = Math.min(xs.length, ys.length);
 
-  // Data extraction
-  const xs = (xSig && frames?.series(xSig.id)) ?? [];
-  const ys = (ySig && frames?.series(ySig.id)) ?? [];
-  const len = Math.min(xs.length, ys.length);
-
-  // Apply zoom / live windowing
-  let start = 0;
-  let end = len;
-  if (zoom) {
-    start = Math.max(0, Math.floor(zoom[0] * len));
-    end = Math.max(start + 1, Math.min(len, Math.ceil(zoom[1] * len)));
-  } else if (mode === 'live') {
-    const winLen = Math.max(8, Math.floor(len * win));
-    start = Math.max(0, len - winLen);
-  }
-
-  // Convert to g and find data extent for auto-fit
-  const xg: number[] = new Array(end - start);
-  const yg: number[] = new Array(end - start);
-  let maxAbs = 0;
-  for (let i = start; i < end; i++) {
-    const x = xs[i].value / GRAVITY;
-    const y = ys[i].value / GRAVITY;
-    xg[i - start] = x;
-    yg[i - start] = y;
-    const m = Math.max(Math.abs(x), Math.abs(y));
-    if (m > maxAbs) maxAbs = m;
-  }
-  const half = Math.max(MIN_HALF, Math.ceil(maxAbs * 1.1));
-
-  // Geometry. Square plot centered in the container.
-  const pad = compact ? 22 : 30;
-  const plot = Math.max(40, Math.min(size.w, size.h) - pad * 2);
+  // Pad / plot box
+  const PAD = 28;
+  const plotW = Math.max(20, size.w - PAD * 2);
+  const plotH = Math.max(20, size.h - PAD * 2);
+  const side = Math.min(plotW, plotH);
   const cx = size.w / 2;
   const cy = size.h / 2;
-  const halfPx = plot / 2;
-  const scale = halfPx / half;
+  const half = side / 2;
 
-  // Ring radii in g
-  const rings = [0.5, 1, 1.5, 2].filter((g) => g <= half);
+  // Min/max fitting from data, symmetric. Floor at 1 m/s^2 so a static plot
+  // doesn't collapse to a single point. Reuses computed extents from the
+  // sample loop below.
+  let lo = Infinity;
+  let hi = -Infinity;
+  for (let i = 0; i < n; i++) {
+    const xv = xs[i].value;
+    const yv = ys[i].value;
+    if (xv < lo) lo = xv; if (xv > hi) hi = xv;
+    if (yv < lo) lo = yv; if (yv > hi) hi = yv;
+  }
+  if (!isFinite(lo) || !isFinite(hi)) { lo = -1; hi = 1; }
+  const span = Math.max(2, hi - lo);
+  const mid = (hi + lo) / 2;
+  const range = span / 2;
+  const toScreenX = (v: number) => cx + ((v - mid) / range) * half;
+  const toScreenY = (v: number) => cy - ((v - mid) / range) * half;
 
   return (
     <div
       ref={wrap}
-      style={{
-        position: 'relative',
-        flex: 1,
-        minWidth: 0,
-        minHeight: 0,
-        overflow: 'hidden',
-      }}
+      style={{ position: 'relative', flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}
     >
-      <svg
-        width="100%"
-        height="100%"
-        viewBox={`0 0 ${size.w} ${size.h}`}
-        preserveAspectRatio="xMidYMid meet"
-      >
-        {rings.map((g) => (
-          <circle
-            key={g}
-            cx={cx}
-            cy={cy}
-            r={g * scale}
-            fill="none"
-            stroke={g === 1 ? W_COLORS.gridMid : W_COLORS.grid}
-            strokeWidth={g === 1 ? 1 : 0.5}
-            strokeDasharray={g === 1 ? '' : '2 3'}
-          />
-        ))}
-        <line x1={cx - halfPx} y1={cy} x2={cx + halfPx} y2={cy} stroke={W_COLORS.gridMid} strokeWidth={0.5} />
-        <line x1={cx} y1={cy - halfPx} x2={cx} y2={cy + halfPx} stroke={W_COLORS.gridMid} strokeWidth={0.5} />
-        <rect
-          x={cx - halfPx}
-          y={cy - halfPx}
-          width={plot}
-          height={plot}
-          fill="none"
-          stroke={W_COLORS.border}
-          strokeWidth={0.5}
-        />
-        {xg.map((x, i) => {
-          const recent = i >= xg.length - 30;
-          // Plot Y goes downward in SVG, so subtract.
+      <svg width="100%" height="100%" viewBox={`0 0 ${size.w} ${size.h}`} preserveAspectRatio="xMidYMid meet">
+        {/* axes */}
+        <line x1={cx - half} y1={cy} x2={cx + half} y2={cy} stroke={W_COLORS.gridMid} strokeWidth={0.5} />
+        <line x1={cx} y1={cy - half} x2={cx} y2={cy + half} stroke={W_COLORS.gridMid} strokeWidth={0.5} />
+        <rect x={cx - half} y={cy - half} width={side} height={side} fill="none" stroke={W_COLORS.border} strokeWidth={0.5} />
+
+        {/* points */}
+        {Array.from({ length: n }, (_, i) => {
+          const recent = i >= n - 30;
           return (
             <circle
               key={i}
-              cx={cx + x * scale}
-              cy={cy - yg[i] * scale}
+              cx={toScreenX(xs[i].value)}
+              cy={toScreenY(ys[i].value)}
               r={recent ? 1.6 : 1}
               fill={recent ? W_COLORS.accent : W_COLORS.text}
-              opacity={recent ? 0.95 : 0.25}
+              opacity={recent ? 0.95 : 0.3}
             />
           );
         })}
-        <text x={cx + halfPx - 2} y={cy - 4} textAnchor="end" fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
-          X (g)
+        {/* axis labels (m/s^2) */}
+        <text x={cx + half - 2} y={cy - 4} textAnchor="end" fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
+          X · {hi.toFixed(1)}
         </text>
-        <text x={cx + 4} y={cy - halfPx + 10} fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
-          Y (g)
+        <text x={cx + 4} y={cy - half + 10} fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
+          Y · {hi.toFixed(1)}
         </text>
-        <text x={cx + 1 * scale + 2} y={cy + 9} fontSize={8} fill={W_COLORS.textFaint} fontFamily="monospace">
-          1g
+
+        {/* status badge */}
+        <text x={cx} y={cy + half - 6} textAnchor="middle" fontSize={9} fill={W_COLORS.textFaint} fontFamily="monospace">
+          {!xSig || !ySig ? 'IMU signals not found' : `${n} pts · range ±${range.toFixed(1)} m/s²`}
         </text>
-        {(!xSig || !ySig) && (
-          <text x={cx} y={cy - halfPx - 4} textAnchor="middle" fontSize={9} fill={W_COLORS.textFaint} fontFamily="monospace">
-            IMU acceleration signals not in catalog
-          </text>
-        )}
       </svg>
     </div>
   );
