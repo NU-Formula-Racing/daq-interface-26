@@ -8,7 +8,6 @@ import { useCatalog } from './SignalsProvider.tsx';
 import { COLORS as SH_COLORS } from './colors.ts';
 import {
   SignalChip,
-  SignalPicker,
   Timeline,
   TopBar,
   WidgetShell,
@@ -426,9 +425,12 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                 ACTIVE
               </button>
             </div>
-            <SignalPicker
-              selected={selectedSignal ? [selectedSignal] : []}
+            <DockSignalPicker
+              selected={selectedSignal}
               onPick={(s) => setSelectedSignal(s === selectedSignal ? null : s)}
+              favorites={favorites}
+              onToggleFav={(id) => setFavorites((favs) => favs.includes(id) ? favs.filter((x) => x !== id) : [...favs, id])}
+              onCollapse={() => setRailOpen(false)}
               activeOnly={signalFilter === 'active'}
             />
             <div onPointerDown={startRailResize} title="Drag to resize" style={{
@@ -934,16 +936,20 @@ interface DockSignalPickerProps {
   favorites: any[];
   onToggleFav: (id: any) => void;
   onCollapse?: () => void;
+  activeOnly?: boolean;
 }
-function DockSignalPicker({ selected, onPick, favorites, onToggleFav, onCollapse }: DockSignalPickerProps) {
+function DockSignalPicker({ selected, onPick, favorites, onToggleFav, onCollapse, activeOnly = false }: DockSignalPickerProps) {
   const catalog = useCatalog();
+  const frames = useFrames();
   const [q, setQ] = useState('');
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const toggle = (gid: string) => setCollapsed((c) => ({ ...c, [gid]: !c[gid] }));
 
-  const matches = catalog.ALL.filter((s) =>
-    !q || s.name.toLowerCase().includes(q.toLowerCase()) || s.groupName.toLowerCase().includes(q.toLowerCase())
-  );
+  const matches = catalog.ALL.filter((s) => {
+    if (activeOnly && (frames?.latest(s.id) ?? null) === null) return false;
+    if (!q) return true;
+    return s.name.toLowerCase().includes(q.toLowerCase()) || s.groupName.toLowerCase().includes(q.toLowerCase());
+  });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
@@ -969,6 +975,7 @@ function DockSignalPicker({ selected, onPick, favorites, onToggleFav, onCollapse
             </div>
             {favorites.map((id) => {
               const s = catalog.resolve(id); if (!s) return null;
+              if (activeOnly && (frames?.latest(s.id) ?? null) === null) return null;
               return <SigRow key={id} s={s} selected={selected === id} fav onPick={onPick} onToggleFav={onToggleFav} />;
             })}
           </div>
