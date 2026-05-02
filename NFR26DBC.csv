@@ -7,6 +7,9 @@ Message ID,Message Name,Sender,Signal Name,Start Bit,Size (bits),Factor,Offset,M
 0x2A2,PDM_Bat_Volt,PDM,Bat_Volt,0,16,0.01,0,0,16,V,5000,float,TRUE,FALSE
 ,PDM_Bat_Volt,PDM,Low_Bat_Volt_Warning,16,8,1,0,0,1,Bool,5000,bool,TRUE,FALSE
 ,PDM_Bat_Volt,PDM,Danger_Bat_Volt_Warning,24,8,1,0,0,1,Bool,5000,bool,TRUE,FALSE
+0x2A3,PDM_Coolant,PDM,Coolant_1_Volt,0,8,1,0,0,3.3,V,500,uint8_t,FALSE,FALSE
+,PDM_Coolant,PDM,Coolant_2_Volt,8,8,1,0,0,3.3,V,500,uint8_t,FALSE,FALSE
+,PDM_Coolant,PDM,Coolant_3_Volt,16,8,1,0,0,3.3,V,500,uint8_t,FALSE,FALSE
 0x28B,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,RPM,0,16,1,0,,,RPM,100,int16_t,TRUE,FALSE
 ,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,Motor_Current,16,16,0.1,0,,,A,100,int16_t,TRUE,FALSE
 ,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,DC_Voltage,32,16,0.1,0,,,V,100,int16_t,TRUE,FALSE
@@ -121,17 +124,17 @@ Message ID,Message Name,Sender,Signal Name,Start Bit,Size (bits),Factor,Offset,M
 0x19: ENCODER_NO_MAGNET
 0x1A: ENCODER_MAGNET_TOO_STRONG
 0x1B: PHASE_FILTER_FAULT",,uint8_t,TRUE,FALSE
-0x20D,ECU_Set_Current_Front_Left_Inverter,ECU,Set_Current_Front_Left_Inverter,0,32,0.001,0,0,50,A,,int32_t,TRUE,FALSE
-0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,ECU,Set_Current_Brake_Front_Left_Inverter,0,32,0.001,0,0,50,A,,int32_t,TRUE,FALSE
-0x20F,ECU_Set_Current_Front_Right_Inverter,ECU,Set_Current_Front_Right_Inverter,0,32,0.001,0,0,50,A,,int32_t,TRUE,FALSE
-0x210,ECU_Set_Current_Brake_Front_Right_Inverter,ECU,Set_Current_Brake_Front_Right_Inverter,0,32,0.001,0,0,50,A,,int32_t,TRUE,FALSE
-0x200,ECU_Set_Current_Rear_Inverter,ECU,Set_Current_Rear_Inverter,0,32,0.001,0,0,360,A,,int32_t,TRUE,FALSE
-0x201,ECU_Set_Current_Brake_Rear_Inverter,ECU,Set_Current_Brake_Rear_Inverter,0,32,0.001,0,0,360,A,,int32_t,TRUE,FALSE
-0x202,ECU_Throttle,ECU,APPS1_Throttle,0,16,1,0,0,2047,,100,int16_t,TRUE,FALSE
-,ECU_Throttle,ECU,APPS2_Throttle,16,16,1,0,0,2047,,100,int16_t,TRUE,FALSE
-0x203,ECU_Brake,ECU,Front_Brake_Pressure,0,16,1,0,0,32767,,100,int16_t,TRUE,FALSE
-,ECU_Brake,ECU,Rear_Brake_Pressure,16,16,1,0,0,32767,,100,int16_t,TRUE,FALSE
-,ECU_Brake,ECU,Brake_Pressed,32,8,1,0,0,1,,100,bool,TRUE,FALSE
+0x20D,ECU_Set_Current_Front_Left_Inverter,ECU,Set_Current_Front_Left_Inverter,0,32,0.001,0,0,50,A,10,int32_t,TRUE,FALSE
+0x20E,ECU_Set_Current_Brake_Front_Left_Inverter,ECU,Set_Current_Brake_Front_Left_Inverter,0,32,0.001,0,0,50,A,10,int32_t,TRUE,FALSE
+0x20F,ECU_Set_Current_Front_Right_Inverter,ECU,Set_Current_Front_Right_Inverter,0,32,0.001,0,0,50,A,10,int32_t,TRUE,FALSE
+0x210,ECU_Set_Current_Brake_Front_Right_Inverter,ECU,Set_Current_Brake_Front_Right_Inverter,0,32,0.001,0,0,50,A,10,int32_t,TRUE,FALSE
+0x200,ECU_Set_Current_Rear_Inverter,ECU,Set_Current_Rear_Inverter,0,32,0.001,0,0,360,A,10,int32_t,TRUE,FALSE
+0x201,ECU_Set_Current_Brake_Rear_Inverter,ECU,Set_Current_Brake_Rear_Inverter,0,32,0.001,0,0,360,A,10,int32_t,TRUE,FALSE
+0x202,ECU_Throttle,ECU,APPS1_Throttle,0,16,1,0,0,2047,,10,int16_t,TRUE,FALSE
+,ECU_Throttle,ECU,APPS2_Throttle,16,16,1,0,0,2047,,10,int16_t,TRUE,FALSE
+0x203,ECU_Brake,ECU,Front_Brake_Pressure,0,16,1,0,0,32767,,10,int16_t,TRUE,FALSE
+,ECU_Brake,ECU,Rear_Brake_Pressure,16,16,1,0,0,32767,,10,int16_t,TRUE,FALSE
+,ECU_Brake,ECU,Brake_Pressed,32,8,1,0,0,1,,10,bool,TRUE,FALSE
 0x204,ECU_Implausibility,ECU,Implausibility_Present,0,8,1,0,0,1,,100,bool,TRUE,FALSE
 ,ECU_Implausibility,ECU,APPSs_Disagreement_Imp,8,8,1,0,0,1,,100,bool,TRUE,FALSE
 ,ECU_Implausibility,ECU,BPPC_Imp,16,8,1,0,0,1,,100,bool,TRUE,FALSE
@@ -141,12 +144,12 @@ Message ID,Message Name,Sender,Signal Name,Start Bit,Size (bits),Factor,Offset,M
 1: PRECHARGE
 2: NEUTRAL
 3: DRIVE
-4: FAULT",10,uint8_t,TRUE,FALSE
+4: FAULT",100,uint8_t,TRUE,FALSE
 0x206,ECU_Drive_Status,ECU,Drive_State,0,8,1,0,0,4,"0: IDLE
 1: PRECHARGE
 2: NEUTRAL
 3: DRIVE
-4: FAULT",10,uint8_t,TRUE,FALSE
+4: FAULT",100,uint8_t,TRUE,FALSE
 0x208,ECU_Active_Aero_Command,ECU,Active_Aero_State,0,1,1,0,0,1,"0: Closed
 1: Open",100,bool,TRUE,FALSE
 ,ECU_Active_Aero_Command,ECU,Active_Aero_Position,1,16,1,0,0,360,degrees,100,int16_t,TRUE,FALSE
@@ -154,7 +157,7 @@ Message ID,Message Name,Sender,Signal Name,Start Bit,Size (bits),Factor,Offset,M
 ,ECU_Pump_Fan_Command,ECU,Rear_Pump_Duty_Cycle,8,8,1,0,0,255,,100,uint8_t,TRUE,FALSE
 ,ECU_Pump_Fan_Command,ECU,Front_Fan_Duty_Cycle,16,8,1,0,0,255,,100,uint8_t,TRUE,FALSE
 ,ECU_Pump_Fan_Command,ECU,Rear_Fan_Duty_Cycle,24,8,1,0,0,255,,100,uint8_t,TRUE,FALSE
-0x20A,ECU_LUT_Response,ECU,Accel_LUT_Id_Response,0,8,1,0,,,,,uint8_t,TRUE,FALSE
+0x20A,ECU_LUT_Response,ECU,Accel_LUT_Id_Response,0,8,1,0,,,,100,uint8_t,TRUE,FALSE
 0x20B,ECU_Temp_Limiting_Status,ECU,IGBT_Temp_Limiting,0,1,1,0,0,1,,100,bool,TRUE,FALSE
 ,ECU_Temp_Limiting_Status,ECU,Battery_Temp_Limiting,1,1,1,0,0,1,,100,bool,TRUE,FALSE
 ,ECU_Temp_Limiting_Status,ECU,Motor_Temp_Limiting,2,1,1,0,0,1,,100,bool,TRUE,FALSE
@@ -592,12 +595,11 @@ Protocol violation error locations (data[3]):
 0x510,Telemetry_RTC_Time,DAQ-Telemetry,RTC_Hour,0,8,1,0,0,23,hours,1000,uint8_t,,
 ,Telemetry_RTC_Time,DAQ-Telemetry,RTC_Minute,8,8,1,0,0,59,minutes,1000,uint8_t,,
 ,Telemetry_RTC_Time,DAQ-Telemetry,RTC_Second,16,8,1,0,0,59,seconds,1000,uint8_t,,
-,Telemetry_RTC_Time,DAQ-Telemetry,RTC_Subsecond,24,32,1,0,0,999,millisconds,1000,uint32_t,,
-0x511,Telemetry_RTC_Date,DAQ-Telemetry,RTC_Year,0,8,1,0,,,,10000,uint8_t,,
-,Telemetry_RTC_Date,DAQ-Telemetry,RTC_Month,8,8,1,0,1,12,,10000,uint8_t,,
-,Telemetry_RTC_Date,DAQ-Telemetry,RTC_Day,16,8,1,0,1,31,,10000,uint8_t,,
-,Telemetry_RTC_Date,DAQ-Telemetry,RTC_Weekday,24,8,1,0,1,7,,10000,uint8_t,,
-0x512,Telemetry_Odometer,DAQ-Telemetry,Miles_Driven,0,32,1,0,0,4294967295,mi,1000,uint32_t,,
+0x511,Telemetry_RTC_Date,DAQ-Telemetry,RTC_Year,0,8,1,0,2000,2099,,1000,uint8_t,,
+,Telemetry_RTC_Date,DAQ-Telemetry,RTC_Month,8,8,1,0,1,12,,1000,uint8_t,,
+,Telemetry_RTC_Date,DAQ-Telemetry,RTC_Day,16,8,1,0,1,31,,1000,uint8_t,,
+,Telemetry_RTC_Date,DAQ-Telemetry,RTC_Weekday,24,8,1,0,1,7,,1000,uint8_t,,
+0x512,Telemetry_Odometer,DAQ-Telemetry,Miles_Driven,0,32,1,0,0,,mi,100,float,,
 0x513,Telemetry_Status,DAQ-Telemetry,Log_File,0,16,1,0,0,9999,,1000,uint16_t,,
 ,Telemetry_Status,DAQ-Telemetry,Logging_Status,16,8,1,0,0,1,"0x00: OK/Logging
 0x01: Card Not Detected
@@ -607,5 +609,10 @@ Protocol violation error locations (data[3]):
 ,Telemetry_Status,DAQ-Telemetry,Wireless_Status,24,8,1,0,0,1,"0x00: OK/Connected
 0x01: Handshake Pending
 0x02: Handshake Failed
-0x03: SPI Comms Error
-",1000,uint8_t,,
+0x03: SPI Comms Error",1000,uint8_t,,
+0x560,Aero_Strain_Gauge1,DAQ-Strain-Gauge,Strain_Gauge_1,0,32,0.0001,0,-100,100,Newtons,10,float,,
+,Aero_Strain_Gauge1,DAQ-Strain-Gauge,Strain_Gauge_2,32,32,0.0001,0,-100,100,Newtons,10,float,,
+0x561,Aero_Strain_Gauge2,DAQ-Strain-Gauge,Strain_Gauge_3,0,32,0.0001,0,-100,100,Newtons,10,float,,
+,Aero_Strain_Gauge2,DAQ-Strain-Gauge,Strain_Gauge_4,32,32,0.0001,0,-100,100,Newtons,10,float,,
+0x562,Aero_Strain_Gauge3,DAQ-Strain-Gauge,Strain_Gauge_5,0,32,0.0001,0,-100,100,Newtons,10,float,,
+,Aero_Strain_Gauge3,DAQ-Strain-Gauge,Strain_Gauge_6,32,32,0.0001,0,-100,100,Newtons,10,float,,
