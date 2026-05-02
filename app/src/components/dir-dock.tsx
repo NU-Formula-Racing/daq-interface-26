@@ -8,6 +8,7 @@ import { useCatalog } from './SignalsProvider.tsx';
 import { COLORS as SH_COLORS } from './colors.ts';
 import {
   SignalChip,
+  SignalPicker,
   Timeline,
   TopBar,
   WidgetShell,
@@ -94,6 +95,16 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
   const [railOpen, setRailOpen] = useState(() => localStorage.getItem('nfr-rail-open') !== '0');
   useEffect(() => { localStorage.setItem('nfr-rail-w', String(railW)); }, [railW]);
   useEffect(() => { localStorage.setItem('nfr-rail-open', railOpen ? '1' : '0'); }, [railOpen]);
+  const FILTER_KEY = 'nfr_signal_filter';
+  const [signalFilter, setSignalFilter] = useState<'all' | 'active'>(() => {
+    if (typeof window === 'undefined') return 'all';
+    const v = window.localStorage.getItem(FILTER_KEY);
+    return v === 'active' ? 'active' : 'all';
+  });
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(FILTER_KEY, signalFilter);
+  }, [signalFilter]);
   const startRailResize = (e: any) => {
     e.preventDefault();
     const sx = e.clientX, ow = railW;
@@ -380,12 +391,45 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
         {/* Left rail — collapsible + resizable */}
         {railOpen ? (
           <div style={{ width: railW, flexShrink: 0, borderRight: `1px solid ${SH_COLORS.border}`, display: 'flex', flexDirection: 'column', minHeight: 0, background: SH_COLORS.bg, position: 'relative' }}>
-            <DockSignalPicker
-              selected={selectedSignal}
+            <div style={{ display: 'flex', gap: 0, padding: '6px 10px 0 10px', background: SH_COLORS.bg }}>
+              <button
+                onClick={() => setSignalFilter('all')}
+                style={{
+                  flex: 1,
+                  padding: '4px 8px',
+                  fontFamily: '"JetBrains Mono", monospace',
+                  fontSize: 9,
+                  letterSpacing: 1.5,
+                  cursor: 'pointer',
+                  background: signalFilter === 'all' ? SH_COLORS.bgElev : 'transparent',
+                  color: signalFilter === 'all' ? SH_COLORS.text : SH_COLORS.textMute,
+                  border: `1px solid ${SH_COLORS.border}`,
+                  borderRight: 'none',
+                }}
+              >
+                ALL
+              </button>
+              <button
+                onClick={() => setSignalFilter('active')}
+                style={{
+                  flex: 1,
+                  padding: '4px 8px',
+                  fontFamily: '"JetBrains Mono", monospace',
+                  fontSize: 9,
+                  letterSpacing: 1.5,
+                  cursor: 'pointer',
+                  background: signalFilter === 'active' ? SH_COLORS.bgElev : 'transparent',
+                  color: signalFilter === 'active' ? SH_COLORS.text : SH_COLORS.textMute,
+                  border: `1px solid ${SH_COLORS.border}`,
+                }}
+              >
+                ACTIVE
+              </button>
+            </div>
+            <SignalPicker
+              selected={selectedSignal ? [selectedSignal] : []}
               onPick={(s) => setSelectedSignal(s === selectedSignal ? null : s)}
-              favorites={favorites}
-              onToggleFav={toggleFav}
-              onCollapse={() => setRailOpen(false)}
+              activeOnly={signalFilter === 'active'}
             />
             <div onPointerDown={startRailResize} title="Drag to resize" style={{
               position: 'absolute', top: 0, bottom: 0, right: -3, width: 6, cursor: 'ew-resize', zIndex: 2,

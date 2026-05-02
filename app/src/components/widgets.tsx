@@ -878,15 +878,18 @@ interface SignalPickerProps {
   filter?: string;
   height?: number | string;
   onFilterChange?: (s: string) => void;
+  activeOnly?: boolean;
 }
-export function SignalPicker({ onPick, selected = [], compact = false, filter = '', height = '100%', onFilterChange }: SignalPickerProps) {
+export function SignalPicker({ onPick, selected = [], compact = false, filter = '', height = '100%', onFilterChange, activeOnly = false }: SignalPickerProps) {
   const catalog = useCatalog();
+  const frames = useFrames();
   const [localFilter, setLocalFilter] = useState(filter);
   const [groupFilter, setGroupFilter] = useState<string>('all');
   const q = (onFilterChange ? filter : localFilter).toLowerCase();
 
   const matches = catalog.ALL.filter((s) => {
     if (groupFilter !== 'all' && s.group !== groupFilter) return false;
+    if (activeOnly && (frames?.latest(s.id) ?? null) === null) return false;
     if (!q) return true;
     return s.name.toLowerCase().includes(q) || s.groupName.toLowerCase().includes(q);
   });
