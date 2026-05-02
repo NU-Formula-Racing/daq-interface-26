@@ -449,21 +449,23 @@ export function GgPlotWidget({
       for (const e of entries) setSize({ w: e.contentRect.width, h: e.contentRect.height });
     });
     ro.observe(wrap.current);
+    // Seed from initial size in case ResizeObserver doesn't fire immediately.
+    const r = wrap.current.getBoundingClientRect();
+    if (r.width > 0 && r.height > 0) setSize({ w: r.width, h: r.height });
     return () => ro.disconnect();
   }, []);
 
-  const latSig = catalog.byName('Y_Axis_Acceleration_Uncompensated');
-  const lonSig = catalog.byName('X_Axis_Acceleration_Uncompensated');
+  const xSig = catalog.byName('X_Axis_Acceleration_Uncompensated');
+  const ySig = catalog.byName('Y_Axis_Acceleration_Uncompensated');
+  const GRAVITY = 9.80665;
+  const MIN_HALF = 2; // floor on the half-range so rings stay visible
 
-  if (!latSig || !lonSig) {
-    return <EmptySlot label="IMU acceleration signals not in catalog" />;
-  }
-  const lat = frames?.series(latSig.id) ?? [];
-  const lon = frames?.series(lonSig.id) ?? [];
-  const len = Math.min(lat.length, lon.length);
+  // Data extraction
+  const xs = (xSig && frames?.series(xSig.id)) ?? [];
+  const ys = (ySig && frames?.series(ySig.id)) ?? [];
+  const len = Math.min(xs.length, ys.length);
 
-  // The two channels come off the same CAN message so their ring buffers
-  // advance in lockstep — pair by index.
+  // Apply zoom / live windowing
   let start = 0;
   let end = len;
   if (zoom) {
@@ -474,31 +476,30 @@ export function GgPlotWidget({
     start = Math.max(0, len - winLen);
   }
 
-  // Plot geometry. Square, axes centered.
+  // Convert to g and find data extent for auto-fit
+  const xg: number[] = new Array(end - start);
+  const yg: number[] = new Array(end - start);
+  let maxAbs = 0;
+  for (let i = start; i < end; i++) {
+    const x = xs[i].value / GRAVITY;
+    const y = ys[i].value / GRAVITY;
+    xg[i - start] = x;
+    yg[i - start] = y;
+    const m = Math.max(Math.abs(x), Math.abs(y));
+    if (m > maxAbs) maxAbs = m;
+  }
+  const half = Math.max(MIN_HALF, Math.ceil(maxAbs * 1.1));
+
+  // Geometry. Square plot centered in the container.
   const pad = compact ? 22 : 30;
   const plot = Math.max(40, Math.min(size.w, size.h) - pad * 2);
   const cx = size.w / 2;
   const cy = size.h / 2;
-  const half = plot / 2;
-  const scale = half / GG_RANGE_G;
+  const halfPx = plot / 2;
+  const scale = halfPx / half;
 
-  const points: Array<{ x: number; y: number; recent: boolean }> = [];
-  for (let i = start; i < end; i++) {
-    const xg = lat[i].value / GRAVITY;
-    // Y axis: positive = forward accel (motorsport convention puts braking
-    // at the bottom). The sensor's +X is car-forward, so flip sign for
-    // screen Y so accel goes up.
-    const yg = -lon[i].value / GRAVITY;
-    const recent = i >= end - 30;
-    points.push({
-      x: cx + xg * scale,
-      y: cy + yg * scale,
-      recent,
-    });
-  }
-
-  // Friction-circle reference rings at 0.5g, 1g, 1.5g, 2g.
-  const rings = [0.5, 1.0, 1.5, 2.0].filter((g) => g <= GG_RANGE_G);
+  // Ring radii in g
+  const rings = [0.5, 1, 1.5, 2].filter((g) => g <= half);
 
   return (
     <div
@@ -511,8 +512,12 @@ export function GgPlotWidget({
         overflow: 'hidden',
       }}
     >
-      <svg width="100%" height="100%" viewBox={`0 0 ${size.w} ${size.h}`}>
-        {/* Reference rings */}
+      <svg
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${size.w} ${size.h}`}
+        preserveAspectRatio="xMidYMid meet"
+      >
         {rings.map((g) => (
           <circle
             key={g}
@@ -520,46 +525,50 @@ export function GgPlotWidget({
             cy={cy}
             r={g * scale}
             fill="none"
-            stroke={g === 1.0 ? W_COLORS.gridMid : W_COLORS.grid}
-            strokeWidth={g === 1.0 ? 1 : 0.5}
-            strokeDasharray={g === 1.0 ? '' : '2 3'}
+            stroke={g === 1 ? W_COLORS.gridMid : W_COLORS.grid}
+            strokeWidth={g === 1 ? 1 : 0.5}
+            strokeDasharray={g === 1 ? '' : '2 3'}
           />
         ))}
-        {/* Crosshair axes */}
-        <line x1={cx - half} y1={cy} x2={cx + half} y2={cy} stroke={W_COLORS.grid} strokeWidth={0.5} />
-        <line x1={cx} y1={cy - half} x2={cx} y2={cy + half} stroke={W_COLORS.grid} strokeWidth={0.5} />
-        {/* Bounding square */}
+        <line x1={cx - halfPx} y1={cy} x2={cx + halfPx} y2={cy} stroke={W_COLORS.gridMid} strokeWidth={0.5} />
+        <line x1={cx} y1={cy - halfPx} x2={cx} y2={cy + halfPx} stroke={W_COLORS.gridMid} strokeWidth={0.5} />
         <rect
-          x={cx - half}
-          y={cy - half}
+          x={cx - halfPx}
+          y={cy - halfPx}
           width={plot}
           height={plot}
           fill="none"
           stroke={W_COLORS.border}
           strokeWidth={0.5}
         />
-        {/* Trail points */}
-        {points.map((p, i) => (
-          <circle
-            key={i}
-            cx={p.x}
-            cy={p.y}
-            r={p.recent ? 1.6 : 1}
-            fill={p.recent ? W_COLORS.accent : W_COLORS.text}
-            opacity={p.recent ? 0.95 : 0.25}
-          />
-        ))}
-        {/* Axis labels */}
-        <text x={cx + half - 2} y={cy - 4} textAnchor="end" fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
-          LAT (g)
+        {xg.map((x, i) => {
+          const recent = i >= xg.length - 30;
+          // Plot Y goes downward in SVG, so subtract.
+          return (
+            <circle
+              key={i}
+              cx={cx + x * scale}
+              cy={cy - yg[i] * scale}
+              r={recent ? 1.6 : 1}
+              fill={recent ? W_COLORS.accent : W_COLORS.text}
+              opacity={recent ? 0.95 : 0.25}
+            />
+          );
+        })}
+        <text x={cx + halfPx - 2} y={cy - 4} textAnchor="end" fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
+          X (g)
         </text>
-        <text x={cx + 4} y={cy - half + 10} fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
-          LON (g)
+        <text x={cx + 4} y={cy - halfPx + 10} fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
+          Y (g)
         </text>
-        {/* Scale labels on inner ring */}
         <text x={cx + 1 * scale + 2} y={cy + 9} fontSize={8} fill={W_COLORS.textFaint} fontFamily="monospace">
           1g
         </text>
+        {(!xSig || !ySig) && (
+          <text x={cx} y={cy - halfPx - 4} textAnchor="middle" fontSize={9} fill={W_COLORS.textFaint} fontFamily="monospace">
+            IMU acceleration signals not in catalog
+          </text>
+        )}
       </svg>
     </div>
   );
