@@ -1020,11 +1020,13 @@ function SigRow({ s, selected, fav, onPick, onToggleFav }: { s: Signal; selected
   return (
     <div style={{
       padding: '5px 10px 5px 12px', display: 'flex', alignItems: 'center', gap: 8,
-      cursor: 'pointer', background: selected ? 'rgba(167,139,250,0.15)' : 'transparent',
+      cursor: 'grab', background: selected ? 'rgba(167,139,250,0.15)' : 'transparent',
       fontFamily: '"JetBrains Mono", monospace', fontSize: 11,
       color: selected ? SH_COLORS.text : '#c8cbd0',
       borderLeft: selected ? `2px solid ${SH_COLORS.accentBright}` : '2px solid transparent',
     }}
+      draggable
+      onDragStart={(e) => { e.dataTransfer.setData('application/x-nfr-signal', String(s.id)); e.dataTransfer.effectAllowed = 'copy'; }}
       onClick={() => onPick(s.id)}
       onMouseEnter={(e) => { if (!selected) (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.03)'; }}
       onMouseLeave={(e) => { if (!selected) (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
