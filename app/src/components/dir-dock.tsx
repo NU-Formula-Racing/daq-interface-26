@@ -17,6 +17,7 @@ import {
 import type { Signal } from '../signals/catalog.ts';
 import type { FramesStore } from '../hooks/useLiveFrames.ts';
 import { FramesCtx, useFrames } from './FramesContext.tsx';
+import { decideDropAction } from './dropAction.ts';
 
 export { useFrames };
 
@@ -535,7 +536,21 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
           </div>
 
           {/* Grid */}
-          <div ref={gridRef} style={{
+          <div
+            ref={gridRef}
+            onDragOver={(e) => {
+              if (e.dataTransfer.types.includes('application/x-nfr-signal')) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+              }
+            }}
+            onDrop={(e) => {
+              const sid = e.dataTransfer.getData('application/x-nfr-signal');
+              if (!sid) return;
+              e.preventDefault();
+              setPendingDrop({ signalId: sid });
+            }}
+            style={{
             flex: 1, padding: 8, overflow: 'auto',
             display: 'grid', gridTemplateColumns: `repeat(${COLS}, 1fr)`,
             gridAutoRows: '44px', gap: 4, minHeight: 0,
@@ -546,7 +561,26 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
               const isDragging = drag?.id === w.id;
               const preview = isDragging && hoverCell ? hoverCell : w;
               return (
-                <div key={w.id} style={{
+                <div
+                  key={w.id}
+                  onDragOver={(e) => {
+                    if (e.dataTransfer.types.includes('application/x-nfr-signal')) {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = 'copy';
+                      e.stopPropagation();
+                    }
+                  }}
+                  onDrop={(e) => {
+                    const sid = e.dataTransfer.getData('application/x-nfr-signal');
+                    if (!sid) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const action = decideDropAction(w, sid);
+                    if (action.kind === 'patch') {
+                      patch(w.id, action.next);
+                    }
+                  }}
+                  style={{
                   gridColumn: `${preview.col} / span ${preview.w}`,
                   gridRow: `${preview.row} / span ${preview.h}`,
                   minWidth: 0, minHeight: 0, position: 'relative',
