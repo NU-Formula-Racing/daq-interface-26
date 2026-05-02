@@ -428,9 +428,6 @@ interface GgPlotWidgetProps {
   zoom?: [number, number] | null;
 }
 
-const GG_RANGE_G = 2.5; // axis spans -GG_RANGE_G..+GG_RANGE_G in g
-const GRAVITY = 9.80665;
-
 export function GgPlotWidget({
   t: _t,
   mode = 'replay',
