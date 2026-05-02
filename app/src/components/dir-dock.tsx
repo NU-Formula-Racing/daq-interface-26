@@ -78,6 +78,71 @@ interface DockDirectionProps {
   frames?: FramesStore;
 }
 
+const DROPPABLE_TYPES = [
+  { id: 'graph', label: 'GRAPH', icon: 'graph' },
+  { id: 'numeric', label: 'NUMERIC', icon: 'num' },
+  { id: 'gauge', label: 'GAUGE', icon: 'gauge' },
+  { id: 'bar', label: 'BAR', icon: 'bar' },
+  { id: 'heatmap', label: 'HEATMAP', icon: 'heat' },
+];
+
+function DropTypePopup({
+  onPick,
+  onCancel,
+}: {
+  onPick: (type: string) => void;
+  onCancel: () => void;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onCancel]);
+  return (
+    <div
+      onClick={onCancel}
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: SH_COLORS.bg,
+          border: `1px solid ${SH_COLORS.border}`,
+          padding: 16,
+          minWidth: 240,
+          fontFamily: '"JetBrains Mono", monospace',
+        }}
+      >
+        <div style={{ fontSize: 10, letterSpacing: 1.5, color: SH_COLORS.textMute, marginBottom: 10 }}>
+          DISPLAY AS
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {DROPPABLE_TYPES.map((wt) => (
+            <button
+              key={wt.id}
+              onClick={() => onPick(wt.id)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '8px 10px', background: 'transparent',
+                color: SH_COLORS.text, border: `1px solid ${SH_COLORS.border}`,
+                fontSize: 11, letterSpacing: 1, cursor: 'pointer', textAlign: 'left',
+              }}
+            >
+              <WidgetIcon kind={wt.icon} />
+              <span>{wt.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref }: DockDirectionProps) {
   const [widgets, setWidgets] = useState<any[]>(loadLayout);
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
@@ -115,6 +180,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
   const gridRef = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState<any>(null);
   const [hoverCell, setHoverCell] = useState<any>(null);
+  const [pendingDrop, setPendingDrop] = useState<{ signalId: any } | null>(null);
 
   // Persist
   useEffect(() => {
@@ -129,8 +195,8 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
   const remove = (id: string) => { setWidgets((ws) => ws.filter((w) => w.id !== id)); if (focusedId === id) setFocusedId(null); };
   const resetLayout = () => setWidgets(DEFAULT_LAYOUT);
 
-  const addWidget = (type: string) => {
-    const sig = selectedSignal || 'Inverter_RPM';
+  const addWidget = (type: string, signalOverride?: any) => {
+    const sig = signalOverride ?? selectedSignal ?? 'Inverter_RPM';
     const id = 'w' + Date.now().toString(36);
     const lastRow = Math.max(0, ...widgets.map((w) => w.row + w.h - 1));
     const multiTypes = ['graph', 'bar', 'heatmap'];
@@ -613,6 +679,16 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
       </div>
 
       <Timeline t={t} onChange={onT} durationSecs={durationSecs} mode={mode} compact />
+
+      {pendingDrop && (
+        <DropTypePopup
+          onCancel={() => setPendingDrop(null)}
+          onPick={(type) => {
+            addWidget(type, pendingDrop.signalId);
+            setPendingDrop(null);
+          }}
+        />
+      )}
 
       {importState?.open && (
         <div
