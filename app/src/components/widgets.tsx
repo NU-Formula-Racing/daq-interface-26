@@ -524,9 +524,9 @@ export function GgPlotWidget({
               key={i}
               cx={toScreenX(xs[i].value)}
               cy={toScreenY(ys[i].value)}
-              r={1}
-              fill={W_COLORS.text}
-              opacity={0.3}
+              r={1.3}
+              fill={W_COLORS.accent}
+              opacity={0.55}
             />
           );
         })}
