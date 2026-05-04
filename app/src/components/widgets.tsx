@@ -429,8 +429,8 @@ interface GgPlotWidgetProps {
 }
 
 export function GgPlotWidget({
-  t: _t,
-  mode: _mode = 'replay',
+  t,
+  mode = 'replay',
   compact: _compact = false,
   window: _win = 0.05,
   zoom: _zoom = null,
@@ -483,6 +483,15 @@ export function GgPlotWidget({
   // Reference rings at 0.5g, 1g, 1.5g, 2g — drawn only if they fit.
   const rings = [0.5, 1, 1.5, 2].filter((g) => g <= range);
 
+  // Index of the sample tied to the current timeline position. Replay: t is
+  // 0..1 across the session, so floor(t * (n-1)). Live: pin to the most
+  // recent sample so the cursor follows incoming data.
+  const cursorIdx = n === 0
+    ? -1
+    : mode === 'live'
+      ? n - 1
+      : Math.max(0, Math.min(n - 1, Math.floor(t * (n - 1))));
+
   return (
     <div
       ref={wrap}
@@ -507,20 +516,41 @@ export function GgPlotWidget({
         <line x1={cx} y1={cy - half} x2={cx} y2={cy + half} stroke={W_COLORS.gridMid} strokeWidth={0.5} />
         <rect x={cx - half} y={cy - half} width={side} height={side} fill="none" stroke={W_COLORS.border} strokeWidth={0.5} />
 
-        {/* points */}
+        {/* points (current scrubber position drawn separately, on top) */}
         {Array.from({ length: n }, (_, i) => {
-          const recent = i >= n - 30;
+          if (i === cursorIdx) return null; // draw the cursor point on top
           return (
             <circle
               key={i}
               cx={toScreenX(xs[i].value)}
               cy={toScreenY(ys[i].value)}
-              r={recent ? 1.6 : 1}
-              fill={recent ? W_COLORS.accent : W_COLORS.text}
-              opacity={recent ? 0.95 : 0.3}
+              r={1}
+              fill={W_COLORS.text}
+              opacity={0.3}
             />
           );
         })}
+        {/* Current-time marker: filled dot + ring at the scrubber position */}
+        {n > 0 && cursorIdx >= 0 && cursorIdx < n && (
+          <g>
+            <circle
+              cx={toScreenX(xs[cursorIdx].value)}
+              cy={toScreenY(ys[cursorIdx].value)}
+              r={3}
+              fill={W_COLORS.accent}
+              opacity={0.95}
+            />
+            <circle
+              cx={toScreenX(xs[cursorIdx].value)}
+              cy={toScreenY(ys[cursorIdx].value)}
+              r={6}
+              fill="none"
+              stroke={W_COLORS.accent}
+              strokeWidth={1}
+              opacity={0.7}
+            />
+          </g>
+        )}
         {/* axis labels (g) */}
         <text x={cx + half - 2} y={cy - 4} textAnchor="end" fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
           X (g)
@@ -534,7 +564,11 @@ export function GgPlotWidget({
 
         {/* status badge */}
         <text x={cx} y={cy + half - 6} textAnchor="middle" fontSize={9} fill={W_COLORS.textFaint} fontFamily="monospace">
-          {!xSig || !ySig ? 'IMU signals not found' : `${n} pts · ±${range}g`}
+          {!xSig || !ySig
+            ? 'IMU signals not found'
+            : n === 0
+              ? `0 pts · ±${range}g`
+              : `X ${(xs[cursorIdx].value / GRAVITY).toFixed(2)}g · Y ${(ys[cursorIdx].value / GRAVITY).toFixed(2)}g · ${n} pts`}
         </text>
       </svg>
     </div>
