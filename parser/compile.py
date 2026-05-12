@@ -56,7 +56,8 @@ def compile_csv(csv_path):
 
             # Determine signed vs unsigned from Data Type
             data_type = row["Data Type"].lower()
-            signed = (data_type.startswith("int") and not data_type.startswith("uint")) or data_type == "float"
+            is_float = data_type == "float"
+            signed = (data_type.startswith("int") and not data_type.startswith("uint")) or is_float
 
             unit = row.get("Unit") or None
 
@@ -68,6 +69,7 @@ def compile_csv(csv_path):
                 scale=scale,
                 offset=offset,
                 unit=unit,
+                is_float=is_float,
             )
 
             current_signals.append(signal)

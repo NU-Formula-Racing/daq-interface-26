@@ -4,7 +4,7 @@ class SignalSpec:
     # All bit positions are absolute:
     # bit 0 is the least-significant bit of byte 0.
     def __init__(self, name, start_bit, length, signed, scale, offset,
-                 unit=None, min_value=None, max_value=None):
+                 unit=None, min_value=None, max_value=None, is_float=False):
         if start_bit < 0:
             raise ValueError("start_bit must be >= 0")
 
@@ -17,6 +17,7 @@ class SignalSpec:
         self.signed = signed
         self.scale = scale
         self.offset = offset
+        self.is_float = is_float
 
         # Optional metadata
         self.unit = unit
