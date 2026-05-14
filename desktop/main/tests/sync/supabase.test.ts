@@ -49,6 +49,7 @@ describe('pushSessionsToCloud', () => {
       markSynced: vi.fn(async () => {}),
     };
     const pusher: CloudPusher = {
+      pushSignals: vi.fn(async () => new Map()),
       pushSession: vi.fn(async (id: string) => {
         if (id === 'bad') throw new Error('rate limited');
       }),
