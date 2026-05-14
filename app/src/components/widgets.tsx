@@ -156,15 +156,25 @@ export function GraphWidget({
   const yVals = Array.from({ length: yTicks + 1 }, (_, i) => dMin + (dSpan * i) / yTicks);
   const xTicks = compact ? 4 : 6;
 
+  // Real session duration drives the x-axis labels. tt is a 0..1 fraction of
+  // the session; multiplying by durationSec gives elapsed seconds from start.
+  const firstMs = frames?.firstTs() ? Date.parse(frames.firstTs() as string) : null;
+  const latestMs = frames?.latestTs() ? Date.parse(frames.latestTs() as string) : null;
+  const durationSec = firstMs != null && latestMs != null
+    ? Math.max(0.001, (latestMs - firstMs) / 1000)
+    : 0;
+
   const fmtTime = (tt: number) => {
-    const m = Math.floor(tt * 60) % 60;
-    const s = Math.floor(tt * 3600) % 60;
+    const total = tt * durationSec;
+    const m = Math.floor(total / 60);
+    const s = Math.floor(total % 60);
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
   const fmtTimeMs = (tt: number) => {
-    const m = Math.floor(tt * 60) % 60;
-    const s = Math.floor(tt * 3600) % 60;
-    const ms = Math.floor((tt * 3600 * 1000) % 1000);
+    const total = tt * durationSec;
+    const m = Math.floor(total / 60);
+    const s = Math.floor(total % 60);
+    const ms = Math.floor((total * 1000) % 1000);
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(ms).padStart(3, '0')}`;
   };
   const fmtVal = (v: number) => {
@@ -1110,8 +1120,9 @@ interface WidgetShellProps {
   draggable?: boolean;
   onDragStart?: (e: any) => void;
   onHeaderClick?: () => void;
+  onSettings?: () => void;
 }
-export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick }: WidgetShellProps) {
+export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick, onSettings }: WidgetShellProps) {
   const [typeOpen, setTypeOpen] = useState(false);
   const compact = density === 'compact';
 
@@ -1189,6 +1200,14 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
           )}
         </div>
 
+        {onSettings && (
+          <button onClick={(e) => { e.stopPropagation(); onSettings(); }} style={{ ...headerBtn(), color: SH_COLORS.textFaint, padding: '2px 5px' }} title="Settings" aria-label="Settings">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </button>
+        )}
         {onRemove && (
           <button onClick={(e) => { e.stopPropagation(); onRemove(); }} style={{ ...headerBtn(), color: SH_COLORS.textFaint, padding: '2px 5px' }} title="Remove">×</button>
         )}

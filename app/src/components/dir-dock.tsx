@@ -193,7 +193,26 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
 
   const COLS = 12;
   const patch = (id: string, next: any) => setWidgets((ws) => ws.map((w) => w.id === id ? (typeof next === 'function' ? next(w) : { ...w, ...next }) : w));
-  const remove = (id: string) => { setWidgets((ws) => ws.filter((w) => w.id !== id)); if (focusedId === id) setFocusedId(null); };
+  // Pull each widget up to the lowest row where its column span doesn't
+  // collide with anything already placed. Run after a delete so empty rows
+  // collapse and the grid shrinks to fit.
+  const compactVertical = (ws: any[]): any[] => {
+    const sorted = [...ws].sort((a, b) => (a.row - b.row) || (a.col - b.col));
+    const placed: any[] = [];
+    for (const w of sorted) {
+      let newRow = 1;
+      for (const p of placed) {
+        const colsOverlap = !(p.col + p.w <= w.col || w.col + w.w <= p.col);
+        if (colsOverlap) newRow = Math.max(newRow, p.row + p.h);
+      }
+      placed.push({ ...w, row: newRow });
+    }
+    return placed;
+  };
+  const remove = (id: string) => {
+    setWidgets((ws) => compactVertical(ws.filter((w) => w.id !== id)));
+    if (focusedId === id) setFocusedId(null);
+  };
   const resetLayout = () => setWidgets(DEFAULT_LAYOUT);
 
   const addWidget = (type: string, signalOverride?: any) => {
@@ -590,12 +609,12 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                   zIndex: isDragging ? 10 : 1,
                   transition: isDragging ? 'none' : 'opacity 120ms',
                 }}
-                  onClick={() => setFocusedId(w.id)}
                 >
                   <WidgetShell widget={w} t={t} mode={mode}
                     density={density} graphStyle={graphStyle}
                     onChange={(next) => patch(w.id, next)}
                     onRemove={() => remove(w.id)}
+                    onSettings={() => setFocusedId(w.id)}
                     draggable
                     onDragStart={(e) => startMove(w, e)}
                   />
