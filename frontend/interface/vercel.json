@@ -1,4 +1,9 @@
 {
+    "redirects": [
+        { "source": "/dash",   "destination": "/app", "permanent": true },
+        { "source": "/graphs", "destination": "/app", "permanent": true },
+        { "source": "/replay", "destination": "/app", "permanent": true }
+    ],
     "rewrites": [
         {
             "source": "/(.*)",
