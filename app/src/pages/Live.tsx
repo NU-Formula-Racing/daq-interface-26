@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SignalsProvider } from '../components/SignalsProvider.tsx';
-import { DockDirection } from '../components/dir-dock.tsx';
+import { DockDirection } from '@nfr/widgets';
+import { SessionPicker } from '../components/SessionPicker.tsx';
 import { useLiveFrames } from '../hooks/useLiveFrames.ts';
 import { useLiveStatus } from '../hooks/useLiveStatus.ts';
 
 const LIVE_THRESHOLD = 0.995; // Anything ≥ this counts as "snap to live"
 
 export default function Live() {
+  const navigate = useNavigate();
   const status = useLiveStatus();
   const frames = useLiveFrames();
   const [t, setT] = useState(1);
@@ -60,6 +63,8 @@ export default function Live() {
           graphStyle="line"
           frames={frames}
           exportHref={status.session_id ? `/api/sessions/${status.session_id}/export.csv` : null}
+          navigate={navigate}
+          sessionSlot={<SessionPicker />}
         />
       </div>
     </SignalsProvider>

@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { SignalsProvider } from '../components/SignalsProvider.tsx';
-import { DockDirection } from '../components/dir-dock.tsx';
+import { DockDirection } from '@nfr/widgets';
+import { SessionPicker } from '../components/SessionPicker.tsx';
 import { useOverview } from '../hooks/useOverview.ts';
 import { FramesStore, type FrameRow } from '../hooks/useLiveFrames.ts';
 import type { OverviewRow } from '../api/types.ts';
@@ -87,6 +88,8 @@ export default function Replay() {
           graphStyle="line"
           frames={store}
           exportHref={id ? `/api/sessions/${id}/export.csv` : null}
+          navigate={navigate}
+          sessionSlot={<SessionPicker />}
         />
       </div>
     </SignalsProvider>
