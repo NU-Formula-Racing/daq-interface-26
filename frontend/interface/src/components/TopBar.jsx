@@ -47,15 +47,15 @@ export default function TopBar() {
             transition={{ duration: 0.5, ease: "easeInOut" }}
           >
             <Link
-              to="/replay"
-              className={`topbar-nav-link ${location.pathname === "/replay" ? "topbar-nav-link--active" : ""}`}
+              to="/app"
+              className={`topbar-nav-link ${location.pathname === "/app" ? "topbar-nav-link--active" : ""}`}
               tabIndex={mode === "replay" ? 0 : -1}
             >
               REPLAY
             </Link>
             <Link
-              to="/graphs"
-              className={`topbar-nav-link ${location.pathname === "/graphs" ? "topbar-nav-link--active" : ""}`}
+              to="/app"
+              className={`topbar-nav-link ${location.pathname === "/app" ? "topbar-nav-link--active" : ""}`}
               tabIndex={mode === "replay" ? 0 : -1}
             >
               GRAPHS
@@ -92,15 +92,15 @@ export default function TopBar() {
           {mode === "replay" && (
             <div className="topbar-mobile-nav">
               <Link
-                to="/replay"
-                className={`topbar-nav-link ${location.pathname === "/replay" ? "topbar-nav-link--active" : ""}`}
+                to="/app"
+                className={`topbar-nav-link ${location.pathname === "/app" ? "topbar-nav-link--active" : ""}`}
                 onClick={() => setMenuOpen(false)}
               >
                 REPLAY
               </Link>
               <Link
-                to="/graphs"
-                className={`topbar-nav-link ${location.pathname === "/graphs" ? "topbar-nav-link--active" : ""}`}
+                to="/app"
+                className={`topbar-nav-link ${location.pathname === "/app" ? "topbar-nav-link--active" : ""}`}
                 onClick={() => setMenuOpen(false)}
               >
                 GRAPHS
