@@ -68,4 +68,26 @@ export class SupabaseFramesStore implements FramesStore {
     this.version++;
     for (const l of this.listeners) l();
   }
+
+  /** Drop oldest frames so each per-signal buffer is at most max long.
+   *  Used by the live adapter to keep memory bounded under a long stream. */
+  trimPerSignal(max: number): void {
+    let trimmed = false;
+    for (const buf of this.bySignal.values()) {
+      if (buf.length > max) {
+        buf.splice(0, buf.length - max);
+        trimmed = true;
+      }
+    }
+    if (trimmed) {
+      // Recompute global firstTs from remaining heads.
+      let earliest: string | null = null;
+      for (const buf of this.bySignal.values()) {
+        if (buf.length === 0) continue;
+        const head = buf[0].ts;
+        if (earliest === null || head < earliest) earliest = head;
+      }
+      this._firstTs = earliest;
+    }
+  }
 }

@@ -595,13 +595,13 @@ export default function HomePage() {
 
   const handleEnterLive = () => {
     setMode('live');
-    navigate('/app');
+    navigate('/app?mode=live');
   };
 
   const handleOpenReplay = () => {
     setMode('replay');
     setCtxSelectedDate(date);
-    navigate('/app');
+    navigate('/app?mode=replay');
   };
 
   // suppress unused warning when reduced motion is on; kept for parity

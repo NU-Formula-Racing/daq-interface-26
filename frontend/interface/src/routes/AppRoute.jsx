@@ -8,6 +8,7 @@ import {
 import { useSupabaseCatalog } from '@/adapters/useSupabaseCatalog';
 import { useSessionList } from '@/adapters/useSessionList';
 import { useSupabaseFrames } from '@/adapters/useSupabaseFrames';
+import { useSupabaseLiveFrames } from '@/adapters/useSupabaseLiveFrames';
 
 // DockDirection uses its own storage key internally ('nfr-dock-layout-v2').
 // We read from the same key to know which signals are currently in the dock.
@@ -35,23 +36,28 @@ function readDockSignalIds(catalog) {
 
 export default function AppRoute() {
   const [search, setSearch] = useSearchParams();
-  const sessionId = search.get('session');
   const navigate = useNavigate();
+  const mode = search.get('mode') === 'live' ? 'live' : 'replay';
+  const sessionId = search.get('session');
+
+  const setMode = (next) => setSearch((p) => {
+    p.set('mode', next);
+    if (next === 'live') p.delete('session');
+    return p;
+  });
 
   const catalog = useSupabaseCatalog();
   const { sessions } = useSessionList(50);
-  const session = sessions.find((s) => s.id === sessionId) ?? sessions[0] ?? null;
 
-  // Default URL to first session if no param.
+  // Replay-mode session selection (only meaningful when mode === 'replay').
+  const session = sessions.find((s) => s.id === sessionId) ?? sessions[0] ?? null;
   useEffect(() => {
-    if (!sessionId && session?.id) {
+    if (mode === 'replay' && !sessionId && session?.id) {
       setSearch((p) => { p.set('session', session.id); return p; }, { replace: true });
     }
-  }, [sessionId, session, setSearch]);
+  }, [mode, sessionId, session, setSearch]);
 
   // Track which signals the dock currently has (from localStorage).
-  // Re-poll periodically since DockDirection writes localStorage on every layout change.
-  // Depends on catalog because it resolves signal-name strings → numeric IDs.
   const [signalIds, setSignalIds] = useState([]);
   useEffect(() => {
     if (!catalog) return;
@@ -66,30 +72,19 @@ export default function AppRoute() {
     return () => clearInterval(interval);
   }, [catalog]);
 
-  const { store, status } = useSupabaseFrames({
-    sessionId: session?.id ?? null,
-    signalIds,
-    start: session?.started_at ?? null,
-    end: session?.ended_at ?? null,
+  // Both adapters mount on every render but only the active one hits Supabase.
+  // Replay only triggers when given a session + signals; live always streams.
+  const replay = useSupabaseFrames({
+    sessionId: mode === 'replay' ? (session?.id ?? null) : null,
+    signalIds: mode === 'replay' ? signalIds : [],
+    start: mode === 'replay' ? (session?.started_at ?? null) : null,
+    end: mode === 'replay' ? (session?.ended_at ?? null) : null,
   });
+  const live = useSupabaseLiveFrames(mode === 'live');
 
-  const statusBadge = (
-    <span style={{
-      padding: '2px 8px',
-      fontSize: 9,
-      letterSpacing: 1,
-      fontFamily: '"JetBrains Mono", monospace',
-      border: '1px solid rgba(255,255,255,0.09)',
-      color:
-        status.kind === 'error' ? '#e06c6c' :
-        status.kind === 'ready' ? '#7ec98f' :
-        '#9da0a8',
-    }}>
-      {status.kind === 'error' ? `ERR: ${String(status.message).slice(0, 40)}` : status.kind.toUpperCase()}
-    </span>
-  );
+  const { store, status } = mode === 'live' ? live : replay;
 
-  const sessionSlot = (
+  const sessionSlot = mode === 'replay' ? (
     <select
       value={session?.id ?? ''}
       onChange={(e) => setSearch((p) => { p.set('session', e.target.value); return p; })}
@@ -108,6 +103,20 @@ export default function AppRoute() {
         </option>
       ))}
     </select>
+  ) : (
+    <span style={{
+      padding: '3px 8px',
+      fontSize: 10,
+      letterSpacing: 1,
+      color:
+        status.kind === 'error' ? '#e06c6c' :
+        status.kind === 'ready' ? '#7ec98f' :
+        '#9da0a8',
+      border: '1px solid rgba(255,255,255,0.09)',
+      fontFamily: '"JetBrains Mono", monospace',
+    }}>
+      {status.kind === 'error' ? `ERR: ${String(status.message).slice(0, 40)}` : `LIVE · ${status.kind.toUpperCase()}`}
+    </span>
   );
 
   return (
@@ -124,9 +133,9 @@ export default function AppRoute() {
           <DockDirection
             t={1}
             onT={() => {}}
-            mode="replay"
-            onMode={() => {}}
-            durationSecs={session?.duration_secs ?? 0}
+            mode={mode}
+            onMode={setMode}
+            durationSecs={mode === 'live' ? 0 : (session?.duration_secs ?? 0)}
             density="comfortable"
             graphStyle="line"
             frames={store}
