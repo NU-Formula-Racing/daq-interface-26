@@ -1262,8 +1262,10 @@ interface TopBarProps {
   /** Replaces the hardcoded date + session label with a custom node when set. */
   sessionSlot?: React.ReactNode;
   compact?: boolean;
+  /** Click handler for the NFR mark + title (e.g. navigate home). */
+  onLogoClick?: () => void;
 }
-export function TopBar({ mode, onMode, title = 'NFR · DAQ', session = 'Session #17', date = '2026-04-21', right, nav, sessionSlot, compact }: TopBarProps) {
+export function TopBar({ mode, onMode, title = 'NFR · DAQ', session = 'Session #17', date = '2026-04-21', right, nav, sessionSlot, compact, onLogoClick }: TopBarProps) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 12,
@@ -1271,7 +1273,11 @@ export function TopBar({ mode, onMode, title = 'NFR · DAQ', session = 'Session 
       background: SH_COLORS.bg, borderBottom: `1px solid ${SH_COLORS.border}`,
       fontFamily: '"JetBrains Mono", monospace', fontSize: 11, flexShrink: 0,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div
+        onClick={onLogoClick}
+        title={onLogoClick ? 'Home' : undefined}
+        style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: onLogoClick ? 'pointer' : 'default' }}
+      >
         <NFRMark />
         <span style={{ color: SH_COLORS.text, letterSpacing: 1.2, fontWeight: 600 }}>{title}</span>
       </div>

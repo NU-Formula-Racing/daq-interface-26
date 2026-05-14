@@ -406,6 +406,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
         title="NFR · DAQ"
         compact
         sessionSlot={sessionSlot}
+        onLogoClick={navigate ? () => navigate('/') : undefined}
         nav={
           <button
             onClick={() => navigate?.('/settings')}
