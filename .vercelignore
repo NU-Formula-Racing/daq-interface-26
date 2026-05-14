@@ -32,14 +32,15 @@ parser/
 .idea/
 .DS_Store
 
-# Loose binaries / data files
-*.png
-*.jpg
-*.csv
-*.nfr
-*.NFR
-NFR26DBC.csv
-session_*.csv
+# Loose binaries / data files at the REPO ROOT only — don't strip
+# legitimate assets inside frontend/interface/src or packages.
+/*.png
+/*.jpg
+/*.csv
+/*.nfr
+/*.NFR
+/NFR26DBC.csv
+/session_*.csv
 
 # Docs / planning aren't needed by the build
 docs/
