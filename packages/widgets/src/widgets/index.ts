@@ -15,4 +15,4 @@ export {
   NFRMark,
   WIDGET_TYPES,
   EmptySlot,
-} from '@nfr/widgets';
+} from './widgets.tsx';

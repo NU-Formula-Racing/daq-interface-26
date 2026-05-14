@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { apiGet } from '../api/client.ts';
 import type { Session } from '../api/types.ts';
-import { useCatalog } from './SignalsProvider.tsx';
+import { useCatalog } from '@nfr/widgets';
 import { COLORS as SH_COLORS } from './colors.ts';
 import {
   SignalChip,
@@ -14,9 +14,9 @@ import {
   WidgetIcon,
   WIDGET_TYPES,
 } from './widgets.tsx';
-import type { Signal } from '../signals/catalog.ts';
+import type { Signal } from '@nfr/widgets';
 import type { FramesStore } from '../hooks/useLiveFrames.ts';
-import { FramesCtx, useFrames } from './FramesContext.tsx';
+import { FramesContext as FramesCtx, useFrames } from './FramesContext.tsx';
 import { decideDropAction } from './dropAction.ts';
 
 export { useFrames };

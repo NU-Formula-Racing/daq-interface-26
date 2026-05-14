@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { buildCatalog } from './catalog.ts';
-import type { SignalDefinition } from '../api/types.ts';
+import type { SignalDefinition } from '../data/types.ts';
 
 const defs: SignalDefinition[] = [
-  { id: 1, source: 'PDM', signal_name: 'bus_voltage', unit: 'V', description: null },
-  { id: 2, source: 'BMS_SOE', signal_name: 'soc', unit: '%', description: null },
-  { id: 3, source: 'BMS_SOE', signal_name: 'pack_voltage', unit: 'V', description: null },
+  { id: 1, source: 'PDM', signal_name: 'bus_voltage', unit: 'V' },
+  { id: 2, source: 'BMS_SOE', signal_name: 'soc', unit: '%' },
+  { id: 3, source: 'BMS_SOE', signal_name: 'pack_voltage', unit: 'V' },
 ];
 
 describe('buildCatalog', () => {

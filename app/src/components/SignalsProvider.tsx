@@ -1,10 +1,7 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import type { SignalCatalog } from '../signals/catalog.ts';
-import { buildCatalog } from '../signals/catalog.ts';
+import { useEffect, useState, type ReactNode } from 'react';
+import { SignalsProvider as SharedSignalsProvider, buildCatalog } from '@nfr/widgets';
+import type { SignalCatalog, SignalDefinition } from '@nfr/widgets';
 import { apiGet } from '../api/client.ts';
-import type { SignalDefinition } from '../api/types.ts';
-
-const Ctx = createContext<SignalCatalog | null>(null);
 
 export function SignalsProvider({ children }: { children: ReactNode }) {
   const [catalog, setCatalog] = useState<SignalCatalog | null>(null);
@@ -18,19 +15,7 @@ export function SignalsProvider({ children }: { children: ReactNode }) {
       });
   }, []);
 
-  if (!catalog) {
-    return (
-      <div className="h-full flex items-center justify-center font-mono text-xs text-[color:var(--color-text-faint)] tracking-widest">
-        LOADING SIGNALS…
-      </div>
-    );
-  }
-
-  return <Ctx.Provider value={catalog}>{children}</Ctx.Provider>;
+  return <SharedSignalsProvider catalog={catalog}>{children}</SharedSignalsProvider>;
 }
 
-export function useCatalog(): SignalCatalog {
-  const cat = useContext(Ctx);
-  if (!cat) throw new Error('useCatalog used outside SignalsProvider');
-  return cat;
-}
+export { useCatalog } from '@nfr/widgets';

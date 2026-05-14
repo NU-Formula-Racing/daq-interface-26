@@ -1,4 +1,4 @@
-import type { SignalDefinition } from '../api/types.ts';
+import type { SignalDefinition } from '../data/types.ts';
 import { colorForSource } from './palette.ts';
 import overlay from './metadata.json';
 

@@ -19,20 +19,10 @@ export interface SignalDefinition {
   id: number;
   source: string;
   signal_name: string;
-  unit: string;
+  unit: string | null;
   min?: number;
   max?: number;
-  description?: string;
+  description?: string | null;
 }
 
-export interface SignalGroup {
-  id: string;
-  name: string;
-  signalIds: number[];
-}
-
-export interface SignalCatalog {
-  all(): SignalDefinition[];
-  resolve(id: number | string): SignalDefinition | null;
-  groups(): SignalGroup[];
-}
+export type { Signal, SignalGroup, SignalCatalog, SignalKind } from '../signals/catalog.ts';
