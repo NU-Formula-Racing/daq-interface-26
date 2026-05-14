@@ -1,9 +1,9 @@
-/* AppDownload - editorial field guide. Mobile resets only. */
+/* AppDownload - desktop palette. Mobile resets only. */
 
 @media (max-width: 720px) {
   .appdl-page .appdl-h1 {
-    font-size: 64px !important;
-    letter-spacing: -1.5px !important;
+    font-size: 36px !important;
+    letter-spacing: 0.06em !important;
   }
   .appdl-page .appdl-chapter {
     grid-template-columns: 1fr !important;
@@ -11,7 +11,7 @@
     gap: 18px !important;
   }
   .appdl-page .appdl-chapter h3 {
-    font-size: 32px !important;
+    font-size: 18px !important;
   }
   .appdl-page .appdl-modes {
     grid-template-columns: 1fr !important;
@@ -31,7 +31,7 @@
     padding: 60px 20px !important;
   }
   .appdl-page .appdl-closing-quote {
-    font-size: 32px !important;
+    font-size: 16px !important;
   }
   .appdl-page .appdl-footer {
     padding: 24px 20px !important;
@@ -41,7 +41,7 @@
     text-align: center !important;
   }
   .appdl-page .appdl-cover-sub {
-    font-size: 20px !important;
+    font-size: 12px !important;
   }
 }
 

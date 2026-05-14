@@ -16,8 +16,8 @@
   min-height: 100vh;
   min-height: 100dvh;
   isolation: isolate;
-  color: #e2e8f0;
-  font-family: var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  color: var(--c-text);
+  font-family: var(--font-mono);
   overflow-x: hidden;
 }
 
@@ -69,9 +69,9 @@
   --rdp-day-width: 32px;
   --rdp-day_button-height: 30px;
   --rdp-day_button-width: 30px;
-  font-family: var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: rgba(220, 230, 240, 0.85);
+  color: var(--c-text-mute);
 }
 .home-datefield .rdp-month_caption {
   font-weight: 500;
@@ -100,9 +100,9 @@
 .home-datefield .rdp-day_button {
   border: none;
   background: transparent;
-  color: rgba(220, 230, 240, 0.78);
+  color: var(--c-text);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 0;
 }
 .home-datefield .rdp-day_button:hover {
   background: rgba(167, 139, 250, 0.1);

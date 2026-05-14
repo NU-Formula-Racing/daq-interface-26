@@ -365,12 +365,10 @@ const DateField = ({ value, onChange, accent = ACCENT }) => {
 const SimpleCard = ({ label, accent = ACCENT, online, children }) => (
   <div
     style={{
-      background: 'rgba(15, 18, 25, 0.65)',
-      border: '1px solid rgba(255, 255, 255, 0.08)',
-      borderRadius: 12,
+      background: 'var(--c-bg-panel)',
+      border: '1px solid var(--c-border)',
+      borderRadius: 0,
       padding: 24,
-      backdropFilter: 'blur(8px)',
-      WebkitBackdropFilter: 'blur(8px)',
       display: 'flex',
       flexDirection: 'column',
     }}
@@ -385,10 +383,11 @@ const SimpleCard = ({ label, accent = ACCENT, online, children }) => (
     >
       <span
         style={{
-          fontFamily: "'Instrument Serif', serif",
-          fontSize: 24,
-          color: '#f1f5f9',
-          letterSpacing: '-0.01em',
+          fontFamily: 'var(--font-mono)',
+          fontSize: 16,
+          color: 'var(--c-text)',
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
         }}
       >
         {label}
@@ -430,13 +429,13 @@ const SimpleButton = ({ children, accent = ACCENT, onClick }) => {
         width: '100%',
         padding: '12px 18px',
         background: hover ? accent : hexToRgba(accent, 0.12),
-        color: hover ? '#0a0c12' : '#f1f5f9',
+        color: hover ? 'var(--c-bg)' : 'var(--c-text)',
         border: `1px solid ${hexToRgba(accent, hover ? 1 : 0.4)}`,
-        borderRadius: 8,
-        fontFamily: "'Inter', system-ui, sans-serif",
-        fontSize: 14,
+        borderRadius: 0,
+        fontFamily: 'var(--font-mono)',
+        fontSize: 11,
         fontWeight: 500,
-        letterSpacing: '0.02em',
+        letterSpacing: '0.12em',
         cursor: 'pointer',
         transition: 'background 160ms ease, color 160ms ease, border-color 160ms ease',
       }}
@@ -471,18 +470,19 @@ const Header = ({ accent }) => (
     <h1
       className="home-h1"
       style={{
-        fontFamily: "'Instrument Serif', serif",
-        fontWeight: 400,
-        fontSize: 'clamp(56px, 9vw, 132px)',
-        letterSpacing: '-0.02em',
-        color: '#f1f5f9',
+        fontFamily: 'var(--font-mono)',
+        fontWeight: 600,
+        fontSize: 'clamp(36px, 6vw, 80px)',
+        letterSpacing: '0.06em',
+        color: 'var(--c-text)',
         margin: 0,
-        lineHeight: 0.95,
+        lineHeight: 1.05,
         textShadow: `0 0 40px ${hexToRgba(accent, 0.12)}`,
         wordBreak: 'break-word',
+        textTransform: 'uppercase',
       }}
     >
-      NFR <span style={{ fontStyle: 'italic', color: '#4E2A84' }}>Interface</span>
+      NFR <span style={{ color: 'var(--c-accent-bright)' }}>Interface</span>
     </h1>
 
     <div
@@ -608,7 +608,7 @@ export default function HomePage() {
   void reduceMotion;
 
   return (
-    <div className="home-wrapper">
+    <div className="home-wrapper marketing">
       <div
         aria-hidden="true"
         style={{
@@ -616,7 +616,7 @@ export default function HomePage() {
           inset: 0,
           zIndex: 0,
           pointerEvents: 'none',
-          background: 'radial-gradient(ellipse at 50% 50%, #0a0e16 0%, #050709 80%)',
+          background: 'var(--c-bg)',
         }}
       >
         <CircuitBoard mobile={isMobile} />
@@ -630,14 +630,14 @@ export default function HomePage() {
 
         <div className="home-cards-grid">
           <SimpleCard label="Live" accent={accent} online={online}>
-            <p style={{ fontSize: 14, color: 'rgba(220, 230, 240, 0.7)', lineHeight: 1.5, margin: '0 0 24px' }}>
+            <p style={{ fontSize: 12, color: 'var(--c-text-mute)', lineHeight: 1.5, margin: '0 0 24px', fontFamily: 'var(--font-mono)' }}>
               Stream real-time CAN and sensor data.
             </p>
             <SimpleButton accent={accent} onClick={handleEnterLive}>Enter</SimpleButton>
           </SimpleCard>
 
           <SimpleCard label="Replay" accent={accent}>
-            <p style={{ fontSize: 14, color: 'rgba(220, 230, 240, 0.7)', lineHeight: 1.5, margin: '0 0 16px' }}>
+            <p style={{ fontSize: 12, color: 'var(--c-text-mute)', lineHeight: 1.5, margin: '0 0 16px', fontFamily: 'var(--font-mono)' }}>
               Analyze past drive sessions.
             </p>
             <div style={{ marginBottom: 16 }}>

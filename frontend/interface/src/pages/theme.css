@@ -1,0 +1,86 @@
+:root {
+  --c-bg: #1e1f22;
+  --c-bg-panel: #2b2d30;
+  --c-bg-elev: #3c3f41;
+  --c-text: #dfe1e5;
+  --c-text-mute: #9da0a8;
+  --c-text-faint: #6f7278;
+  --c-border: rgba(255,255,255,0.09);
+  --c-accent: #7c6fde;
+  --c-accent-bright: #a78bfa;
+  --c-ok: #7ec98f;
+  --c-warn: #f0a55c;
+  --c-err: #e06c6c;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-mono);
+}
+
+.marketing {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-mono);
+  min-height: 100vh;
+}
+
+.marketing a {
+  color: var(--c-accent-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.marketing a:hover {
+  color: var(--c-text);
+}
+
+.marketing button,
+.marketing .btn {
+  background: var(--c-bg-panel);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+  border-radius: 0;
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.marketing button:hover,
+.marketing .btn:hover {
+  background: var(--c-bg-elev);
+  border-color: var(--c-accent);
+}
+
+.marketing .btn-primary {
+  background: var(--c-accent);
+  border-color: var(--c-accent-bright);
+  color: var(--c-text);
+}
+
+.marketing .btn-primary:hover {
+  background: var(--c-accent-bright);
+}
+
+.marketing h1, .marketing h2, .marketing h3 {
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--c-text);
+}
+
+.marketing h1 { font-size: 28px; letter-spacing: 1.5px; }
+.marketing h2 { font-size: 18px; }
+.marketing h3 { font-size: 13px; text-transform: uppercase; color: var(--c-text-mute); }
+
+.marketing .label {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--c-text-faint);
+  text-transform: uppercase;
+}

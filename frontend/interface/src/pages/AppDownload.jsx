@@ -2,16 +2,16 @@ import { useNavigate } from 'react-router-dom';
 import FRWindow from '../components/FRWindow.jsx';
 import './AppDownload.css';
 
-// Editorial palette (cream / Northwestern purple)
-const E_BG = '#f4f1ec';
-const E_INK = '#1a1816';
-const E_MUTED = 'rgba(26,24,22,0.6)';
-const E_RULE = 'rgba(0,0,0,0.15)';
-const E_PURPLE = '#4E2A84';
+// Design tokens — desktop palette
+const E_BG = 'var(--c-bg)';
+const E_INK = 'var(--c-text)';
+const E_MUTED = 'var(--c-text-mute)';
+const E_RULE = 'var(--c-border)';
+const E_PURPLE = 'var(--c-accent-bright)';
 
-const SERIF = "'Instrument Serif', serif";
-const SANS = "'Inter Tight', Inter, sans-serif";
-const MONO_E = "'JetBrains Mono', monospace";
+const SERIF = "var(--font-mono)";
+const SANS = "var(--font-mono)";
+const MONO_E = "var(--font-mono)";
 
 const RELEASES_URL = 'https://github.com/NU-Formula-Racing/daq-interface-26/releases/latest';
 
@@ -37,8 +37,8 @@ function ENav({ issue = 'A FIELD GUIDE', onBack }) {
         onClick={onBack}
         style={{ display: 'flex', alignItems: 'baseline', gap: 8, cursor: 'pointer' }}
       >
-        <span style={{ fontFamily: SERIF, fontSize: 26, fontStyle: 'italic', color: E_PURPLE, lineHeight: 1 }}>NFR</span>
-        <span style={{ fontFamily: SERIF, fontSize: 26, color: E_INK, lineHeight: 1 }}>interface</span>
+        <span style={{ fontFamily: SERIF, fontSize: 14, letterSpacing: '0.1em', color: E_PURPLE, lineHeight: 1, textTransform: 'uppercase', fontWeight: 700 }}>NFR</span>
+        <span style={{ fontFamily: SERIF, fontSize: 14, letterSpacing: '0.1em', color: E_INK, lineHeight: 1, textTransform: 'uppercase', fontWeight: 700 }}>interface</span>
       </div>
       <span style={{ fontFamily: MONO_E, fontSize: 10, color: E_MUTED, letterSpacing: 1.5, marginLeft: 4 }}>{issue}</span>
       <div style={{ flex: 1 }} />
@@ -69,17 +69,18 @@ function EDownload() {
           alignItems: 'center',
           gap: 10,
           padding: '15px 24px',
-          borderRadius: 4,
-          background: E_PURPLE,
-          color: '#fff',
-          border: 'none',
+          borderRadius: 0,
+          background: 'var(--c-accent)',
+          color: 'var(--c-text)',
+          border: '1px solid var(--c-accent-bright)',
           fontFamily: SANS,
-          fontSize: 14,
+          fontSize: 11,
           fontWeight: 600,
-          letterSpacing: 0.2,
-          boxShadow: '0 6px 20px rgba(78,42,132,0.28)',
+          letterSpacing: '1.2px',
+          boxShadow: 'none',
           cursor: 'pointer',
           textDecoration: 'none',
+          textTransform: 'uppercase',
         }}
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -128,7 +129,7 @@ function EFooter() {
       }}
     >
       <span>{'\u00A9'} NORTHWESTERN FORMULA RACING</span>
-      <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 14, color: E_INK, letterSpacing: 0 }}>built in Evanston</span>
+      <span style={{ fontFamily: SERIF, fontSize: 11, color: E_MUTED, letterSpacing: '1px', textTransform: 'uppercase' }}>built in Evanston</span>
       <span>nfrinterface.com</span>
     </div>
   );
@@ -148,7 +149,7 @@ function Chapter({ n, title, eyebrow, children }) {
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <span style={{ fontFamily: MONO_E, fontSize: 10, letterSpacing: 1.5, color: E_MUTED }}>CHAPTER</span>
-        <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 84, color: E_PURPLE, lineHeight: 0.85, letterSpacing: -2 }}>
+        <span style={{ fontFamily: SERIF, fontSize: 64, color: E_PURPLE, lineHeight: 0.85, letterSpacing: '-1px', fontWeight: 700 }}>
           {n}
         </span>
         <span style={{ fontFamily: MONO_E, fontSize: 10, letterSpacing: 1.5, color: E_MUTED, marginTop: 8 }}>
@@ -156,7 +157,7 @@ function Chapter({ n, title, eyebrow, children }) {
         </span>
       </div>
       <div>
-        <h3 style={{ fontFamily: SERIF, fontSize: 52, fontWeight: 400, letterSpacing: -1, lineHeight: 1.02, margin: '0 0 20px' }}>
+        <h3 style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 600, letterSpacing: '1px', lineHeight: 1.15, margin: '0 0 20px', color: 'var(--c-text)', textTransform: 'uppercase' }}>
           {title}
         </h3>
         {children}
@@ -187,7 +188,7 @@ export default function AppDownload() {
   ];
 
   return (
-    <div style={{ background: E_BG, minHeight: '100vh' }}>
+    <div className="marketing" style={{ background: E_BG, minHeight: '100vh' }}>
       <div
         className="appdl-page"
         style={{
@@ -221,26 +222,28 @@ export default function AppDownload() {
             className="appdl-h1"
             style={{
               fontFamily: SERIF,
-              fontSize: 156,
-              lineHeight: 0.85,
-              letterSpacing: -4,
-              fontWeight: 400,
+              fontSize: 'clamp(48px, 10vw, 96px)',
+              lineHeight: 1.05,
+              letterSpacing: '0.08em',
+              fontWeight: 700,
               margin: 0,
+              textTransform: 'uppercase',
+              color: 'var(--c-text)',
             }}
           >
-            NFR <span style={{ fontStyle: 'italic', color: E_PURPLE }}>Interface</span>
+            NFR <span style={{ color: E_PURPLE }}>Interface</span>
           </h1>
           <p
             className="appdl-cover-sub"
             style={{
               fontFamily: SERIF,
-              fontStyle: 'italic',
-              fontSize: 28,
-              lineHeight: 1.3,
+              fontSize: 13,
+              lineHeight: 1.6,
               color: E_MUTED,
               maxWidth: 720,
               margin: 0,
               fontWeight: 400,
+              letterSpacing: '0.06em',
             }}
           >
             A short manual for reading the NFR 26 car {'\u2014'} live from the bus, replayed from a log, broadcast to the pit.
@@ -260,7 +263,7 @@ export default function AppDownload() {
             </>
           }
         >
-          <p style={{ fontSize: 17, lineHeight: 1.6, color: E_INK, maxWidth: 720, margin: 0 }}>
+          <p style={{ fontSize: 12, lineHeight: 1.7, color: E_MUTED, maxWidth: 720, margin: 0, fontFamily: MONO_E }}>
             Built for the embedded subteam at Northwestern Formula Racing. One window holds every signal from the car {'\u2014'} engine, inverter, brakes, tires, IMU {'\u2014'} decoded against the team's DBC and rendered into a tiled dashboard you can rearrange to taste.
           </p>
         </Chapter>
@@ -275,7 +278,7 @@ export default function AppDownload() {
             </>
           }
         >
-          <p style={{ fontSize: 17, lineHeight: 1.6, color: E_MUTED, maxWidth: 720, margin: '0 0 24px' }}>
+          <p style={{ fontSize: 12, lineHeight: 1.7, color: E_MUTED, maxWidth: 720, margin: '0 0 24px', fontFamily: MONO_E }}>
             Each panel reads a named signal. Add graphs, gauges, numerics, bars, heatmaps {'\u2014'} drag to resize, click the {'\u00D7'} to remove. Layouts persist between sessions.
           </p>
           <div className="appdl-frwindow-wrap" style={{ width: '100%', maxWidth: 1080 }}>
@@ -313,11 +316,11 @@ export default function AppDownload() {
                   borderTop: `1px solid ${E_RULE}`,
                 }}
               >
-                <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 28, color: E_PURPLE, lineHeight: 1 }}>
+                <span style={{ fontFamily: SERIF, fontSize: 11, letterSpacing: '0.15em', color: E_PURPLE, lineHeight: 1 }}>
                   {c.roman}
                 </span>
-                <span style={{ fontFamily: SERIF, fontSize: 32, letterSpacing: -0.5, lineHeight: 1.05 }}>{c.t}</span>
-                <span style={{ fontSize: 14, lineHeight: 1.55, color: E_MUTED }}>{c.b}</span>
+                <span style={{ fontFamily: SERIF, fontSize: 14, letterSpacing: '0.1em', lineHeight: 1.2, fontWeight: 600, textTransform: 'uppercase', color: 'var(--c-text)' }}>{c.t}</span>
+                <span style={{ fontSize: 11, lineHeight: 1.65, color: E_MUTED, fontFamily: SERIF }}>{c.b}</span>
               </div>
             ))}
           </div>
@@ -340,14 +343,14 @@ export default function AppDownload() {
             className="appdl-closing-quote"
             style={{
               fontFamily: SERIF,
-              fontSize: 52,
-              fontStyle: 'italic',
-              lineHeight: 1.1,
-              letterSpacing: -1,
-              color: E_INK,
+              fontSize: 22,
+              lineHeight: 1.4,
+              letterSpacing: '0.06em',
+              color: E_MUTED,
               maxWidth: 900,
               margin: 0,
               fontWeight: 400,
+              textTransform: 'uppercase',
             }}
           >
             Built by the people who drive the car.
