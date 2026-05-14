@@ -1,18 +1,45 @@
-# Heavy / desktop-only stuff Vercel doesn't need to upload.
-desktop/release/
-desktop/main/dist/
-desktop/build/
-app/dist/
-parser/__pycache__/
-parser/dist/
-parser/build/
-parser/.venv/
-.worktrees/
-.superpowers/
-.playwright-mcp/
+# Vercel needs root config + all workspace package.json files (so `npm install`
+# can resolve workspaces) + frontend/interface source + packages/widgets source.
+# Block everything else aggressively to keep the upload small.
+
+# Universal: never upload node_modules or build output
+**/node_modules/
+**/dist/
+**/build/
+**/.cache/
+**/release/
+
+# Desktop electron specifics — Vercel doesn't need any of this, but keep
+# desktop/package.json so the workspace declaration in root package.json
+# still resolves cleanly.
+desktop/main/
+desktop/preload/
+desktop/migrations/
+desktop/vitest.config.ts
+desktop/tsconfig.json
 *.dmg
 *.app
 *.AppImage
-session_*.csv
-NFR26DBC.csv
+
+# Parser stack — Python, not deployed
+parser/
+
+# Worktrees / IDE / OS noise
+.worktrees/
+.superpowers/
+.playwright-mcp/
+.vscode/
+.idea/
+.DS_Store
+
+# Loose binaries / data files
 *.png
+*.jpg
+*.csv
+*.nfr
+*.NFR
+NFR26DBC.csv
+session_*.csv
+
+# Docs / planning aren't needed by the build
+docs/
