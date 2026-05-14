@@ -7,6 +7,8 @@ import Replay from './pages/Replay';
 import Graphs from './pages/Graphs';
 import AppDownload from './pages/AppDownload';
 import TopBar from './components/TopBar';
+import AppDevRoute from './routes/AppDevRoute';
+import AppRoute from './routes/AppRoute';
 
 function PageWrapper({ children }) {
   return (
@@ -24,7 +26,7 @@ function PageWrapper({ children }) {
 
 function App() {
   const location = useLocation();
-  const isHome = location.pathname === '/' || location.pathname === '/app';
+  const isHome = location.pathname === '/' || location.pathname === '/app' || location.pathname === '/app-dev';
 
   return (
     <>
@@ -35,7 +37,9 @@ function App() {
           <Route path="/dashboard" element={<PageWrapper><Dash /></PageWrapper>} />
           <Route path="/replay" element={<PageWrapper><Replay /></PageWrapper>} />
           <Route path="/graphs" element={<PageWrapper><Graphs /></PageWrapper>} />
-          <Route path="/app" element={<PageWrapper><AppDownload /></PageWrapper>} />
+          <Route path="/app-download" element={<PageWrapper><AppDownload /></PageWrapper>} />
+          <Route path="/app" element={<AppRoute />} />
+          <Route path="/app-dev" element={<AppDevRoute />} />
         </Routes>
       </AnimatePresence>
     </>
