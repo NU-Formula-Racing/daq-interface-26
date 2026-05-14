@@ -133,6 +133,7 @@ export default function AppRoute() {
             navigate={navigate}
             sessionSlot={sessionSlot}
             exportHref={null}
+            allowDataImport={false}
           />
         </div>
       </FramesProvider>

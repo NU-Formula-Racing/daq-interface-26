@@ -79,6 +79,9 @@ interface DockDirectionProps {
   navigate?: (path: string) => void;
   /** Slot for a session picker component (desktop-specific). */
   sessionSlot?: React.ReactNode;
+  /** Show the IMPORT NFR + DBC upload buttons. False on the website,
+   *  where signal/data ingestion is desktop-only. Default true. */
+  allowDataImport?: boolean;
 }
 
 const DROPPABLE_TYPES = [
@@ -146,7 +149,7 @@ function DropTypePopup({
   );
 }
 
-export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot }: DockDirectionProps) {
+export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true }: DockDirectionProps) {
   const [widgets, setWidgets] = useState<any[]>(loadLayout);
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
   const [focusedId, setFocusedId] = useState<string | null>(null);
@@ -419,34 +422,38 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
         }
         right={
           <>
-            {nfrStatus && (
-              <span style={{ color: SH_COLORS.textMute, fontSize: 9, marginRight: 4 }}>{nfrStatus}</span>
+            {allowDataImport && (
+              <>
+                {nfrStatus && (
+                  <span style={{ color: SH_COLORS.textMute, fontSize: 9, marginRight: 4 }}>{nfrStatus}</span>
+                )}
+                <input
+                  ref={nfrFileRef}
+                  type="file"
+                  accept=".nfr,.NFR,application/octet-stream"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={onPickNfr}
+                />
+                <input
+                  ref={nfrFolderRef}
+                  type="file"
+                  // @ts-expect-error — non-standard but supported in Chromium/Safari/FF
+                  webkitdirectory=""
+                  directory=""
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={onPickNfr}
+                />
+                <button onClick={() => setNfrModalOpen(true)} style={smallBtn()} title="Import .nfr files">↑ IMPORT NFR</button>
+                <span style={{ width: 1, height: 12, background: SH_COLORS.border, margin: '0 4px' }} />
+                {dbcStatus && (
+                  <span style={{ color: SH_COLORS.textMute, fontSize: 9, marginRight: 4 }}>{dbcStatus}</span>
+                )}
+                <input ref={fileRef} type="file" accept=".csv,text/csv" style={{ display: 'none' }} onChange={onPickDbc} />
+                <button onClick={() => fileRef.current?.click()} style={smallBtn()} title="Upload a new DBC CSV">↑ DBC</button>
+              </>
             )}
-            <input
-              ref={nfrFileRef}
-              type="file"
-              accept=".nfr,.NFR,application/octet-stream"
-              multiple
-              style={{ display: 'none' }}
-              onChange={onPickNfr}
-            />
-            <input
-              ref={nfrFolderRef}
-              type="file"
-              // @ts-expect-error — non-standard but supported in Chromium/Safari/FF
-              webkitdirectory=""
-              directory=""
-              multiple
-              style={{ display: 'none' }}
-              onChange={onPickNfr}
-            />
-            <button onClick={() => setNfrModalOpen(true)} style={smallBtn()} title="Import .nfr files">↑ IMPORT NFR</button>
-            <span style={{ width: 1, height: 12, background: SH_COLORS.border, margin: '0 4px' }} />
-            {dbcStatus && (
-              <span style={{ color: SH_COLORS.textMute, fontSize: 9, marginRight: 4 }}>{dbcStatus}</span>
-            )}
-            <input ref={fileRef} type="file" accept=".csv,text/csv" style={{ display: 'none' }} onChange={onPickDbc} />
-            <button onClick={() => fileRef.current?.click()} style={smallBtn()} title="Upload a new DBC CSV">↑ DBC</button>
             <button onClick={resetLayout} style={smallBtn()} title="Reset layout to default">⟲ RESET</button>
             {exportHref ? (
               <a href={exportHref} download style={{ ...smallBtn(), textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }} title="Export current session as CSV">↓ EXPORT</a>
