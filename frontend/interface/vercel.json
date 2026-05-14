@@ -1,5 +1,5 @@
 {
-    "installCommand": "cd ../.. && npm install",
+    "installCommand": "cd ../.. && npm ci",
     "buildCommand": "cd ../.. && npm run build --workspace=frontend/interface",
     "outputDirectory": "dist",
     "redirects": [
