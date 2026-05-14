@@ -39,6 +39,7 @@ export default function AppRoute() {
   const navigate = useNavigate();
   const mode = search.get('mode') === 'live' ? 'live' : 'replay';
   const sessionId = search.get('session');
+  const [t, setT] = useState(1);
 
   const setMode = (next) => setSearch((p) => {
     p.set('mode', next);
@@ -131,8 +132,8 @@ export default function AppRoute() {
           fontFamily: '"JetBrains Mono", monospace',
         }}>
           <DockDirection
-            t={1}
-            onT={() => {}}
+            t={mode === 'live' ? 1 : t}
+            onT={setT}
             mode={mode}
             onMode={setMode}
             durationSecs={mode === 'live' ? 0 : (session?.duration_secs ?? 0)}
