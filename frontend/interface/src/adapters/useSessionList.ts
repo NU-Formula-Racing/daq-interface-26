@@ -9,7 +9,6 @@ export interface SessionListItem {
   duration_secs: number;
   driver: string | null;
   car: string | null;
-  signal_count: number;
 }
 
 export function useSessionList(limit = 50) {

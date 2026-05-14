@@ -51,7 +51,7 @@ export default function AppDevRoute() {
             >
               {sessions.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.date} · {s.duration_secs}s · {s.signal_count} signals
+                  {s.date} · {s.duration_secs}s
                 </option>
               ))}
             </select>

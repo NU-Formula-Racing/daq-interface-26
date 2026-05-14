@@ -13,7 +13,11 @@ import { useSupabaseFrames } from '@/adapters/useSupabaseFrames';
 // We read from the same key to know which signals are currently in the dock.
 const DOCK_STORAGE_KEY = 'nfr-dock-layout-v2';
 
-function readDockSignalIds() {
+// Widget layouts persist signals as either numeric IDs or string names
+// (e.g. "Battery_Voltage" or "Rear Inverter/RPM"). Resolve through the
+// catalog so we always send numeric IDs to get_signals_window.
+function readDockSignalIds(catalog) {
+  if (!catalog) return [];
   try {
     const raw = localStorage.getItem(DOCK_STORAGE_KEY);
     if (!raw) return [];
@@ -21,11 +25,11 @@ function readDockSignalIds() {
     const ids = new Set();
     for (const w of widgets ?? []) {
       for (const sig of w.signals ?? []) {
-        const n = typeof sig === 'number' ? sig : Number(sig);
-        if (!Number.isNaN(n)) ids.add(n);
+        const resolved = catalog.resolve(sig);
+        if (resolved) ids.add(resolved.id);
       }
     }
-    return [...ids];
+    return [...ids].sort((a, b) => a - b);
   } catch { return []; }
 }
 
@@ -47,15 +51,20 @@ export default function AppRoute() {
 
   // Track which signals the dock currently has (from localStorage).
   // Re-poll periodically since DockDirection writes localStorage on every layout change.
-  const [signalIds, setSignalIds] = useState(readDockSignalIds);
+  // Depends on catalog because it resolves signal-name strings → numeric IDs.
+  const [signalIds, setSignalIds] = useState([]);
   useEffect(() => {
+    if (!catalog) return;
+    setSignalIds(readDockSignalIds(catalog));
     const interval = setInterval(() => {
-      const next = readDockSignalIds();
-      const same = next.length === signalIds.length && next.every((v, i) => v === signalIds[i]);
-      if (!same) setSignalIds(next);
+      const next = readDockSignalIds(catalog);
+      setSignalIds((prev) => {
+        const same = next.length === prev.length && next.every((v, i) => v === prev[i]);
+        return same ? prev : next;
+      });
     }, 500);
     return () => clearInterval(interval);
-  }, [signalIds]);
+  }, [catalog]);
 
   const { store, status } = useSupabaseFrames({
     sessionId: session?.id ?? null,
@@ -95,7 +104,7 @@ export default function AppRoute() {
     >
       {sessions.map((s) => (
         <option key={s.id} value={s.id}>
-          {s.date} · {s.duration_secs}s · {s.signal_count} signals
+          {s.date} · {s.duration_secs}s
         </option>
       ))}
     </select>
