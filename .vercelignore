@@ -1,0 +1,18 @@
+# Heavy / desktop-only stuff Vercel doesn't need to upload.
+desktop/release/
+desktop/main/dist/
+desktop/build/
+app/dist/
+parser/__pycache__/
+parser/dist/
+parser/build/
+parser/.venv/
+.worktrees/
+.superpowers/
+.playwright-mcp/
+*.dmg
+*.app
+*.AppImage
+session_*.csv
+NFR26DBC.csv
+*.png

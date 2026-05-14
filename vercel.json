@@ -1,7 +1,7 @@
 {
-    "installCommand": "cd ../.. && npm ci",
-    "buildCommand": "cd ../.. && npm run build --workspace=frontend/interface",
-    "outputDirectory": "dist",
+    "installCommand": "npm install",
+    "buildCommand": "npm run build --workspace=frontend/interface",
+    "outputDirectory": "frontend/interface/dist",
     "redirects": [
         { "source": "/dash",   "destination": "/app", "permanent": true },
         { "source": "/graphs", "destination": "/app", "permanent": true },
