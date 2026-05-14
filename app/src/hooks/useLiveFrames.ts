@@ -1,6 +1,7 @@
 import { useEffect, useSyncExternalStore, useState } from 'react';
 import { subscribeLive } from '../api/ws.ts';
 import type { ParserEvent } from '../api/types.ts';
+import type { FramesStore as IFramesStore, FrameRow as IFrameRow } from '@nfr/widgets';
 
 export interface FrameRow {
   ts: string;
@@ -12,7 +13,7 @@ interface FramesStoreOptions {
   bufferSize?: number;
 }
 
-export class FramesStore {
+export class FramesStore implements IFramesStore {
   private ringBySignal = new Map<number, FrameRow[]>();
   private latestBySignal = new Map<number, FrameRow>();
   private listeners = new Set<() => void>();
