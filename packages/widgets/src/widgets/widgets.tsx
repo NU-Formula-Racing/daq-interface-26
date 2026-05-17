@@ -1,6 +1,6 @@
 // Shared widget renderers. Pure presentational — read from current time/data.
 // Each widget: <GraphWidget/>, <NumericWidget/>, <GaugeWidget/>, <BarWidget/>, <HeatmapWidget/>
-import React, { useContext, useRef, useState, useLayoutEffect } from 'react';
+import React, { useContext, useMemo, useRef, useState, useLayoutEffect } from 'react';
 import { FramesContext, useCatalog } from '../data/contexts.tsx';
 import type { Signal } from '../signals/catalog.ts';
 import { COLORS as W_COLORS } from '../theme/colors.ts';
@@ -25,12 +25,14 @@ interface GraphWidgetProps {
   zoom?: [number, number] | null;
   onZoom?: (z: [number, number] | null) => void;
   mode?: 'live' | 'replay';
+  /** Per-signal color overrides keyed by signal id. Falls back to sig.color. */
+  signalColors?: Record<number, string>;
 }
 
 export function GraphWidget({
   signals = [], t, window: win = 0.05, style = 'line',
   density = 'normal', compact = false, showAxes = true, showCursor = true, height,
-  zoom = null, onZoom, mode = 'replay',
+  zoom = null, onZoom, mode = 'replay', signalColors,
 }: GraphWidgetProps) {
   const catalog = useCatalog();
   const frames = useFrames();
@@ -281,7 +283,7 @@ export function GraphWidget({
       }}>
         {legend.map((l) => (
           <div key={l.sig.id} style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
-            <span style={{ width: 7, height: 2, background: l.sig.color, flexShrink: 0 }} />
+            <span style={{ width: 7, height: 2, background: signalColors?.[l.sig.id] ?? l.sig.color, flexShrink: 0 }} />
             <span style={{ color: W_COLORS.textMute, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 120 }}>{l.sig.name}</span>
             <span style={{ color: W_COLORS.text, fontVariantNumeric: 'tabular-nums' }}>
               {fmtVal(l.current)}<span style={{ color: W_COLORS.textFaint, marginLeft: 2 }}>{l.sig.unit}</span>
@@ -338,7 +340,7 @@ export function GraphWidget({
 
         {/* Series */}
         {series.map((s) => {
-          const color = s.sig.color || W_COLORS.accentBright;
+          const color = signalColors?.[s.sig.id] ?? s.sig.color ?? W_COLORS.accentBright;
           return (
             <g key={s.sig.id}>
               {style === 'area' && (
@@ -585,6 +587,52 @@ export function GgPlotWidget({
         </text>
       </svg>
     </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────
+// Cell voltages — auto-finds all signals named Cell_V_<n> in the catalog
+// and renders them as a single multi-line graph. No manual signal config.
+// ────────────────────────────────────────────────────────────
+interface CellVoltagesWidgetProps {
+  t: number;
+  window?: number;
+  style?: 'line' | 'area' | 'step';
+  compact?: boolean;
+  zoom?: [number, number] | null;
+  onZoom?: (z: [number, number] | null) => void;
+  mode?: 'live' | 'replay';
+  signalColors?: Record<number, string>;
+}
+export function CellVoltagesWidget(props: CellVoltagesWidgetProps) {
+  const catalog = useCatalog();
+  // Discover Cell_V_<digits> signals; sort by cell index so the legend reads
+  // 0, 1, 2, … rather than alphabetical 0, 1, 10, 11, 2.
+  const cellSignals = useMemo(() => {
+    const matches: { id: number; idx: number }[] = [];
+    for (const s of catalog.ALL) {
+      const m = /^Cell_V_(\d+)$/.exec(s.name);
+      if (m) matches.push({ id: s.id, idx: parseInt(m[1], 10) });
+    }
+    matches.sort((a, b) => a.idx - b.idx);
+    return matches.map((m) => m.id);
+  }, [catalog]);
+
+  if (cellSignals.length === 0) {
+    return <EmptySlot label="No Cell_V_* signals in catalog" />;
+  }
+  return (
+    <GraphWidget
+      signals={cellSignals}
+      t={props.t}
+      mode={props.mode}
+      window={props.window ?? 0.05}
+      style={props.style ?? 'line'}
+      compact={props.compact}
+      zoom={props.zoom}
+      onZoom={props.onZoom}
+      signalColors={props.signalColors}
+    />
   );
 }
 
@@ -1094,6 +1142,7 @@ export const WIDGET_TYPES = [
   { id: 'bar', label: 'BAR', icon: 'bar' },
   { id: 'heatmap', label: 'HEATMAP', icon: 'heat' },
   { id: 'gg', label: 'G-G', icon: 'gg' },
+  { id: 'cellv', label: 'CELL V', icon: 'cellv' },
 ];
 
 export function WidgetIcon({ kind, size = 10 }: { kind?: string; size?: number }) {
@@ -1106,6 +1155,7 @@ export function WidgetIcon({ kind, size = 10 }: { kind?: string; size?: number }
     case 'bar': return <svg {...common} viewBox="0 0 10 10"><rect x="1" y="4" width="8" height="1.5"/><rect x="1" y="7" width="5" height="1.5"/></svg>;
     case 'heat': return <svg {...common} viewBox="0 0 10 10" fill="currentColor" stroke="none"><rect x="1" y="1" width="3" height="3"/><rect x="5" y="1" width="3" height="3" opacity="0.6"/><rect x="1" y="5" width="3" height="3" opacity="0.4"/><rect x="5" y="5" width="3" height="3" opacity="0.8"/></svg>;
     case 'gg': return <svg {...common} viewBox="0 0 10 10"><circle cx="5" cy="5" r="3.5"/><line x1="5" y1="1.5" x2="5" y2="8.5"/><line x1="1.5" y1="5" x2="8.5" y2="5"/></svg>;
+    case 'cellv': return <svg {...common} viewBox="0 0 10 10"><rect x="1" y="2" width="1.2" height="6"/><rect x="3" y="3.5" width="1.2" height="4.5"/><rect x="5" y="2.5" width="1.2" height="5.5"/><rect x="7" y="1.5" width="1.2" height="6.5"/></svg>;
     default: return null;
   }
 }
@@ -1131,12 +1181,13 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
 
   const renderBody = () => {
     switch (widget.type) {
-      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={widget.zoom || null} onZoom={(z) => onChange({ ...widget, zoom: z })} />;
+      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={widget.zoom || null} onZoom={(z) => onChange({ ...widget, zoom: z })} signalColors={widget.signalColors} />;
       case 'numeric': return <NumericWidget signal={widget.signals[0]} t={t} compact={compact} />;
       case 'gauge': return <GaugeWidget signal={widget.signals[0]} t={t} />;
       case 'bar': return <BarWidget signals={widget.signals} t={t} />;
       case 'heatmap': return <HeatmapWidget signals={widget.signals} t={t} />;
       case 'gg': return <GgPlotWidget t={t} mode={mode} window={widget.window || 0.05} compact={compact} zoom={widget.zoom || null} />;
+      case 'cellv': return <CellVoltagesWidget t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={widget.zoom || null} onZoom={(z) => onChange({ ...widget, zoom: z })} signalColors={widget.signalColors} />;
       default: return <EmptySlot label="Pick a type" />;
     }
   };

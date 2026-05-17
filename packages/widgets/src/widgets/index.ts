@@ -5,6 +5,7 @@ export {
   BarWidget,
   HeatmapWidget,
   GgPlotWidget,
+  CellVoltagesWidget,
   WidgetShell,
   SignalChip,
   SignalPicker,

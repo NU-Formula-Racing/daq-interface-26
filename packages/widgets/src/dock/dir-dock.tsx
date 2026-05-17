@@ -150,6 +150,7 @@ function DropTypePopup({
 }
 
 export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true }: DockDirectionProps) {
+  const catalog = useCatalog();
   const [widgets, setWidgets] = useState<any[]>(loadLayout);
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
   const [focusedId, setFocusedId] = useState<string | null>(null);
@@ -659,14 +660,39 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                         none — search below to add
                       </span>
                     )}
-                    {w.signals.map((s: any) => (
-                      <SignalChip
-                        key={s}
-                        sigId={s}
-                        size="xs"
-                        onRemove={() => patch(w.id, { signals: w.signals.filter((x: any) => x !== s) })}
-                      />
-                    ))}
+                    {w.signals.map((s: any) => {
+                      const sig = catalog.resolve(s);
+                      const effective = (sig && (w.signalColors?.[sig.id] ?? sig.color)) ?? '#a78bfa';
+                      return (
+                        <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <SignalChip
+                            sigId={s}
+                            size="xs"
+                            onRemove={() => patch(w.id, {
+                              signals: w.signals.filter((x: any) => x !== s),
+                              // Drop any orphaned color override for this signal.
+                              signalColors: sig
+                                ? Object.fromEntries(Object.entries(w.signalColors ?? {}).filter(([k]) => Number(k) !== sig.id))
+                                : w.signalColors,
+                            })}
+                          />
+                          {sig && (
+                            <input
+                              type="color"
+                              value={effective}
+                              onChange={(e) => patch(w.id, {
+                                signalColors: { ...(w.signalColors ?? {}), [sig.id]: e.target.value },
+                              })}
+                              title={`Color for ${sig.name}`}
+                              style={{
+                                width: 18, height: 18, padding: 0, border: `1px solid ${SH_COLORS.border}`,
+                                background: 'transparent', cursor: 'pointer',
+                              }}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                   <InspectorSignalAdder
                     widget={w}
