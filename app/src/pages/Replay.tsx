@@ -33,6 +33,16 @@ function makeReplayStore(rows: OverviewRow[], t: number): FramesStore {
   const cutoff = (arr: FrameRow[]) =>
     Math.max(0, Math.min(arr.length - 1, Math.floor(t * arr.length)));
 
+  let firstTs: string | null = null;
+  let latestTs: string | null = null;
+  for (const arr of bySignal.values()) {
+    if (arr.length === 0) continue;
+    const f = arr[0].ts;
+    const l = arr[arr.length - 1].ts;
+    if (firstTs === null || f < firstTs) firstTs = f;
+    if (latestTs === null || l > latestTs) latestTs = l;
+  }
+
   return {
     push: () => {},
     latest: (id: number) => {
@@ -47,6 +57,8 @@ function makeReplayStore(rows: OverviewRow[], t: number): FramesStore {
       // The scrubber moves a cursor dot; it doesn't trim the visible series.
       return bySignal.get(id) ?? [];
     },
+    firstTs: () => firstTs,
+    latestTs: () => latestTs,
     getVersion: () => 0,
     subscribe: () => () => {},
   } as unknown as FramesStore;
