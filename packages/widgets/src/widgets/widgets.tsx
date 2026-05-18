@@ -445,7 +445,7 @@ export function GraphWidget({
 // ────────────────────────────────────────────────────────────
 // G-G plot — fixed scatter of lateral vs longitudinal acceleration
 // from the IMU. Not customizable: signals are hard-wired to the
-// X_/Y_Axis_Acceleration_Uncompensated channels off message 0x550.
+// X_/Y_Axis_Acceleration channels off message 0x550.
 // ────────────────────────────────────────────────────────────
 interface GgPlotWidgetProps {
   t: number;
@@ -478,8 +478,8 @@ export function GgPlotWidget({
     return () => ro.disconnect();
   }, []);
 
-  const xSig = catalog.byName('X_Axis_Acceleration_Uncompensated');
-  const ySig = catalog.byName('Y_Axis_Acceleration_Uncompensated');
+  const xSig = catalog.byName('X_Axis_Acceleration');
+  const ySig = catalog.byName('Y_Axis_Acceleration');
   const xs = xSig && frames ? frames.series(xSig.id) : [];
   const ys = ySig && frames ? frames.series(ySig.id) : [];
   const n = Math.min(xs.length, ys.length);
