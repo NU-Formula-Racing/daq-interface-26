@@ -13,7 +13,7 @@ import {
 } from '../widgets/widgets.tsx';
 import type { Signal } from '../signals/catalog.ts';
 import type { FramesStore } from '../data/types.ts';
-import { FramesContext as FramesCtx, useFrames } from '../data/contexts.tsx';
+import { FramesContext as FramesCtx, useFrames, HoverProvider } from '../data/contexts.tsx';
 import { decideDropAction } from './dropAction.ts';
 import { compactVertical } from './compactVertical.ts';
 
@@ -400,6 +400,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
 
   return (
     <FramesCtx.Provider value={frames ?? null}>
+    <HoverProvider>
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: SH_COLORS.bgInner, fontFamily: '"Inter", system-ui, sans-serif' }}>
       <TopBar
         mode={mode}
@@ -968,6 +969,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
         </div>
       )}
     </div>
+    </HoverProvider>
     </FramesCtx.Provider>
   );
 }
