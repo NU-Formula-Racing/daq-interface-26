@@ -1,8 +1,16 @@
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
 import type { FramesStore, SignalCatalog } from './types.ts';
 
 export const FramesContext = createContext<FramesStore | null>(null);
 export const SignalsContext = createContext<SignalCatalog | null>(null);
+
+export interface HoverState {
+  hoverT: number | null;
+  setHoverT: (v: number | null) => void;
+}
+
+const NOOP_HOVER: HoverState = { hoverT: null, setHoverT: () => {} };
+export const HoverContext = createContext<HoverState>(NOOP_HOVER);
 
 export function useFrames(): FramesStore | null {
   return useContext(FramesContext);
@@ -12,6 +20,10 @@ export function useCatalog(): SignalCatalog {
   const cat = useContext(SignalsContext);
   if (!cat) throw new Error('useCatalog used outside SignalsProvider');
   return cat;
+}
+
+export function useHover(): HoverState {
+  return useContext(HoverContext);
 }
 
 export function FramesProvider({
@@ -43,4 +55,10 @@ export function SignalsProvider({
     );
   }
   return <SignalsContext.Provider value={catalog}>{children}</SignalsContext.Provider>;
+}
+
+export function HoverProvider({ children }: { children: ReactNode }) {
+  const [hoverT, setHoverT] = useState<number | null>(null);
+  const value = useMemo<HoverState>(() => ({ hoverT, setHoverT }), [hoverT]);
+  return <HoverContext.Provider value={value}>{children}</HoverContext.Provider>;
 }
