@@ -1,5 +1,12 @@
 import type pg from 'pg';
+import WebSocket from 'ws';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+
+// Electron bundles Node 20, which has no global WebSocket. Supabase-js v2 throws
+// at realtime init if one isn't present, even though sync only uses REST.
+if (typeof (globalThis as { WebSocket?: unknown }).WebSocket === 'undefined') {
+  (globalThis as { WebSocket?: unknown }).WebSocket = WebSocket;
+}
 
 export interface SignalDef {
   source: string;
