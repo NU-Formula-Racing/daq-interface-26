@@ -1,7 +1,7 @@
 // Shared widget renderers. Pure presentational — read from current time/data.
 // Each widget: <GraphWidget/>, <NumericWidget/>, <GaugeWidget/>, <BarWidget/>, <HeatmapWidget/>
 import React, { useContext, useMemo, useRef, useState, useLayoutEffect } from 'react';
-import { FramesContext, useCatalog } from '../data/contexts.tsx';
+import { FramesContext, useCatalog, useHover } from '../data/contexts.tsx';
 import type { Signal } from '../signals/catalog.ts';
 import { COLORS as W_COLORS } from '../theme/colors.ts';
 
@@ -39,7 +39,7 @@ export function GraphWidget({
   const wrap = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [size, setSize] = useState({ w: 320, h: 160 });
-  const [hoverFrac, setHoverFrac] = useState<number | null>(null); // 0..1 within plot
+  const { hoverT, setHoverT } = useHover();
   const [zoomDrag, setZoomDrag] = useState<{ a: number; b: number } | null>(null);
 
   useLayoutEffect(() => {
@@ -65,6 +65,14 @@ export function GraphWidget({
     // Replay: show the entire session. The scrubber just moves the cursor.
     t0 = 0;
     t1 = 1;
+  }
+
+  // Derive in-window fraction from the shared session-fraction hoverT.
+  // Anything outside this graph's window hides the cursor for this frame.
+  let hoverFrac: number | null = null;
+  if (hoverT != null) {
+    const f = (hoverT - t0) / Math.max(1e-9, t1 - t0);
+    hoverFrac = f >= 0 && f <= 1 ? f : null;
   }
 
   const padL = compact ? 32 : 40, padR = 8, padT = compact ? 18 : 22, padB = compact ? 16 : 20;
@@ -218,17 +226,21 @@ export function GraphWidget({
   const onPointerMove = (e: any) => {
     if (!svgRef.current) return;
     const f = fracFromEvent(e);
-    setHoverFrac(f);
+    setHoverT(t0 + f * (t1 - t0));
     if (zoomDrag) setZoomDrag({ a: zoomDrag.a, b: f });
   };
-  const onPointerLeave = () => { if (!zoomDrag) setHoverFrac(null); };
+  const onPointerLeave = () => { if (!zoomDrag) setHoverT(null); };
   const onPointerDown = (e: any) => {
     if (e.button !== 0) return;
     e.preventDefault();
     const f = fracFromEvent(e);
     const startF = f;
     let endF = f;
-    const mv = (ev: any) => { endF = fracFromEvent(ev); setZoomDrag({ a: startF, b: endF }); setHoverFrac(endF); };
+    const mv = (ev: any) => {
+      endF = fracFromEvent(ev);
+      setZoomDrag({ a: startF, b: endF });
+      setHoverT(t0 + endF * (t1 - t0));
+    };
     const up = () => {
       document.removeEventListener('pointermove', mv);
       document.removeEventListener('pointerup', up);
