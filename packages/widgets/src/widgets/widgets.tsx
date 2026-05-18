@@ -374,6 +374,7 @@ export function GraphWidget({
         {/* Playhead cursor (from global t). Dashed if we're not hovering. */}
         {showCursor && cursorVisible && (
           <line
+            data-testid="graph-cursor"
             x1={cursorX} x2={cursorX} y1={padT} y2={padT + plotH}
             stroke={hoverFrac !== null ? W_COLORS.accentBright : W_COLORS.accentBright}
             strokeWidth={1}
