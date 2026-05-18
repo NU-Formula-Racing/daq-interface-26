@@ -359,8 +359,7 @@ export function GraphWidget({
                 <path d={areaPathFor(s.data)} fill={color} fillOpacity={0.12} stroke="none" />
               )}
               <path d={pathFor(s.data)} fill="none" stroke={color} strokeWidth={1.5}
-                strokeLinejoin="round" strokeLinecap="round"
-                style={{ filter: `drop-shadow(0 0 3px ${color}55)` }} />
+                strokeLinejoin="round" strokeLinecap="round" />
               {/* End dot (current) */}
               <circle cx={x(N - 1)} cy={y(s.data[N - 1])} r={2.5} fill={color} />
               {/* Cursor dot — follows the playhead `t` (or hover when present) */}
