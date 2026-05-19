@@ -15,16 +15,24 @@ export interface SignalDef {
   description: string | null;
 }
 
-export interface SessionToPush {
+export interface Reading {
+  ts: string;
+  signal_id: number;
+  value: number;
+}
+
+export interface SessionHeader {
   id: string;
   row: Record<string, unknown>;
   /** Signal definitions referenced by this session's readings. */
   signals: Array<SignalDef & { local_id: number }>;
-  readings: Array<{ ts: string; signal_id: number; value: number }>;
 }
 
 export interface LocalReader {
-  unsynced: () => Promise<SessionToPush[]>;
+  /** Lightweight: session metadata + signal defs, no readings. */
+  unsyncedHeaders: () => Promise<SessionHeader[]>;
+  /** Streams readings for a session in bounded batches. */
+  readingsBatches: (sessionId: string) => AsyncIterable<Reading[]>;
   markSynced: (sessionId: string) => Promise<void>;
 }
 
@@ -32,10 +40,7 @@ export interface CloudPusher {
   /** Upsert signal defs by (source, signal_name); return local_id → cloud_id. */
   pushSignals: (defs: Array<SignalDef & { local_id: number }>) => Promise<Map<number, number>>;
   pushSession: (sessionId: string, row: Record<string, unknown>) => Promise<void>;
-  pushReadings: (
-    sessionId: string,
-    readings: SessionToPush['readings'],
-  ) => Promise<void>;
+  pushReadings: (sessionId: string, readings: Reading[]) => Promise<void>;
 }
 
 export interface PushResult {
@@ -48,22 +53,25 @@ export async function pushSessionsToCloud(
   reader: LocalReader,
   pusher: CloudPusher,
 ): Promise<PushResult> {
-  const sessions = await reader.unsynced();
+  const headers = await reader.unsyncedHeaders();
   let pushed = 0;
   let failed = 0;
   const errors: Array<{ sessionId: string; message: string }> = [];
-  for (const s of sessions) {
+  for (const s of headers) {
     try {
       // Upsert signal defs first so we can translate the readings'
       // local signal_ids into whatever ids the cloud uses.
       const idMap = s.signals.length > 0 ? await pusher.pushSignals(s.signals) : new Map();
-      const translated = s.readings.map((r) => ({
-        ts: r.ts,
-        signal_id: idMap.get(r.signal_id) ?? r.signal_id,
-        value: r.value,
-      }));
       await pusher.pushSession(s.id, s.row);
-      await pusher.pushReadings(s.id, translated);
+      // Stream readings: bounded memory regardless of session size.
+      for await (const batch of reader.readingsBatches(s.id)) {
+        const translated = batch.map((r) => ({
+          ts: r.ts,
+          signal_id: idMap.get(r.signal_id) ?? r.signal_id,
+          value: r.value,
+        }));
+        await pusher.pushReadings(s.id, translated);
+      }
       await reader.markSynced(s.id);
       pushed++;
     } catch (err) {
@@ -74,9 +82,57 @@ export async function pushSessionsToCloud(
   return { pushed, failed, errors };
 }
 
+/** Batch size for streaming readings out of local pg. Keep small enough that
+ * one batch (rows × ~150B) stays well under 100 MB of V8 heap. */
+const READINGS_BATCH = 50_000;
+
+interface ReadingRow {
+  ts: Date;
+  signal_id: number;
+  value: string;
+}
+
+async function* streamReadings(pool: pg.Pool, sessionId: string): AsyncGenerator<Reading[]> {
+  // Keyset pagination on (ts, signal_id) — bounded memory regardless of
+  // session size. The composite key is unique per session because of the
+  // UNIQUE (session_id, ts, signal_id) constraint.
+  let cursorTs: Date | null = null;
+  let cursorSignalId = 0;
+  for (;;) {
+    let rows: ReadingRow[];
+    if (cursorTs === null) {
+      const res = await pool.query<ReadingRow>(
+        `SELECT ts, signal_id, value FROM sd_readings
+         WHERE session_id = $1
+         ORDER BY ts, signal_id LIMIT $2`,
+        [sessionId, READINGS_BATCH],
+      );
+      rows = res.rows;
+    } else {
+      const res = await pool.query<ReadingRow>(
+        `SELECT ts, signal_id, value FROM sd_readings
+         WHERE session_id = $1 AND (ts, signal_id) > ($2, $3)
+         ORDER BY ts, signal_id LIMIT $4`,
+        [sessionId, cursorTs, cursorSignalId, READINGS_BATCH],
+      );
+      rows = res.rows;
+    }
+    if (rows.length === 0) return;
+    yield rows.map((r) => ({
+      ts: r.ts.toISOString(),
+      signal_id: r.signal_id,
+      value: Number(r.value),
+    }));
+    const last = rows[rows.length - 1];
+    cursorTs = last.ts;
+    cursorSignalId = last.signal_id;
+    if (rows.length < READINGS_BATCH) return;
+  }
+}
+
 export function localReaderFromPool(pool: pg.Pool): LocalReader {
   return {
-    async unsynced() {
+    async unsyncedHeaders() {
       const { rows: sessions } = await pool.query<{
         id: string;
         date: string;
@@ -94,14 +150,8 @@ export function localReaderFromPool(pool: pg.Pool): LocalReader {
           WHERE synced_at IS NULL AND ended_at IS NOT NULL
           ORDER BY started_at ASC`);
 
-      const out: SessionToPush[] = [];
+      const out: SessionHeader[] = [];
       for (const s of sessions) {
-        const { rows: readings } = await pool.query<{
-          ts: Date;
-          signal_id: number;
-          value: string;
-        }>(`SELECT ts, signal_id, value FROM sd_readings WHERE session_id = $1 ORDER BY ts`,
-          [s.id]);
         const { rows: signals } = await pool.query<{
           id: number;
           source: string;
@@ -133,14 +183,12 @@ export function localReaderFromPool(pool: pg.Pool): LocalReader {
             unit: d.unit,
             description: d.description,
           })),
-          readings: readings.map((r) => ({
-            ts: r.ts.toISOString(),
-            signal_id: r.signal_id,
-            value: Number(r.value),
-          })),
         });
       }
       return out;
+    },
+    readingsBatches(sessionId: string): AsyncIterable<Reading[]> {
+      return streamReadings(pool, sessionId);
     },
     async markSynced(id) {
       await pool.query(`UPDATE sessions SET synced_at = now() WHERE id = $1`, [id]);
