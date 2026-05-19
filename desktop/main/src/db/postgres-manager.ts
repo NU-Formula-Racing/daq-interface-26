@@ -1,4 +1,12 @@
 import { spawn, spawnSync, type ChildProcess } from 'child_process';
+
+// Windows leaves postgres worker processes orphaned when the postmaster
+// is terminated via TerminateProcess (Node's SIGTERM on win32). Use taskkill
+// /T to recursively terminate the full process tree.
+function killTreeWindows(pid: number, force: boolean): void {
+  const args = force ? ['/F', '/T', '/PID', String(pid)] : ['/T', '/PID', String(pid)];
+  spawn('taskkill', args, { stdio: 'ignore' });
+}
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import path, { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
@@ -153,9 +161,19 @@ export class PostgresManager {
 
     // Timed out — kill the child before throwing.
     if (this.child === child && child.exitCode === null) {
-      child.kill('SIGTERM');
+      if (process.platform === 'win32' && child.pid != null) {
+        killTreeWindows(child.pid, false);
+      } else {
+        child.kill('SIGTERM');
+      }
       await new Promise((r) => setTimeout(r, 2_000));
-      if (child.exitCode === null) child.kill('SIGKILL');
+      if (child.exitCode === null) {
+        if (process.platform === 'win32' && child.pid != null) {
+          killTreeWindows(child.pid, true);
+        } else {
+          child.kill('SIGKILL');
+        }
+      }
     }
     throw new Error(
       `postgres did not become ready within 20s${stderrBuf ? `: ${stderrBuf.trim()}` : ''}`,
@@ -169,9 +187,19 @@ export class PostgresManager {
       const done = () => resolveP();
       if (child.exitCode !== null) return done();
       child.once('close', done);
-      child.kill('SIGTERM');
+      if (process.platform === 'win32' && child.pid != null) {
+        killTreeWindows(child.pid, true);
+      } else {
+        child.kill('SIGTERM');
+      }
       setTimeout(() => {
-        if (child.exitCode === null) child.kill('SIGKILL');
+        if (child.exitCode === null) {
+          if (process.platform === 'win32' && child.pid != null) {
+            killTreeWindows(child.pid, true);
+          } else {
+            child.kill('SIGKILL');
+          }
+        }
       }, 5_000);
     });
   }

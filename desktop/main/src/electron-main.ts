@@ -80,6 +80,18 @@ app.whenReady().then(async () => {
 
 app.on('window-all-closed', async () => {
   if (isRelaunching) return; // relaunch flow handles its own shutdown
-  if (shutdownFn) await shutdownFn();
-  app.quit();
+  // Force-exit if shutdown stalls (e.g. a Windows child process refuses to die)
+  // so the app doesn't linger in Task Manager.
+  const forceExit = setTimeout(() => {
+    console.error('shutdown timed out after 8s — forcing exit');
+    app.exit(0);
+  }, 8_000);
+  try {
+    if (shutdownFn) await shutdownFn();
+  } catch (err) {
+    console.error('shutdown error:', err);
+  } finally {
+    clearTimeout(forceExit);
+    app.quit();
+  }
 });

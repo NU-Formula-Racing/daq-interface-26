@@ -2,6 +2,25 @@ import { spawn, type ChildProcessWithoutNullStreams } from 'child_process';
 import { EventEmitter } from 'events';
 import { parseLine, type ParserEvent } from './protocol.ts';
 
+// Windows: child.kill('SIGTERM') only terminates the immediate process and
+// leaves grandchildren (e.g. PyInstaller helpers) orphaned. Use taskkill /T
+// to recursively terminate the whole process tree.
+function killTree(child: ChildProcessWithoutNullStreams): void {
+  if (process.platform === 'win32' && child.pid != null) {
+    spawn('taskkill', ['/F', '/T', '/PID', String(child.pid)], { stdio: 'ignore' });
+  } else {
+    child.kill('SIGTERM');
+  }
+}
+
+function forceKillTree(child: ChildProcessWithoutNullStreams): void {
+  if (process.platform === 'win32' && child.pid != null) {
+    spawn('taskkill', ['/F', '/T', '/PID', String(child.pid)], { stdio: 'ignore' });
+  } else {
+    child.kill('SIGKILL');
+  }
+}
+
 export interface ParserManagerOptions {
   command: string;
   args: string[];
@@ -46,9 +65,9 @@ export class ParserManager extends EventEmitter {
       const done = () => resolve();
       if (child.exitCode !== null) return done();
       child.once('close', done);
-      child.kill('SIGTERM');
+      killTree(child);
       setTimeout(() => {
-        if (child.exitCode === null) child.kill('SIGKILL');
+        if (child.exitCode === null) forceKillTree(child);
       }, 2_000);
     });
   }
