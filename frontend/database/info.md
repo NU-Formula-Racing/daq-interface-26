@@ -47,6 +47,7 @@ Monthly partitions: `sd_readings_2026_03` through `sd_readings_2026_12`, plus `s
 - `get_session_signals(session_id)` — distinct signals available in a session
 - `get_signal_window(session_id, signal_id, start, end)` — raw data for zoom detail
 - `get_session_overview(session_id, bucket_secs)` — all signals bucketed for replay dashboard
+- `get_session_signal_ids(session_id)` — distinct signal IDs present in a session (powers the active-signals filter)
 
 #### Realtime
 
