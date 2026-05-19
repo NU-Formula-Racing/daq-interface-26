@@ -9,6 +9,7 @@ import { useSupabaseCatalog } from '@/adapters/useSupabaseCatalog';
 import { useSessionList } from '@/adapters/useSessionList';
 import { useSupabaseFrames } from '@/adapters/useSupabaseFrames';
 import { useSupabaseLiveFrames } from '@/adapters/useSupabaseLiveFrames';
+import DateAndSessionPicker from '@/components/DateAndSessionPicker';
 
 // DockDirection uses its own storage key internally ('nfr-dock-layout-v2').
 // We read from the same key to know which signals are currently in the dock.
@@ -48,15 +49,28 @@ export default function AppRoute() {
   });
 
   const catalog = useSupabaseCatalog();
-  const { sessions } = useSessionList(50);
+  const { sessions } = useSessionList(200);
 
   // Replay-mode session selection (only meaningful when mode === 'replay').
   const session = sessions.find((s) => s.id === sessionId) ?? sessions[0] ?? null;
+
+  const urlDate = search.get('date');
+  const selectedDate =
+    urlDate ?? session?.date ?? new Date().toISOString().split('T')[0];
+
+  const setSelectedDate = (date) => setSearch((p) => {
+    p.set('date', date);
+    p.delete('session');
+    return p;
+  });
+
   useEffect(() => {
-    if (mode === 'replay' && !sessionId && session?.id) {
-      setSearch((p) => { p.set('session', session.id); return p; }, { replace: true });
+    if (mode !== 'replay' || sessionId) return;
+    const firstForDate = sessions.find((s) => s.date === selectedDate);
+    if (firstForDate) {
+      setSearch((p) => { p.set('session', firstForDate.id); return p; }, { replace: true });
     }
-  }, [mode, sessionId, session, setSearch]);
+  }, [mode, sessionId, selectedDate, sessions, setSearch]);
 
   // Track which signals the dock currently has (from localStorage).
   const [signalIds, setSignalIds] = useState([]);
@@ -86,24 +100,17 @@ export default function AppRoute() {
   const { store, status } = mode === 'live' ? live : replay;
 
   const sessionSlot = mode === 'replay' ? (
-    <select
-      value={session?.id ?? ''}
-      onChange={(e) => setSearch((p) => { p.set('session', e.target.value); return p; })}
-      style={{
-        background: '#2b2d30',
-        color: '#dfe1e5',
-        border: '1px solid rgba(255,255,255,0.09)',
-        padding: '3px 8px',
-        fontFamily: '"JetBrains Mono", monospace',
-        fontSize: 10,
-      }}
-    >
-      {sessions.map((s) => (
-        <option key={s.id} value={s.id}>
-          {s.date} · {s.duration_secs}s
-        </option>
-      ))}
-    </select>
+    <DateAndSessionPicker
+      sessions={sessions}
+      selectedDate={selectedDate}
+      onSelectedDate={setSelectedDate}
+      sessionId={session?.id ?? null}
+      onSessionId={(id) => setSearch((p) => {
+        if (id) p.set('session', id); else p.delete('session');
+        return p;
+      })}
+      formatSessionLabel={(s) => `${new Date(s.started_at).toISOString().slice(11,19)} · ${s.duration_secs}s`}
+    />
   ) : (
     <span style={{
       padding: '3px 8px',
