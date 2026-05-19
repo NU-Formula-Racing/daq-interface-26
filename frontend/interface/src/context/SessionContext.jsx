@@ -218,7 +218,9 @@ export function SessionProvider({ children }) {
   // REPLAY MODE helpers
   // =========================================================================
 
-  /** Load bucketed overview data for a session (all signals, 1-second buckets). */
+  /** Load session metadata for replay. Values themselves are fetched lazily by
+   *  consumers via FramesStore; here we only populate `sessionSignals` so the
+   *  active-signals filter in the sidebar is correct. No bulk row fetch. */
   const loadReplaySessionData = useCallback(async (sid) => {
     if (sid == null) {
       setReplaySessionData([]);
@@ -227,38 +229,35 @@ export function SessionProvider({ children }) {
     }
     setIsLoading(true);
     try {
-      // Fetch bucketed overview via RPC (paginated to handle large sessions)
-      const rows = await fetchAllRows((sb) =>
-        sb.rpc("get_session_overview", {
-          p_session_id: sid,
-          p_bucket_secs: 1,
-        })
+      // No bulk row fetch — consumers pull rows lazily through the FramesStore.
+      setReplaySessionData([]);
+
+      const { data: idRows, error: idsErr } = await supabase.rpc(
+        'get_session_signal_ids',
+        { p_session_id: sid },
       );
+      if (idsErr) {
+        console.error('get_session_signal_ids failed', idsErr);
+        setSessionSignals([]);
+        return;
+      }
 
-      // Shape matches old format: {timestamp, signal_name, value, unit, source}
-      const mapped = (rows || []).map((r) => ({
-        timestamp: r.timestamp,
-        signal_name: r.signal_name,
-        value: r.value,
-        unit: r.unit,
-        source: r.source,
-        session_id: sid,
-      }));
-      setReplaySessionData(mapped);
-
-      // Also fetch the distinct signals for this session
-      const { data: signals } = await supabase.rpc("get_session_signals", {
-        p_session_id: sid,
-      });
-
-      // Only keep signals that actually have data in this session
-      const signalNamesWithData = new Set(mapped.map((r) => r.signal_name));
-      const filteredSignals = (signals || []).filter((s) =>
-        signalNamesWithData.has(s.signal_name)
+      // Hydrate names/units from the cached catalog so consumers don't need
+      // another join. signalDefs is populated on mount.
+      const defs = signalDefsRef.current;
+      const next = [];
+      for (const row of idRows ?? []) {
+        const id = row.signal_id;
+        const def = defs.get(id);
+        if (def) next.push({ signal_id: id, ...def });
+      }
+      next.sort((a, b) =>
+        (a.source ?? '').localeCompare(b.source ?? '') ||
+        (a.signal_name ?? '').localeCompare(b.signal_name ?? '')
       );
-      setSessionSignals(filteredSignals);
+      setSessionSignals(next);
     } catch (err) {
-      console.error("Error loading replay session data:", err);
+      console.error('Error loading replay session data:', err);
       setReplaySessionData([]);
       setSessionSignals([]);
     } finally {
