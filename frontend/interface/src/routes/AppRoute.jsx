@@ -9,6 +9,7 @@ import { useSupabaseCatalog } from '@/adapters/useSupabaseCatalog';
 import { useSessionList } from '@/adapters/useSessionList';
 import { useSupabaseFrames } from '@/adapters/useSupabaseFrames';
 import { useSupabaseLiveFrames } from '@/adapters/useSupabaseLiveFrames';
+import { useSessionSignalIds } from '@/adapters/useSessionSignalIds';
 import DateAndSessionPicker from '@/components/DateAndSessionPicker';
 
 // DockDirection uses its own storage key internally ('nfr-dock-layout-v2').
@@ -87,6 +88,10 @@ export default function AppRoute() {
     return () => clearInterval(interval);
   }, [catalog]);
 
+  const { ids: sessionSignalIds, status: idsStatus } = useSessionSignalIds(
+    mode === 'replay' ? (session?.id ?? null) : null,
+  );
+
   // Both adapters mount on every render but only the active one hits Supabase.
   // Replay only triggers when given a session + signals; live always streams.
   const replay = useSupabaseFrames({
@@ -151,6 +156,7 @@ export default function AppRoute() {
             sessionSlot={sessionSlot}
             exportHref={null}
             allowDataImport={false}
+            availableSignalIds={mode === 'replay' && idsStatus === 'ready' ? sessionSignalIds : null}
           />
         </div>
       </FramesProvider>

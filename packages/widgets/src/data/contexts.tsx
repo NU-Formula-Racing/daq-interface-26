@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import React, { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
 import type { FramesStore, SignalCatalog } from './types.ts';
 
 export const FramesContext = createContext<FramesStore | null>(null);
@@ -61,4 +61,13 @@ export function HoverProvider({ children }: { children: ReactNode }) {
   const [hoverT, setHoverT] = useState<number | null>(null);
   const value = useMemo<HoverState>(() => ({ hoverT, setHoverT }), [hoverT]);
   return <HoverContext.Provider value={value}>{children}</HoverContext.Provider>;
+}
+
+/** Set of signal IDs that have data in the current session. When the value
+ *  is `null` the consumer behaves as if no filter applies (back-compat for
+ *  desktop, which has all data locally). */
+export const AvailableSignalsContext = createContext<ReadonlySet<number> | null>(null);
+
+export function useAvailableSignals(): ReadonlySet<number> | null {
+  return useContext(AvailableSignalsContext);
 }

@@ -13,7 +13,7 @@ import {
 } from '../widgets/widgets.tsx';
 import type { Signal } from '../signals/catalog.ts';
 import type { FramesStore } from '../data/types.ts';
-import { FramesContext as FramesCtx, useFrames, HoverProvider } from '../data/contexts.tsx';
+import { FramesContext as FramesCtx, useFrames, HoverProvider, AvailableSignalsContext, useAvailableSignals } from '../data/contexts.tsx';
 import { decideDropAction } from './dropAction.ts';
 import { compactVertical } from './compactVertical.ts';
 
@@ -82,6 +82,9 @@ interface DockDirectionProps {
   /** Show the IMPORT NFR + DBC upload buttons. False on the website,
    *  where signal/data ingestion is desktop-only. Default true. */
   allowDataImport?: boolean;
+  /** If provided, the signal pickers hide signals whose id is not in this set.
+   *  null = no filter (desktop default — all catalog signals shown). */
+  availableSignalIds?: ReadonlySet<number> | null;
 }
 
 const DROPPABLE_TYPES = [
@@ -149,7 +152,7 @@ function DropTypePopup({
   );
 }
 
-export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true }: DockDirectionProps) {
+export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true, availableSignalIds = null }: DockDirectionProps) {
   const catalog = useCatalog();
   const [widgets, setWidgets] = useState<any[]>(loadLayout);
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
@@ -401,6 +404,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
   return (
     <FramesCtx.Provider value={frames ?? null}>
     <HoverProvider>
+    <AvailableSignalsContext.Provider value={availableSignalIds ?? null}>
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: SH_COLORS.bgInner, fontFamily: '"Inter", system-ui, sans-serif' }}>
       <TopBar
         mode={mode}
@@ -969,6 +973,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
         </div>
       )}
     </div>
+    </AvailableSignalsContext.Provider>
     </HoverProvider>
     </FramesCtx.Provider>
   );
@@ -986,12 +991,14 @@ function InspectorSignalAdder({
   onAdd: (sid: any) => void;
 }) {
   const catalog = useCatalog();
+  const available = useAvailableSignals();
   const q = query.trim().toLowerCase();
   const matches = q
     ? catalog.ALL.filter(
         (s) =>
-          s.name.toLowerCase().includes(q) ||
-          s.groupName.toLowerCase().includes(q),
+          (!available || available.has(s.id)) &&
+          (s.name.toLowerCase().includes(q) ||
+          s.groupName.toLowerCase().includes(q)),
       ).slice(0, 8)
     : [];
 
@@ -1091,15 +1098,18 @@ interface DockSignalPickerProps {
 function DockSignalPicker({ selected, onPick, favorites, onToggleFav, onCollapse, activeOnly = false }: DockSignalPickerProps) {
   const catalog = useCatalog();
   const frames = useFrames();
+  const available = useAvailableSignals();
   const [q, setQ] = useState('');
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const toggle = (gid: string) => setCollapsed((c) => ({ ...c, [gid]: !c[gid] }));
 
   const matches = catalog.ALL.filter((s) => {
+    if (available && !available.has(s.id)) return false;
     if (activeOnly && (frames?.latest(s.id) ?? null) === null) return false;
     if (!q) return true;
     return s.name.toLowerCase().includes(q.toLowerCase()) || s.groupName.toLowerCase().includes(q.toLowerCase());
   });
+  const totalAvailable = available ? catalog.ALL.filter((s) => available.has(s.id)).length : catalog.ALL.length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
@@ -1125,6 +1135,7 @@ function DockSignalPicker({ selected, onPick, favorites, onToggleFav, onCollapse
             </div>
             {favorites.map((id) => {
               const s = catalog.resolve(id); if (!s) return null;
+              if (available && !available.has(s.id)) return null;
               if (activeOnly && (frames?.latest(s.id) ?? null) === null) return null;
               return <SigRow key={id} s={s} selected={selected === id} fav onPick={onPick} onToggleFav={onToggleFav} />;
             })}
@@ -1160,7 +1171,7 @@ function DockSignalPicker({ selected, onPick, favorites, onToggleFav, onCollapse
       </div>
 
       <div style={{ padding: '4px 10px', borderTop: `1px solid ${SH_COLORS.border}`, fontFamily: '"JetBrains Mono", monospace', fontSize: 9, color: SH_COLORS.textFaint, letterSpacing: 0.5 }}>
-        {matches.length} / {catalog.ALL.length} · CLICK TO STAGE · ★ TO FAVORITE
+        {matches.length} / {totalAvailable} · CLICK TO STAGE · ★ TO FAVORITE
       </div>
     </div>
   );
