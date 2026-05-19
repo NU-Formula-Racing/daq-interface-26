@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'reac
 import { supabase } from '@/lib/supabaseClient';
 import { SupabaseFramesStore, type RpcRow } from './SupabaseFramesStore';
 import { bucketFor } from './bucketFor';
+import { FramesCache } from './framesCache';
 
 export type FetchStatus =
   | { kind: 'idle' }
@@ -18,24 +19,28 @@ export interface UseSupabaseFramesArgs {
 }
 
 /**
- * Incremental replay fetcher:
- *   - On (session | start | end) change → reset store, fetch ALL current signals.
- *   - On signalIds change only → fetch ONLY newly-added signals; leave the
- *     ones already in the store untouched. Removed signals stay in the store
- *     as harmless ballast.
+ * Lazy per-signal replay fetcher.
+ *
+ *  - At session-open: nothing happens until at least one signal is requested.
+ *  - On signalIds change: only the newly-added IDs are fetched.
+ *  - Toggling a signal OFF then ON does NOT refetch — the FramesCache
+ *    remembers that (session, signal, window, bucket) tuple.
+ *  - On session or window change: the FramesStore is reset and previously
+ *    cached IDs for the old session are dropped.
  */
 export function useSupabaseFrames(args: UseSupabaseFramesArgs) {
   const storeRef = useRef<SupabaseFramesStore>(new SupabaseFramesStore());
+  const cacheRef = useRef<FramesCache>(new FramesCache(256));
   const store = storeRef.current;
+  const cache = cacheRef.current;
   const [status, setStatus] = useState<FetchStatus>({ kind: 'idle' });
 
-  // What's currently materialized in the store for the current session window.
   const stateRef = useRef<{
     sessionId: string | null;
     start: string | null;
     end: string | null;
-    fetched: Set<number>;
-  }>({ sessionId: null, start: null, end: null, fetched: new Set() });
+    bucketSecs: number | null;
+  }>({ sessionId: null, start: null, end: null, bucketSecs: null });
 
   useSyncExternalStore(
     (cb) => store.subscribe(cb),
@@ -54,35 +59,35 @@ export function useSupabaseFrames(args: UseSupabaseFramesArgs) {
       return;
     }
 
-    const sessionChanged =
-      stateRef.current.sessionId !== args.sessionId ||
-      stateRef.current.start !== args.start ||
-      stateRef.current.end !== args.end;
-
-    let toFetch: number[];
-    if (sessionChanged) {
-      store.reset();
-      stateRef.current = {
-        sessionId: args.sessionId,
-        start: args.start,
-        end: args.end,
-        fetched: new Set(),
-      };
-      toFetch = args.signalIds;
-    } else {
-      toFetch = args.signalIds.filter((id) => !stateRef.current.fetched.has(id));
-      if (toFetch.length === 0) {
-        // Nothing new since last fetch. Idempotent — status stays as-is.
-        return;
-      }
-    }
-
-    let cancelled = false;
     const startMs = Date.parse(args.start);
     const endMs = Date.parse(args.end);
     const durationSecs = Math.max(1, Math.round((endMs - startMs) / 1000));
     const bucketSecs = bucketFor(durationSecs, args.targetBuckets ?? 800);
 
+    const windowChanged =
+      stateRef.current.sessionId !== args.sessionId ||
+      stateRef.current.start !== args.start ||
+      stateRef.current.end !== args.end ||
+      stateRef.current.bucketSecs !== bucketSecs;
+
+    if (windowChanged) {
+      if (stateRef.current.sessionId) cache.resetSession(stateRef.current.sessionId);
+      store.reset();
+      stateRef.current = {
+        sessionId: args.sessionId,
+        start: args.start,
+        end: args.end,
+        bucketSecs,
+      };
+    }
+
+    const toFetch = cache.missing(args.sessionId, args.signalIds, args.start, args.end, bucketSecs);
+    if (toFetch.length === 0) {
+      setStatus({ kind: 'ready' });
+      return;
+    }
+
+    let cancelled = false;
     setStatus({ kind: 'loading' });
     supabase.rpc('get_signals_window', {
       p_session_id: args.sessionId,
@@ -98,12 +103,12 @@ export function useSupabaseFrames(args: UseSupabaseFramesArgs) {
         return;
       }
       store.ingest((data ?? []) as RpcRow[]);
-      for (const id of toFetch) stateRef.current.fetched.add(id);
+      cache.recordFetch(args.sessionId!, toFetch, args.start!, args.end!, bucketSecs);
       setStatus({ kind: 'ready' });
     });
 
     return () => { cancelled = true; };
-  }, [args.sessionId, idsKey, args.start, args.end, args.targetBuckets, store]);
+  }, [args.sessionId, idsKey, args.start, args.end, args.targetBuckets, store, cache]);
 
   return { store, status };
 }
