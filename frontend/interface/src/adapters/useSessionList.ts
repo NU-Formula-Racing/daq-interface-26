@@ -9,6 +9,7 @@ export interface SessionListItem {
   duration_secs: number;
   driver: string | null;
   car: string | null;
+  session_number: number | null;
 }
 
 export function useSessionList(limit = 50) {

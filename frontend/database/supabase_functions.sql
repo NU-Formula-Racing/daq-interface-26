@@ -151,3 +151,34 @@ BEGIN
   SELECT t.signal_id FROM t WHERE t.signal_id IS NOT NULL ORDER BY t.signal_id;
 END;
 $$ LANGUAGE plpgsql STABLE;
+
+
+-- list_sessions: paginated session list with derived duration. Drives the
+-- session picker (date dropdown). `session_number` is included for clients
+-- that prefer the DB-assigned ordinal; clients can also derive an in-day
+-- index when the column is NULL.
+DROP FUNCTION IF EXISTS list_sessions(integer);
+
+CREATE OR REPLACE FUNCTION list_sessions(p_limit integer DEFAULT 50)
+RETURNS TABLE (
+  id uuid,
+  date date,
+  started_at timestamptz,
+  ended_at timestamptz,
+  duration_secs integer,
+  driver text,
+  car text,
+  session_number integer
+)
+LANGUAGE sql
+STABLE
+AS $$
+  SELECT
+    s.id, s.date, s.started_at, s.ended_at,
+    EXTRACT(EPOCH FROM (s.ended_at - s.started_at))::INT AS duration_secs,
+    s.driver, s.car, s.session_number
+  FROM sessions s
+  WHERE s.ended_at IS NOT NULL
+  ORDER BY s.started_at DESC
+  LIMIT p_limit;
+$$;

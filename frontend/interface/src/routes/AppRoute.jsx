@@ -114,7 +114,12 @@ export default function AppRoute() {
         if (id) p.set('session', id); else p.delete('session');
         return p;
       })}
-      formatSessionLabel={(s) => `${new Date(s.started_at).toISOString().slice(11,19)} · ${s.duration_secs}s`}
+      formatSessionLabel={(s, num) => {
+        const time = new Date(s.started_at).toLocaleTimeString([], {
+          hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+        });
+        return `#${num} · ${time} · ${s.duration_secs}s`;
+      }}
     />
   ) : (
     <span style={{

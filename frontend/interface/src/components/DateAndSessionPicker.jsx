@@ -21,7 +21,11 @@ const inputStyle = {
  *  - onSelectedDate(date)
  *  - sessionId: string | null
  *  - onSessionId(id)
- *  - formatSessionLabel(session) -> string (optional)
+ *  - formatSessionLabel(session, dayIndex) -> string (optional)
+ *
+ *  `dayIndex` is the 1-based chronological position of the session within
+ *  the selected date (earliest = 1). Falls back to `s.session_number` when
+ *  the DB column happens to be populated.
  */
 export default function DateAndSessionPicker({
   sessions,
@@ -31,17 +35,25 @@ export default function DateAndSessionPicker({
   onSessionId,
   formatSessionLabel,
 }) {
-  const dayLabel = (s) => {
-    if (formatSessionLabel) return formatSessionLabel(s);
-    const t = s.started_at ? new Date(s.started_at).toISOString().slice(11, 19) : "?";
-    const dur = s.duration_secs != null ? ` · ${s.duration_secs}s` : "";
-    return `${t}${dur}`;
-  };
-
   const sessionsForDate = useMemo(
-    () => sessions.filter((s) => s.date === selectedDate),
+    () =>
+      sessions
+        .filter((s) => s.date === selectedDate)
+        .sort((a, b) => (a.started_at ?? "").localeCompare(b.started_at ?? "")),
     [sessions, selectedDate],
   );
+
+  const dayLabel = (s, idx) => {
+    const num = s.session_number ?? idx + 1;
+    if (formatSessionLabel) return formatSessionLabel(s, num);
+    const t = s.started_at
+      ? new Date(s.started_at).toLocaleTimeString([], {
+          hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
+        })
+      : "?";
+    const dur = s.duration_secs != null ? ` · ${s.duration_secs}s` : "";
+    return `#${num} · ${t}${dur}`;
+  };
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -52,8 +64,8 @@ export default function DateAndSessionPicker({
         style={inputStyle}
       >
         {sessionsForDate.length === 0 && <option value="">No sessions</option>}
-        {sessionsForDate.map((s) => (
-          <option key={s.id} value={s.id}>{dayLabel(s)}</option>
+        {sessionsForDate.map((s, idx) => (
+          <option key={s.id} value={s.id}>{dayLabel(s, idx)}</option>
         ))}
       </select>
     </div>
