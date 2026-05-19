@@ -22,7 +22,7 @@ describe('pushSessionsToCloud', () => {
     };
     const pusher: CloudPusher = {
       pushSignals: vi.fn(async () => new Map()),
-      pushSession: vi.fn(async () => {}),
+      pushSession: vi.fn(async (id: string) => id),
       pushReadings: vi.fn(async () => {}),
     };
 
@@ -50,7 +50,7 @@ describe('pushSessionsToCloud', () => {
     };
     const pusher: CloudPusher = {
       pushSignals: vi.fn(async () => new Map()),
-      pushSession: vi.fn(async () => {}),
+      pushSession: vi.fn(async (id: string) => id),
       pushReadings: vi.fn(async () => {}),
     };
 
@@ -79,13 +79,38 @@ describe('pushSessionsToCloud', () => {
     };
     const pusher: CloudPusher = {
       pushSignals: vi.fn(async () => new Map([[7, 700]])),
-      pushSession: vi.fn(async () => {}),
+      pushSession: vi.fn(async (id: string) => id),
       pushReadings: vi.fn(async () => {}),
     };
 
     await pushSessionsToCloud(reader, pusher);
     expect(pusher.pushReadings).toHaveBeenCalledWith('s1', [
       { ts: 't', signal_id: 700, value: 1 },
+    ]);
+  });
+
+  it('routes readings to the cloud id returned by pushSession (hash dedup)', async () => {
+    // Machine B is syncing a re-import of a file that machine A already
+    // pushed. pushSession sees the matching source_file_hash and returns the
+    // existing cloud session id; readings go under that id.
+    const reader: LocalReader = {
+      unsyncedHeaders: vi.fn(async () => [
+        { id: 'local-B', row: { source_file_hash: 'abc' }, signals: [] },
+      ]),
+      readingsBatches: vi.fn(() =>
+        batchesOf([{ ts: 't', signal_id: 1, value: 1 }])(),
+      ),
+      markSynced: vi.fn(async () => {}),
+    };
+    const pusher: CloudPusher = {
+      pushSignals: vi.fn(async () => new Map()),
+      pushSession: vi.fn(async () => 'cloud-A'), // dedup hit
+      pushReadings: vi.fn(async () => {}),
+    };
+
+    await pushSessionsToCloud(reader, pusher);
+    expect(pusher.pushReadings).toHaveBeenCalledWith('cloud-A', [
+      { ts: 't', signal_id: 1, value: 1 },
     ]);
   });
 
@@ -102,6 +127,7 @@ describe('pushSessionsToCloud', () => {
       pushSignals: vi.fn(async () => new Map()),
       pushSession: vi.fn(async (id: string) => {
         if (id === 'bad') throw new Error('rate limited');
+        return id;
       }),
       pushReadings: vi.fn(async () => {}),
     };

@@ -39,7 +39,12 @@ export interface LocalReader {
 export interface CloudPusher {
   /** Upsert signal defs by (source, signal_name); return local_id → cloud_id. */
   pushSignals: (defs: Array<SignalDef & { local_id: number }>) => Promise<Map<number, number>>;
-  pushSession: (sessionId: string, row: Record<string, unknown>) => Promise<void>;
+  /**
+   * Upsert the session row. If the row carries a `source_file_hash`, the cloud
+   * dedups on that hash — returns the existing cloud session id if found,
+   * otherwise the inserted id (which equals the local id).
+   */
+  pushSession: (sessionId: string, row: Record<string, unknown>) => Promise<string>;
   pushReadings: (sessionId: string, readings: Reading[]) => Promise<void>;
 }
 
@@ -62,7 +67,11 @@ export async function pushSessionsToCloud(
       // Upsert signal defs first so we can translate the readings'
       // local signal_ids into whatever ids the cloud uses.
       const idMap = s.signals.length > 0 ? await pusher.pushSignals(s.signals) : new Map();
-      await pusher.pushSession(s.id, s.row);
+      // pushSession returns the cloud session id. If the row had a
+      // source_file_hash that matches an existing cloud session (re-import of
+      // the same .bin from another machine), the returned id will be that
+      // existing cloud id and pushReadings will dedup against its rows.
+      const cloudSessionId = await pusher.pushSession(s.id, s.row);
       // Stream readings: bounded memory regardless of session size.
       for await (const batch of reader.readingsBatches(s.id)) {
         const translated = batch.map((r) => ({
@@ -70,7 +79,7 @@ export async function pushSessionsToCloud(
           signal_id: idMap.get(r.signal_id) ?? r.signal_id,
           value: r.value,
         }));
-        await pusher.pushReadings(s.id, translated);
+        await pusher.pushReadings(cloudSessionId, translated);
       }
       await reader.markSynced(s.id);
       pushed++;
@@ -144,8 +153,9 @@ export function localReaderFromPool(pool: pg.Pool): LocalReader {
         notes: string | null;
         source: string;
         source_file: string | null;
+        source_file_hash: string | null;
       }>(`SELECT id, date::text, started_at, ended_at, track, driver, car,
-                 notes, source, source_file
+                 notes, source, source_file, source_file_hash
           FROM sessions
           WHERE synced_at IS NULL AND ended_at IS NOT NULL
           ORDER BY started_at ASC`);
@@ -175,6 +185,7 @@ export function localReaderFromPool(pool: pg.Pool): LocalReader {
             notes: s.notes,
             source: s.source,
             source_file: s.source_file,
+            source_file_hash: s.source_file_hash,
           },
           signals: signals.map((d) => ({
             local_id: d.id,
@@ -228,9 +239,25 @@ export function supabaseCloudPusher(
       return map;
     },
     async pushSession(sessionId, row) {
+      // If the session carries a content hash, check the cloud first — a
+      // matching row means this exact source file was already imported and
+      // synced from another machine. We return that row's id and skip the
+      // insert so readings dedup against its existing rows.
+      const hash = typeof row.source_file_hash === 'string' ? row.source_file_hash : null;
+      if (hash) {
+        const { data: existing, error: selErr } = await client
+          .from('sessions')
+          .select('id')
+          .eq('source_file_hash', hash)
+          .limit(1)
+          .maybeSingle();
+        if (selErr) throw new Error(`session lookup failed: ${selErr.message}`);
+        if (existing?.id) return existing.id as string;
+      }
       const payload = { id: sessionId, ...row };
       const { error } = await client.from('sessions').upsert(payload);
       if (error) throw new Error(`session upsert failed: ${error.message}`);
+      return sessionId;
     },
     async pushReadings(sessionId, readings) {
       if (readings.length === 0) return;

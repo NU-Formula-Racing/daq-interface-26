@@ -51,6 +51,17 @@ export function postgresCloudPusher(connectionString: string): CloudPusher & {
       return map;
     },
     async pushSession(sessionId, row) {
+      // Content-hash dedup: if a session with the same source_file_hash is
+      // already in the cloud, return that id and skip the insert. Readings
+      // will then upsert against the existing session's rows and dedup.
+      const hash = typeof row.source_file_hash === 'string' ? row.source_file_hash : null;
+      if (hash) {
+        const { rows: existing } = await pool.query<{ id: string }>(
+          `SELECT id FROM sessions WHERE source_file_hash = $1 LIMIT 1`,
+          [hash],
+        );
+        if (existing.length > 0) return existing[0].id;
+      }
       const cols = ['id', ...Object.keys(row)];
       const vals = [sessionId, ...Object.values(row)];
       const placeholders = cols.map((_, i) => `$${i + 1}`).join(', ');
@@ -63,6 +74,7 @@ export function postgresCloudPusher(connectionString: string): CloudPusher & {
         `VALUES (${placeholders}) ` +
         `ON CONFLICT (id) DO UPDATE SET ${updates}`;
       await pool.query(sql, vals);
+      return sessionId;
     },
 
     async pushReadings(sessionId, readings) {

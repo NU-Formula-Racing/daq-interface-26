@@ -55,6 +55,7 @@ describe('POST /api/sync/push', () => {
         pushSignals: async () => new Map(),
         pushSession: async (id: string) => {
           pushedSessions.push(id);
+          return id;
         },
         pushReadings: async () => {},
       }),

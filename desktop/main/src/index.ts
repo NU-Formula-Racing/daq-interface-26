@@ -16,6 +16,7 @@ import type { SetupState } from './server/routes/setup.ts';
 import type { ImportResult } from './server/routes/import.ts';
 import type { CatalogDeps } from './server/routes/catalog.ts';
 import { spawn } from 'child_process';
+import { createHash } from 'crypto';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..', '..');
@@ -295,11 +296,27 @@ export async function run(opts: {
     const target = join(NFR_UPLOADS_DIR, `${Date.now()}-${safeName}`);
     writeFileSync(target, body);
 
+    // Content-hash dedup: skip re-parsing if this exact file was already imported.
+    const sourceFileHash = createHash('sha256').update(body).digest('hex');
+    const existing = await pool.query<{ id: string }>(
+      `SELECT id FROM sessions WHERE source_file_hash = $1 LIMIT 1`,
+      [sourceFileHash],
+    );
+    if (existing.rows.length > 0) {
+      const id = existing.rows[0].id;
+      const cnt = await pool.query<{ n: string }>(
+        `SELECT count(*)::text AS n FROM sd_readings WHERE session_id = $1`,
+        [id],
+      );
+      return { session_id: id, row_count: Number(cnt.rows[0]?.n ?? '0') };
+    }
+
     const cfgNow = await getAppConfig(pool);
     const importDbc = typeof cfgNow.dbcPath === 'string' ? cfgNow.dbcPath : dbcCsv;
     const subArgs = ['batch', '--dbc', importDbc, '--file', target];
     const args = parserIsPython ? [PARSER_PY, ...subArgs] : subArgs;
     const importDsn = dsn;
+    const localPool = pool;
 
     return new Promise<ImportResult>((resolve) => {
       const child = spawn(parserBinary, args, {
@@ -310,7 +327,7 @@ export async function run(opts: {
       let stderr = '';
       child.stdout.on('data', (d) => { stdout += String(d); });
       child.stderr.on('data', (d) => { stderr += String(d); });
-      child.on('close', (code) => {
+      child.on('close', async (code) => {
         if (code !== 0) {
           resolve({
             session_id: null,
@@ -330,6 +347,17 @@ export async function run(opts: {
             }
           } catch {
             /* ignore non-JSON lines */
+          }
+        }
+        if (sessionId) {
+          try {
+            await localPool.query(
+              `UPDATE sessions SET source_file_hash = $1 WHERE id = $2`,
+              [sourceFileHash, sessionId],
+            );
+          } catch (err) {
+            // Don't fail the import if hash stamping fails — just log.
+            console.error('failed to stamp source_file_hash:', err);
           }
         }
         resolve({ session_id: sessionId, row_count: rowCount });
