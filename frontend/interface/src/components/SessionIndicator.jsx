@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { useSession } from "@/context/SessionContext";
 import { motion } from "framer-motion";
-import DatePicker from "@/components/DatePicker";
+import DateAndSessionPicker from "@/components/DateAndSessionPicker";
 import "./TopBar.css";
 
 function formatSessionLabel(session) {
@@ -35,17 +35,6 @@ export default function SessionIndicator() {
   useEffect(() => {
     measure();
   }, [measure, sessionId, availableSessions]);
-
-  const inputStyle = {
-    background: "var(--hud-bg)",
-    border: "1px solid rgba(255,255,255,0.16)",
-    fontFamily: "var(--font-mono)",
-    fontSize: "0.8rem",
-    color: "#f0f0f0",
-    borderRadius: "4px",
-    padding: "4px 8px",
-    outline: "none",
-  };
 
   return (
     <motion.div
@@ -91,21 +80,14 @@ export default function SessionIndicator() {
           whiteSpace: "nowrap",
         }}
       >
-        <DatePicker value={selectedDate} onChange={setSelectedDate} />
-        <select
-          value={sessionId ?? ""}
-          onChange={(e) => setSessionId(e.target.value)}
-          style={inputStyle}
-        >
-          {availableSessions.length === 0 && (
-            <option value="">No sessions</option>
-          )}
-          {availableSessions.map((session) => (
-            <option key={session.id} value={session.id}>
-              {formatSessionLabel(session)}
-            </option>
-          ))}
-        </select>
+        <DateAndSessionPicker
+          sessions={availableSessions.map((s) => ({ ...s, date: selectedDate }))}
+          selectedDate={selectedDate}
+          onSelectedDate={setSelectedDate}
+          sessionId={sessionId}
+          onSessionId={setSessionId}
+          formatSessionLabel={formatSessionLabel}
+        />
       </motion.div>
     </motion.div>
   );
