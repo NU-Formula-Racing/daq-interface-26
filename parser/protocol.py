@@ -54,5 +54,8 @@ class ProtocolEmitter:
         clamped = max(0, min(100, int(pct)))
         self._emit({"type": "import_progress", "file": file, "pct": clamped})
 
+    def signal_quality(self, *, rssi: int, snr: float) -> None:
+        self._emit({"type": "signal_quality", "rssi": int(rssi), "snr": float(snr)})
+
     def error(self, msg: str) -> None:
         self._emit({"type": "error", "msg": msg})

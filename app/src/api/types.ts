@@ -45,6 +45,9 @@ export interface LiveStatus {
   port: string | null;
   session_id: string | null;
   source: 'live' | 'sd_import' | null;
+  /** Most recent LoRa-link metrics, refreshed on every USB packet. */
+  rssi?: number | null;
+  snr?: number | null;
 }
 
 export type ParserEvent =
@@ -53,4 +56,5 @@ export type ParserEvent =
   | { type: 'session_ended'; session_id: string; row_count: number }
   | { type: 'frames'; rows: Array<{ ts: string; signal_id: number; value: number }> }
   | { type: 'import_progress'; file: string; pct: number }
+  | { type: 'signal_quality'; rssi: number; snr: number }
   | { type: 'error'; msg: string };

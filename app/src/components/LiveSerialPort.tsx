@@ -3,7 +3,12 @@ import { apiGet, apiPost } from '../api/client.ts';
 
 interface SerialPort { path: string; label: string }
 interface AppConfig { serialPort?: string | null }
-interface LiveStatus { basestation: 'connected' | 'disconnected'; port: string | null }
+interface LiveStatus {
+  basestation: 'connected' | 'disconnected';
+  port: string | null;
+  rssi?: number | null;
+  snr?: number | null;
+}
 
 export function LiveSerialPort() {
   const [ports, setPorts] = useState<SerialPort[]>([]);
@@ -93,6 +98,16 @@ export function LiveSerialPort() {
               {status.basestation}
             </strong>
             {status.port && <span> ({status.port})</span>}
+            {typeof status.rssi === 'number' && (
+              <span style={{ marginLeft: 12 }}>
+                RSSI: <code>{status.rssi}</code> dBm
+              </span>
+            )}
+            {typeof status.snr === 'number' && (
+              <span style={{ marginLeft: 8 }}>
+                SNR: <code>{status.snr.toFixed(1)}</code> dB
+              </span>
+            )}
           </span>
         )}
       </div>

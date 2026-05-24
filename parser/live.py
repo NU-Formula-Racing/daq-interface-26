@@ -32,11 +32,16 @@ PROTOCOL_BATCH_ROWS = 100  # max rows per outbound `frames` message
 
 @dataclass(frozen=True)
 class SourceEvent:
-    kind: str   # "connected" | "disconnected" | "frame"
+    kind: str   # "connected" | "disconnected" | "frame" | "signal_quality"
     port: str | None = None
     ts_ms: int | None = None
     frame_id: int | None = None
     data: bytes | None = None
+    # Populated only for kind="signal_quality": LoRa link metrics measured
+    # by the basestation for the most recent received packet. They are
+    # forwarded to the UI for diagnostic display.
+    rssi: int | None = None
+    snr: float | None = None
 
 
 @dataclass(frozen=True)
@@ -128,6 +133,9 @@ def run_live(
                         _flush_rt()
                     if len(out_rows) >= PROTOCOL_BATCH_ROWS:
                         _flush_out()
+
+            elif evt.kind == "signal_quality":
+                emitter.signal_quality(rssi=evt.rssi or 0, snr=float(evt.snr or 0.0))
 
             elif evt.kind == "disconnected":
                 _flush_rt()

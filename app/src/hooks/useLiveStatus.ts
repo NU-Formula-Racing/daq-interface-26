@@ -8,6 +8,8 @@ const INITIAL: LiveStatus = {
   port: null,
   session_id: null,
   source: null,
+  rssi: null,
+  snr: null,
 };
 
 export function useLiveStatus(): LiveStatus {
@@ -30,6 +32,9 @@ export function useLiveStatus(): LiveStatus {
         }
         if (ev.type === 'session_ended') {
           return { ...prev, session_id: null, source: null };
+        }
+        if (ev.type === 'signal_quality') {
+          return { ...prev, rssi: ev.rssi, snr: ev.snr };
         }
         return prev;
       });
