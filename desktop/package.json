@@ -15,6 +15,7 @@
     "package:win": "npm run build:main && electron-builder --win portable --publish=never"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1053.0",
     "@fastify/static": "^8.3.0",
     "@fastify/websocket": "^11.2.0",
     "@supabase/supabase-js": "^2.104.1",

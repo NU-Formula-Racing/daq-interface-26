@@ -1,6 +1,16 @@
 import type pg from 'pg';
 
-export type AppConfig = Record<string, unknown>;
+export interface AppConfig extends Record<string, unknown> {
+  supabaseUrl?: string | null;
+  supabaseAnonKey?: string | null;
+  // DigitalOcean Spaces (S3-compatible) credentials. All four must be set
+  // for the cloud upload flow to be available.
+  spacesEndpoint?: string | null;   // e.g. "https://nyc3.digitaloceanspaces.com"
+  spacesRegion?: string | null;     // e.g. "us-east-1" (DO ignores but SDK requires)
+  spacesBucket?: string | null;
+  spacesAccessKey?: string | null;
+  spacesSecretKey?: string | null;
+}
 
 export async function getAppConfig(pool: pg.Pool): Promise<AppConfig> {
   const { rows } = await pool.query<{ data: AppConfig }>(
