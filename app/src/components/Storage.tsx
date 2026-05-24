@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { apiGet, apiPost } from '../api/client.ts';
+import { apiGet, apiPost, uploadSession as apiUploadSession } from '../api/client.ts';
+import { StorageLocalTab, type LocalSession } from './StorageLocalTab.tsx';
 
 interface CatalogEntry {
   name: string;
@@ -31,6 +32,8 @@ export function Storage() {
   const [dialog, setDialog] = useState<DialogState>({ kind: 'none' });
   const [manualPath, setManualPath] = useState<string>('');
   const [manualMode, setManualMode] = useState<'create' | 'connect' | null>(null);
+  const [activeTab, setActiveTab] = useState<'local' | 'cloud'>('local');
+  const [sessions, setSessions] = useState<LocalSession[]>([]);
 
   const refresh = () => {
     apiGet<CatalogResponse>('/api/db/catalog')
@@ -38,8 +41,15 @@ export function Storage() {
       .catch(() => {});
   };
 
+  const refreshSessions = () => {
+    apiGet<LocalSession[]>('/api/sessions')
+      .then(setSessions)
+      .catch(() => {});
+  };
+
   useEffect(() => {
     refresh();
+    refreshSessions();
     const id = setInterval(refresh, 5000);
     return () => clearInterval(id);
   }, []);
@@ -330,6 +340,34 @@ export function Storage() {
           </div>
         </div>
       )}
+
+      {/* Local / Cloud session tabs */}
+      <div className="border border-[color:var(--color-border)] mt-2">
+        <div className="flex border-b border-[color:var(--color-border)]">
+          <button
+            onClick={() => setActiveTab('local')}
+            className={`px-4 py-1.5 text-[10px] tracking-widest border-r border-[color:var(--color-border)] ${activeTab === 'local' ? 'bg-[color:var(--color-bg)] text-[color:var(--color-text)]' : 'text-[color:var(--color-text-mute)]'}`}
+          >
+            LOCAL
+          </button>
+          <button
+            onClick={() => setActiveTab('cloud')}
+            className={`px-4 py-1.5 text-[10px] tracking-widest ${activeTab === 'cloud' ? 'bg-[color:var(--color-bg)] text-[color:var(--color-text)]' : 'text-[color:var(--color-text-mute)]'}`}
+          >
+            CLOUD
+          </button>
+        </div>
+        <div className="p-2">
+          {activeTab === 'local' && (
+            <StorageLocalTab sessions={sessions} uploadSession={apiUploadSession} />
+          )}
+          {activeTab === 'cloud' && (
+            <div className="text-[11px] text-[color:var(--color-text-faint)] py-2">
+              Coming soon — implemented in pull-flow plan.
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Create/connect confirmation modal */}
       {dialog.kind === 'add' && (
