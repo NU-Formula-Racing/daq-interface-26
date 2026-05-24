@@ -58,3 +58,19 @@ export async function apiDelete(path: string): Promise<void> {
   const res = await fetch(buildUrl(path), { method: 'DELETE' });
   await throwOnError(res);
 }
+
+export interface UploadResult {
+  status: 'ok' | 'already_synced';
+  uploadedBytes?: number;
+  files?: number;
+  contentHash?: string;
+  existing?: { uploaded_by_machine: string | null; uploaded_at: string | null };
+}
+
+export async function uploadSession(sessionId: string): Promise<UploadResult> {
+  const r = await fetch(buildUrl(`/api/cloud/upload/${sessionId}`), { method: 'POST' });
+  const body = await r.json();
+  if (r.status === 409) return { status: 'already_synced', existing: body.existing };
+  if (!r.ok) throw new Error(body.error ?? `HTTP ${r.status}`);
+  return { status: 'ok', ...body };
+}
