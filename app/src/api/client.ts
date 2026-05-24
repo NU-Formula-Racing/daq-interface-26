@@ -67,6 +67,43 @@ export interface UploadResult {
   existing?: { uploaded_by_machine: string | null; uploaded_at: string | null };
 }
 
+export interface CloudDayGroup {
+  date: string;
+  totalBytes: number;
+  sessions: Array<{ id: string; date: string; totalBytes: number; alreadyLocal: boolean }>;
+}
+
+export async function listCloudSessions(): Promise<CloudDayGroup[]> {
+  const r = await fetch(buildUrl('/api/cloud/sessions'));
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+export async function pullSessions(ids: string[]): Promise<{ results: Array<{ id: string; ok: boolean; error?: string; rowCount?: number }> }> {
+  const r = await fetch(buildUrl('/api/cloud/pull'), {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ ids }),
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+export async function estimateLocalBytes(ids: string[]): Promise<number> {
+  const r = await fetch(buildUrl('/api/local/estimate'), {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ ids }),
+  });
+  return (await r.json()).approxBytes;
+}
+
+export async function deleteLocalSessions(ids: string[]): Promise<{ approxBytesFreed: number }> {
+  const r = await fetch(buildUrl('/api/local/delete'), {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ ids }),
+  });
+  return r.json();
+}
+
 export async function uploadSession(sessionId: string): Promise<UploadResult> {
   const r = await fetch(buildUrl(`/api/cloud/upload/${sessionId}`), { method: 'POST' });
   const body = await r.json();
