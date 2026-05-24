@@ -5,6 +5,7 @@ import { ActivityHeatmap } from '../components/ActivityHeatmap.tsx';
 import { Storage } from '../components/Storage.tsx';
 import { Broadcast } from '../components/Broadcast.tsx';
 import { CloudSync } from '../components/CloudSync.tsx';
+import { LiveSerialPort } from '../components/LiveSerialPort.tsx';
 import { Uninstall } from '../components/Uninstall.tsx';
 
 interface DbStats {
@@ -125,6 +126,8 @@ export default function Settings() {
         <h1 className="text-sm tracking-widest text-[color:var(--color-text)] uppercase">Database</h1>
 
         <Storage />
+
+        <LiveSerialPort />
 
         <Broadcast />
 

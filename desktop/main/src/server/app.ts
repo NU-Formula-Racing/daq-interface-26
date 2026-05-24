@@ -23,6 +23,13 @@ import { registerBroadcastRoutes, type BroadcastDeps } from './routes/broadcast.
 import { registerUninstallRoutes, type UninstallDeps } from './routes/uninstall.ts';
 import { registerCloudUploadRoutes } from './routes/cloud-upload.ts';
 import { registerCloudPullRoutes } from './routes/cloud-pull.ts';
+import { registerSerialPortRoutes } from './routes/serial-ports.ts';
+
+/** Config keys that, when changed via POST /api/config, require the parser
+ *  subprocess to be re-spawned so it picks up the new value. */
+const PARSER_RESTART_KEYS = new Set([
+  'serialPort', 'replayFile', 'replaySpeed', 'dbcPath',
+]);
 
 export interface BuildAppOptions {
   pool: pg.Pool | null;
@@ -34,6 +41,9 @@ export interface BuildAppOptions {
   staticRoot?: string;
   dbcStorePath?: string;
   onDbcChanged?: () => Promise<void>;
+  /** Called when /api/config receives a patch that includes any parser-affecting
+   *  key (serialPort, replayFile, replaySpeed, dbcPath). */
+  onParserConfigChanged?: () => Promise<void>;
   dsn?: string;
   pgConnStr?: string;
   onImport?: (filename: string, body: Buffer) => Promise<ImportResult>;
@@ -104,10 +114,20 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     app.post<{ Body: Record<string, unknown> }>(
       '/api/config',
       async (req) => {
-        await setAppConfig(pool, req.body ?? {});
+        const patch = req.body ?? {};
+        await setAppConfig(pool, patch);
+        const needsRestart = Object.keys(patch).some((k) => PARSER_RESTART_KEYS.has(k));
+        if (needsRestart && opts.onParserConfigChanged) {
+          // Don't block the response on the parser restart — fire and forget.
+          opts.onParserConfigChanged().catch((err) => {
+            req.log.error({ err }, 'parser restart after config change failed');
+          });
+        }
         return { ok: true };
       }
     );
+
+    registerSerialPortRoutes(app);
 
     registerSessionRoutes(app, pool);
     registerSignalRoutes(app, pool);

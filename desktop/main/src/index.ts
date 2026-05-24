@@ -414,6 +414,7 @@ export async function run(opts: {
     staticRoot: opts.staticRoot,
     dbcStorePath,
     onDbcChanged: restartParser,
+    onParserConfigChanged: restartParser,
     dsn: dsn ?? undefined,
     pgConnStr: dsn ?? undefined,
     onImport: runBatchImport,
