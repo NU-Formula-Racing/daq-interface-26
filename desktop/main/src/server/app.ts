@@ -22,6 +22,7 @@ import { registerCatalogRoutes, type CatalogDeps } from './routes/catalog.ts';
 import { registerBroadcastRoutes, type BroadcastDeps } from './routes/broadcast.ts';
 import { registerUninstallRoutes, type UninstallDeps } from './routes/uninstall.ts';
 import { registerCloudUploadRoutes } from './routes/cloud-upload.ts';
+import { registerCloudPullRoutes } from './routes/cloud-pull.ts';
 
 export interface BuildAppOptions {
   pool: pg.Pool | null;
@@ -130,6 +131,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     }
     if (opts.pgConnStr) {
       registerCloudUploadRoutes(app, pool, opts.pgConnStr);
+      registerCloudPullRoutes(app, pool, opts.pgConnStr);
     }
   }
 
