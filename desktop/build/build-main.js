@@ -11,7 +11,9 @@ await build({
   bundle: true,
   platform: 'node',
   format: 'cjs',
-  external: ['electron', 'pg-native'],
+  // duckdb is a native module — keep it as a runtime require so esbuild
+  // doesn't try to inline @mapbox/node-pre-gyp's optional aws-sdk/nock deps.
+  external: ['electron', 'pg-native', 'duckdb'],
   // Replace every `import.meta.url` reference with our banner-defined identifier.
   define: {
     'import.meta.url': '__bundleMetaUrl',
