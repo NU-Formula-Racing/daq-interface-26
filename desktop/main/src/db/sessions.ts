@@ -12,6 +12,12 @@ export interface Session {
   source: 'live' | 'sd_import';
   source_file: string | null;
   synced_at: string | null;
+  content_hash: string | null;
+  manifest_key: string | null;
+  total_bytes: string | null;          // BIGINT → string via pg default
+  uploaded_by_machine: string | null;
+  uploaded_at: string | null;
+  local_deleted_at: string | null;
 }
 
 export interface SessionDetail extends Session {
@@ -32,9 +38,11 @@ export interface OverviewRow {
 export async function listSessions(pool: pg.Pool): Promise<Session[]> {
   const { rows } = await pool.query<Session>(
     `SELECT id, date::text, started_at, ended_at, track, driver, car, notes,
-            source, source_file, synced_at
+            source, source_file, synced_at,
+            content_hash, manifest_key, total_bytes::text, uploaded_by_machine,
+            uploaded_at, local_deleted_at
      FROM sessions
-     ORDER BY started_at DESC`
+     ORDER BY started_at DESC`,
   );
   return rows;
 }
@@ -45,9 +53,11 @@ export async function getSession(
 ): Promise<SessionDetail | null> {
   const { rows } = await pool.query<Session>(
     `SELECT id, date::text, started_at, ended_at, track, driver, car, notes,
-            source, source_file, synced_at
+            source, source_file, synced_at,
+            content_hash, manifest_key, total_bytes::text, uploaded_by_machine,
+            uploaded_at, local_deleted_at
      FROM sessions WHERE id = $1`,
-    [id]
+    [id],
   );
   if (rows.length === 0) return null;
 

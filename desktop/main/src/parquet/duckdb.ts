@@ -23,7 +23,8 @@ export class DuckDB {
   /** Run a query and return all rows. */
   all<T = Record<string, unknown>>(sql: string, ...params: unknown[]): Promise<T[]> {
     return new Promise((resolve, reject) => {
-      this.conn.all(sql, ...params, (err: Error | null, rows: T[]) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (this.conn.all as any)(sql, ...params, (err: Error | null, rows: T[]) => {
         if (err) reject(err);
         else resolve(rows);
       });
