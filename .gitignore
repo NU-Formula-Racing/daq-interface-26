@@ -163,3 +163,7 @@ parser/active-dbc.csv
 
 # Local NFR upload staging
 parser/uploads/
+
+# Supabase backup intermediate part files (large; only keep final .ndjson.gz)
+backups/supabase-pre-parquet/*.part.ndjson
+backups/supabase-pre-parquet/parse_batch.py
