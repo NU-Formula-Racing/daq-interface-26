@@ -21,6 +21,7 @@ import { registerImportRoutes, type ImportResult } from './routes/import.ts';
 import { registerCatalogRoutes, type CatalogDeps } from './routes/catalog.ts';
 import { registerBroadcastRoutes, type BroadcastDeps } from './routes/broadcast.ts';
 import { registerUninstallRoutes, type UninstallDeps } from './routes/uninstall.ts';
+import { registerCloudUploadRoutes } from './routes/cloud-upload.ts';
 
 export interface BuildAppOptions {
   pool: pg.Pool | null;
@@ -33,6 +34,7 @@ export interface BuildAppOptions {
   dbcStorePath?: string;
   onDbcChanged?: () => Promise<void>;
   dsn?: string;
+  pgConnStr?: string;
   onImport?: (filename: string, body: Buffer) => Promise<ImportResult>;
   catalogDeps?: CatalogDeps;
   broadcastDeps?: BroadcastDeps;
@@ -125,6 +127,9 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     }
     if (opts.broadcastDeps) {
       registerBroadcastRoutes(app, opts.broadcastDeps);
+    }
+    if (opts.pgConnStr) {
+      registerCloudUploadRoutes(app, pool, opts.pgConnStr);
     }
   }
 

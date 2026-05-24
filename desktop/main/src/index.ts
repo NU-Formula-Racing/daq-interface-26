@@ -415,6 +415,7 @@ export async function run(opts: {
     dbcStorePath,
     onDbcChanged: restartParser,
     dsn: dsn ?? undefined,
+    pgConnStr: dsn ?? undefined,
     onImport: runBatchImport,
     catalogDeps,
     broadcastDeps,
