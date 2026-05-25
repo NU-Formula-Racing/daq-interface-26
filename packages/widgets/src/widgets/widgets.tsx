@@ -394,13 +394,19 @@ export function GraphWidget({
               {style === 'area' && (
                 <path d={areaPathFor(s.data)} fill={color} fillOpacity={0.12} stroke="none" />
               )}
-              {style === 'dots' ? (
-                // One circle per sample. r=1.5 keeps it light at dense buckets;
-                // user can switch back to 'line' if dots feel cluttered.
-                s.data.map((v, i) => (
-                  <circle key={i} cx={x(i)} cy={y(v)} r={1.5} fill={color} />
-                ))
-              ) : (
+              {style === 'dots' ? (() => {
+                // N is ~1.2 samples per pixel, so rendering every sample makes
+                // dots overlap into a near-continuous band that reads as a line.
+                // Stride so adjacent dots are ~5 px apart — about 80 dots across
+                // a 400 px graph, visibly discrete at any zoom level.
+                const targetSpacingPx = 5;
+                const stride = Math.max(1, Math.round(N / Math.max(1, plotW / targetSpacingPx)));
+                const out: React.ReactNode[] = [];
+                for (let i = 0; i < N; i += stride) {
+                  out.push(<circle key={i} cx={x(i)} cy={y(s.data[i])} r={2} fill={color} />);
+                }
+                return out;
+              })() : (
                 <path d={pathFor(s.data)} fill="none" stroke={color} strokeWidth={1.5}
                   strokeLinejoin="round" strokeLinecap="round" />
               )}
