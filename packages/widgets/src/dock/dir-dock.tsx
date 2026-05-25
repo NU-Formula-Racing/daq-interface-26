@@ -740,6 +740,18 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                         <SegBtn active={w.yMode === 'fixed'} onClick={() => patch(w.id, { yMode: 'fixed' })}>FIXED</SegBtn>
                       </div>
                     </div>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, letterSpacing: 1.2 }}>
+                        <span>MIN/MAX BAND</span>
+                        <span style={{ color: w.showRange === false ? SH_COLORS.textFaint : SH_COLORS.accentBright }}>
+                          {w.showRange === false ? 'OFF' : 'ON'}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <SegBtn active={w.showRange !== false} onClick={() => patch(w.id, { showRange: true })}>ON</SegBtn>
+                        <SegBtn active={w.showRange === false} onClick={() => patch(w.id, { showRange: false })}>OFF</SegBtn>
+                      </div>
+                    </div>
                   </>
                 )}
                 <div>

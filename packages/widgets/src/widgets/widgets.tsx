@@ -27,12 +27,15 @@ interface GraphWidgetProps {
   mode?: 'live' | 'replay';
   /** Per-signal color overrides keyed by signal id. Falls back to sig.color. */
   signalColors?: Record<number, string>;
+  /** Show a translucent band between vMin and vMax behind each trace.
+   *  Useful for spike-debugging at coarse zoom. Default true. */
+  showRange?: boolean;
 }
 
 export function GraphWidget({
   signals = [], t, window: win = 0.05, style = 'line',
   density = 'normal', compact = false, showAxes = true, showCursor = true, height,
-  zoom = null, onZoom, mode = 'replay', signalColors,
+  zoom = null, onZoom, mode = 'replay', signalColors, showRange = true,
 }: GraphWidgetProps) {
   const catalog = useCatalog();
   const frames = useFrames();
@@ -99,14 +102,14 @@ export function GraphWidget({
   const series = signals.map((sid: any) => {
     const sig = catalog.resolve(sid);
     if (!sig) return null;
-    const allRaw = (frames?.series(sig.id) ?? []).map((r) => r.value);
-    if (allRaw.length === 0) return { sig, data: new Array(N).fill(0), empty: true };
+    const all = frames?.series(sig.id) ?? [];
+    if (all.length === 0) return { sig, data: new Array(N).fill(0), vMin: null as number[] | null, vMax: null as number[] | null, empty: true };
 
     // Decide which slice of the buffer to render.
     // - Live: rolling window — last `win` fraction of the buffer ending at "now".
     // - Zoomed (either mode): the zoom range maps to a fraction of the buffer.
     // - Replay (no zoom): full buffer; the scrubber just moves the cursor.
-    const len = allRaw.length;
+    const len = all.length;
     const winLen = Math.max(8, Math.floor(len * win));
     let start: number, end: number;
     if (zoom && zoom.length === 2) {
@@ -119,11 +122,26 @@ export function GraphWidget({
       start = 0;
       end = len;
     }
-    const sliced = allRaw.slice(start, end);
-    if (sliced.length === 0) return { sig, data: new Array(N).fill(0), empty: true };
-    const data = resampleToN(sliced, N);
-    return { sig, data };
-  }).filter(Boolean) as { sig: Signal; data: number[]; empty?: boolean }[];
+    const slicedFrames = all.slice(start, end);
+    if (slicedFrames.length === 0) return { sig, data: new Array(N).fill(0), vMin: null, vMax: null, empty: true };
+
+    const valueRaw = slicedFrames.map((f) => f.value);
+    const data = resampleToN(valueRaw, N);
+
+    // Build vMin/vMax tracks only if at least one frame has a real spread.
+    const hasRange = slicedFrames.some(
+      (f) => f.vMin !== undefined && f.vMax !== undefined && f.vMin !== f.vMax,
+    );
+    let vMin: number[] | null = null;
+    let vMax: number[] | null = null;
+    if (showRange && hasRange) {
+      const minRaw = slicedFrames.map((f) => (f.vMin ?? f.value));
+      const maxRaw = slicedFrames.map((f) => (f.vMax ?? f.value));
+      vMin = resampleToN(minRaw, N);
+      vMax = resampleToN(maxRaw, N);
+    }
+    return { sig, data, vMin, vMax };
+  }).filter(Boolean) as { sig: Signal; data: number[]; vMin: number[] | null; vMax: number[] | null; empty?: boolean }[];
 
   // Domain: prefer customized catalog ranges; fall back to data range with 5% pad
   let dMin = Infinity, dMax = -Infinity;
@@ -141,6 +159,8 @@ export function GraphWidget({
           if (v < lo) lo = v;
           if (v > hi) hi = v;
         }
+        if (s.vMin) for (const v of s.vMin) { if (v < lo) lo = v; if (v > hi) hi = v; }
+        if (s.vMax) for (const v of s.vMax) { if (v < lo) lo = v; if (v > hi) hi = v; }
         if (lo === Infinity) { lo = 0; hi = 1; }
         if (hi === lo) {
           lo -= 0.5;
@@ -214,6 +234,14 @@ export function GraphWidget({
     d += ` L ${x(0)} ${y(data[0])}`;
     for (let i = 1; i < data.length; i++) d += ` L ${x(i)} ${y(data[i])}`;
     d += ` L ${x(N - 1)} ${padT + plotH} Z`;
+    return d;
+  };
+  const bandPathFor = (lo: number[], hi: number[]) => {
+    if (lo.length === 0 || hi.length === 0) return '';
+    let d = `M ${x(0)} ${y(hi[0])}`;
+    for (let i = 1; i < hi.length; i++) d += ` L ${x(i)} ${y(hi[i])}`;
+    for (let i = lo.length - 1; i >= 0; i--) d += ` L ${x(i)} ${y(lo[i])}`;
+    d += ' Z';
     return d;
   };
 
@@ -355,6 +383,14 @@ export function GraphWidget({
           const color = signalColors?.[s.sig.id] ?? s.sig.color ?? W_COLORS.accentBright;
           return (
             <g key={s.sig.id}>
+              {s.vMin && s.vMax && (
+                <path
+                  d={bandPathFor(s.vMin, s.vMax)}
+                  fill={color}
+                  fillOpacity={0.18}
+                  stroke="none"
+                />
+              )}
               {style === 'area' && (
                 <path d={areaPathFor(s.data)} fill={color} fillOpacity={0.12} stroke="none" />
               )}
@@ -1196,7 +1232,7 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
 
   const renderBody = () => {
     switch (widget.type) {
-      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={widget.zoom || null} onZoom={(z) => { onChange({ ...widget, zoom: z }); onZoom?.(z); }} signalColors={widget.signalColors} />;
+      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={widget.zoom || null} onZoom={(z) => { onChange({ ...widget, zoom: z }); onZoom?.(z); }} signalColors={widget.signalColors} showRange={widget.showRange} />;
       case 'numeric': return <NumericWidget signal={widget.signals[0]} t={t} compact={compact} />;
       case 'gauge': return <GaugeWidget signal={widget.signals[0]} t={t} />;
       case 'bar': return <BarWidget signals={widget.signals} t={t} />;
