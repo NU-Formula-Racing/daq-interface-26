@@ -1232,13 +1232,18 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
 
   const renderBody = () => {
     switch (widget.type) {
-      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={widget.zoom || null} onZoom={(z) => { onChange({ ...widget, zoom: z }); onZoom?.(z); }} signalColors={widget.signalColors} showRange={widget.showRange} />;
+      // Shared-zoom model: the widget's own buffer is always the data for the
+      // currently visible window (Replay.tsx refetches when zoom changes).
+      // Pass zoom={null} so GraphWidget renders the whole buffer 1:1 instead of
+      // sub-slicing into it — that would compound the orchestrator's zoom and
+      // shrink the visible range on every drag.
+      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} />;
       case 'numeric': return <NumericWidget signal={widget.signals[0]} t={t} compact={compact} />;
       case 'gauge': return <GaugeWidget signal={widget.signals[0]} t={t} />;
       case 'bar': return <BarWidget signals={widget.signals} t={t} />;
       case 'heatmap': return <HeatmapWidget signals={widget.signals} t={t} />;
-      case 'gg': return <GgPlotWidget t={t} mode={mode} window={widget.window || 0.05} compact={compact} zoom={widget.zoom || null} />;
-      case 'cellv': return <CellVoltagesWidget t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={widget.zoom || null} onZoom={(z) => { onChange({ ...widget, zoom: z }); onZoom?.(z); }} signalColors={widget.signalColors} />;
+      case 'gg': return <GgPlotWidget t={t} mode={mode} window={widget.window || 0.05} compact={compact} zoom={null} />;
+      case 'cellv': return <CellVoltagesWidget t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} />;
       default: return <EmptySlot label="Pick a type" />;
     }
   };
