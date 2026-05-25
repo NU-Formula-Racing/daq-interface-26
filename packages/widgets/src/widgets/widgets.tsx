@@ -128,6 +128,21 @@ export function GraphWidget({
     const valueRaw = slicedFrames.map((f) => f.value);
     const data = resampleToN(valueRaw, N);
 
+    // For dots mode: capture per-sample (x-fraction, value) so the render can
+    // position each dot at its true timestamp instead of using the resampled-
+    // uniform array. Avoids "all dots overlap into a line" when zoomed in to a
+    // window containing fewer raw samples than plot pixels.
+    let dots: { f: number; v: number }[] | null = null;
+    if (slicedFrames.length > 0) {
+      const firstTs = Date.parse(slicedFrames[0].ts);
+      const lastTs = Date.parse(slicedFrames[slicedFrames.length - 1].ts);
+      const span = Math.max(1, lastTs - firstTs);
+      dots = slicedFrames.map((f) => ({
+        f: (Date.parse(f.ts) - firstTs) / span,
+        v: f.value,
+      }));
+    }
+
     // Build vMin/vMax tracks only if at least one frame has a real spread.
     const hasRange = slicedFrames.some(
       (f) => f.vMin !== undefined && f.vMax !== undefined && f.vMin !== f.vMax,
@@ -140,8 +155,8 @@ export function GraphWidget({
       vMin = resampleToN(minRaw, N);
       vMax = resampleToN(maxRaw, N);
     }
-    return { sig, data, vMin, vMax };
-  }).filter(Boolean) as { sig: Signal; data: number[]; vMin: number[] | null; vMax: number[] | null; empty?: boolean }[];
+    return { sig, data, vMin, vMax, dots };
+  }).filter(Boolean) as { sig: Signal; data: number[]; vMin: number[] | null; vMax: number[] | null; empty?: boolean; dots?: { f: number; v: number }[] | null }[];
 
   // Domain: prefer customized catalog ranges; fall back to data range with 5% pad
   let dMin = Infinity, dMax = -Infinity;
@@ -395,15 +410,21 @@ export function GraphWidget({
                 <path d={areaPathFor(s.data)} fill={color} fillOpacity={0.12} stroke="none" />
               )}
               {style === 'dots' ? (() => {
-                // N is ~1.2 samples per pixel, so rendering every sample makes
-                // dots overlap into a near-continuous band that reads as a line.
-                // Stride so adjacent dots are ~5 px apart — about 80 dots across
-                // a 400 px graph, visibly discrete at any zoom level.
-                const targetSpacingPx = 5;
-                const stride = Math.max(1, Math.round(N / Math.max(1, plotW / targetSpacingPx)));
+                // Use the per-sample (timestamp-fraction, value) array directly
+                // — one circle per actual sample, positioned at its real x.
+                // No resampling: zoom in and you see every sent sample.
+                // If there are so many samples they'd overlap (> 1 per 4 px),
+                // stride them so dots stay visibly discrete.
+                const pts = s.dots ?? [];
+                if (pts.length === 0) return null;
+                const targetCount = Math.max(20, Math.floor(plotW / 4));
+                const stride = pts.length > targetCount
+                  ? Math.ceil(pts.length / targetCount)
+                  : 1;
                 const out: React.ReactNode[] = [];
-                for (let i = 0; i < N; i += stride) {
-                  out.push(<circle key={i} cx={x(i)} cy={y(s.data[i])} r={2} fill={color} />);
+                for (let i = 0; i < pts.length; i += stride) {
+                  const p = pts[i];
+                  out.push(<circle key={i} cx={padL + p.f * plotW} cy={y(p.v)} r={2} fill={color} />);
                 }
                 return out;
               })() : (
