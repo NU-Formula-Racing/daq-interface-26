@@ -111,3 +111,15 @@ export async function uploadSession(sessionId: string): Promise<UploadResult> {
   if (!r.ok) throw new Error(body.error ?? `HTTP ${r.status}`);
   return { status: 'ok', ...body };
 }
+
+export interface UnsyncedSummary {
+  count: number;
+  approxBytes: number;
+  sessionIds: string[];
+}
+
+export async function getUnsyncedSummary(): Promise<UnsyncedSummary> {
+  const r = await fetch(buildUrl('/api/cloud/unsynced-summary'));
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
