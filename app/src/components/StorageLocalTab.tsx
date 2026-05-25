@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { UploadAllButton } from './UploadAllButton.tsx';
+import { getUnsyncedSummary, uploadSession as apiUploadSession } from '../api/client.ts';
 
 export interface LocalSession {
   id: string;
@@ -134,6 +136,11 @@ export function StorageLocalTab(props: StorageLocalTabProps) {
 
   return (
     <div className="space-y-3">
+      <UploadAllButton
+        getSummary={getUnsyncedSummary}
+        uploadSession={apiUploadSession}
+        onChanged={() => onChanged?.()}
+      />
       <div className="flex gap-2">
         <button
           onClick={uploadAll}
