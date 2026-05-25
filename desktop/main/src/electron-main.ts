@@ -58,6 +58,7 @@ app.whenReady().then(async () => {
       migrationsDir: join(resources, 'migrations'),
       parserBinary: join(resources, 'parser', process.platform === 'win32' ? 'parser.exe' : 'parser'),
       staticRoot: join(resources, 'app'),
+      cloudDefaultsDir: resources,
       userDataDir: app.getPath('userData'),
     });
     shutdownFn = booted.shutdown;

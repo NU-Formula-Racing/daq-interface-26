@@ -17,6 +17,7 @@ import type { ImportResult } from './server/routes/import.ts';
 import type { CatalogDeps } from './server/routes/catalog.ts';
 import { spawn } from 'child_process';
 import { createHash } from 'crypto';
+import { loadCloudDefaults } from './cloud/defaults.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..', '..');
@@ -55,11 +56,14 @@ export async function run(opts: {
   parserBinary?: string;
   staticRoot?: string;
   userDataDir?: string;
+  cloudDefaultsDir?: string;
 } = {}) {
   const defaultHost = opts.host ?? process.env.NFR_BIND_HOST ?? '127.0.0.1';
   const port = opts.port ?? Number(process.env.NFR_BIND_PORT ?? '4444');
   const dbcCsv = opts.dbcCsv ?? join(REPO_ROOT, 'NFR26DBC.csv');
   const migrationsDir = opts.migrationsDir ?? MIGRATIONS_DIR;
+  const cloudDefaultsDir = opts.cloudDefaultsDir ?? REPO_ROOT;
+  const cloudDefaults = loadCloudDefaults(cloudDefaultsDir);
   const parserBinary =
     opts.parserBinary ??
     process.env.NFR_PARSER_BINARY ??
@@ -429,6 +433,7 @@ export async function run(opts: {
     onImport: runBatchImport,
     catalogDeps,
     broadcastDeps,
+    cloudDefaults,
     uninstallDeps: {
       catalogPath,
       userDataDir,
