@@ -1,13 +1,11 @@
 import type pg from 'pg';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { createHash } from 'node:crypto';
-import { mkdtemp, rm, writeFile, readFile } from 'node:fs/promises';
+import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { parseManifest } from '../parquet/manifest.ts';
 import { importParquetIntoSession } from '../parquet/reader.ts';
 import { upsertBlob } from '../db/blobs.ts';
-import type { SpacesClient } from './spaces.ts';
+import type { PublicSpaces } from './spaces-public.ts';
 
 export interface PullResult {
   rowCount: number;
@@ -18,7 +16,7 @@ export async function pullSession(opts: {
   sessionId: string;
   pool: pg.Pool;
   sb: SupabaseClient;
-  spaces: SpacesClient;
+  spaces: PublicSpaces;
   pgConnStr: string;
 }): Promise<PullResult> {
   const { sessionId, pool, sb, spaces, pgConnStr } = opts;
@@ -31,8 +29,9 @@ export async function pullSession(opts: {
   if (!sessRow.manifest_key) throw new Error('session has no manifest');
 
   // 2. Download + verify manifest.
-  const manifestRaw = await spaces.getString(sessRow.manifest_key);
-  const manifest = parseManifest(manifestRaw);
+  // sessRow.manifest_key looks like "sessions/<uuid>/manifest.json".
+  // fetchManifest takes just the session id; derive it.
+  const manifest = await spaces.fetchManifest(sessionId);
   if (manifest.session_content_hash !== sessRow.content_hash) {
     throw new Error('manifest hash mismatch with catalog');
   }
@@ -44,12 +43,9 @@ export async function pullSession(opts: {
     const downloaded: Array<{ source: string; localPath: string; manifestEntry: typeof manifest.files[number] }> = [];
     for (const f of manifest.files) {
       const local = join(dir, `${f.source.replace(/[^A-Za-z0-9_.-]/g, '_')}.parquet`);
-      // Download the full file; use head().contentLength so we get whatever is actually stored.
-      const head = await spaces.head(f.object_key);
-      const body = await spaces.probeBytes(f.object_key, 0, head.contentLength);
-      await writeFile(local, body);
-      const sha = createHash('sha256').update(await readFile(local)).digest('hex');
-      if (sha !== f.sha256) throw new Error(`${f.object_key}: hash mismatch`);
+      const { bytes, sha256 } = await spaces.fetchToFile(f.object_key, local);
+      if (bytes !== f.bytes) throw new Error(`${f.object_key}: size mismatch`);
+      if (sha256 !== f.sha256) throw new Error(`${f.object_key}: hash mismatch`);
       downloaded.push({ source: f.source, localPath: local, manifestEntry: f });
     }
 
