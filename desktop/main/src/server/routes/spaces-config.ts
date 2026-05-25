@@ -1,28 +1,28 @@
 import type { FastifyInstance } from 'fastify';
 import type pg from 'pg';
 import { getAppConfig, setAppConfig } from '../../db/config.ts';
+import type { CloudDefaults } from '../../cloud/defaults.ts';
+import { getEffectiveCloudConfig } from '../../cloud/effective-config.ts';
 
-/**
- * GET /api/cloud/status — non-secret cloud config + presence flags for the
- * secret fields. Covers both halves of the cloud setup (Supabase metastore
- * and DO Spaces bulk store) so the frontend can render a single panel.
- *
- * Endpoint name kept under /api/spaces/* historically; alias /api/cloud/*
- * for clarity. Same handler for both.
- */
 interface CloudStatus {
-  // Supabase
+  // User-set values (never secrets — only string fields the user pasted)
   supabaseUrl: string | null;
   hasSupabaseAnonKey: boolean;
-  // DigitalOcean Spaces
   spacesEndpoint: string | null;
   spacesRegion: string | null;
   spacesBucket: string | null;
   hasSpacesAccessKey: boolean;
   hasSpacesSecretKey: boolean;
-  // Aggregate
-  spacesConfigured: boolean;
-  supabaseConfigured: boolean;
+  // Bundled defaults — informational, displayed read-only
+  defaults: {
+    supabaseUrl: string | null;
+    hasSupabaseAnonKey: boolean;
+    spacesPublicBase: string | null;
+  };
+  // Aggregate flags computed by the resolver
+  spacesWriteReady: boolean;
+  supabaseReadReady: boolean;
+  spacesReadReady: boolean;
   cloudLiveEnabled: boolean;
 }
 
@@ -35,36 +35,41 @@ const SECRET_KEYS = [
   'spacesAccessKey', 'spacesSecretKey',
 ] as const;
 
-export function registerSpacesConfigRoutes(app: FastifyInstance, pool: pg.Pool) {
+export function registerSpacesConfigRoutes(
+  app: FastifyInstance,
+  pool: pg.Pool,
+  cloudDefaults: CloudDefaults,
+) {
   const buildStatus = async (): Promise<CloudStatus> => {
     const cfg = await getAppConfig(pool);
+    const eff = await getEffectiveCloudConfig(pool, cloudDefaults);
     const str = (k: keyof typeof cfg) =>
       typeof cfg[k] === 'string' ? (cfg[k] as string) : null;
     const has = (k: keyof typeof cfg) =>
       typeof cfg[k] === 'string' && (cfg[k] as string).length > 0;
 
-    const supabaseUrl = str('supabaseUrl');
-    const hasSupabaseAnonKey = has('supabaseAnonKey');
-    const spacesEndpoint = str('spacesEndpoint');
-    const spacesRegion = str('spacesRegion');
-    const spacesBucket = str('spacesBucket');
-    const hasSpacesAccessKey = has('spacesAccessKey');
-    const hasSpacesSecretKey = has('spacesSecretKey');
-
     return {
-      supabaseUrl, hasSupabaseAnonKey,
-      spacesEndpoint, spacesRegion, spacesBucket,
-      hasSpacesAccessKey, hasSpacesSecretKey,
-      spacesConfigured: !!(spacesEndpoint && spacesRegion && spacesBucket
-                          && hasSpacesAccessKey && hasSpacesSecretKey),
-      supabaseConfigured: !!(supabaseUrl && hasSupabaseAnonKey),
-      cloudLiveEnabled: cfg.cloudLiveEnabled === true,
+      supabaseUrl: str('supabaseUrl'),
+      hasSupabaseAnonKey: has('supabaseAnonKey'),
+      spacesEndpoint: str('spacesEndpoint'),
+      spacesRegion: str('spacesRegion'),
+      spacesBucket: str('spacesBucket'),
+      hasSpacesAccessKey: has('spacesAccessKey'),
+      hasSpacesSecretKey: has('spacesSecretKey'),
+      defaults: {
+        supabaseUrl: cloudDefaults.supabaseUrl,
+        hasSupabaseAnonKey: !!cloudDefaults.supabaseAnonKey,
+        spacesPublicBase: cloudDefaults.spacesPublicBase,
+      },
+      spacesWriteReady: eff.spacesWriteReady,
+      supabaseReadReady: !!(eff.supabaseUrl && eff.supabaseAnonKey),
+      spacesReadReady: !!eff.spacesPublicBase,
+      cloudLiveEnabled: eff.cloudLiveEnabled,
     };
   };
 
   app.get('/api/cloud/status', buildStatus);
-  // Back-compat alias — same payload, was the original endpoint name.
-  app.get('/api/spaces/status', buildStatus);
+  app.get('/api/spaces/status', buildStatus);  // back-compat alias
 
   const savePatch = async (body: Record<string, unknown>) => {
     const patch: Record<string, unknown> = {};
