@@ -38,11 +38,17 @@ export function makeSpaces(cfg: SpacesConfig): SpacesClient {
         Body: createReadStream(localPath),
         ContentLength: st.size,
         ContentType: contentType,
+        // Web app reads parquet files directly from Spaces with no
+        // credentials — make uploaded objects public so anonymous fetches
+        // work. Session data is non-sensitive (CAN telemetry from the
+        // team's own car) and URLs are UUID-keyed.
+        ACL: 'public-read',
       }));
     },
     async putBytes(key, body, contentType) {
       await s3.send(new PutObjectCommand({
         Bucket: cfg.bucket, Key: key, Body: body, ContentType: contentType,
+        ACL: 'public-read',
       }));
     },
     async head(key) {
