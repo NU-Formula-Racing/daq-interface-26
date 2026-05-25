@@ -65,6 +65,10 @@
       {
         "from": "../NFR26DBC.csv",
         "to": "NFR26DBC.csv"
+      },
+      {
+        "from": "build/cloud-defaults.json",
+        "to": "cloud-defaults.json"
       }
     ],
     "mac": {
