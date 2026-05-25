@@ -752,6 +752,13 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                         <SegBtn active={w.showRange === false} onClick={() => patch(w.id, { showRange: false })}>OFF</SegBtn>
                       </div>
                     </div>
+                    <div>
+                      <div style={{ marginBottom: 5, letterSpacing: 1.2 }}>STYLE</div>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <SegBtn active={(w.graphStyle ?? graphStyle) === 'line'} onClick={() => patch(w.id, { graphStyle: 'line' })}>LINE</SegBtn>
+                        <SegBtn active={(w.graphStyle ?? graphStyle) === 'dots'} onClick={() => patch(w.id, { graphStyle: 'dots' })}>DOTS</SegBtn>
+                      </div>
+                    </div>
                   </>
                 )}
                 <div>

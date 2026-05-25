@@ -16,7 +16,7 @@ interface GraphWidgetProps {
   signals?: any[];
   t: number;
   window?: number;
-  style?: 'line' | 'area' | 'step';
+  style?: 'line' | 'area' | 'step' | 'dots';
   density?: string;
   compact?: boolean;
   showAxes?: boolean;
@@ -394,8 +394,16 @@ export function GraphWidget({
               {style === 'area' && (
                 <path d={areaPathFor(s.data)} fill={color} fillOpacity={0.12} stroke="none" />
               )}
-              <path d={pathFor(s.data)} fill="none" stroke={color} strokeWidth={1.5}
-                strokeLinejoin="round" strokeLinecap="round" />
+              {style === 'dots' ? (
+                // One circle per sample. r=1.5 keeps it light at dense buckets;
+                // user can switch back to 'line' if dots feel cluttered.
+                s.data.map((v, i) => (
+                  <circle key={i} cx={x(i)} cy={y(v)} r={1.5} fill={color} />
+                ))
+              ) : (
+                <path d={pathFor(s.data)} fill="none" stroke={color} strokeWidth={1.5}
+                  strokeLinejoin="round" strokeLinecap="round" />
+              )}
               {/* End dot (current) */}
               <circle cx={x(N - 1)} cy={y(s.data[N - 1])} r={2.5} fill={color} />
               {/* Cursor dot — follows the playhead `t` (or hover when present) */}
@@ -645,7 +653,7 @@ export function GgPlotWidget({
 interface CellVoltagesWidgetProps {
   t: number;
   window?: number;
-  style?: 'line' | 'area' | 'step';
+  style?: 'line' | 'area' | 'step' | 'dots';
   compact?: boolean;
   zoom?: [number, number] | null;
   onZoom?: (z: [number, number] | null) => void;
@@ -1237,7 +1245,8 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
       // Pass zoom={null} so GraphWidget renders the whole buffer 1:1 instead of
       // sub-slicing into it — that would compound the orchestrator's zoom and
       // shrink the visible range on every drag.
-      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} />;
+      // widget.graphStyle overrides the dock-level default per-graph.
+      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={widget.graphStyle ?? graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} />;
       case 'numeric': return <NumericWidget signal={widget.signals[0]} t={t} compact={compact} />;
       case 'gauge': return <GaugeWidget signal={widget.signals[0]} t={t} />;
       case 'bar': return <BarWidget signals={widget.signals} t={t} />;
