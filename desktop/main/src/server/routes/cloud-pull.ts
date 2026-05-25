@@ -1,38 +1,39 @@
 import type { FastifyInstance } from 'fastify';
 import type pg from 'pg';
 import { createClient } from '../../cloud/supabase-client.ts';
-import { makeSpaces } from '../../cloud/spaces.ts';
-import { getAppConfig } from '../../db/config.ts';
+import { makePublicSpaces } from '../../cloud/spaces-public.ts';
 import { listCloudSessionsGroupedByDay } from '../../cloud/list.ts';
 import { pullSession } from '../../cloud/pull.ts';
 import { deleteLocalSessionRows, estimateLocalBytes } from '../../db/local-delete.ts';
+import type { CloudDefaults } from '../../cloud/defaults.ts';
+import { getEffectiveCloudConfig } from '../../cloud/effective-config.ts';
 
-export function registerCloudPullRoutes(app: FastifyInstance, pool: pg.Pool, pgConnStr: string) {
-  async function spacesAndSb() {
-    const cfg = await getAppConfig(pool);
-    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey ||
-        !cfg.spacesEndpoint || !cfg.spacesBucket ||
-        !cfg.spacesAccessKey || !cfg.spacesSecretKey) {
-      throw new Error('cloud not configured');
+export function registerCloudPullRoutes(
+  app: FastifyInstance,
+  pool: pg.Pool,
+  pgConnStr: string,
+  cloudDefaults: CloudDefaults,
+) {
+  async function readDeps() {
+    const eff = await getEffectiveCloudConfig(pool, cloudDefaults);
+    if (!eff.supabaseUrl || !eff.supabaseAnonKey || !eff.spacesPublicBase) {
+      throw new Error('cloud read not configured (missing supabase URL/anon-key or spaces public base)');
     }
     return {
-      sb: createClient(cfg.supabaseUrl as string, cfg.supabaseAnonKey as string),
-      spaces: makeSpaces({
-        endpoint: cfg.spacesEndpoint as string, region: (cfg.spacesRegion as string | null | undefined) ?? 'us-east-1',
-        bucket: cfg.spacesBucket as string, accessKey: cfg.spacesAccessKey as string, secretKey: cfg.spacesSecretKey as string,
-      }),
+      sb: createClient(eff.supabaseUrl, eff.supabaseAnonKey),
+      spaces: makePublicSpaces(eff.spacesPublicBase),
     };
   }
 
   app.get('/api/cloud/sessions', async () => {
-    const { sb } = await spacesAndSb();
+    const { sb } = await readDeps();
     const { rows } = await pool.query<{ id: string }>('SELECT id FROM sessions');
     const local = new Set(rows.map((r) => r.id));
     return await listCloudSessionsGroupedByDay(sb, local);
   });
 
   app.post<{ Body: { ids: string[] } }>('/api/cloud/pull', async (req, reply) => {
-    const { sb, spaces } = await spacesAndSb();
+    const { sb, spaces } = await readDeps();
     const results: Array<{ id: string; ok: boolean; error?: string; rowCount?: number }> = [];
     for (const id of req.body.ids) {
       try {
