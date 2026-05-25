@@ -67,7 +67,9 @@ function makeReplayStore(rows: OverviewRow[], t: number): FramesStore {
 export default function Replay() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { rows, loading, error } = useOverview(id!, 1);
+  // Bucket auto-picked from session duration — ~2000 points per signal,
+  // clamped to [50 ms, 5 s]. Sub-second granularity is supported.
+  const { rows, loading, error } = useOverview(id!);
   const [t, setT] = useState(1);
 
   const store = useMemo(() => makeReplayStore(rows, t), [rows, t]);

@@ -154,9 +154,13 @@ export function CloudConfig() {
           type="checkbox"
           checked={status?.cloudLiveEnabled ?? false}
           onChange={async (e) => {
+            // Capture target.checked synchronously: React resets controlled
+            // inputs back to the declared `checked` value during the await,
+            // which inverts the value `flashInfo` would otherwise read.
+            const next = e.target.checked;
             try {
-              await apiPost('/api/cloud/config', { cloudLiveEnabled: e.target.checked });
-              flashInfo(e.target.checked ? 'Live cloud stream enabled.' : 'Live cloud stream disabled.');
+              await apiPost('/api/cloud/config', { cloudLiveEnabled: next });
+              flashInfo(next ? 'Live cloud stream enabled.' : 'Live cloud stream disabled.');
               refresh();
             } catch (err) { flashError(`Toggle failed: ${String(err)}`); }
           }}
