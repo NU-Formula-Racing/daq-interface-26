@@ -26,7 +26,11 @@ describe('StorageLocalTab', () => {
     render(<StorageLocalTab sessions={sessions} uploadSession={upload} />);
     fireEvent.click(screen.getByLabelText('select-a'));
     fireEvent.click(screen.getByRole('button', { name: /upload selected/i }));
-    await waitFor(() => expect(screen.getByText(/already synced/i)).toBeInTheDocument());
-    expect(screen.getByText('other-mac')).toBeInTheDocument();
+    // The phrase appears in both the row status and the modal — scope to dialog.
+    await waitFor(() => {
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toHaveTextContent(/already synced/i);
+      expect(dialog).toHaveTextContent('other-mac');
+    });
   });
 });
