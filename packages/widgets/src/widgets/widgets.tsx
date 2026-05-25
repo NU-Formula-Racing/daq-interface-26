@@ -83,8 +83,10 @@ export function GraphWidget({
   const plotH = Math.max(10, size.h - padT - padB);
   const N = Math.max(40, Math.min(800, Math.round(plotW * 1.2)));
 
-  // Sample signals — read real data from frames store. Normalize to length N
-  // by resampling/padding so the rest of the plotting math is unchanged.
+  // Normalize a value array to length N by nearest-neighbor sampling.
+  // Never invents an interpolated value between samples — each output slot
+  // gets the closest real sample's value. Keeps actual sample fidelity for
+  // line / area / step plots.
   const resampleToN = (values: number[], n: number): number[] => {
     if (values.length === 0) return new Array(n).fill(0);
     if (values.length === 1) return new Array(n).fill(values[0]);
@@ -92,10 +94,8 @@ export function GraphWidget({
     const last = values.length - 1;
     for (let i = 0; i < n; i++) {
       const fx = (i / (n - 1)) * last;
-      const i0 = Math.floor(fx);
-      const i1 = Math.min(last, i0 + 1);
-      const f = fx - i0;
-      out[i] = values[i0] * (1 - f) + values[i1] * f;
+      const idx = Math.min(last, Math.round(fx));
+      out[i] = values[idx];
     }
     return out;
   };
