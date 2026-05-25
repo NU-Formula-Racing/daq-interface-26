@@ -4,19 +4,32 @@ import { createClient } from '../../cloud/supabase-client.ts';
 import os from 'node:os';
 import { makeSpaces } from '../../cloud/spaces.ts';
 import { uploadSession, AlreadySyncedError } from '../../cloud/upload.ts';
-import { getAppConfig } from '../../db/config.ts';
+import type { CloudDefaults } from '../../cloud/defaults.ts';
+import { getEffectiveCloudConfig } from '../../cloud/effective-config.ts';
 
-export function registerCloudUploadRoutes(app: FastifyInstance, pool: pg.Pool, pgConnStr: string) {
+export function registerCloudUploadRoutes(
+  app: FastifyInstance,
+  pool: pg.Pool,
+  pgConnStr: string,
+  cloudDefaults: CloudDefaults,
+) {
   app.post<{ Params: { id: string } }>('/api/cloud/upload/:id', async (req, reply) => {
-    const cfg = await getAppConfig(pool);
-    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) return reply.code(400).send({ error: 'supabase not configured' });
-    if (!cfg.spacesEndpoint || !cfg.spacesBucket || !cfg.spacesAccessKey || !cfg.spacesSecretKey) {
-      return reply.code(400).send({ error: 'spaces not configured' });
+    const eff = await getEffectiveCloudConfig(pool, cloudDefaults);
+    if (!eff.supabaseUrl || !eff.supabaseAnonKey) {
+      return reply.code(400).send({ error: 'supabase not configured' });
     }
-    const sb = createClient(cfg.supabaseUrl as string, cfg.supabaseAnonKey as string);
+    if (!eff.spacesWriteReady) {
+      return reply.code(400).send({
+        error: 'spaces write credentials not configured (endpoint, region, bucket, access key, secret key)',
+      });
+    }
+    const sb = createClient(eff.supabaseUrl, eff.supabaseAnonKey);
     const spaces = makeSpaces({
-      endpoint: cfg.spacesEndpoint as string, region: (cfg.spacesRegion as string | null | undefined) ?? 'us-east-1',
-      bucket: cfg.spacesBucket as string, accessKey: cfg.spacesAccessKey as string, secretKey: cfg.spacesSecretKey as string,
+      endpoint: eff.spacesEndpoint!,
+      region: eff.spacesRegion!,
+      bucket: eff.spacesBucket!,
+      accessKey: eff.spacesAccessKey!,
+      secretKey: eff.spacesSecretKey!,
     });
     try {
       const r = await uploadSession({
