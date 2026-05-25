@@ -10,6 +10,10 @@ export interface AppConfig extends Record<string, unknown> {
   spacesBucket?: string | null;
   spacesAccessKey?: string | null;
   spacesSecretKey?: string | null;
+  /** When true, the desktop streams parser frames into Supabase rt_readings
+   *  in best-effort batches as a live-feed mirror. Supabase truncates the
+   *  table nightly so this is a "cool factor" view, not a durable copy. */
+  cloudLiveEnabled?: boolean | null;
 }
 
 export async function getAppConfig(pool: pg.Pool): Promise<AppConfig> {

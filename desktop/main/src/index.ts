@@ -86,6 +86,7 @@ export async function run(opts: {
   let pool: pg.Pool | null = null;
   let parser: ParserManager | null = null;
   let watcher: FolderWatcher | null = null;
+  let liveStreamer: import('./cloud/live-stream.ts').LiveStreamer | null = null;
   let authToken: string | null = null;
   let pgManager: PostgresManager | null = null;
   let dsn: string | null = null;
@@ -170,6 +171,14 @@ export async function run(opts: {
         restartDelayMs: 2_000,
       });
       parser.start();
+
+      // Live cloud broadcaster (optional; controlled by cloudLiveEnabled in config).
+      try {
+        const { startLiveStreamer } = await import('./cloud/live-stream.ts');
+        liveStreamer = await startLiveStreamer({ parser, pool });
+      } catch (err) {
+        console.error('live cloud broadcaster failed to start:', (err as Error).message);
+      }
 
       if (watchDir) {
         watcher = new FolderWatcher({
