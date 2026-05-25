@@ -46,35 +46,51 @@ describe('RPC functions', () => {
     expect(rows[rows.length - 1].value).toBe(20);
   });
 
-  it('get_signal_downsampled buckets to 10-second averages', async () => {
+  it('get_session_signal_ids returns distinct signal IDs for the session', async () => {
     const { rows } = await db.client.query(
-      `SELECT bucket, avg_value FROM get_signal_downsampled($1, $2, INTERVAL '10 seconds')
-       ORDER BY bucket`,
-      [f.sessionId, f.signalAId]
-    );
-    // 60 points, values 0..59 → six buckets of 10, avgs 4.5, 14.5, 24.5, 34.5, 44.5, 54.5
-    expect(rows).toHaveLength(6);
-    const avgs = rows.map((r) => Number(r.avg_value));
-    expect(avgs).toEqual([4.5, 14.5, 24.5, 34.5, 44.5, 54.5]);
-  });
-
-  it('get_session_overview buckets all signals at once', async () => {
-    const { rows } = await db.client.query(
-      `SELECT * FROM get_session_overview($1, 30)
-       ORDER BY bucket, signal_id`,
+      `SELECT signal_id FROM get_session_signal_ids($1) ORDER BY signal_id`,
       [f.sessionId]
     );
-    // Two buckets x two signals = 4 rows
-    expect(rows).toHaveLength(4);
-    const byKey = new Map(
-      rows.map((r) => [`${r.bucket.toISOString()}_${r.signal_id}`, Number(r.avg_value)])
+    const ids = rows.map((r: any) => r.signal_id).sort((a: number, b: number) => a - b);
+    expect(ids).toEqual([f.signalAId, f.signalBId].sort((a, b) => a - b));
+  });
+
+  it('get_signals_window accepts DOUBLE PRECISION bucket_secs and returns envelope columns', async () => {
+    const start = f.baseTs;
+    const end = new Date(f.baseTs.getTime() + 60_000);
+
+    // Coarse bucket: 10s → 6 buckets per signal → 12 rows total.
+    const { rows: coarse } = await db.client.query(
+      `SELECT * FROM get_signals_window($1, $2::integer[], $3::timestamptz, $4::timestamptz, 10.0::double precision)
+       ORDER BY ts, signal_id`,
+      [f.sessionId, [f.signalAId, f.signalBId], start, end]
     );
-    // First 30-sec bucket: A avg = 14.5, B avg = 85.5; second: A=44.5, B=55.5
-    const b0 = new Date(f.baseTs).toISOString();
-    const b1 = new Date(f.baseTs.getTime() + 30_000).toISOString();
-    expect(byKey.get(`${b0}_${f.signalAId}`)).toBe(14.5);
-    expect(byKey.get(`${b0}_${f.signalBId}`)).toBe(85.5);
-    expect(byKey.get(`${b1}_${f.signalAId}`)).toBe(44.5);
-    expect(byKey.get(`${b1}_${f.signalBId}`)).toBe(55.5);
+    expect(coarse).toHaveLength(12);
+    for (const r of coarse) {
+      const vMin = Number(r.value_min);
+      const vMax = Number(r.value_max);
+      const vAvg = Number(r.value_avg);
+      expect(vMin).toBeLessThanOrEqual(vAvg);
+      expect(vAvg).toBeLessThanOrEqual(vMax);
+      expect(Number(r.sample_n)).toBeGreaterThan(0);
+      expect(typeof r.signal_name).toBe('string');
+    }
+
+    // Sub-second bucket (0.5s). With 1 sample/second per signal, each bucket
+    // holds 0 or 1 samples — most are empty so we expect roughly 60 non-empty
+    // rows per signal (i.e. ≤ 120 total), still ≥ the coarse count.
+    const { rows: fine } = await db.client.query(
+      `SELECT * FROM get_signals_window($1, $2::integer[], $3::timestamptz, $4::timestamptz, 0.5::double precision)
+       ORDER BY ts, signal_id`,
+      [f.sessionId, [f.signalAId, f.signalBId], start, end]
+    );
+    expect(fine.length).toBeGreaterThanOrEqual(coarse.length);
+    // At fine bucketing, value_min === value_max for buckets holding a single sample.
+    for (const r of fine) {
+      if (Number(r.sample_n) === 1) {
+        expect(Number(r.value_min)).toBe(Number(r.value_max));
+        expect(Number(r.value_avg)).toBe(Number(r.value_min));
+      }
+    }
   });
 });
