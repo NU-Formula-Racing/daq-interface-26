@@ -53,24 +53,44 @@ export async function pullSession(opts: {
       downloaded.push({ source: f.source, localPath: local, manifestEntry: f });
     }
 
-    // 4. Single-transaction import into local PG.
+    // 4. Cloud-takes-precedence semantics: wipe any prior local copy for
+    //    this session_id, then UPSERT the session row from the cloud's
+    //    metadata. The git-pull-with-force model — a user clicking "Sync
+    //    from cloud" wants the cloud version, no merge, no append.
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      // Insert session row, mirroring cloud columns.
+      await client.query('DELETE FROM sd_readings WHERE session_id = $1', [sessionId]);
+      await client.query('DELETE FROM session_blobs WHERE session_id = $1', [sessionId]);
       await client.query(
         `INSERT INTO sessions (id, date, started_at, ended_at, track, driver, car, notes,
                                source, source_file, source_file_hash,
-                               content_hash, manifest_key, total_bytes, uploaded_at, synced_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-         ON CONFLICT (id) DO NOTHING`,
+                               content_hash, manifest_key, total_bytes, uploaded_at, synced_at,
+                               local_deleted_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NULL)
+         ON CONFLICT (id) DO UPDATE SET
+           date             = EXCLUDED.date,
+           started_at       = EXCLUDED.started_at,
+           ended_at         = EXCLUDED.ended_at,
+           track            = EXCLUDED.track,
+           driver           = EXCLUDED.driver,
+           car              = EXCLUDED.car,
+           notes            = EXCLUDED.notes,
+           source           = EXCLUDED.source,
+           source_file      = EXCLUDED.source_file,
+           source_file_hash = EXCLUDED.source_file_hash,
+           content_hash     = EXCLUDED.content_hash,
+           manifest_key     = EXCLUDED.manifest_key,
+           total_bytes      = EXCLUDED.total_bytes,
+           uploaded_at      = EXCLUDED.uploaded_at,
+           synced_at        = EXCLUDED.synced_at,
+           local_deleted_at = NULL`,
         [sessRow.id, sessRow.date, sessRow.started_at, sessRow.ended_at, sessRow.track, sessRow.driver,
          sessRow.car, sessRow.notes, sessRow.source, sessRow.source_file, sessRow.source_file_hash,
          sessRow.content_hash, sessRow.manifest_key,
          downloaded.reduce((a, d) => a + d.manifestEntry.bytes, 0),
          new Date().toISOString(), new Date().toISOString()],
       );
-      // Commit the sessions insert first so the FK on sd_readings is satisfied.
       await client.query('COMMIT');
     } finally {
       client.release();

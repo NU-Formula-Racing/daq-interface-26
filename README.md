@@ -39,6 +39,30 @@ Notes, design files, and references for the project. Nothing here runs.
 
 The DBC file. It is the lookup table that tells the parser how to turn raw CAN bytes into named signals like `BMS_SOC` or `Battery_Voltage`. If the firmware on the car changes its message layout, this file has to change too.
 
+## Syncing data with the cloud (push and pull)
+
+Cloud sync works like `git`. There are two directions, and they each have a clear winner:
+
+- **Push (upload to cloud).** You select sessions in **Settings → Storage → Local** and click **Upload selected**. Your local copy gets sent to the cloud and becomes the canonical version there. Whatever was on the cloud for that session before is replaced. *Local wins on push.*
+- **Pull (sync from cloud).** You go to **Settings → Storage → Cloud**, pick the sessions or days you want, and click **Pull selected**. The cloud version is downloaded and overwrites your local copy of those sessions. If you had been editing or re-parsing locally, those local changes are gone. *Cloud wins on pull.*
+
+In other words: pushing is **"make the cloud match my local"** and pulling is **"make my local match the cloud."** Neither direction tries to merge — there is one canonical side per operation and the other side gets overwritten.
+
+A few practical consequences:
+
+- If you re-parse a day on your machine with a corrected DBC, the new parse is now the local version. To share it with everyone else, **push** it. To go back to what was on the cloud, **pull** it.
+- Two teammates uploading the **same** drive day from different machines: the second person's upload is rejected with a "this session was already synced" message so they don't silently overwrite the first person's work. They can then **pull** to get the version that's there, or click "Re-upload anyway" if they're sure their copy is the right one.
+- Deleting a session locally (**DELETE LOCAL** button) does **not** touch the cloud copy. You can always pull it back.
+- The cloud holds the long-term archive. Local storage is just a fast working copy on your machine.
+
+Where the bytes actually live:
+
+| What | Where |
+| --- | --- |
+| Drive listing (date, driver, car, notes) | Supabase Postgres — small metadata only |
+| Per-signal sample rows (the bulk) | DigitalOcean Spaces — one Parquet file per CAN message source, per session |
+| Live frames (while you're recording) | Local embedded Postgres, plus optionally streamed to Supabase `rt_readings` for the "cool factor" cloud live view (cleared nightly) |
+
 ## How it all fits together
 
 You open the app. Electron starts the local server. The server boots embedded Postgres and runs migrations. The server spawns the parser, which connects to the car (or replays a file). The frontend opens in the Electron window and pulls live frames over a WebSocket and historical sessions over the HTTP API. You can also turn on broadcast mode in settings, which makes the dashboard reachable from any browser on the same WiFi.
