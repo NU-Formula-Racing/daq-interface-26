@@ -103,22 +103,27 @@ def run_batch_import(
             session_id=deterministic_id,
         )
 
-        # If this exact file has been imported before, the session row already
-        # exists and so do its readings — skip the COPY pass and report the
-        # existing session as "ended" with whatever count is in the table.
+        # Re-import policy: if this .nfr has been imported before, delete the
+        # previous parse's rows and re-decode with the current DBC. This is
+        # how a user recovers from "I parsed with the wrong DBC version" —
+        # they just import the file again and the new parse overwrites the
+        # old. session_id is deterministic from file content, so cloud sync
+        # / replays / favourites keep pointing at the same UUID.
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT count(*) FROM sd_readings WHERE session_id = %s",
+                "DELETE FROM sd_readings WHERE session_id = %s",
                 (str(session_id),),
             )
-            (existing_rows,) = cur.fetchone()
-        if existing_rows > 0:
-            emitter.session_started(str(session_id), source="sd_import")
-            emitter.import_progress(str(nfr_file), pct=100)
-            emitter.session_ended(str(session_id), row_count=int(existing_rows))
-            return session_id
-
+            deleted_rows = cur.rowcount or 0
+            # Reset session bookkeeping so ended_at gets recomputed below.
+            cur.execute(
+                "UPDATE sessions SET ended_at = NULL WHERE id = %s",
+                (str(session_id),),
+            )
         emitter.session_started(str(session_id), source="sd_import")
+        if deleted_rows > 0:
+            # Surface the rewrite explicitly so the desktop can show "re-parsed".
+            emitter.import_progress(str(nfr_file), pct=0)
 
         next_progress_threshold = PROGRESS_STEP_PCT
 

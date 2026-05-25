@@ -87,6 +87,48 @@ def test_run_batch_import_creates_session_and_rows(
     assert any(t == "import_progress" for t in types)
 
 
+def test_reimport_overwrites_old_rows_with_new_dbc(
+    scratch_db: str, tmp_path: Path
+) -> None:
+    """Reimporting the same .nfr with a different DBC must replace the old
+    parse — not skip silently. Same session_id (deterministic from file
+    content), different signal_definitions, different row count."""
+    log = _write_log(tmp_path)
+
+    # First DBC: full set of three signals.
+    dbc1 = _write_dbc(tmp_path)
+    buf = io.StringIO()
+    session_id = run_batch_import(
+        dsn=scratch_db, dbc_csv=dbc1, nfr_file=log, emitter=ProtocolEmitter(buf)
+    )
+    with psycopg.connect(scratch_db) as conn:
+        first_count = conn.execute(
+            "SELECT count(*) FROM sd_readings WHERE session_id = %s",
+            (session_id,),
+        ).fetchone()[0]
+    assert first_count == 5
+
+    # Second DBC: drop PDM signals — only BMS_SOE.soc remains decodable.
+    dbc2_path = tmp_path / "dbc2.csv"
+    dbc2_path.write_text(
+        "Message ID,Message Name,Sender,Signal Name,Start Bit,Size (bits),Factor,Offset,Unit,Data Type\n"
+        "0x456,BMS_SOE,BMS_SOE,soc,0,8,0.5,0,%,uint8\n"
+    )
+    buf2 = io.StringIO()
+    second_id = run_batch_import(
+        dsn=scratch_db, dbc_csv=dbc2_path, nfr_file=log, emitter=ProtocolEmitter(buf2)
+    )
+    assert second_id == session_id
+
+    with psycopg.connect(scratch_db) as conn:
+        second_count = conn.execute(
+            "SELECT count(*) FROM sd_readings WHERE session_id = %s",
+            (second_id,),
+        ).fetchone()[0]
+    # Only the one BMS_SOE row should remain — old PDM rows were deleted.
+    assert second_count == 1
+
+
 def test_run_batch_import_rejects_missing_file(
     scratch_db: str, tmp_path: Path
 ) -> None:

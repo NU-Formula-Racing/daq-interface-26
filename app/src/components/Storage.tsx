@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
-import { apiGet, apiPost, uploadSession as apiUploadSession } from '../api/client.ts';
+import {
+  apiGet, apiPost, uploadSession as apiUploadSession,
+  estimateLocalBytes, deleteLocalSessions,
+} from '../api/client.ts';
 import { StorageLocalTab, type LocalSession } from './StorageLocalTab.tsx';
 
 interface CatalogEntry {
@@ -359,7 +362,13 @@ export function Storage() {
         </div>
         <div className="p-2">
           {activeTab === 'local' && (
-            <StorageLocalTab sessions={sessions} uploadSession={apiUploadSession} />
+            <StorageLocalTab
+              sessions={sessions}
+              uploadSession={apiUploadSession}
+              estimateLocalBytes={estimateLocalBytes}
+              deleteLocalSessions={deleteLocalSessions}
+              onChanged={refreshSessions}
+            />
           )}
           {activeTab === 'cloud' && (
             <div className="text-[11px] text-[color:var(--color-text-faint)] py-2">
