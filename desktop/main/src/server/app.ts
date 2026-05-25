@@ -25,6 +25,7 @@ import { registerCloudUploadRoutes } from './routes/cloud-upload.ts';
 import { registerCloudPullRoutes } from './routes/cloud-pull.ts';
 import { registerSerialPortRoutes } from './routes/serial-ports.ts';
 import { registerSpacesConfigRoutes } from './routes/spaces-config.ts';
+import { registerUnsyncedSummaryRoutes } from './routes/unsynced-summary.ts';
 
 /** Config keys that, when changed via POST /api/config, require the parser
  *  subprocess to be re-spawned so it picks up the new value. */
@@ -130,6 +131,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
 
     registerSerialPortRoutes(app);
     registerSpacesConfigRoutes(app, pool);
+    registerUnsyncedSummaryRoutes(app, pool);
 
     registerSessionRoutes(app, pool);
     registerSignalRoutes(app, pool);
