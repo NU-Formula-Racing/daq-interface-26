@@ -170,3 +170,7 @@ backups/supabase-pre-parquet/parse_batch.py
 
 # Vercel local dev artefacts
 .vercel
+
+# Bundled cloud read-defaults; copied into the .app at build time. Kept out of
+# git history to avoid leaking rotation-able tokens by accident.
+desktop/build/cloud-defaults.json

@@ -1,0 +1,5 @@
+{
+  "supabaseUrl": "https://YOUR-PROJECT.supabase.co",
+  "supabaseAnonKey": "eyJ...",
+  "spacesPublicBase": "https://YOUR-BUCKET.YOUR-REGION.digitaloceanspaces.com"
+}
