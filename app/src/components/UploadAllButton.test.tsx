@@ -13,7 +13,7 @@ describe('UploadAllButton', () => {
     const onChanged = vi.fn();
 
     render(<UploadAllButton
-      getSummary={getSummary} uploadSession={upload} onChanged={onChanged} />);
+      getSummary={getSummary} uploadSession={upload} onChanged={onChanged} writeReady={true} />);
 
     await waitFor(() => expect(screen.getByRole('button', { name: /upload all/i }))
       .toHaveTextContent('2 sessions'));
@@ -33,7 +33,17 @@ describe('UploadAllButton', () => {
       count: 0, approxBytes: 0, sessionIds: [],
     });
     render(<UploadAllButton getSummary={getSummary}
-      uploadSession={vi.fn()} onChanged={vi.fn()} />);
+      uploadSession={vi.fn()} onChanged={vi.fn()} writeReady={true} />);
+    await waitFor(() => expect(getSummary).toHaveBeenCalled());
+    expect(screen.queryByRole('button', { name: /upload all/i })).toBeNull();
+  });
+
+  it('renders nothing when writeReady is false', async () => {
+    const getSummary = vi.fn().mockResolvedValue({
+      count: 5, approxBytes: 100, sessionIds: ['a', 'b', 'c', 'd', 'e'],
+    });
+    render(<UploadAllButton getSummary={getSummary}
+      uploadSession={vi.fn()} onChanged={vi.fn()} writeReady={false} />);
     await waitFor(() => expect(getSummary).toHaveBeenCalled());
     expect(screen.queryByRole('button', { name: /upload all/i })).toBeNull();
   });

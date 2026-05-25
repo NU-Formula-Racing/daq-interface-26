@@ -7,6 +7,8 @@ export interface UploadAllButtonProps {
   getSummary: () => Promise<Summary>;
   uploadSession: (id: string) => Promise<UploadResult>;
   onChanged: () => void;
+  /** When false, render nothing — uploads can't work without write creds. */
+  writeReady: boolean;
 }
 
 function humanBytes(n: number): string {
@@ -48,6 +50,7 @@ export function UploadAllButton(props: UploadAllButtonProps) {
   };
 
   if (!summary || summary.count === 0) return null;
+  if (!props.writeReady) return null;
 
   return (
     <>

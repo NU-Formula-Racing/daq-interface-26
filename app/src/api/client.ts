@@ -123,3 +123,20 @@ export async function getUnsyncedSummary(): Promise<UnsyncedSummary> {
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json();
 }
+
+export interface CloudStatusForUi {
+  spacesWriteReady: boolean;
+  supabaseReadReady: boolean;
+  spacesReadReady: boolean;
+}
+
+export async function getCloudStatus(): Promise<CloudStatusForUi> {
+  const r = await fetch('/api/cloud/status');
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const body = await r.json();
+  return {
+    spacesWriteReady: !!body.spacesWriteReady,
+    supabaseReadReady: !!body.supabaseReadReady,
+    spacesReadReady: !!body.spacesReadReady,
+  };
+}

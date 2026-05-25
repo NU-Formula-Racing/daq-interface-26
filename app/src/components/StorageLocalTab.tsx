@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { UploadAllButton } from './UploadAllButton.tsx';
-import { getUnsyncedSummary, uploadSession as apiUploadSession } from '../api/client.ts';
+import { getUnsyncedSummary, uploadSession as apiUploadSession, getCloudStatus } from '../api/client.ts';
 
 export interface LocalSession {
   id: string;
@@ -38,6 +38,10 @@ function humanBytes(n: number): string {
 
 export function StorageLocalTab(props: StorageLocalTabProps) {
   const { sessions, uploadSession, estimateLocalBytes, deleteLocalSessions, onChanged } = props;
+  const [writeReady, setWriteReady] = useState(false);
+  useEffect(() => {
+    getCloudStatus().then((s) => setWriteReady(s.spacesWriteReady)).catch(() => setWriteReady(false));
+  }, []);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [statuses, setStatuses] = useState<Record<string, RowStatus>>({});
   const [syncedModal, setSyncedModal] =
@@ -140,6 +144,7 @@ export function StorageLocalTab(props: StorageLocalTabProps) {
         getSummary={getUnsyncedSummary}
         uploadSession={apiUploadSession}
         onChanged={() => onChanged?.()}
+        writeReady={writeReady}
       />
       <div className="flex gap-2">
         <button
@@ -159,6 +164,14 @@ export function StorageLocalTab(props: StorageLocalTabProps) {
           </button>
         )}
       </div>
+
+      {!writeReady && sessions.some((s) => !s.synced_at) && (
+        <div className="text-[11px] border border-yellow-700/40 bg-yellow-900/10 px-3 py-2">
+          You have unsynced sessions but no Spaces write credentials. Paste them
+          under <strong>Settings → Cloud config → Write credentials</strong> to
+          upload, or just leave them local.
+        </div>
+      )}
 
       <table className="w-full text-[11px]">
         <tbody>
