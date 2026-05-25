@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import type pg from 'pg';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '../../cloud/supabase-client.ts';
 import os from 'node:os';
 import { makeSpaces } from '../../cloud/spaces.ts';
 import { uploadSession, AlreadySyncedError } from '../../cloud/upload.ts';

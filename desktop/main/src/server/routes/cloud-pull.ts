@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import type pg from 'pg';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '../../cloud/supabase-client.ts';
 import { makeSpaces } from '../../cloud/spaces.ts';
 import { getAppConfig } from '../../db/config.ts';
 import { listCloudSessionsGroupedByDay } from '../../cloud/list.ts';

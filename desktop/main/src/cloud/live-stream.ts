@@ -13,7 +13,7 @@
 import type { EventEmitter } from 'events';
 import type pg from 'pg';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from './supabase-client.ts';
 import { getAppConfig } from '../db/config.ts';
 
 const BATCH_ROWS = 200;       // flush every N rows
