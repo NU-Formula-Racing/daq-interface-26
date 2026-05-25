@@ -9,17 +9,19 @@ interface CloudStatus {
   spacesBucket: string | null;
   hasSpacesAccessKey: boolean;
   hasSpacesSecretKey: boolean;
-  spacesConfigured: boolean;
-  supabaseConfigured: boolean;
+  defaults: {
+    supabaseUrl: string | null;
+    hasSupabaseAnonKey: boolean;
+    spacesPublicBase: string | null;
+  };
+  spacesWriteReady: boolean;
+  supabaseReadReady: boolean;
+  spacesReadReady: boolean;
   cloudLiveEnabled: boolean;
 }
 
 const PLACEHOLDER_SET = '••••• (set)';
 
-/** Single panel covering both halves of the cloud config:
- *  - Supabase metastore (sessions/signal_definitions/session_blobs).
- *  - DigitalOcean Spaces bucket holding the Parquet bulk data.
- *  Both are required for the new upload + pull + live-stream flows. */
 export function CloudConfig() {
   const [status, setStatus] = useState<CloudStatus | null>(null);
   const [supabaseUrl, setSupabaseUrl] = useState('');
@@ -29,6 +31,8 @@ export function CloudConfig() {
   const [spacesBucket, setSpacesBucket] = useState('');
   const [spacesAccessKey, setSpacesAccessKey] = useState('');
   const [spacesSecretKey, setSpacesSecretKey] = useState('');
+  const [showWriteInputs, setShowWriteInputs] = useState(false);
+  const [showSupabaseOverride, setShowSupabaseOverride] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
@@ -53,7 +57,6 @@ export function CloudConfig() {
       if (spacesAccessKey) patch.spacesAccessKey = spacesAccessKey.trim();
       if (spacesSecretKey) patch.spacesSecretKey = spacesSecretKey.trim();
       await apiPost('/api/cloud/config', patch);
-      // Never echo secrets back to the user
       setSupabaseAnonKey('');
       setSpacesAccessKey('');
       setSpacesSecretKey('');
@@ -72,56 +75,78 @@ export function CloudConfig() {
         Cloud config
       </legend>
 
-      <div className="text-[10px] text-[color:var(--color-text-mute)] leading-relaxed">
-        Two providers, one form: Supabase holds session metadata, DO Spaces
-        holds the Parquet bulk data. Both are needed for the Upload All and
-        Pull flows. Credentials are stored locally in the app config — they
-        never appear in API responses or logs.
+      {/* Default cloud (read-only display) */}
+      <div className="space-y-2">
+        <div className="text-[10px] tracking-widest text-[color:var(--color-text-mute)]">
+          DEFAULT CLOUD (READ-ONLY)
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
+          <div className="border border-[color:var(--color-border)]/60 px-2 py-1">
+            <div className="text-[9px] tracking-widest text-[color:var(--color-text-mute)]">SUPABASE</div>
+            <div className="truncate" title={status?.defaults.supabaseUrl ?? ''}>
+              {status?.defaults.supabaseUrl ?? '—'}
+            </div>
+          </div>
+          <div className="border border-[color:var(--color-border)]/60 px-2 py-1">
+            <div className="text-[9px] tracking-widest text-[color:var(--color-text-mute)]">SPACES (PUBLIC URL)</div>
+            <div className="truncate" title={status?.defaults.spacesPublicBase ?? ''}>
+              {status?.defaults.spacesPublicBase ?? '—'}
+            </div>
+          </div>
+        </div>
+        <div className="text-[10px] text-[color:var(--color-text-mute)]">
+          Reads work out of the box. The Cloud tab in Storage and the
+          per-session pull flow will use these unless you override below.
+        </div>
       </div>
 
-      {/* Supabase */}
-      <div className="space-y-2 border-t border-[color:var(--color-border)]/60 pt-3">
-        <div className="text-[10px] tracking-widest text-[color:var(--color-text-mute)]">SUPABASE (METASTORE)</div>
-        <Field
-          label="SUPABASE URL"
-          value={supabaseUrl} setValue={setSupabaseUrl}
-          placeholder={status?.supabaseUrl ?? 'https://xxx.supabase.co'}
-        />
-        <Field
-          label="SUPABASE ANON KEY"
-          value={supabaseAnonKey} setValue={setSupabaseAnonKey} secret
-          placeholder={status?.hasSupabaseAnonKey ? PLACEHOLDER_SET : 'eyJ…'}
-        />
+      {/* Supabase override — collapsed by default */}
+      <div className="border-t border-[color:var(--color-border)]/60 pt-3">
+        <button
+          onClick={() => setShowSupabaseOverride((v) => !v)}
+          className="text-[10px] tracking-widest text-[color:var(--color-text-mute)] hover:text-[color:var(--color-text)]"
+        >
+          {showSupabaseOverride ? '▾' : '▸'} OVERRIDE SUPABASE (ADVANCED)
+        </button>
+        {showSupabaseOverride && (
+          <div className="space-y-2 mt-2">
+            <Field label="SUPABASE URL"
+              value={supabaseUrl} setValue={setSupabaseUrl}
+              placeholder={status?.supabaseUrl ?? 'https://xxx.supabase.co'} />
+            <Field label="SUPABASE ANON KEY"
+              value={supabaseAnonKey} setValue={setSupabaseAnonKey} secret
+              placeholder={status?.hasSupabaseAnonKey ? PLACEHOLDER_SET : 'eyJ…'} />
+          </div>
+        )}
       </div>
 
-      {/* DO Spaces */}
-      <div className="space-y-2 border-t border-[color:var(--color-border)]/60 pt-3">
-        <div className="text-[10px] tracking-widest text-[color:var(--color-text-mute)]">DIGITALOCEAN SPACES (BULK STORE)</div>
-        <Field
-          label="ENDPOINT URL"
-          value={spacesEndpoint} setValue={setSpacesEndpoint}
-          placeholder={status?.spacesEndpoint ?? 'https://nyc3.digitaloceanspaces.com'}
-        />
-        <Field
-          label="REGION SLUG"
-          value={spacesRegion} setValue={setSpacesRegion}
-          placeholder={status?.spacesRegion ?? 'nyc3'}
-        />
-        <Field
-          label="BUCKET NAME"
-          value={spacesBucket} setValue={setSpacesBucket}
-          placeholder={status?.spacesBucket ?? 'nfr26-sessions'}
-        />
-        <Field
-          label="ACCESS KEY ID"
-          value={spacesAccessKey} setValue={setSpacesAccessKey} secret
-          placeholder={status?.hasSpacesAccessKey ? PLACEHOLDER_SET : 'DO00…'}
-        />
-        <Field
-          label="SECRET ACCESS KEY"
-          value={spacesSecretKey} setValue={setSpacesSecretKey} secret
-          placeholder={status?.hasSpacesSecretKey ? PLACEHOLDER_SET : '••••••••'}
-        />
+      {/* Spaces write credentials — collapsed by default */}
+      <div className="border-t border-[color:var(--color-border)]/60 pt-3">
+        <button
+          onClick={() => setShowWriteInputs((v) => !v)}
+          className="text-[10px] tracking-widest text-[color:var(--color-text-mute)] hover:text-[color:var(--color-text)]"
+        >
+          {showWriteInputs ? '▾' : '▸'} WRITE CREDENTIALS (FOR UPLOADING)
+        </button>
+        {showWriteInputs && (
+          <div className="space-y-2 mt-2">
+            <Field label="ENDPOINT URL"
+              value={spacesEndpoint} setValue={setSpacesEndpoint}
+              placeholder={status?.spacesEndpoint ?? 'https://nyc3.digitaloceanspaces.com'} />
+            <Field label="REGION SLUG"
+              value={spacesRegion} setValue={setSpacesRegion}
+              placeholder={status?.spacesRegion ?? 'nyc3'} />
+            <Field label="BUCKET NAME"
+              value={spacesBucket} setValue={setSpacesBucket}
+              placeholder={status?.spacesBucket ?? 'nfr26-sessions'} />
+            <Field label="ACCESS KEY ID"
+              value={spacesAccessKey} setValue={setSpacesAccessKey} secret
+              placeholder={status?.hasSpacesAccessKey ? PLACEHOLDER_SET : 'DO00…'} />
+            <Field label="SECRET ACCESS KEY"
+              value={spacesSecretKey} setValue={setSpacesSecretKey} secret
+              placeholder={status?.hasSpacesSecretKey ? PLACEHOLDER_SET : '••••••••'} />
+          </div>
+        )}
       </div>
 
       <label className="flex items-center gap-2 text-[11px] cursor-pointer pt-1">
@@ -152,8 +177,8 @@ export function CloudConfig() {
           {busy ? 'SAVING…' : 'SAVE'}
         </button>
         <span className="text-[10px] tracking-widest text-[color:var(--color-text-mute)] self-center">
-          SUPABASE: {status?.supabaseConfigured ? 'CONFIGURED' : 'NOT CONFIGURED'} ·{' '}
-          SPACES: {status?.spacesConfigured ? 'CONFIGURED' : 'NOT CONFIGURED'}
+          READ: {status?.supabaseReadReady && status?.spacesReadReady ? 'READY' : 'NOT READY'} ·{' '}
+          WRITE: {status?.spacesWriteReady ? 'READY' : 'NOT READY'}
         </span>
       </div>
 
