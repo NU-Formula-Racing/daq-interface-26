@@ -25,6 +25,7 @@ import { registerCloudPullRoutes } from './routes/cloud-pull.ts';
 import { registerSerialPortRoutes } from './routes/serial-ports.ts';
 import { registerSpacesConfigRoutes } from './routes/spaces-config.ts';
 import { registerUnsyncedSummaryRoutes } from './routes/unsynced-summary.ts';
+import type { CloudDefaults } from '../cloud/defaults.ts';
 
 /** Config keys that, when changed via POST /api/config, require the parser
  *  subprocess to be re-spawned so it picks up the new value. */
@@ -50,10 +51,18 @@ export interface BuildAppOptions {
   catalogDeps?: CatalogDeps;
   broadcastDeps?: BroadcastDeps;
   uninstallDeps?: UninstallDeps;
+  /** Read-only defaults baked into the .app, used as fallback when the user
+   *  hasn't pasted their own creds. Null/missing fields fall back to manual
+   *  entry via the Cloud config panel. */
+  cloudDefaults?: CloudDefaults;
 }
 
 export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> {
   const app = Fastify({ logger: opts.logger ?? false });
+
+  const cloudDefaults: CloudDefaults = opts.cloudDefaults ?? {
+    supabaseUrl: null, supabaseAnonKey: null, spacesPublicBase: null,
+  };
 
   app.addContentTypeParser(
     ['text/csv', 'text/plain', 'application/sql'],
@@ -128,7 +137,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     );
 
     registerSerialPortRoutes(app);
-    registerSpacesConfigRoutes(app, pool);
+    registerSpacesConfigRoutes(app, pool, cloudDefaults);
     registerUnsyncedSummaryRoutes(app, pool);
 
     registerSessionRoutes(app, pool);
@@ -151,8 +160,8 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
       registerBroadcastRoutes(app, opts.broadcastDeps);
     }
     if (opts.pgConnStr) {
-      registerCloudUploadRoutes(app, pool, opts.pgConnStr);
-      registerCloudPullRoutes(app, pool, opts.pgConnStr);
+      registerCloudUploadRoutes(app, pool, opts.pgConnStr, cloudDefaults);
+      registerCloudPullRoutes(app, pool, opts.pgConnStr, cloudDefaults);
     }
   }
 
