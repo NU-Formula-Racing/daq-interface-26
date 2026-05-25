@@ -54,6 +54,10 @@ A few practical consequences:
 - Two teammates uploading the **same** drive day from different machines: the second person's upload is rejected with a "this session was already synced" message so they don't silently overwrite the first person's work. They can then **pull** to get the version that's there, or click "Re-upload anyway" if they're sure their copy is the right one.
 - Deleting a session locally (**DELETE LOCAL** button) does **not** touch the cloud copy. You can always pull it back.
 - The cloud holds the long-term archive. Local storage is just a fast working copy on your machine.
+- **First time only — bulk migration.** A new install will show an
+  **Upload all** button on the Local tab listing every unsynced session.
+  Click it once to push all your historical drives to the cloud.
+  Subsequent runs of the button only upload anything new since.
 
 Where the bytes actually live:
 
