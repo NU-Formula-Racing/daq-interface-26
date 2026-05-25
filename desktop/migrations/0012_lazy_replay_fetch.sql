@@ -2,6 +2,10 @@
 -- sd_readings for a given session. Loose index scan via recursive CTE — see
 -- frontend/database/supabase_functions.sql for the cloud equivalent and the
 -- rationale (plain SELECT DISTINCT reads every matching row).
+--
+-- DROP first because the function may exist with a SMALLINT return type from
+-- an older install of this work — CREATE OR REPLACE can't change return type.
+DROP FUNCTION IF EXISTS get_session_signal_ids(UUID);
 CREATE OR REPLACE FUNCTION get_session_signal_ids(p_session_id UUID)
 RETURNS TABLE (signal_id INTEGER)
 LANGUAGE plpgsql STABLE AS $$
