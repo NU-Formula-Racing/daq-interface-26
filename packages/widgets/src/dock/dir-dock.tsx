@@ -85,6 +85,9 @@ interface DockDirectionProps {
   /** If provided, the signal pickers hide signals whose id is not in this set.
    *  null = no filter (desktop default — all catalog signals shown). */
   availableSignalIds?: ReadonlySet<number> | null;
+  /** Notified when any widget's zoom range changes. Use to drive a global
+   *  visible-window fetch. `null` = the widget reset its zoom. */
+  onZoom?: (z: [number, number] | null) => void;
 }
 
 const DROPPABLE_TYPES = [
@@ -152,7 +155,7 @@ function DropTypePopup({
   );
 }
 
-export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true, availableSignalIds = null }: DockDirectionProps) {
+export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true, availableSignalIds = null, onZoom }: DockDirectionProps) {
   const catalog = useCatalog();
   const [widgets, setWidgets] = useState<any[]>(loadLayout);
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
@@ -614,6 +617,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                     onChange={(next) => patch(w.id, next)}
                     onRemove={() => remove(w.id)}
                     onSettings={() => setFocusedId(w.id)}
+                    onZoom={onZoom}
                     draggable
                     onDragStart={(e) => startMove(w, e)}
                   />

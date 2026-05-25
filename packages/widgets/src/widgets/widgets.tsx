@@ -1186,20 +1186,23 @@ interface WidgetShellProps {
   onDragStart?: (e: any) => void;
   onHeaderClick?: () => void;
   onSettings?: () => void;
+  /** Notified when any widget's zoom range changes. Use to drive a global
+   *  visible-window fetch. `null` = the widget reset its zoom. */
+  onZoom?: (z: [number, number] | null) => void;
 }
-export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick, onSettings }: WidgetShellProps) {
+export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick, onSettings, onZoom }: WidgetShellProps) {
   const [typeOpen, setTypeOpen] = useState(false);
   const compact = density === 'compact';
 
   const renderBody = () => {
     switch (widget.type) {
-      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={widget.zoom || null} onZoom={(z) => onChange({ ...widget, zoom: z })} signalColors={widget.signalColors} />;
+      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={widget.zoom || null} onZoom={(z) => { onChange({ ...widget, zoom: z }); onZoom?.(z); }} signalColors={widget.signalColors} />;
       case 'numeric': return <NumericWidget signal={widget.signals[0]} t={t} compact={compact} />;
       case 'gauge': return <GaugeWidget signal={widget.signals[0]} t={t} />;
       case 'bar': return <BarWidget signals={widget.signals} t={t} />;
       case 'heatmap': return <HeatmapWidget signals={widget.signals} t={t} />;
       case 'gg': return <GgPlotWidget t={t} mode={mode} window={widget.window || 0.05} compact={compact} zoom={widget.zoom || null} />;
-      case 'cellv': return <CellVoltagesWidget t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={widget.zoom || null} onZoom={(z) => onChange({ ...widget, zoom: z })} signalColors={widget.signalColors} />;
+      case 'cellv': return <CellVoltagesWidget t={t} mode={mode} window={widget.window || 0.05} style={graphStyle} compact={compact} zoom={widget.zoom || null} onZoom={(z) => { onChange({ ...widget, zoom: z }); onZoom?.(z); }} signalColors={widget.signalColors} />;
       default: return <EmptySlot label="Pick a type" />;
     }
   };
