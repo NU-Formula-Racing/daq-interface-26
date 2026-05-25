@@ -21,15 +21,20 @@ export interface SessionDetail extends Session {
   }>;
 }
 
-export interface OverviewRow {
-  bucket: string;
-  signal_id: number;
-  avg_value: number;
-}
-
 export interface WindowRow {
   ts: string;
   value: number;
+}
+
+export interface SignalWindowRow {
+  ts: string;
+  signal_id: number;
+  signal_name: string;
+  unit: string | null;
+  value_min: number;
+  value_max: number;
+  value_avg: number;
+  sample_n: number;
 }
 
 export interface SignalDefinition {
