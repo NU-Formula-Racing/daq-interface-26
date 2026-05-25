@@ -3,7 +3,6 @@ import type pg from 'pg';
 import {
   deleteSession,
   getSession,
-  getSessionOverview,
   listSessions,
   updateSession,
   type SessionPatch,
@@ -38,11 +37,4 @@ export function registerSessionRoutes(app: FastifyInstance, pool: pg.Pool) {
     }
   );
 
-  app.get<{ Params: { id: string }; Querystring: { bucket?: string } }>(
-    '/api/sessions/:id/overview',
-    async (req) => {
-      const bucket = Number(req.query.bucket ?? '10');
-      return getSessionOverview(pool, req.params.id, bucket);
-    }
-  );
 }
