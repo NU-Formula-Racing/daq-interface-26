@@ -29,12 +29,6 @@ export interface SessionDetail extends Session {
   }>;
 }
 
-export interface OverviewRow {
-  bucket: string;
-  signal_id: number;
-  avg_value: number;
-}
-
 export async function listSessions(pool: pg.Pool): Promise<Session[]> {
   const { rows } = await pool.query<Session>(
     `SELECT id, date::text, started_at, ended_at, track, driver, car, notes,
@@ -99,22 +93,3 @@ export async function deleteSession(pool: pg.Pool, id: string): Promise<void> {
   await pool.query(`DELETE FROM sessions WHERE id = $1`, [id]);
 }
 
-export async function getSessionOverview(
-  pool: pg.Pool,
-  id: string,
-  bucketSecs: number
-): Promise<OverviewRow[]> {
-  const { rows } = await pool.query<{
-    bucket: Date;
-    signal_id: number;
-    avg_value: string;
-  }>(
-    `SELECT bucket, signal_id, avg_value FROM get_session_overview($1, $2) ORDER BY bucket, signal_id`,
-    [id, bucketSecs]
-  );
-  return rows.map((r) => ({
-    bucket: r.bucket.toISOString(),
-    signal_id: r.signal_id,
-    avg_value: Number(r.avg_value),
-  }));
-}
