@@ -125,3 +125,32 @@ export async function restoreSessions(opts: {
 
   return { sessions: sessionsRestored, rows: rowsRestored };
 }
+
+async function main(): Promise<void> {
+  const { Pool } = await import('pg');
+  const { resolve } = await import('node:path');
+
+  const connStr = process.env.NFR_DB_URL;
+  if (!connStr) {
+    console.error('NFR_DB_URL env var required.');
+    process.exit(2);
+  }
+  const ids = process.argv.slice(2);
+  if (ids.length === 0) {
+    console.error('usage: tsx restore-from-backup.ts <session-uuid> [<session-uuid> ...]');
+    process.exit(2);
+  }
+  const backupDir = resolve('backups/supabase-pre-parquet');
+
+  const pool = new Pool({ connectionString: connStr });
+  try {
+    const summary = await restoreSessions({ pool, backupDir, sessionIds: ids });
+    console.log(`Restored ${summary.sessions} session(s), ${summary.rows} reading(s).`);
+  } finally {
+    await pool.end();
+  }
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((err) => { console.error(err); process.exit(1); });
+}
