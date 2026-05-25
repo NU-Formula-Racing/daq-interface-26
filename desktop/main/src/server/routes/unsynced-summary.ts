@@ -17,7 +17,7 @@ export function registerUnsyncedSummaryRoutes(app: FastifyInstance, pool: pg.Poo
          FROM sd_readings
          GROUP BY session_id
        ) c ON c.session_id = s.id
-       WHERE s.synced_at IS NULL
+       WHERE s.manifest_key IS NULL
        ORDER BY s.started_at DESC`,
     );
     const sessionIds = rows.map((r) => r.id);

@@ -21,9 +21,32 @@ export interface SpacesClient {
   ensureBucket: () => Promise<void>;
 }
 
+/**
+ * Strip a leading bucket subdomain from an endpoint URL.
+ *
+ * DigitalOcean shows the bucket URL ("https://<bucket>.<region>.digitaloceanspaces.com")
+ * in its Spaces tab, so users naturally paste that — but the S3 SDK then
+ * composes "<bucket>.<endpoint>" and gets the bucket name twice in the host,
+ * which fails TLS hostname verification. Normalize by removing the bucket
+ * subdomain if present.
+ */
+export function normalizeEndpoint(endpoint: string, bucket: string): string {
+  try {
+    const u = new URL(endpoint);
+    const prefix = `${bucket}.`;
+    if (u.hostname.startsWith(prefix)) {
+      u.hostname = u.hostname.slice(prefix.length);
+    }
+    return u.toString().replace(/\/$/, '');
+  } catch {
+    return endpoint;
+  }
+}
+
 export function makeSpaces(cfg: SpacesConfig): SpacesClient {
+  const endpoint = normalizeEndpoint(cfg.endpoint, cfg.bucket);
   const s3 = new S3Client({
-    endpoint: cfg.endpoint,
+    endpoint,
     region: cfg.region,
     credentials: { accessKeyId: cfg.accessKey, secretAccessKey: cfg.secretKey },
     forcePathStyle: cfg.forcePathStyle ?? false,

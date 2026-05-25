@@ -31,15 +31,18 @@ export async function uploadSession(opts: {
   const { rows: srows } = await pool.query(
     `SELECT id, date::text, started_at, ended_at, track, driver, car, notes,
             source, source_file, source_file_hash,
-            synced_at, uploaded_by_machine, uploaded_at
+            synced_at, manifest_key, uploaded_by_machine, uploaded_at
      FROM sessions WHERE id = $1`,
     [sessionId],
   );
   if (srows.length === 0) throw new Error(`session ${sessionId} not found`);
   const sessionRow = srows[0];
 
-  // Dedup: if already synced locally, raise immediately.
-  if (sessionRow.synced_at) {
+  // Dedup: if this session has already been uploaded via the Parquet flow,
+  // raise immediately. Gate on manifest_key (set only on real Spaces uploads),
+  // not synced_at, because pre-migration sync code wrote synced_at without
+  // ever putting bytes in Spaces.
+  if (sessionRow.manifest_key) {
     throw new AlreadySyncedError({
       uploaded_by_machine: sessionRow.uploaded_by_machine ?? null,
       uploaded_at: sessionRow.uploaded_at?.toISOString?.() ?? String(sessionRow.uploaded_at) ?? null,
