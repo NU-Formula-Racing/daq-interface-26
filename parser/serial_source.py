@@ -3,14 +3,14 @@
 Wire format from the LoRa basestation (telemetry-26 base-station firmware,
 processIncomingPackets):
 
-  +--------+------+-----+-------------+-----------------+
-  | sync   | rssi | snr | payload_sz  | payload[ps]     |
-  | 2 B    | i16  | f32 | u16         | ps bytes        |
-  | AA 55  |      |     |             |                 |
-  +--------+------+-----+-------------+-----------------+
+  +--------+------+-----+-----+----------------+
+  | sync   | rssi | snr | len | payload[len]   |
+  | 2 B    | i16  | f32 | u8  | len bytes      |
+  | AA 55  |      |     |     |                |
+  +--------+------+-----+-----+----------------+
 
-`payload` is a packed sequence of 18-byte can::CanFrame records (defined in
-core/drivers/can/can_types.hpp):
+`len` is the byte count of `payload`. `payload` is a packed sequence of
+18-byte can::CanFrame records (defined in core/drivers/can/can_types.hpp):
 
   CanFrame {
     uint32_t timestamp;
@@ -39,11 +39,11 @@ RECONNECT_INTERVAL = 2.0
 IDLE_TIMEOUT = 10.0
 
 SYNC_BYTES = b"\xAA\x55"
-HEADER_SIZE = 2 + 2 + 4 + 2  # sync + rssi + snr + payload_size = 10 bytes
-HEADER_STRUCT = struct.Struct("<2shfH")  # sync, rssi (i16), snr (f32), size (u16)
-# Sanity: refuse to read pathologically large payloads — the LoRa FIFO is
-# 255 bytes, so > 512 is certainly desync garbage.
-MAX_PAYLOAD = 512
+HEADER_SIZE = 2 + 2 + 4 + 1  # sync + rssi + snr + len = 9 bytes
+HEADER_STRUCT = struct.Struct("<2shfB")  # sync, rssi (i16), snr (f32), len (u8)
+# `len` is u8 so the LoRa FIFO ceiling (255 bytes) is also the protocol
+# ceiling — anything above is by definition desync garbage.
+MAX_PAYLOAD = 255
 
 
 def _parse_packets(buf: bytes) -> tuple[list[SourceEvent], bytes]:
