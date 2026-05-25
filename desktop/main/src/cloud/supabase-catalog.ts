@@ -31,10 +31,22 @@ export async function commitSessionToCatalog(
     });
   }
 
-  // Upsert the session row with cloud bookkeeping columns.
+  // Upsert the session row with cloud bookkeeping columns. The local schema
+  // has columns the cloud schema doesn't (synced_at, local_deleted_at) — only
+  // send the cloud-side fields so PostgREST's schema cache doesn't reject the
+  // request.
   const sessionPayload = {
-    ...args.sessionRow,
     id: args.sessionId,
+    date: args.sessionRow.date,
+    started_at: args.sessionRow.started_at,
+    ended_at: args.sessionRow.ended_at,
+    track: args.sessionRow.track,
+    driver: args.sessionRow.driver,
+    car: args.sessionRow.car,
+    notes: args.sessionRow.notes,
+    source: args.sessionRow.source,
+    source_file: args.sessionRow.source_file,
+    source_file_hash: args.sessionRow.source_file_hash,
     content_hash: args.manifest.session_content_hash,
     manifest_key: `sessions/${args.sessionId}/manifest.json`,
     total_bytes: args.totalBytes,
