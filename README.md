@@ -58,6 +58,12 @@ A few practical consequences:
   **Upload all** button on the Local tab listing every unsynced session.
   Click it once to push all your historical drives to the cloud.
   Subsequent runs of the button only upload anything new since.
+- **First-time install:** the .app ships with read-only cloud defaults
+  baked in (Supabase project URL + anon key + Spaces public URL). Just
+  open the app, go to Settings → Storage → Cloud, and pull whatever days
+  you need. No keys to paste. To upload (push), you do still need to paste
+  Spaces access + secret keys under Settings → Cloud config → "Write
+  credentials."
 
 Where the bytes actually live:
 
