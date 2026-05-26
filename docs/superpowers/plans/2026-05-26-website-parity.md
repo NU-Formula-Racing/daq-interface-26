@@ -1,150 +1,438 @@
-# Website Parity with Desktop App Implementation Plan
+# Website Parity with Desktop App Implementation Plan (Option B)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Bring `frontend/interface/` (public website) into behavioral and visual parity with the desktop app's `/app` route: fix the broken active-signal filter, port the sub-second graph bucket fix, mirror the desktop's calendar-style session picker, and verify the DigitalOcean Spaces data pipeline.
+**Goal:** Make the public website's `/app` route actually serve cloud sessions by adding a Supabase Edge Function that reads Parquet from DigitalOcean Spaces, fix the broken signal-id catalog, port the desktop-style session picker, and verify widget parity.
 
-**Architecture:** Website-only edits. Replay still fetches via Supabase RPCs — no browser-side Parquet/Spaces fetch. Session picker is a new JSX port of `app/src/components/SessionPicker.tsx`. Sub-second buckets require widening the Supabase function's `p_bucket_secs` parameter from `INT` to `NUMERIC` (this lives in `frontend/database/supabase_functions.sql`, which is the website's own DB layer — not desktop code).
+**Architecture:** Edge function (Deno + DuckDB-WASM) does HTTP range reads against the public DO Spaces base, buckets server-side, returns the existing RpcRow JSON shape. The website calls it via `supabase.functions.invoke('signals-window', ...)` instead of `supabase.rpc(...)`. `get_session_signal_ids` SQL is rewritten to derive ids from `session_blobs ⋈ signal_definitions` (no `sd_readings` dependency).
 
-**Tech Stack:** React 19, Vite, Supabase JS, `@nfr/widgets` workspace package, `react-router-dom` 7, `vitest`, `@testing-library/react`.
+**Tech Stack:** Supabase Edge Functions (Deno), `@duckdb/duckdb-wasm`, React 19 + Vite (website), `vitest`, `@testing-library/react`.
 
-**Hard constraint:** Do not modify any file under `app/`, `desktop/`, `parser/`, or `packages/widgets/` source. The Supabase SQL under `frontend/database/` IS allowed (it's the website's database layer).
+**Hard constraint:** Do not modify any file under `app/`, `desktop/`, `parser/`, or `packages/widgets/`. Work is on branch `website-parity` inside `.worktrees/website-parity`.
+
+**State of play:**
+- Task 1 of the prior plan already verified: Spaces public base is reachable;
+  manifests + Parquet files are public; `sd_readings` does NOT exist on
+  Supabase; pre-existing SQL functions are broken.
 
 ---
 
 ## File map
 
 **Create:**
-- `frontend/interface/src/components/SessionPicker.jsx` — calendar→day-list session picker ported from desktop.
-- `frontend/interface/src/components/SessionPicker.test.jsx` — unit tests for the picker.
+- `supabase/functions/signals-window/index.ts` — new Edge Function.
+- `supabase/functions/signals-window/deno.json` — Deno config (DuckDB-WASM import).
+- `supabase/functions/signals-window/test.ts` — Deno smoke test.
+- `frontend/interface/src/components/SessionPicker.jsx` — calendar picker.
+- `frontend/interface/src/components/SessionPicker.test.jsx` — picker tests.
 
 **Modify:**
-- `frontend/interface/src/adapters/useSessionList.ts` — add `source` field to `SessionListItem` and select it from the RPC return.
-- `frontend/database/supabase_functions.sql` — change `list_sessions` to return `source`; change `get_signals_window` `p_bucket_secs` from `INT` to `NUMERIC`.
-- `frontend/interface/src/adapters/useSupabaseFrames.ts` — use raw fractional `bucketSecs` instead of `bucketFor()`.
-- `frontend/interface/src/adapters/bucketFor.ts` — delete (becomes unused).
-- `frontend/interface/src/adapters/bucketFor.test.ts` — delete (corresponding test).
-- `frontend/interface/src/adapters/framesCache.ts` — confirm cache key uses bucket as-is (already does — no change unless verification finds a `Math.round`).
-- `frontend/interface/src/routes/AppRoute.jsx` — replace `<DateAndSessionPicker>` with `<SessionPicker>`.
-- `frontend/interface/src/components/DateAndSessionPicker.jsx` — delete after route swap (also delete `DatePicker.jsx`, `DatePicker.css` if no remaining importers).
+- `frontend/database/supabase_functions.sql` — rewrite `get_session_signal_ids`;
+  add `source` to `list_sessions` return.
+- `frontend/interface/src/adapters/useSupabaseFrames.ts` — swap RPC for
+  Edge Function; fractional bucket; minor type changes.
+- `frontend/interface/src/adapters/bucketFor.ts` — delete.
+- `frontend/interface/src/adapters/bucketFor.test.ts` — delete.
+- `frontend/interface/src/adapters/useSessionList.ts` — add `source` field.
+- `frontend/interface/src/routes/AppRoute.jsx` — wire new picker; remove
+  dead `selectedDate`/`urlDate` block.
+- `frontend/interface/src/components/DateAndSessionPicker.jsx` — delete.
+- `frontend/interface/src/components/DatePicker.jsx` + `DatePicker.css` —
+  delete if no other importers.
 
-**Verify (read-only):**
-- `desktop/build/cloud-defaults.json` — read to learn canonical Spaces base URL.
-- `packages/widgets/src/dock/dir-dock.tsx` — already confirms `availableSignalIds: ReadonlySet<number>` contract.
-
----
-
-## Task 1: Sanity-verify Spaces & pipeline (read-only)
-
-**Files:**
-- Read: `desktop/build/cloud-defaults.json`
-
-- [ ] **Step 1: Read cloud-defaults**
-
-```bash
-cat desktop/build/cloud-defaults.json
-```
-Expected: JSON with `spacesPublicBase`, `supabaseUrl`, `supabaseAnonKey`. Record the `spacesPublicBase` value (call it `$SPACES_BASE`).
-
-- [ ] **Step 2: Pick a known session id**
-
-Run in psql against the same Supabase project (or use Supabase MCP):
-```sql
-SELECT id FROM sessions WHERE source = 'sd_import' ORDER BY started_at DESC LIMIT 1;
-```
-Record the id (call it `$SID`).
-
-- [ ] **Step 3: HEAD the session manifest**
-
-```bash
-curl -I "$SPACES_BASE/sessions/$SID/manifest.json"
-```
-Expected: `HTTP/2 200`. If 403/404, the pipeline is broken at the upload side — **stop and report**; fix is desktop-side and out of scope.
-
-- [ ] **Step 4: Confirm the Supabase RPC returns rows for that session**
-
-```sql
-SELECT count(*) FROM get_signals_window(
-  '$SID'::uuid,
-  ARRAY(SELECT signal_id FROM get_session_signal_ids('$SID'::uuid) LIMIT 5),
-  (SELECT started_at FROM sessions WHERE id = '$SID'),
-  (SELECT coalesce(ended_at, started_at + interval '60 seconds') FROM sessions WHERE id = '$SID'),
-  1
-);
-```
-Expected: count > 0. If 0, the Supabase mirror is empty for that session — **stop and report**; fix is desktop-side.
-
-- [ ] **Step 5: Commit a note**
-
-No code changes. Skip the commit step.
+**Verify (read-only):** `desktop/build/cloud-defaults.json`,
+`packages/widgets/src/dock/dir-dock.tsx`.
 
 ---
 
-## Task 2: Widen `get_signals_window` to NUMERIC bucket seconds
+## Task 1: Rewrite broken SQL functions (signal-ids + list_sessions)
 
 **Files:**
-- Modify: `frontend/database/supabase_functions.sql` (around line 89 — the `get_signals_window` definition)
+- Modify: `frontend/database/supabase_functions.sql`
 
-- [ ] **Step 1: Find the function definition**
+- [ ] **Step 1: Read current state of the two functions**
 
-Open `frontend/database/supabase_functions.sql` and locate `CREATE OR REPLACE FUNCTION get_signals_window(...)`. Inside, change:
-```sql
-p_bucket_secs INT DEFAULT 1
-```
-to
-```sql
-p_bucket_secs NUMERIC DEFAULT 1
+```bash
+sed -n '115,200p' frontend/database/supabase_functions.sql
 ```
 
-- [ ] **Step 2: Verify the body still type-checks**
+- [ ] **Step 2: Rewrite `get_session_signal_ids` to use `session_blobs`**
 
-Inside the body, the line is:
+Replace the body of `get_session_signal_ids` (lines ~117 onward) with:
 ```sql
-floor(extract(epoch FROM r.timestamp) / p_bucket_secs) * p_bucket_secs
+CREATE OR REPLACE FUNCTION get_session_signal_ids(p_session_id UUID)
+RETURNS TABLE (signal_id SMALLINT)
+LANGUAGE sql STABLE AS $$
+  SELECT DISTINCT sd.id::SMALLINT AS signal_id
+  FROM session_blobs sb
+  JOIN signal_definitions sd ON sd.source = sb.source
+  WHERE sb.session_id = p_session_id
+  ORDER BY sd.id;
+$$;
 ```
-`floor` and arithmetic both accept NUMERIC, so no body change needed. Confirm by reading the function source.
 
-- [ ] **Step 3: Also widen `get_session_overview` for consistency**
+- [ ] **Step 3: Add `source` to `list_sessions`**
 
-In the same file, change `get_session_overview`'s `p_bucket_secs INT DEFAULT 1` → `p_bucket_secs NUMERIC DEFAULT 1`.
+Find the `list_sessions` function (around line 162). Add `source TEXT` to the
+`RETURNS TABLE (...)` column list, and `s.source` to the SELECT in matching
+position. Keep the existing `DROP FUNCTION IF EXISTS list_sessions(integer);`
+and update the new signature accordingly.
 
-- [ ] **Step 4: Apply migration to Supabase**
+- [ ] **Step 4: Apply both changes as a Supabase migration**
 
-Use the Supabase MCP `apply_migration` tool with the updated function definitions. Migration name: `widen_bucket_secs_to_numeric`.
+Use Supabase MCP `apply_migration` with migration name
+`fix_signal_ids_and_session_source`. Migration body = both function
+definitions in one block.
 
-- [ ] **Step 5: Verify the function accepts a float**
+- [ ] **Step 5: Verify with `execute_sql`**
 
-Via Supabase MCP `execute_sql`:
 ```sql
-SELECT count(*) FROM get_signals_window(
-  (SELECT id FROM sessions WHERE source='sd_import' LIMIT 1)::uuid,
-  ARRAY[1]::int[],
-  NOW() - interval '1 day',
-  NOW(),
-  0.05
+SELECT COUNT(*) FROM get_session_signal_ids(
+  '8ac70c7f-890b-55cd-9b00-7d98cb2dc313'::uuid
 );
 ```
-Expected: returns without a type error. (Count may be 0 — that's fine.)
+Expected: > 0.
+
+```sql
+SELECT id, source FROM list_sessions(3);
+```
+Expected: rows with non-null `source`.
 
 - [ ] **Step 6: Commit**
 
 ```bash
+cd /Users/andrewxue/Documents/daq-interface-26/.worktrees/website-parity
 git add frontend/database/supabase_functions.sql
-git commit -m "supabase: widen p_bucket_secs to NUMERIC for sub-second buckets"
+git commit -m "supabase: rewrite get_session_signal_ids; add source to list_sessions"
 ```
 
 ---
 
-## Task 3: Use fractional bucketSecs in website replay adapter
+## Task 2: Scaffold the `signals-window` Edge Function
 
 **Files:**
-- Modify: `frontend/interface/src/adapters/useSupabaseFrames.ts:62-65`
+- Create: `supabase/functions/signals-window/index.ts`
+- Create: `supabase/functions/signals-window/deno.json`
+
+- [ ] **Step 1: Confirm `supabase` CLI directory layout**
+
+```bash
+ls supabase 2>/dev/null && ls supabase/functions 2>/dev/null
+```
+If `supabase/` doesn't exist yet, create the path tree:
+```bash
+mkdir -p supabase/functions/signals-window
+```
+
+- [ ] **Step 2: Write `deno.json`**
+
+Create `supabase/functions/signals-window/deno.json`:
+```json
+{
+  "imports": {
+    "@duckdb/duckdb-wasm": "npm:@duckdb/duckdb-wasm@1.29.0"
+  }
+}
+```
+
+- [ ] **Step 3: Write the function skeleton (no DuckDB yet)**
+
+Create `supabase/functions/signals-window/index.ts`:
+```ts
+// Supabase Edge Function: signals-window
+// Reads per-source Parquet files from DO Spaces, buckets server-side,
+// returns the historical RpcRow shape the website expects.
+
+import { createClient } from 'jsr:@supabase/supabase-js@2';
+
+interface Body {
+  session_id: string;
+  signal_ids: number[];
+  start: string;
+  end: string;
+  bucket_secs: number;
+}
+
+interface RpcRow {
+  ts: string;
+  signal_id: number;
+  signal_name: string;
+  unit: string;
+  value_min: number;
+  value_max: number;
+  value_avg: number;
+  sample_n: number;
+}
+
+const SPACES_BASE = Deno.env.get('SPACES_PUBLIC_BASE')
+  ?? 'https://nfrinterface.sfo3.digitaloceanspaces.com';
+
+Deno.serve(async (req) => {
+  if (req.method !== 'POST') return new Response('method', { status: 405 });
+  let body: Body;
+  try { body = await req.json() as Body; }
+  catch { return new Response('bad json', { status: 400 }); }
+
+  if (!body.session_id || !Array.isArray(body.signal_ids) || body.signal_ids.length === 0
+      || !body.start || !body.end || !(body.bucket_secs > 0)) {
+    return new Response('missing fields', { status: 400 });
+  }
+
+  const supa = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  );
+
+  // 1. Look up which `source` each requested signal_id belongs to.
+  const { data: defs, error: defsErr } = await supa
+    .from('signal_definitions')
+    .select('id, signal_name, unit, source')
+    .in('id', body.signal_ids);
+  if (defsErr) return new Response(defsErr.message, { status: 500 });
+  if (!defs || defs.length === 0) {
+    return new Response(JSON.stringify([]), { headers: { 'content-type': 'application/json' } });
+  }
+
+  // For now: stub — real Parquet read lands in Task 3.
+  const rows: RpcRow[] = [];
+  return new Response(JSON.stringify(rows), {
+    headers: { 'content-type': 'application/json' },
+  });
+});
+```
+
+- [ ] **Step 4: Deploy via Supabase MCP**
+
+Use `mcp__supabase__deploy_edge_function` with:
+- `name`: `signals-window`
+- `files`: include `index.ts` (and `deno.json` if the tool supports it).
+
+- [ ] **Step 5: Smoke test the stub**
+
+```bash
+curl -X POST "https://wbtlgbmddaxeqhdntnxa.supabase.co/functions/v1/signals-window" \
+  -H "Authorization: Bearer $(grep VITE_SUPABASE_ANON_KEY frontend/interface/.env.local | cut -d= -f2)" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "8ac70c7f-890b-55cd-9b00-7d98cb2dc313",
+    "signal_ids": [1],
+    "start": "2026-05-17T22:33:10.703Z",
+    "end":   "2026-05-17T22:34:51.658Z",
+    "bucket_secs": 1
+  }'
+```
+Expected: `[]` (stub returns empty). 200 status.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add supabase/functions/signals-window/
+git commit -m "supabase: scaffold signals-window edge function (stub)"
+```
+
+---
+
+## Task 3: Implement DuckDB-WASM Parquet aggregation
+
+**Files:**
+- Modify: `supabase/functions/signals-window/index.ts`
+
+- [ ] **Step 1: Add the DuckDB-WASM bootstrap**
+
+Replace the `// For now: stub` section with a real DuckDB read. Add this
+helper at module scope (above `Deno.serve`):
+```ts
+import * as duckdb from '@duckdb/duckdb-wasm';
+
+let dbPromise: Promise<duckdb.AsyncDuckDB> | null = null;
+
+async function getDuckDB(): Promise<duckdb.AsyncDuckDB> {
+  if (dbPromise) return dbPromise;
+  dbPromise = (async () => {
+    const bundles = duckdb.getJsDelivrBundles();
+    const bundle = await duckdb.selectBundle(bundles);
+    const worker = await duckdb.createWorker(bundle.mainWorker!);
+    const logger = new duckdb.ConsoleLogger();
+    const db = new duckdb.AsyncDuckDB(logger, worker);
+    await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+    return db;
+  })();
+  return dbPromise;
+}
+```
+
+- [ ] **Step 2: Replace the stub with the real query**
+
+Substitute the `// For now: stub — real Parquet read lands in Task 3.` block
+and trailing `return` with:
+```ts
+  // 2. Group requested signal_ids by source -> parquet URL.
+  const bySource = new Map<string, number[]>();
+  for (const d of defs) {
+    const safe = String(d.source).replace(/[^A-Za-z0-9_.-]/g, '_');
+    const arr = bySource.get(safe) ?? [];
+    arr.push(d.id);
+    bySource.set(safe, arr);
+  }
+
+  // 3. Build a UNION ALL across one read_parquet per source.
+  const unionPieces: string[] = [];
+  const params: Array<string | number> = [];
+  for (const [safe, ids] of bySource) {
+    const url = `${SPACES_BASE}/sessions/${body.session_id}/${safe}.parquet`;
+    const idList = ids.map((n) => String(n)).join(',');
+    unionPieces.push(
+      `SELECT timestamp AS ts, signal_id, value
+       FROM read_parquet('${url.replace(/'/g, "''")}')
+       WHERE signal_id IN (${idList})
+         AND timestamp >= TIMESTAMP '${body.start.replace(/'/g, "''")}'
+         AND timestamp <  TIMESTAMP '${body.end.replace(/'/g, "''")}'`
+    );
+  }
+  if (unionPieces.length === 0) {
+    return new Response('[]', { headers: { 'content-type': 'application/json' } });
+  }
+
+  const bucket = Number(body.bucket_secs);
+  const sql = `
+    WITH all_rows AS (
+      ${unionPieces.join('\n      UNION ALL\n      ')}
+    )
+    SELECT
+      to_timestamp(floor(epoch(ts) / ${bucket}) * ${bucket}) AS ts,
+      signal_id,
+      min(value) AS value_min,
+      max(value) AS value_max,
+      avg(value) AS value_avg,
+      COUNT(*)::INT AS sample_n
+    FROM all_rows
+    GROUP BY 1, 2
+    ORDER BY 1, 2;
+  `;
+
+  const db = await getDuckDB();
+  const conn = await db.connect();
+  try {
+    const result = await conn.query(sql);
+    const defById = new Map(defs.map((d) => [d.id, d]));
+    const out: RpcRow[] = [];
+    for (let i = 0; i < result.numRows; i++) {
+      const r = result.get(i)!.toJSON() as {
+        ts: Date; signal_id: number; value_min: number;
+        value_max: number; value_avg: number; sample_n: number;
+      };
+      const def = defById.get(Number(r.signal_id));
+      out.push({
+        ts: r.ts.toISOString(),
+        signal_id: Number(r.signal_id),
+        signal_name: def?.signal_name ?? '',
+        unit: def?.unit ?? '',
+        value_min: r.value_min,
+        value_max: r.value_max,
+        value_avg: r.value_avg,
+        sample_n: r.sample_n,
+      });
+    }
+    return new Response(JSON.stringify(out), {
+      headers: { 'content-type': 'application/json' },
+    });
+  } finally {
+    await conn.close();
+  }
+```
+
+- [ ] **Step 3: Deploy the updated function**
+
+Re-run `mcp__supabase__deploy_edge_function` with the new `index.ts`.
+
+- [ ] **Step 4: Smoke test against the real session**
+
+Find a signal_id that exists in the BMS source:
+```sql
+SELECT id, signal_name, source FROM signal_definitions WHERE source = 'BMS' LIMIT 3;
+```
+
+Then:
+```bash
+curl -X POST "https://wbtlgbmddaxeqhdntnxa.supabase.co/functions/v1/signals-window" \
+  -H "Authorization: Bearer $(grep VITE_SUPABASE_ANON_KEY frontend/interface/.env.local | cut -d= -f2)" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "8ac70c7f-890b-55cd-9b00-7d98cb2dc313",
+    "signal_ids": [<ID>],
+    "start": "2026-05-17T22:33:10.703Z",
+    "end":   "2026-05-17T22:34:51.658Z",
+    "bucket_secs": 1
+  }' | head -c 500
+```
+Expected: JSON array of rows with `ts`, `signal_id`, `signal_name`, `unit`,
+`value_min`, `value_max`, `value_avg`, `sample_n`. Non-empty.
+
+If it returns a DuckDB-WASM init error: the `getJsDelivrBundles` path is
+unreachable from Supabase's edge runtime. Fall back to `@duckdb/node-api`
+(npm package that ships native binaries) which Deno supports via its
+`npm:` specifier with no WASM. Replace the bootstrap to:
+```ts
+import { DuckDBInstance } from 'npm:@duckdb/node-api@1.1.3';
+const instance = await DuckDBInstance.create();
+const conn = await instance.connect();
+```
+Adapt the result-reading code accordingly.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add supabase/functions/signals-window/index.ts
+git commit -m "supabase: signals-window reads Parquet via DuckDB + UNION ALL by source"
+```
+
+- [ ] **Step 6: Add a smoke test under `supabase/functions/signals-window/test.ts`**
+
+This is documentation more than CI — the test hits the deployed endpoint
+and verifies non-empty output:
+```ts
+// Run: deno test --allow-net --allow-env supabase/functions/signals-window/test.ts
+const ANON = Deno.env.get('SUPABASE_ANON_KEY')!;
+const URL = 'https://wbtlgbmddaxeqhdntnxa.supabase.co/functions/v1/signals-window';
+
+Deno.test('signals-window returns non-empty for known session', async () => {
+  const res = await fetch(URL, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${ANON}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      session_id: '8ac70c7f-890b-55cd-9b00-7d98cb2dc313',
+      signal_ids: [/* fill with a real BMS signal_id */],
+      start: '2026-05-17T22:33:10.703Z',
+      end:   '2026-05-17T22:34:51.658Z',
+      bucket_secs: 1,
+    }),
+  });
+  const json = await res.json();
+  if (!Array.isArray(json) || json.length === 0) {
+    throw new Error(`expected rows, got ${JSON.stringify(json).slice(0, 200)}`);
+  }
+});
+```
+
+Commit:
+```bash
+git add supabase/functions/signals-window/test.ts
+git commit -m "supabase: signals-window smoke test"
+```
+
+---
+
+## Task 4: Swap website adapter to Edge Function
+
+**Files:**
+- Modify: `frontend/interface/src/adapters/useSupabaseFrames.ts`
 - Delete: `frontend/interface/src/adapters/bucketFor.ts`
 - Delete: `frontend/interface/src/adapters/bucketFor.test.ts`
 
-- [ ] **Step 1: Update the bucket calculation**
+- [ ] **Step 1: Replace the bucket calculation block**
 
-In `frontend/interface/src/adapters/useSupabaseFrames.ts`, replace lines 62-65:
+In `frontend/interface/src/adapters/useSupabaseFrames.ts` lines 62-65,
+replace:
 ```ts
     const startMs = Date.parse(args.start);
     const endMs = Date.parse(args.end);
@@ -159,43 +447,63 @@ with:
     const bucketSecs = durationSecs / (args.targetBuckets ?? 800);
 ```
 
-- [ ] **Step 2: Drop the now-unused import**
+- [ ] **Step 2: Replace the RPC call with an Edge Function invoke**
 
-In the same file, remove the line:
+Find the `supabase.rpc('get_signals_window', { p_session_id: ..., ... })`
+block (around line 92). Replace with:
 ```ts
-import { bucketFor } from './bucketFor';
+    supabase.functions.invoke('signals-window', {
+      body: {
+        session_id: args.sessionId,
+        signal_ids: toFetch,
+        start: args.start,
+        end: args.end,
+        bucket_secs: bucketSecs,
+      },
+    }).then(({ data, error }) => {
+      if (cancelled) return;
+      if (error) {
+        console.error('signals-window failed', error);
+        setStatus({ kind: 'error', message: error.message });
+        return;
+      }
+      store.ingest((data ?? []) as RpcRow[]);
+      cache.recordFetch(args.sessionId!, toFetch, args.start!, args.end!, bucketSecs);
+      setStatus({ kind: 'ready' });
+    });
 ```
 
-- [ ] **Step 3: Confirm no other importers**
+- [ ] **Step 3: Drop the now-unused `bucketFor` import**
 
-Run:
+Remove `import { bucketFor } from './bucketFor';` at the top.
+
+- [ ] **Step 4: Verify no other importers**
+
 ```bash
-grep -rn "from .*bucketFor" frontend/interface/src
+grep -rn "from .*bucketFor\|bucketFor(" frontend/interface/src
 ```
 Expected: zero matches.
 
-- [ ] **Step 4: Delete `bucketFor.ts` and its test**
+- [ ] **Step 5: Delete bucketFor files**
 
 ```bash
 rm frontend/interface/src/adapters/bucketFor.ts \
    frontend/interface/src/adapters/bucketFor.test.ts
 ```
 
-- [ ] **Step 5: Confirm cache key handles fractional buckets**
-
-Open `frontend/interface/src/adapters/framesCache.ts` and verify the key-building function uses `bucketSecs` as-is (no `Math.round`). If it rounds, change it to embed the raw number (e.g. `String(bucketSecs)`). If it already uses raw, no change.
-
-- [ ] **Step 6: Run the adapter tests**
+- [ ] **Step 6: Update the adapter test if it pinned the integer bucket**
 
 ```bash
-cd frontend/interface && npm test -- adapters/useSupabaseFrames.test.ts adapters/framesCache.test.ts
+cd .worktrees/website-parity/frontend/interface && npm test -- adapters/useSupabaseFrames.test.ts
 ```
-Expected: all tests pass. If `useSupabaseFrames.test.ts` asserts an integer bucket value, update the expectation to the fractional value the new code produces (e.g. for `start=...:00:00`, `end=...:00:01`, `targetBuckets=800` → `bucketSecs = 1/800 = 0.00125`).
+If the test asserts `p_bucket_secs: 1` or similar, update it to expect a
+`functions.invoke('signals-window', { body: { bucket_secs: <fractional> } })`
+call shape. Use vitest's `vi.spyOn` on `supabase.functions.invoke`.
 
 - [ ] **Step 7: Run all frontend tests**
 
 ```bash
-cd frontend/interface && npm test
+cd .worktrees/website-parity/frontend/interface && npm test
 ```
 Expected: all pass.
 
@@ -205,133 +513,69 @@ Expected: all pass.
 git add frontend/interface/src/adapters/useSupabaseFrames.ts \
         frontend/interface/src/adapters/bucketFor.ts \
         frontend/interface/src/adapters/bucketFor.test.ts \
-        frontend/interface/src/adapters/useSupabaseFrames.test.ts \
-        frontend/interface/src/adapters/framesCache.ts
-git commit -m "website: sub-second graph buckets in replay (parity with desktop)"
+        frontend/interface/src/adapters/useSupabaseFrames.test.ts
+git commit -m "website: fetch replay frames via signals-window edge function (sub-second buckets)"
 ```
 
 ---
 
-## Task 4: Diagnose the active-signal filter
+## Task 5: End-to-end smoke test in the browser
 
-**Files:**
-- Read-only: `packages/widgets/src/dock/dir-dock.tsx:1066`, `:1173`
-- Read-only: `frontend/interface/src/routes/AppRoute.jsx:164`
-- Read-only: `frontend/interface/src/adapters/useSessionSignalIds.ts`
+**Files:** none modified.
 
-- [ ] **Step 1: Add a temporary diagnostic log**
-
-In `frontend/interface/src/routes/AppRoute.jsx`, just before the `return` (after `const sessionSlot = ...`), insert:
-```jsx
-useEffect(() => {
-  console.log('[DIAG availableSignalIds]', {
-    mode,
-    idsStatus,
-    sessionId: session?.id ?? null,
-    setSize: sessionSignalIds.size,
-    sample: [...sessionSignalIds].slice(0, 5),
-  });
-}, [mode, idsStatus, session?.id, sessionSignalIds]);
-```
-
-- [ ] **Step 2: Run the dev server**
+- [ ] **Step 1: Start dev server**
 
 ```bash
-cd frontend/interface && npm run dev
+cd .worktrees/website-parity/frontend/interface && npm run dev
 ```
-Open `http://localhost:5173/app?session=<known-sid>`.
 
-- [ ] **Step 3: Observe the console**
+- [ ] **Step 2: Open a known session**
 
-Three outcomes are possible:
-
-(a) `setSize: 0` and `idsStatus: 'error'` — RPC failing. Inspect the error in the Network tab; usually a Supabase RLS or function-signature issue. Fix is in `frontend/database/supabase_functions.sql` for `get_session_signal_ids`.
-
-(b) `setSize: 0` and `idsStatus: 'ready'` — RPC returned no rows. The session may have no `sd_readings` rows. Pick a different session id to confirm the wiring before claiming a bug.
-
-(c) `setSize > 0` and `idsStatus: 'ready'`, but the picker still shows all signals — widget consumer issue. Open `packages/widgets/src/dock/dir-dock.tsx:1066-1075` to confirm `available.has(s.id)` is reached. If it is, the bug is most likely that `availableSignalIds` is being **re-created on every render** (new Set identity each tick), forcing the dock to think there's no filter or to render before the Set settles. Fix: memoize.
-
-- [ ] **Step 4: Apply the fix based on the outcome**
-
-For outcome (c), in `frontend/interface/src/routes/AppRoute.jsx` line ~164, wrap the value to ensure stable identity:
-```jsx
-const filteredAvailable = mode === 'replay' && idsStatus === 'ready'
-  ? sessionSignalIds
-  : null;
+Navigate to:
 ```
-This is already what the code does — `sessionSignalIds` itself is the `Set` returned by the hook, which is stable across renders for a given `sessionId` because the hook stores it in state. So if outcome (c) reproduces, the next suspect is that `useSessionSignalIds` recreates the empty Set on first render and `availableSignalIds` lands as an **empty Set** before the gating clause (`idsStatus === 'ready'`) flips. Confirm by checking the timestamp of the first log vs the picker-open event.
+http://localhost:5173/app?session=8ac70c7f-890b-55cd-9b00-7d98cb2dc313&mode=replay
+```
 
-For outcome (a), fix the SQL function and re-apply migration. For (b), this is not a bug — close as "works as designed".
+- [ ] **Step 3: Confirm graph renders**
 
-- [ ] **Step 5: Remove the diagnostic log**
+Add a signal to a graph widget; verify a non-empty curve appears. Open
+DevTools Network tab and confirm the `signals-window` call returns 200 with
+JSON.
 
-Delete the `useEffect` block added in Step 1.
+- [ ] **Step 4: Confirm signal filter works**
 
-- [ ] **Step 6: Run frontend tests**
+Open a widget's signal-picker dropdown. Confirm only signals from
+`get_session_signal_ids` appear (e.g. BMS, ECU, DAQ-IMU sources for this
+session — not the full catalog).
 
+- [ ] **Step 5: Confirm sub-second buckets**
+
+Zoom the graph timeline to a 5-second window. Confirm the curve is dense
+(many samples), not stair-stepped.
+
+- [ ] **Step 6: Kill dev server**
+
+`Ctrl-C` and then verify:
 ```bash
-cd frontend/interface && npm test
+lsof -i :5173 || echo "port free"
 ```
-Expected: all pass.
+Expected: `port free`.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: No commit; report findings**
 
-If a fix was applied:
-```bash
-git add frontend/interface/src/routes/AppRoute.jsx frontend/interface/src/adapters/useSessionSignalIds.ts
-git commit -m "website: fix active-signal filter (root-cause from diagnostic)"
-```
-If no fix was needed (outcome b or false alarm), commit nothing.
+If anything failed, file a follow-up task in the plan and stop. Otherwise
+proceed to Task 6.
 
 ---
 
-## Task 5: Add `source` to the website session list
+## Task 6: Add `source` to `SessionListItem`
 
 **Files:**
-- Modify: `frontend/database/supabase_functions.sql` (the `list_sessions` function around line 162)
 - Modify: `frontend/interface/src/adapters/useSessionList.ts`
 
-- [ ] **Step 1: Read the current `list_sessions` definition**
+- [ ] **Step 1: Add `source` field**
 
-```bash
-sed -n '155,200p' frontend/database/supabase_functions.sql
-```
-Note the existing column list.
-
-- [ ] **Step 2: Add `source TEXT` to the RETURNS TABLE and to the SELECT**
-
-In `frontend/database/supabase_functions.sql`, in the `list_sessions` function:
-- Add `source TEXT` to the `RETURNS TABLE (...)` column list.
-- Add `s.source` to the `SELECT` projection, matching the column order.
-
-- [ ] **Step 3: Apply migration**
-
-Use Supabase MCP `apply_migration`. Migration name: `list_sessions_add_source`. Drop and recreate the function (`list_sessions` already has a `DROP FUNCTION IF EXISTS` line at 160 — keep that and update the new signature accordingly).
-
-- [ ] **Step 4: Smoke-test the RPC**
-
-Via Supabase MCP `execute_sql`:
-```sql
-SELECT id, source FROM list_sessions(5);
-```
-Expected: returns rows with non-null `source` values like `sd_import` or `live`.
-
-- [ ] **Step 5: Add `source` to `SessionListItem`**
-
-In `frontend/interface/src/adapters/useSessionList.ts`, change:
-```ts
-export interface SessionListItem {
-  id: string;
-  date: string;
-  started_at: string;
-  ended_at: string | null;
-  duration_secs: number;
-  driver: string | null;
-  car: string | null;
-  session_number: number | null;
-}
-```
-to add `source`:
+In `frontend/interface/src/adapters/useSessionList.ts`:
 ```ts
 export interface SessionListItem {
   id: string;
@@ -346,141 +590,255 @@ export interface SessionListItem {
 }
 ```
 
-- [ ] **Step 6: Run tests**
+- [ ] **Step 2: Run tests**
 
 ```bash
-cd frontend/interface && npm test
+cd .worktrees/website-parity/frontend/interface && npm test
 ```
 Expected: all pass (no test asserts on this field yet).
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
-git add frontend/database/supabase_functions.sql frontend/interface/src/adapters/useSessionList.ts
-git commit -m "website: expose session source for desktop-style picker filtering"
+git add frontend/interface/src/adapters/useSessionList.ts
+git commit -m "website: expose session source on SessionListItem"
 ```
 
 ---
 
-## Task 6: Port the desktop-style SessionPicker — write the failing test
+## Task 7: Write failing test for desktop-style SessionPicker
 
 **Files:**
 - Create: `frontend/interface/src/components/SessionPicker.test.jsx`
 
-- [ ] **Step 1: Write the test file**
+- [ ] **Step 1: Write the test**
 
-Create `frontend/interface/src/components/SessionPicker.test.jsx` with:
+Create `frontend/interface/src/components/SessionPicker.test.jsx`:
 ```jsx
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SessionPicker from './SessionPicker';
 
 const SESSIONS = [
-  {
-    id: 'aaaaaaaa-0000-0000-0000-000000000001',
-    date: '2026-04-21',
-    started_at: '2026-04-21T14:23:00Z',
-    ended_at: '2026-04-21T14:28:20Z',
-    duration_secs: 320,
-    driver: 'Alex',
-    car: null,
-    session_number: 1,
-    source: 'sd_import',
-  },
-  {
-    id: 'aaaaaaaa-0000-0000-0000-000000000002',
-    date: '2026-04-21',
-    started_at: '2026-04-21T15:00:00Z',
-    ended_at: '2026-04-21T15:05:00Z',
-    duration_secs: 300,
-    driver: 'Sam',
-    car: null,
-    session_number: 2,
-    source: 'sd_import',
-  },
-  {
-    id: 'bbbbbbbb-0000-0000-0000-000000000003',
-    date: '2026-04-22',
-    started_at: '2026-04-22T10:00:00Z',
-    ended_at: '2026-04-22T10:02:00Z',
-    duration_secs: 120,
-    driver: null,
-    car: null,
-    session_number: null,
-    source: 'live', // should be filtered out
-  },
+  { id: 'aaaaaaaa-0000-0000-0000-000000000001',
+    date: '2026-04-21', started_at: '2026-04-21T14:23:00Z',
+    ended_at: '2026-04-21T14:28:20Z', duration_secs: 320,
+    driver: 'Alex', car: null, session_number: 1, source: 'sd_import' },
+  { id: 'aaaaaaaa-0000-0000-0000-000000000002',
+    date: '2026-04-21', started_at: '2026-04-21T15:00:00Z',
+    ended_at: '2026-04-21T15:05:00Z', duration_secs: 300,
+    driver: 'Sam', car: null, session_number: 2, source: 'sd_import' },
+  { id: 'bbbbbbbb-0000-0000-0000-000000000003',
+    date: '2026-04-22', started_at: '2026-04-22T10:00:00Z',
+    ended_at: '2026-04-22T10:02:00Z', duration_secs: 120,
+    driver: null, car: null, session_number: null, source: 'live' },
 ];
 
-function open(button) { fireEvent.click(button); }
-
 describe('SessionPicker', () => {
-  it('shows the calendar when opened and excludes non-sd_import sessions from day badges', () => {
+  it('opens a calendar; day with 2 sd_import sessions shows the badge', () => {
     render(<SessionPicker sessions={SESSIONS} currentId={null} onPick={() => {}} />);
-    open(screen.getByRole('button', { name: /select session|▾/i }));
-    // April 21 has 2 sd_import sessions; April 22 has 1 live (filtered).
+    fireEvent.click(screen.getByRole('button', { name: /select session|▾/i }));
     expect(screen.getByText('21')).toBeInTheDocument();
     expect(screen.getByText('22')).toBeInTheDocument();
-    // Badge "2" present for day 21 (two sd_import sessions)
     expect(screen.getByText('2')).toBeInTheDocument();
   });
 
-  it('drills into a day and labels sessions by local time, not by #N', () => {
+  it('drills into a day; labels do not use #N', () => {
     render(<SessionPicker sessions={SESSIONS} currentId={null} onPick={() => {}} />);
-    open(screen.getByRole('button', { name: /select session|▾/i }));
+    fireEvent.click(screen.getByRole('button', { name: /select session|▾/i }));
     fireEvent.click(screen.getByText('21'));
-    // Should NOT show "#1" or "#2" anywhere
     expect(screen.queryByText(/#1/)).toBeNull();
     expect(screen.queryByText(/#2/)).toBeNull();
-    // Should show the 8-char id prefix for each session
-    expect(screen.getByText('aaaaaaaa')).toBeInTheDocument();
+    expect(screen.getAllByText('aaaaaaaa').length).toBeGreaterThan(0);
   });
 
-  it('calls onPick with the chosen session id', () => {
+  it('calls onPick on session click', () => {
     const onPick = vi.fn();
     render(<SessionPicker sessions={SESSIONS} currentId={null} onPick={onPick} />);
-    open(screen.getByRole('button', { name: /select session|▾/i }));
+    fireEvent.click(screen.getByRole('button', { name: /select session|▾/i }));
     fireEvent.click(screen.getByText('21'));
-    // Click first session in the day list
-    fireEvent.click(screen.getByText('aaaaaaaa'));
+    fireEvent.click(screen.getAllByText('aaaaaaaa')[0]);
     expect(onPick).toHaveBeenCalledWith('aaaaaaaa-0000-0000-0000-000000000001');
   });
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [ ] **Step 2: Run; verify it fails for missing module**
 
 ```bash
-cd frontend/interface && npm test -- src/components/SessionPicker.test.jsx
+cd .worktrees/website-parity/frontend/interface && npm test -- src/components/SessionPicker.test.jsx
 ```
-Expected: FAIL — "Cannot find module './SessionPicker'".
+Expected: FAIL with "Cannot find module './SessionPicker'".
 
-- [ ] **Step 3: Commit the failing test**
+- [ ] **Step 3: Commit**
 
 ```bash
 git add frontend/interface/src/components/SessionPicker.test.jsx
-git commit -m "test: SessionPicker calendar + day list + onPick contract"
+git commit -m "test: SessionPicker calendar UX contract"
 ```
 
 ---
 
-## Task 7: Implement SessionPicker (port from desktop)
+## Task 8: Implement SessionPicker (port from desktop)
 
 **Files:**
 - Create: `frontend/interface/src/components/SessionPicker.jsx`
 
-- [ ] **Step 1: Read the desktop reference**
+- [ ] **Step 1: Read desktop reference**
 
 ```bash
 sed -n '1,338p' app/src/components/SessionPicker.tsx
 ```
-This is the source of truth for visuals + UX. The website version is a JSX port that:
-- Takes `sessions`, `currentId`, `onPick(id)` props directly (no internal `apiGet` or `useParams`).
-- Inlines `SH_COLORS` constants (don't reach into desktop's `colors.ts`).
-- Uses the same calendar grid + day list components.
 
-- [ ] **Step 2: Create the file**
+- [ ] **Step 2: Create the JSX port**
 
-Create `frontend/interface/src/components/SessionPicker.jsx`:
+Create `frontend/interface/src/components/SessionPicker.jsx` with the full
+JSX port (calendar grid + day list, inlined `COLORS` constants, `sd_import`
+filter, no `#N` numbering). See the full implementation block at the bottom
+of this plan in the **Appendix A: SessionPicker.jsx body**.
+
+- [ ] **Step 3: Run picker tests**
+
+```bash
+cd .worktrees/website-parity/frontend/interface && npm test -- src/components/SessionPicker.test.jsx
+```
+Expected: all three tests pass.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add frontend/interface/src/components/SessionPicker.jsx
+git commit -m "website: desktop-style calendar SessionPicker"
+```
+
+---
+
+## Task 9: Wire SessionPicker into AppRoute
+
+**Files:**
+- Modify: `frontend/interface/src/routes/AppRoute.jsx`
+- Delete: `frontend/interface/src/components/DateAndSessionPicker.jsx`
+- Delete (conditional): `frontend/interface/src/components/DatePicker.jsx`,
+  `DatePicker.css`
+
+- [ ] **Step 1: Swap the import + JSX**
+
+In `frontend/interface/src/routes/AppRoute.jsx`:
+- Change `import DateAndSessionPicker from '@/components/DateAndSessionPicker';`
+  to `import SessionPicker from '@/components/SessionPicker';`.
+- Replace the `<DateAndSessionPicker ... />` block with:
+  ```jsx
+  <SessionPicker
+    sessions={sessions}
+    currentId={session?.id ?? null}
+    onPick={(id) => setSearch((p) => {
+      if (id) p.set('session', id); else p.delete('session');
+      p.delete('date');
+      return p;
+    })}
+  />
+  ```
+
+- [ ] **Step 2: Remove dead `selectedDate`/`urlDate` logic**
+
+Delete:
+- `const urlDate = search.get('date');`
+- `const selectedDate = urlDate ?? session?.date ?? new Date().toISOString().split('T')[0];`
+- `const setSelectedDate = ...`
+- The `useEffect(() => { if (mode !== 'replay' || sessionId) return; ... }, [...])`
+  block.
+
+- [ ] **Step 3: Confirm no remaining importers of `DateAndSessionPicker` or `DatePicker`**
+
+```bash
+grep -rn "DateAndSessionPicker\|from .*DatePicker" frontend/interface/src
+```
+Expected: zero matches.
+
+- [ ] **Step 4: Delete orphaned files**
+
+```bash
+rm frontend/interface/src/components/DateAndSessionPicker.jsx \
+   frontend/interface/src/components/DatePicker.jsx \
+   frontend/interface/src/components/DatePicker.css
+```
+
+- [ ] **Step 5: Run dev server + smoke test**
+
+```bash
+cd .worktrees/website-parity/frontend/interface && npm run dev
+```
+Open `http://localhost:5173/app`. Confirm calendar UX. Kill the server when
+done (verify port 5173 free).
+
+- [ ] **Step 6: Run all tests**
+
+```bash
+cd .worktrees/website-parity/frontend/interface && npm test
+```
+Expected: pass.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add frontend/interface/src/routes/AppRoute.jsx \
+        frontend/interface/src/components/DateAndSessionPicker.jsx \
+        frontend/interface/src/components/DatePicker.jsx \
+        frontend/interface/src/components/DatePicker.css
+git commit -m "website: AppRoute uses SessionPicker; drop dead DateAndSessionPicker"
+```
+
+---
+
+## Task 10: Widget parity audit
+
+**Files:** read-only.
+
+- [ ] **Step 1: Confirm workspace resolution**
+
+```bash
+ls -la .worktrees/website-parity/frontend/interface/node_modules/@nfr/widgets
+```
+Expected: symlink to `packages/widgets`.
+
+- [ ] **Step 2: Confirm widgets uses source entrypoint**
+
+```bash
+cat packages/widgets/package.json | grep -E '"main"|"types"|"exports"'
+```
+Expected: `"main": "src/index.ts"`.
+
+- [ ] **Step 3: Smoke-check parity items visually**
+
+While still in dev server, confirm in the website `/app` graph widget:
+- Cursor snaps to samples (no interpolation).
+- X-axis labels are relative to session start.
+- Enum signals render as names.
+- Reset-zoom button is present.
+- Data-status dot is colored.
+
+If any are missing despite the shared package, note as a follow-up.
+
+- [ ] **Step 4: No commit needed**
+
+---
+
+## Verification checklist
+
+- [ ] `curl -X POST .../signals-window` returns rows for a known session.
+- [ ] Website `/app?session=<sid>` renders a graph with real data.
+- [ ] `get_session_signal_ids` returns non-empty set; signal-picker filters.
+- [ ] Sub-second zoom looks dense.
+- [ ] Session picker is calendar UX, no `#N`.
+- [ ] `git diff --stat main` shows no changes under `app/`, `desktop/`,
+      `parser/`, or `packages/widgets/`.
+- [ ] All `vitest` and `deno test` suites pass.
+
+---
+
+## Appendix A: SessionPicker.jsx body
+
+Use this as the file content in Task 8 Step 2:
 
 ```jsx
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -627,13 +985,6 @@ function SessionDayList({ date, sessions, currentId, onPick, onBack }) {
   );
 }
 
-/**
- * Calendar-style session picker.
- * Props:
- *   sessions: SessionListItem[]   (full list; sd_import gets filtered internally)
- *   currentId: string | null
- *   onPick(id: string)
- */
 export default function SessionPicker({ sessions, currentId, onPick }) {
   const [open, setOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -743,171 +1094,3 @@ export default function SessionPicker({ sessions, currentId, onPick }) {
   );
 }
 ```
-
-- [ ] **Step 3: Run the SessionPicker test**
-
-```bash
-cd frontend/interface && npm test -- src/components/SessionPicker.test.jsx
-```
-Expected: all three tests pass. If the "calls onPick" test fails because the day list shows multiple `aaaaaaaa` strings (one per session), narrow the selector — e.g. `screen.getAllByText('aaaaaaaa')[0]`.
-
-- [ ] **Step 4: Commit**
-
-```bash
-git add frontend/interface/src/components/SessionPicker.jsx
-git commit -m "website: desktop-style calendar SessionPicker"
-```
-
----
-
-## Task 8: Wire SessionPicker into AppRoute
-
-**Files:**
-- Modify: `frontend/interface/src/routes/AppRoute.jsx`
-- Delete: `frontend/interface/src/components/DateAndSessionPicker.jsx`
-- Delete (conditional): `frontend/interface/src/components/DatePicker.jsx`, `DatePicker.css`
-
-- [ ] **Step 1: Swap the import**
-
-In `frontend/interface/src/routes/AppRoute.jsx`, change:
-```jsx
-import DateAndSessionPicker from '@/components/DateAndSessionPicker';
-```
-to:
-```jsx
-import SessionPicker from '@/components/SessionPicker';
-```
-
-- [ ] **Step 2: Replace the JSX**
-
-Find the `sessionSlot = mode === 'replay' ? (...)` block. Replace the `<DateAndSessionPicker ... />` JSX with:
-```jsx
-<SessionPicker
-  sessions={sessions}
-  currentId={session?.id ?? null}
-  onPick={(id) => setSearch((p) => {
-    if (id) p.set('session', id); else p.delete('session');
-    p.delete('date');
-    return p;
-  })}
-/>
-```
-
-- [ ] **Step 3: Remove the now-dead date helper logic**
-
-In the same file, the `selectedDate` / `setSelectedDate` / `urlDate` block and the `useEffect` that auto-picks first session for `selectedDate` are no longer needed (the new picker manages its own calendar cursor). Delete:
-- `const urlDate = search.get('date');`
-- `const selectedDate = urlDate ?? session?.date ?? new Date().toISOString().split('T')[0];`
-- `const setSelectedDate = ...`
-- The `useEffect(() => { if (mode !== 'replay' || sessionId) return; ... }, [...])` block that auto-picks `firstForDate`.
-
-Keep the `session` and `sessionId` derivations untouched.
-
-- [ ] **Step 4: Check remaining importers of `DateAndSessionPicker` and `DatePicker`**
-
-```bash
-grep -rn "DateAndSessionPicker\|from .*DatePicker" frontend/interface/src
-```
-Expected: only the AppRoute import (which we just removed) — should now show zero matches.
-
-- [ ] **Step 5: Delete the orphaned files**
-
-```bash
-rm frontend/interface/src/components/DateAndSessionPicker.jsx \
-   frontend/interface/src/components/DatePicker.jsx \
-   frontend/interface/src/components/DatePicker.css
-```
-
-- [ ] **Step 6: Run the dev server and smoke-test**
-
-```bash
-cd frontend/interface && npm run dev
-```
-Open `http://localhost:5173/app`. Confirm:
-- The trigger button reads `Select session ▾` initially.
-- Clicking opens a calendar with badged days.
-- Clicking a day shows the time-list with `HH:MM:SS` labels and 8-char id stubs (no `#N`).
-- Picking a session updates the URL `?session=...` and the dock starts loading data.
-
-Kill the dev server when done.
-
-- [ ] **Step 7: Run all frontend tests**
-
-```bash
-cd frontend/interface && npm test
-```
-Expected: all pass.
-
-- [ ] **Step 8: Commit**
-
-```bash
-git add frontend/interface/src/routes/AppRoute.jsx \
-        frontend/interface/src/components/DateAndSessionPicker.jsx \
-        frontend/interface/src/components/DatePicker.jsx \
-        frontend/interface/src/components/DatePicker.css
-git commit -m "website: AppRoute uses desktop-style SessionPicker; drop dead DateAndSessionPicker"
-```
-
----
-
-## Task 9: Widget parity audit
-
-**Files:**
-- Read-only: `frontend/interface/package.json`, `packages/widgets/package.json`, `packages/widgets/src/index.ts`
-
-- [ ] **Step 1: Confirm workspace resolution**
-
-```bash
-ls -la frontend/interface/node_modules/@nfr/widgets
-```
-Expected: symlink to `packages/widgets`. If it's a copied directory or missing, run from the repo root:
-```bash
-npm install
-```
-
-- [ ] **Step 2: Confirm widgets uses source entrypoint**
-
-```bash
-cat packages/widgets/package.json | grep -E '"main"|"types"|"exports"'
-```
-Expected: `"main": "src/index.ts"` (no build step required — Vite consumes source).
-
-- [ ] **Step 3: Run the widget test suite to confirm nothing is broken upstream**
-
-```bash
-cd packages/widgets && npm test
-```
-Expected: all pass. If failures, this is a pre-existing issue — note but don't fix (out of scope).
-
-- [ ] **Step 4: Smoke-check the desktop-fix parity**
-
-Start the website dev server again, open `/app?session=<sid>`. Visually confirm in the dock graph:
-- Cursor snaps to nearest sample (no interpolation between samples).
-- X-axis labels are relative to session start.
-- Enum signals render as names, not the raw dictionary object.
-- Reset-zoom button (purple corner) is present.
-- Data-status dot is colored per signal status.
-
-If any of these are missing despite running the same `@nfr/widgets`, file a separate issue — they should propagate automatically from the shared package.
-
-- [ ] **Step 5: No commit needed unless action was taken**
-
-If `npm install` modified `package-lock.json`:
-```bash
-git add package-lock.json
-git commit -m "deps: refresh lockfile after workspace audit"
-```
-
----
-
-## Verification checklist
-
-After all tasks complete, verify against the spec:
-
-- [ ] `cat desktop/build/cloud-defaults.json` → publishes a Spaces URL, the URL `HEAD`s 200, and the corresponding Supabase RPC returns rows for a known session (Task 1).
-- [ ] Supabase `get_signals_window` accepts a fractional `p_bucket_secs` without error (Task 2).
-- [ ] On the website `/app` route, zooming a graph to a sub-second window renders dense samples (not stair-stepped) (Task 3).
-- [ ] On the website `/app` route, opening a widget signal picker hides signals that have no data in the current session (Task 4).
-- [ ] The session picker on the website is a calendar grid (Task 7) wired into AppRoute (Task 8), with no `#N` numbering visible anywhere.
-- [ ] `git status` shows no modifications under `app/`, `desktop/`, `parser/`, or `packages/widgets/`.
-- [ ] All vitest suites pass: `cd frontend/interface && npm test` and `cd packages/widgets && npm test`.

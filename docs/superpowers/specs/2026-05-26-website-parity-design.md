@@ -1,165 +1,152 @@
 # Website parity with desktop app + Spaces verification
 
-**Date:** 2026-05-26
-**Scope:** `frontend/interface/` (the public Vite website at nfrinterface.com) only.
+**Date:** 2026-05-26 (revised after Task 1 discovery)
+**Scope:** `frontend/interface/` (the public Vite website at nfrinterface.com) and a new Supabase Edge Function that proxies Parquet reads from DO Spaces.
 **Out of scope:** any change under `app/`, `desktop/`, `parser/`, `packages/widgets/` source.
 
 ## Goal
 
-Bring the public website's `/app` route into behavioral and visual parity with
-the desktop app for the parts that overlap (replay, session picker, signal
-filtering), verify the DigitalOcean Spaces data path is healthy, and fix the
-broken active-signal filter.
+Make the public website's `/app` route actually work for cloud-hosted sessions
+by reading Parquet data from DigitalOcean Spaces via a Supabase Edge Function,
+then bring the surrounding UI (session picker, active-signal filter) into
+parity with the desktop app.
 
 ## Background
 
-- The website (`frontend/interface/`) shares widget code with the desktop app
-  via the `@nfr/widgets` workspace package, so most widget-level fixes
-  propagate automatically.
-- Replay/session adapters are **forked**: desktop uses REST against its local
-  Fastify server (`app/src/hooks/useReplayFrames.ts`), website uses Supabase
-  RPCs (`frontend/interface/src/adapters/useSupabaseFrames.ts`).
-- Bulk per-signal data lives in DO Spaces as Parquet. The website does not
-  fetch Parquet directly; it reads aggregated buckets via the Supabase
-  `get_signals_window` RPC.
+- The website shares widget code with desktop via the `@nfr/widgets` workspace
+  package, so widget-level fixes propagate automatically.
+- The Supabase Postgres for the website has only `sessions`,
+  `signal_definitions`, `session_blobs` (Spaces object pointers), and
+  `rt_readings` (live). **There is no `sd_readings` table on Supabase.**
+  The bulk per-session signal data lives only as Parquet files in DO Spaces.
+- The pre-existing Supabase SQL functions `get_signals_window` and
+  `get_session_signal_ids` reference `sd_readings`, so they currently error
+  out. The website's `/app` replay is non-functional in production today.
 
-## Problems to fix
+## Spaces layout (verified)
 
-1. **Sub-second buckets don't propagate to the website.** Desktop
-   (`app/src/hooks/useReplayFrames.ts` line 102) computes
-   `bucketSecs = durationSecs / TARGET_BUCKETS` with no rounding. Website
-   (`frontend/interface/src/adapters/useSupabaseFrames.ts` lines 63–65)
-   computes `Math.max(1, Math.round(...))` for `durationSecs` and then calls
-   `bucketFor(...)`, which floors to whole seconds. Short zoom windows render
-   as coarse, stair-step lines on the website.
+- Public base: `https://nfrinterface.sfo3.digitaloceanspaces.com`
+- Per-session manifest: `sessions/<uuid>/manifest.json` listing one entry per
+  CAN source (`BMS`, `ECU`, `DAQ-IMU`, ...). Each entry has `source`,
+  `object_key`, `bytes`, `row_count`, `sha256`.
+- Per-source Parquet: `sessions/<uuid>/<safe_source_name>.parquet`. Schema is
+  `(timestamp TIMESTAMP, signal_id SMALLINT, value DOUBLE)`, sorted by
+  `(signal_id, ts)`, ZSTD-compressed, ROW_GROUP_SIZE 1M.
+- All objects are publicly readable; HTTP range reads work
+  (DuckDB-WASM can stream a slice of a Parquet remotely).
 
-2. **Active-signal filter is broken on the website.** AppRoute passes
-   `availableSignalIds` from `useSessionSignalIds` (a `Set<number>`) into the
-   `DockDirection` widget. Desktop does the same and it works. Root cause is
-   one of: stale widget bundle on the website, a divergent status enum
-   between the two hooks, or a Set-vs-array mismatch.
+## Architecture
 
-3. **Session picker is a flat dropdown numbered `#1 · 14:23:00 · 320s`.**
-   Desktop uses a calendar grid → click date → list of sessions labeled by
-   local time and short id. The user wants the website to match desktop
-   exactly.
+```
+Browser  ─supabase.functions.invoke('signals-window', body)─►  Supabase Edge Fn
+                                                                     │
+                                                                     ▼
+                                                       DuckDB-WASM (in Deno)
+                                                                     │
+                                                              HTTP range reads
+                                                                     ▼
+                                            DO Spaces  (.../sessions/<id>/*.parquet)
+```
 
-4. **Spaces connectivity has never been verified from the website's origin.**
-   Even though the website doesn't fetch Parquet directly, we need
-   confidence the published `cloud-defaults.json` URL is reachable and the
-   data is actually populated in Supabase for sessions whose Parquet exists
-   in Spaces.
+Edge function performs aggregation server-side with DuckDB-WASM. Frontend
+receives the same JSON shape as the (broken) RPC used to return — so widget
+code is unchanged.
 
-## Design
+For the signal-id catalog per session, a new SQL function joins
+`session_blobs` ↔ `signal_definitions` by `source` to enumerate the signal_ids
+present in a session — no Parquet read needed.
 
-### 1. Spaces & data-pipeline verification (diagnostic only)
+## Components
 
-Read-only sanity checks; no production code added unless something fails.
+### A. Supabase Edge Function `signals-window`
 
-- Read `desktop/build/cloud-defaults.json` to learn canonical
-  `spacesPublicBase`, `supabaseUrl`.
-- From a browser tab on the website's origin (or `curl`): `HEAD` a known
-  manifest URL `<spacesPublicBase>/sessions/<id>/manifest.json`. Pass = bucket
-  reachable + CORS open for the website origin.
-- Open the website `/app?session=<id>` for a session known to exist in Spaces;
-  confirm `get_signals_window` returns rows. Pass = pipeline healthy via
-  Supabase, no Spaces work needed.
-- If any check fails, surface the gap and stop. Fixes for desktop or DB are
-  out of scope per user instruction.
+- Deno + `@duckdb/duckdb-wasm` (via npm import).
+- **Request:**
+  ```json
+  {
+    "session_id": "uuid",
+    "signal_ids": [1, 7, 42],
+    "start": "2026-05-17T22:33:10.703Z",
+    "end":   "2026-05-17T22:34:51.658Z",
+    "bucket_secs": 0.125
+  }
+  ```
+- **Response:** Array of rows in the existing `RpcRow` shape:
+  ```ts
+  { ts: string; signal_id: number; signal_name: string; unit: string;
+    value_min: number; value_max: number; value_avg: number; sample_n: number }
+  ```
+- **Algorithm:**
+  1. Validate body.
+  2. From Supabase Postgres, look up which `source` each `signal_id` belongs
+     to (via `signal_definitions`).
+  3. Group signal_ids by source → list of Parquet URLs to read.
+  4. Open DuckDB-WASM in the edge runtime; run a single SQL that
+     `UNION ALL`s the `read_parquet('<https-url>')` calls per source,
+     filters by `signal_id IN (...)` and `ts ∈ [start, end)`, buckets via
+     `to_timestamp(floor(extract(epoch FROM ts)/bucket)*bucket)`, and
+     aggregates min/max/avg/count.
+  5. JOIN against signal_definitions (preloaded as a small table) for
+     `signal_name`/`unit`.
+  6. Return the rows as JSON.
 
-### 2. Fix active-signal filter
+### B. Replace broken SQL functions
 
-Trace the contract end-to-end:
+In `frontend/database/supabase_functions.sql`:
+- Remove (or rewrite) `get_signals_window` — replaced by the edge function.
+  Keep the SQL signature removal documented in a migration.
+- Rewrite `get_session_signal_ids(p_session_id uuid)`:
+  ```sql
+  SELECT DISTINCT sd.id::smallint AS signal_id
+  FROM session_blobs sb
+  JOIN signal_definitions sd ON sd.source = sb.source
+  WHERE sb.session_id = p_session_id;
+  ```
+- Rewrite `list_sessions(p_limit integer)` to also return `source` (needed
+  by the new SessionPicker for `sd_import` filtering).
 
-- Read `packages/widgets/src/dock/...` (read-only) to learn whether
-  `availableSignalIds` is expected as `Set<number>` or `number[]` and which
-  call sites use it.
-- Compare website `useSessionSignalIds` return shape and `status` enum to
-  desktop's.
-- Apply the minimum diff on the website side. Most likely fix:
-  - rebuild/reinstall `@nfr/widgets` so the website has the same bundle as
-    desktop, **or**
-  - normalize the Set/array at the AppRoute boundary, **or**
-  - align the `status` string enum so the gating `idsStatus === 'ready'`
-    actually trips.
-
-Verification: open `/app?session=<id>`, open any widget signal picker, confirm
-signals not present in the session are hidden.
-
-### 3. Sub-second bucket parity
+### C. Frontend adapter swap
 
 In `frontend/interface/src/adapters/useSupabaseFrames.ts`:
+- Replace `supabase.rpc('get_signals_window', ...)` with
+  `supabase.functions.invoke('signals-window', { body: ... })`.
+- Drop the integer-rounding from `bucket_secs` — edge fn accepts fractional.
+- No widget changes.
 
-- Replace
-  ```ts
-  const durationSecs = Math.max(1, Math.round((endMs - startMs) / 1000));
-  const bucketSecs = bucketFor(durationSecs, args.targetBuckets ?? 800);
-  ```
-  with
-  ```ts
-  const durationSecs = Math.max(0.001, (endMs - startMs) / 1000);
-  const bucketSecs = durationSecs / (args.targetBuckets ?? 800);
-  ```
-- Drop `bucketFor` import if it's no longer used anywhere; keep the file and
-  its tests if `bucketFor` has other callers.
-- Update `FramesCache.recordFetch` / `missing` key handling only if it
-  rounds the `bucketSecs` parameter (it shouldn't — but verify).
+### D. Active-signal filter
 
-Verification: zoom the graph to a 5-second window on the website; confirm
-samples are dense like desktop, not stepped.
+Once `get_session_signal_ids` is rewritten (component B), the filter starts
+working again. Add a runtime diagnostic for one cycle to confirm.
 
-### 4. Desktop-style session picker
+### E. Desktop-style session picker
 
-Create `frontend/interface/src/components/SessionPicker.jsx` by porting
-`app/src/components/SessionPicker.tsx` to JSX:
+Unchanged from previous spec — port `app/src/components/SessionPicker.tsx`
+to `frontend/interface/src/components/SessionPicker.jsx` (calendar grid → day
+list, label = local time + short id, no `#N` numbering).
 
-- Calendar grid with `‹ TODAY ›` controls. Days with sessions are highlighted
-  and badge-counted; days without are disabled.
-- Click a date → day-list panel: each row shows
-  `new Date(s.started_at).toLocaleTimeString()` on the left and
-  `s.source_file?.split('/').slice(-1)[0] ?? s.id.slice(0,8)` on the right.
-- No `#N` numbering, no `Ns` duration in the row label.
-- Trigger button label = `${new Date(current.started_at).toLocaleDateString()} · ${currentId.slice(0,8)}`.
+### F. Widget parity audit
 
-Wiring:
-- Source sessions from existing `useSessionList()` (Supabase RPC
-  `list_sessions`) — do not introduce a new fetch path.
-- Filter to `s.source === 'sd_import'` like desktop does.
-  (If `useSessionList` rows don't currently carry `source`, extend the
-  `SessionListItem` interface and the RPC selection rather than dropping the
-  filter.)
-- Replace `<DateAndSessionPicker .../>` in `routes/AppRoute.jsx` with
-  `<SessionPicker .../>`. Preserve `?session=`, `?date=` URL params: on pick,
-  call `setSearch` exactly as today.
-
-Remove `DateAndSessionPicker.jsx` and `DatePicker.jsx`/`DatePicker.css` only if
-no other component still imports them — otherwise leave them in place.
-
-### 5. Widget-parity audit
-
-- Check `frontend/interface/package.json` resolves `@nfr/widgets` from the
-  workspace (`packages/widgets`).
-- If `packages/widgets` has a `dist/` build step, rebuild it once so both
-  consumers run the same compiled code. If Vite imports source directly, no
-  action.
-- Eyeball-test the website `/app` route against the desktop screenshots for:
-  cursor snap, x-axis anchor to session start, enum signal name rendering,
-  reset-zoom button, data-status dot, min/max band toggle. File a follow-up
-  task for anything that still differs.
-
-## Non-goals
-
-- No browser-side Parquet/Spaces fetch path.
-- No changes to RPCs, migrations, or DB schema.
-- No marketing-page (`/`, `/app-download`) redesign.
-- No new features — only parity and bug fixes.
+Unchanged — confirm `@nfr/widgets` resolves to the workspace source so all
+recent fixes (cursor snap, x-axis anchor, enum names, reset-zoom dot)
+propagate.
 
 ## Verification checklist
 
-- [ ] Spaces public base URL responds to HEAD for a known manifest.
-- [ ] `/app?session=<known-id>` renders data on the website.
-- [ ] Signal picker on the website hides signals not in the current session.
-- [ ] 5-second zoom on the website looks as dense as desktop.
-- [ ] Session picker on the website is a calendar grid matching desktop UX.
-- [ ] No `app/`, `desktop/`, `parser/`, or `packages/widgets/` source files
-      modified.
+- [ ] Edge function deployed; smoke test from `curl` returns rows for a known
+      session and signal subset.
+- [ ] `useSupabaseFrames` swapped to `functions.invoke`; website `/app` route
+      renders a real session graph end-to-end.
+- [ ] `get_session_signal_ids` returns non-empty `Set` for a known session;
+      widget signal pickers hide signals not in the session.
+- [ ] Session picker on the website is a calendar grid matching desktop UX
+      with no `#N`.
+- [ ] No source modified under `app/`, `desktop/`, `parser/`, or
+      `packages/widgets/`.
+
+## Non-goals
+
+- No browser-side Parquet/Spaces fetch path (would also work via DuckDB-WASM
+  but adds 3-5 MB to the bundle and complicates caching).
+- No private-bucket auth — Spaces base is public-readable.
+- No changes to the desktop upload format.
+- No live-mode changes (`rt_readings` path untouched).
