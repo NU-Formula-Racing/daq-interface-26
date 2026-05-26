@@ -362,22 +362,41 @@ export function GraphWidget({
   const cursorFrac = (tCursor - t0) / (t1 - t0 || 1);
   const cursorX = xAtFrac(cursorFrac);
 
-  // Values at cursor (interpolate) and current (end)
-  const valueAt = (data: number[], frac: number) => {
-    const ix = frac * (N - 1);
-    const i0 = Math.floor(ix), i1 = Math.min(N - 1, i0 + 1);
-    const f = ix - i0;
-    return data[i0] * (1 - f) + data[i1] * f;
+  // Nearest-real-sample snap for the cursor. Each series carries an array of
+  // (timestamp-fraction, value) pairs in `dots`; given a target fraction we
+  // binary-search for the closest sample and return its position + value. No
+  // interpolation — the displayed value is always one of the actual recorded
+  // samples, and the cursor dot lands exactly on it.
+  const nearestSample = (
+    dots: { f: number; v: number }[] | null | undefined,
+    frac: number,
+  ): { f: number; v: number } | null => {
+    if (!dots || dots.length === 0) return null;
+    if (dots.length === 1) return dots[0];
+    let lo = 0;
+    let hi = dots.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (dots[mid].f < frac) lo = mid + 1; else hi = mid;
+    }
+    // `lo` is the first index whose f >= frac; check it and its predecessor.
+    const a = dots[Math.max(0, lo - 1)];
+    const b = dots[lo];
+    return Math.abs(a.f - frac) <= Math.abs(b.f - frac) ? a : b;
   };
 
-  // Legend data: value at the cursor (scrubber or hover). For live mode with no
-  // explicit playhead, fall back to the most recent sample so the legend stays
-  // populated.
-  const legend = series.map((s) => ({
-    sig: s.sig,
-    current: cursorVisible ? valueAt(s.data, cursorFrac) : s.data[N - 1],
-    cursor: cursorVisible ? valueAt(s.data, cursorFrac) : null,
-  }));
+  // Legend data: nearest real sample to the cursor for each series. In live
+  // mode (no explicit playhead) fall back to the most recent sample.
+  const legend = series.map((s) => {
+    const snap = cursorVisible ? nearestSample(s.dots, cursorFrac) : null;
+    const latest = s.dots && s.dots.length > 0 ? s.dots[s.dots.length - 1] : null;
+    return {
+      sig: s.sig,
+      current: snap ? snap.v : (latest ? latest.v : s.data[N - 1]),
+      cursor: snap ? snap.v : null,
+      cursorSnapFrac: snap ? snap.f : null,
+    };
+  });
 
   const showHoverTooltip = hoverFrac !== null && series.length > 0;
   const zoomed = !!zoom;
@@ -520,12 +539,40 @@ export function GraphWidget({
                 <path d={pathFor(s.data)} fill="none" stroke={color} strokeWidth={1.5}
                   strokeLinejoin="round" strokeLinecap="round" />
               )}
-              {/* End dot (current) */}
-              <circle cx={x(N - 1)} cy={y(s.data[N - 1])} r={2.5} fill={color} />
+              {/* End dot (current) — placed at the last real sample so it
+                  lines up with the legend's "current" value in any mode. */}
+              {(() => {
+                const last = s.dots && s.dots.length > 0
+                  ? s.dots[s.dots.length - 1]
+                  : null;
+                if (!last) return null;
+                return (
+                  <circle
+                    cx={padL + last.f * plotW}
+                    cy={y(last.v)}
+                    r={2.5}
+                    fill={color}
+                  />
+                );
+              })()}
               {/* Cursor dot — follows the playhead `t` (or hover when present) */}
-              {cursorVisible && (
-                <circle cx={cursorX} cy={y(valueAt(s.data, cursorFrac))} r={3} fill={W_COLORS.bgInner} stroke={color} strokeWidth={1.5} />
-              )}
+              {cursorVisible && (() => {
+                // Snap the cursor dot to the nearest real sample for this
+                // series. Lines up exactly with the legend value above and
+                // visibly indicates which raw sample is being read.
+                const snap = nearestSample(s.dots, cursorFrac);
+                if (!snap) return null;
+                return (
+                  <circle
+                    cx={padL + snap.f * plotW}
+                    cy={y(snap.v)}
+                    r={3}
+                    fill={W_COLORS.bgInner}
+                    stroke={color}
+                    strokeWidth={1.5}
+                  />
+                );
+              })()}
             </g>
           );
         })}
