@@ -47,7 +47,7 @@ def decode_frame(frame_id, data, decode_table):
         raw_value = (payload >> signal.start_bit) & mask
 
         # 5. Handle signed signals and floats
-        if getattr(signal, "is_float", False):
+        if getattr(signal, "is_float", False) and signal.length in (32, 64):
             if signal.length == 32:
                 raw_value = struct.unpack("f", struct.pack("I", raw_value))[0]
             elif signal.length == 64:
