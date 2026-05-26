@@ -73,16 +73,24 @@ export async function getSession(
   // Earliest actual reading — the trusted anchor for x-axis labels in the
   // replay widget. Cheap query: covers the (session_id, signal_id, ts)
   // index. Returns null when the session has zero rows.
-  const dataStart = await pool.query<{ data_start_ts: string | null }>(
-    `SELECT MIN(ts)::text AS data_start_ts
+  //
+  // Critical: don't cast to ::text. Postgres' default text representation
+  // of timestamptz is "2026-05-25 16:46:24.201-05" — a space instead of T
+  // and an offset without minutes. Date.parse mishandles this and shifts
+  // by 5 hours on some platforms. Returning the raw Date lets node-postgres
+  // produce a JS Date which Fastify serializes as proper ISO 8601 (the
+  // same format as started_at).
+  const dataStart = await pool.query<{ data_start_ts: Date | null }>(
+    `SELECT MIN(ts) AS data_start_ts
      FROM sd_readings WHERE session_id = $1`,
     [id]
   );
+  const dataStartIso = dataStart.rows[0]?.data_start_ts ?? null;
 
   return {
     ...rows[0],
     signals: sigs.rows,
-    data_start_ts: dataStart.rows[0]?.data_start_ts ?? null,
+    data_start_ts: dataStartIso ? dataStartIso.toISOString() : null,
   };
 }
 
