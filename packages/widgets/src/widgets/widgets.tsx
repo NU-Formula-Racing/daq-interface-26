@@ -9,6 +9,45 @@ function useFrames() {
   return useContext(FramesContext);
 }
 
+// ── Value formatting helpers ────────────────────────────────────
+// Module-scope so every widget renderer can use them.
+
+export function formatValue(v: number): string {
+  if (Math.abs(v) >= 1000) return v.toFixed(0);
+  if (Math.abs(v) >= 100) return v.toFixed(0);
+  if (Math.abs(v) >= 10) return v.toFixed(1);
+  return v.toFixed(2);
+}
+
+/** Some DBC rows pack a value→name dictionary into the unit column, e.g.
+ *  "0x00: NONE\n0x01: OVER_VOLTAGE\n...". Parse it once and return a
+ *  numeric-keyed lookup. Returns null when the unit isn't enum-shaped. */
+export function parseEnumMap(unit: string | null | undefined): Map<number, string> | null {
+  if (!unit) return null;
+  if (!/0x[0-9a-fA-F]{1,4}\s*:/.test(unit)) return null;
+  const map = new Map<number, string>();
+  const re = /0x([0-9a-fA-F]{1,4})\s*:\s*([^\n]*?)(?=(?:\s+0x[0-9a-fA-F]{1,4}\s*:)|$)/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(unit)) !== null) {
+    const key = parseInt(m[1], 16);
+    const name = m[2].trim();
+    if (name) map.set(key, name);
+  }
+  return map.size > 0 ? map : null;
+}
+
+/** "1.00" + "V" or "OVER_VOLTAGE" depending on whether the signal's unit
+ *  encodes an enum dictionary. When `isEnum: true`, callers should NOT
+ *  render the unit alongside (the unit IS the enum dictionary). */
+export function fmtValOrEnum(v: number, unit: string | null | undefined): { text: string; isEnum: boolean } {
+  const map = parseEnumMap(unit);
+  if (!map) return { text: formatValue(v), isEnum: false };
+  const key = Math.round(v);
+  const name = map.get(key);
+  if (name) return { text: name, isEnum: true };
+  return { text: `0x${key.toString(16).toUpperCase().padStart(2, '0')}`, isEnum: true };
+}
+
 // ────────────────────────────────────────────────────────────
 // Graph — oscilloscope-style line/area/step
 // ────────────────────────────────────────────────────────────
@@ -230,12 +269,7 @@ export function GraphWidget({
     const ms = Math.floor((total * 1000) % 1000);
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(ms).padStart(3, '0')}`;
   };
-  const fmtVal = (v: number) => {
-    if (Math.abs(v) >= 1000) return v.toFixed(0);
-    if (Math.abs(v) >= 100) return v.toFixed(0);
-    if (Math.abs(v) >= 10) return v.toFixed(1);
-    return v.toFixed(2);
-  };
+  const fmtVal = formatValue;
 
   const pathFor = (data: number[]) => {
     if (style === 'step') {
@@ -370,7 +404,17 @@ export function GraphWidget({
             <span style={{ width: 7, height: 2, background: signalColors?.[l.sig.id] ?? l.sig.color, flexShrink: 0 }} />
             <span style={{ color: W_COLORS.textMute, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 120 }}>{l.sig.name}</span>
             <span style={{ color: W_COLORS.text, fontVariantNumeric: 'tabular-nums' }}>
-              {fmtVal(l.current)}<span style={{ color: W_COLORS.textFaint, marginLeft: 2 }}>{l.sig.unit}</span>
+              {(() => {
+                const r = fmtValOrEnum(l.current, l.sig.unit);
+                return (
+                  <>
+                    {r.text}
+                    {!r.isEnum && (
+                      <span style={{ color: W_COLORS.textFaint, marginLeft: 2 }}>{l.sig.unit}</span>
+                    )}
+                  </>
+                );
+              })()}
             </span>
           </div>
         ))}
@@ -522,7 +566,18 @@ export function GraphWidget({
                   <span style={{ color: W_COLORS.textMute, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 90 }}>{l.sig.name}</span>
                 </span>
                 <span style={{ color: W_COLORS.text, fontVariantNumeric: 'tabular-nums' }}>
-                  {l.cursor !== null ? fmtVal(l.cursor) : '—'}<span style={{ color: W_COLORS.textFaint, marginLeft: 2 }}>{l.sig.unit}</span>
+                  {(() => {
+                    if (l.cursor === null) return <>—</>;
+                    const r = fmtValOrEnum(l.cursor, l.sig.unit);
+                    return (
+                      <>
+                        {r.text}
+                        {!r.isEnum && (
+                          <span style={{ color: W_COLORS.textFaint, marginLeft: 2 }}>{l.sig.unit}</span>
+                        )}
+                      </>
+                    );
+                  })()}
                 </span>
               </div>
             ))}
@@ -780,17 +835,27 @@ export function NumericWidget({ signal, compact = false }: NumericWidgetProps) {
         color: W_COLORS.text, lineHeight: 1.05, letterSpacing: -2,
         fontVariantNumeric: 'tabular-nums', marginTop: 4,
       }}>
-        {v != null ? v.toFixed(Math.abs(v) >= 100 ? 0 : Math.abs(v) >= 10 ? 1 : 2) : '—'}
+        {(() => {
+          if (v == null) return '—';
+          const r = fmtValOrEnum(v, sig.unit);
+          return r.text;
+        })()}
       </div>
-      {sig.unit && (
-        <div style={{
-          fontFamily: '"Inter", system-ui, sans-serif',
-          fontSize: 11, color: W_COLORS.textMute, letterSpacing: 1.5,
-          textTransform: 'uppercase', marginTop: 4, fontWeight: 400,
-        }}>
-          {sig.unit}
-        </div>
-      )}
+      {sig.unit && (() => {
+        // Suppress the unit row when the unit is an enum dictionary —
+        // the value row already shows the named enum.
+        const isEnum = !!parseEnumMap(sig.unit);
+        if (isEnum) return null;
+        return (
+          <div style={{
+            fontFamily: '"Inter", system-ui, sans-serif',
+            fontSize: 11, color: W_COLORS.textMute, letterSpacing: 1.5,
+            textTransform: 'uppercase', marginTop: 4, fontWeight: 400,
+          }}>
+            {sig.unit}
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -848,10 +913,10 @@ export function GaugeWidget({ signal }: GaugeWidgetProps) {
             x2={cx + Math.cos(ta) * r2} y2={cy + Math.sin(ta) * r2} stroke={W_COLORS.textFaint} strokeWidth={1} />;
         })}
         <text x={cx} y={cy + 4} textAnchor="middle" fill={W_COLORS.text} fontSize={sz * 0.18} fontWeight={500} fontFamily='"JetBrains Mono", monospace' style={{ fontVariantNumeric: 'tabular-nums', letterSpacing: -1 }}>
-          {v != null ? v.toFixed(Math.abs(v) >= 100 ? 0 : 1) : '—'}
+          {v != null ? fmtValOrEnum(v, sig.unit).text : '—'}
         </text>
         <text x={cx} y={cy + sz * 0.18} textAnchor="middle" fill={W_COLORS.textMute} fontSize={11} fontFamily='"JetBrains Mono", monospace'>
-          {sig.unit}
+          {parseEnumMap(sig.unit) ? '' : sig.unit}
         </text>
       </svg>
     </div>
@@ -879,7 +944,16 @@ export function BarWidget({ signals = [] }: BarWidgetProps) {
             <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: '"JetBrains Mono", monospace', fontSize: 10, color: W_COLORS.textMute }}>
               <span style={{ color: W_COLORS.text }}>{s.name}</span>
               <span style={{ fontVariantNumeric: 'tabular-nums', color: W_COLORS.text }}>
-                {v != null ? v.toFixed(1) : '—'} <span style={{ color: W_COLORS.textFaint }}>{s.unit}</span>
+                {(() => {
+                  if (v == null) return <>—</>;
+                  const r = fmtValOrEnum(v, s.unit);
+                  return (
+                    <>
+                      {r.text}
+                      {!r.isEnum && <span style={{ color: W_COLORS.textFaint }}> {s.unit}</span>}
+                    </>
+                  );
+                })()}
               </span>
             </div>
             <div style={{ height: 10, background: 'rgba(255,255,255,0.04)', position: 'relative', overflow: 'hidden' }}>

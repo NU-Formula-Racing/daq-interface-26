@@ -10,6 +10,8 @@ import {
   WidgetShell,
   WidgetIcon,
   WIDGET_TYPES,
+  fmtValOrEnum,
+  parseEnumMap,
 } from '../widgets/widgets.tsx';
 import type { Signal } from '../signals/catalog.ts';
 import type { FramesStore } from '../data/types.ts';
@@ -1264,7 +1266,9 @@ function SigRow({ s, selected, fav, onPick, onToggleFav }: { s: Signal; selected
       </span>
       <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
       <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.name}</span>
-      <span style={{ color: SH_COLORS.textFaint, fontSize: 9 }}>{s.unit || '—'}</span>
+      <span style={{ color: SH_COLORS.textFaint, fontSize: 9 }}>
+        {parseEnumMap(s.unit) ? '(enum)' : (s.unit || '—')}
+      </span>
     </div>
   );
 }
@@ -1291,7 +1295,18 @@ function SignalReadout({ sig }: { sig: any; t: number }) {
         <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
         <span style={{ color: SH_COLORS.text, fontSize: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
       </span>
-      <span style={{ color: SH_COLORS.text, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{v != null ? v.toFixed(1) : '—'} <span style={{ color: SH_COLORS.textFaint }}>{s.unit}</span></span>
+      <span style={{ color: SH_COLORS.text, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+        {(() => {
+          if (v == null) return <>—</>;
+          const r = fmtValOrEnum(v, s.unit);
+          return (
+            <>
+              {r.text}
+              {!r.isEnum && <span style={{ color: SH_COLORS.textFaint }}> {s.unit}</span>}
+            </>
+          );
+        })()}
+      </span>
     </div>
   );
 }
