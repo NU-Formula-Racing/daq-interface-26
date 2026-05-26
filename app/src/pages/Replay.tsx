@@ -139,6 +139,7 @@ function ReplayInner({ id, detail, navigate }: ReplayInnerProps) {
         availableSignalIds={idsStatus === 'ready' ? availableSignalIds : null}
         onZoom={handleZoom}
         zoomActive={visStart !== sessionStart || visEnd !== sessionEnd}
+        sessionStartTs={sessionStart}
       />
     </div>
   );

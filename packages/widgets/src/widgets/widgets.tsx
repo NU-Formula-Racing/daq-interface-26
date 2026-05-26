@@ -73,13 +73,18 @@ interface GraphWidgetProps {
    *  narrower than the full session. Makes the corner reset-zoom button
    *  visible. */
   zoomActive?: boolean;
+  /** ISO timestamp of the session's start. When set, x-axis labels are
+   *  computed as elapsed-time-into-the-session — so a zoomed view of the
+   *  drive's 14th minute still reads "14:00 → 14:30" instead of "00:00
+   *  → 00:30". Falls back to window-relative labels when unset. */
+  sessionStartTs?: string | null;
 }
 
 export function GraphWidget({
   signals = [], t, window: win = 0.05, style = 'line',
   density = 'normal', compact = false, showAxes = true, showCursor = true, height,
   zoom = null, onZoom, mode = 'replay', signalColors, showRange = true,
-  zoomActive = false,
+  zoomActive = false, sessionStartTs = null,
 }: GraphWidgetProps) {
   const catalog = useCatalog();
   const frames = useFrames();
@@ -248,22 +253,33 @@ export function GraphWidget({
   const yVals = Array.from({ length: yTicks + 1 }, (_, i) => dMin + (dSpan * i) / yTicks);
   const xTicks = compact ? 4 : 6;
 
-  // Real session duration drives the x-axis labels. tt is a 0..1 fraction of
-  // the session; multiplying by durationSec gives elapsed seconds from start.
+  // X-axis labels reflect the absolute time position of the visible window
+  // within the session, not just a 0-relative slice. firstMs/latestMs are
+  // the bounds of the data currently in the buffer (set by the orchestrator's
+  // last refetch); when sessionStartTs is provided, label by elapsed seconds
+  // from that anchor.
   const firstMs = frames?.firstTs() ? Date.parse(frames.firstTs() as string) : null;
   const latestMs = frames?.latestTs() ? Date.parse(frames.latestTs() as string) : null;
+  const sessionStartMs = sessionStartTs ? Date.parse(sessionStartTs) : null;
   const durationSec = firstMs != null && latestMs != null
     ? Math.max(0.001, (latestMs - firstMs) / 1000)
     : 0;
 
+  // Elapsed seconds from session start to the LEFT edge of the visible
+  // window. When session anchor is unknown, this is 0 — labels degrade to
+  // window-relative (the old behaviour).
+  const windowStartOffsetSec = sessionStartMs != null && firstMs != null
+    ? Math.max(0, (firstMs - sessionStartMs) / 1000)
+    : 0;
+
   const fmtTime = (tt: number) => {
-    const total = tt * durationSec;
+    const total = windowStartOffsetSec + tt * durationSec;
     const m = Math.floor(total / 60);
     const s = Math.floor(total % 60);
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
   const fmtTimeMs = (tt: number) => {
-    const total = tt * durationSec;
+    const total = windowStartOffsetSec + tt * durationSec;
     const m = Math.floor(total / 60);
     const s = Math.floor(total % 60);
     const ms = Math.floor((total * 1000) % 1000);
@@ -1367,8 +1383,11 @@ interface WidgetShellProps {
    *  Forwarded to graph widgets so they can render their corner reset
    *  button. */
   zoomActive?: boolean;
+  /** ISO timestamp of the session start. Forwarded to graph widgets so
+   *  their x-axis labels read as elapsed-into-session at any zoom. */
+  sessionStartTs?: string | null;
 }
-export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick, onSettings, onZoom, zoomActive }: WidgetShellProps) {
+export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick, onSettings, onZoom, zoomActive, sessionStartTs }: WidgetShellProps) {
   const [typeOpen, setTypeOpen] = useState(false);
   const compact = density === 'compact';
   const frames = useFrames();
@@ -1412,7 +1431,7 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
       // sub-slicing into it — that would compound the orchestrator's zoom and
       // shrink the visible range on every drag.
       // widget.graphStyle overrides the dock-level default per-graph.
-      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={widget.graphStyle ?? graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} zoomActive={zoomActive} />;
+      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={widget.graphStyle ?? graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} zoomActive={zoomActive} sessionStartTs={sessionStartTs} />;
       case 'numeric': return <NumericWidget signal={widget.signals[0]} t={t} compact={compact} />;
       case 'gauge': return <GaugeWidget signal={widget.signals[0]} t={t} />;
       case 'bar': return <BarWidget signals={widget.signals} t={t} />;

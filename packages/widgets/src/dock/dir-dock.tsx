@@ -93,6 +93,9 @@ interface DockDirectionProps {
   /** True when the orchestrator's visible window is narrower than the full
    *  session. Drives the in-graph "reset zoom" corner button visibility. */
   zoomActive?: boolean;
+  /** ISO timestamp of the session start. Forwarded to widgets so their
+   *  x-axis labels read as elapsed-into-session at any zoom level. */
+  sessionStartTs?: string | null;
 }
 
 const DROPPABLE_TYPES = [
@@ -160,7 +163,7 @@ function DropTypePopup({
   );
 }
 
-export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true, availableSignalIds = null, onZoom, zoomActive }: DockDirectionProps) {
+export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true, availableSignalIds = null, onZoom, zoomActive, sessionStartTs }: DockDirectionProps) {
   const catalog = useCatalog();
   const [widgets, setWidgets] = useState<any[]>(loadLayout);
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
@@ -624,6 +627,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                     onSettings={() => setFocusedId(w.id)}
                     onZoom={onZoom}
                     zoomActive={zoomActive}
+                    sessionStartTs={sessionStartTs}
                     draggable
                     onDragStart={(e) => startMove(w, e)}
                   />
