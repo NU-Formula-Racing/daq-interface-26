@@ -138,6 +138,7 @@ function ReplayInner({ id, detail, navigate }: ReplayInnerProps) {
         sessionSlot={<SessionPicker />}
         availableSignalIds={idsStatus === 'ready' ? availableSignalIds : null}
         onZoom={handleZoom}
+        zoomActive={visStart !== sessionStart || visEnd !== sessionEnd}
       />
     </div>
   );

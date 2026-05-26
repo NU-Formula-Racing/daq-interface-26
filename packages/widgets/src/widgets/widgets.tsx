@@ -30,12 +30,17 @@ interface GraphWidgetProps {
   /** Show a translucent band between vMin and vMax behind each trace.
    *  Useful for spike-debugging at coarse zoom. Default true. */
   showRange?: boolean;
+  /** Driven from the orchestrator: true when the shared replay zoom is
+   *  narrower than the full session. Makes the corner reset-zoom button
+   *  visible. */
+  zoomActive?: boolean;
 }
 
 export function GraphWidget({
   signals = [], t, window: win = 0.05, style = 'line',
   density = 'normal', compact = false, showAxes = true, showCursor = true, height,
   zoom = null, onZoom, mode = 'replay', signalColors, showRange = true,
+  zoomActive = false,
 }: GraphWidgetProps) {
   const catalog = useCatalog();
   const frames = useFrames();
@@ -329,6 +334,30 @@ export function GraphWidget({
 
   return (
     <div ref={wrap} style={{ width: '100%', height: height || '100%', position: 'relative', background: W_COLORS.bgInner }}>
+      {/* Reset-zoom corner button — visible only while a non-trivial zoom is
+          active. Driven by the orchestrator's zoomActive flag, not internal
+          widget state. */}
+      {zoomActive && onZoom && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onZoom(null); }}
+          title="Reset zoom (or double-click the plot)"
+          style={{
+            position: 'absolute', top: 4, right: 4, zIndex: 3,
+            background: 'rgba(168, 85, 247, 0.85)',   // purple-500
+            color: '#ffffff',
+            border: '1px solid rgba(168, 85, 247, 1)',
+            borderRadius: 3,
+            padding: '2px 6px',
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: compact ? 9 : 10,
+            letterSpacing: 0.8,
+            cursor: 'pointer',
+            lineHeight: 1.2,
+          }}
+        >
+          ⤢ RESET
+        </button>
+      )}
       {/* Legend strip: name + current value for each signal */}
       <div style={{
         position: 'absolute', top: 4, left: padL, right: padR, zIndex: 2,
@@ -1260,10 +1289,46 @@ interface WidgetShellProps {
   /** Notified when any widget's zoom range changes. Use to drive a global
    *  visible-window fetch. `null` = the widget reset its zoom. */
   onZoom?: (z: [number, number] | null) => void;
+  /** True when the shared replay zoom is narrower than the full session.
+   *  Forwarded to graph widgets so they can render their corner reset
+   *  button. */
+  zoomActive?: boolean;
 }
-export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick, onSettings, onZoom }: WidgetShellProps) {
+export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick, onSettings, onZoom, zoomActive }: WidgetShellProps) {
   const [typeOpen, setTypeOpen] = useState(false);
   const compact = density === 'compact';
+  const frames = useFrames();
+  const catalog = useCatalog();
+
+  // RAW vs AGGREGATED status for graph widgets: max sample_n across all
+  // currently-buffered buckets for this widget's signals. Green if every
+  // bucket holds ≤ 1 raw sample, orange if any bucket aggregated multiple.
+  let aggStatus: 'raw' | 'aggregated' | 'empty' = 'empty';
+  if (widget.type === 'graph' && frames) {
+    let maxN = 0;
+    let seen = 0;
+    for (const sig of widget.signals ?? []) {
+      const resolved = catalog.resolve(sig);
+      if (!resolved) continue;
+      const arr = frames.series(resolved.id) ?? [];
+      for (const f of arr) {
+        const n = f.sampleN ?? 1;
+        if (n > maxN) maxN = n;
+        seen += 1;
+      }
+    }
+    if (seen === 0) aggStatus = 'empty';
+    else if (maxN > 1) aggStatus = 'aggregated';
+    else aggStatus = 'raw';
+  }
+  const aggColor =
+    aggStatus === 'raw' ? '#22c55e'         // green-500
+      : aggStatus === 'aggregated' ? '#fb923c'  // orange-400
+        : '#525252';                          // neutral-600 (no data)
+  const aggTitle =
+    aggStatus === 'raw' ? 'Every shown point is a real recorded sample (raw)'
+      : aggStatus === 'aggregated' ? 'Multiple raw samples averaged per bucket — zoom in for detail'
+        : 'No data in current window';
 
   const renderBody = () => {
     switch (widget.type) {
@@ -1273,7 +1338,7 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
       // sub-slicing into it — that would compound the orchestrator's zoom and
       // shrink the visible range on every drag.
       // widget.graphStyle overrides the dock-level default per-graph.
-      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={widget.graphStyle ?? graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} />;
+      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={widget.graphStyle ?? graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} zoomActive={zoomActive} />;
       case 'numeric': return <NumericWidget signal={widget.signals[0]} t={t} compact={compact} />;
       case 'gauge': return <GaugeWidget signal={widget.signals[0]} t={t} />;
       case 'bar': return <BarWidget signals={widget.signals} t={t} />;
@@ -1346,6 +1411,21 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
           )}
         </div>
 
+        {widget.type === 'graph' && (
+          <span
+            title={aggTitle}
+            aria-label={`Data status: ${aggStatus}`}
+            style={{
+              display: 'inline-block',
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              background: aggColor,
+              margin: '0 4px',
+              flexShrink: 0,
+            }}
+          />
+        )}
         {onSettings && (
           <button onClick={(e) => { e.stopPropagation(); onSettings(); }} style={{ ...headerBtn(), color: SH_COLORS.textFaint, padding: '2px 5px' }} title="Settings" aria-label="Settings">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
