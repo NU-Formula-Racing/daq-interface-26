@@ -4,6 +4,11 @@ export interface FrameRow {
   value: number;       // = avg when bucketed, raw value otherwise
   vMin?: number;
   vMax?: number;
+  /** Number of raw samples aggregated into this bucket. > 1 means the
+   *  server averaged multiple raw samples; = 1 (or undefined) means the
+   *  value is a single raw sample. Surfaced in the graph settings panel
+   *  as the RAW / AGGREGATED indicator. */
+  sampleN?: number;
 }
 
 export interface FramesStore {

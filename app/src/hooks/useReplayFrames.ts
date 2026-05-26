@@ -21,6 +21,7 @@ class ReplayFramesStore implements FramesStore {
         value: r.value_avg,
         vMin: r.value_min,
         vMax: r.value_max,
+        sampleN: r.sample_n,
       };
       let buf = this.bySignal.get(r.signal_id);
       if (!buf) { buf = []; this.bySignal.set(r.signal_id, buf); }

@@ -719,19 +719,57 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                     }}
                   />
                 </div>
-                {w.type === 'graph' && (
+                {w.type === 'graph' && (() => {
+                  // Sample-status indicator: peek at the frames buffer for the
+                  // widget's signals and find the largest sample_n across all
+                  // returned buckets. sample_n > 1 means the server aggregated
+                  // multiple raw samples into a bucket — zooming in further
+                  // will reveal more detail. sample_n ≤ 1 means every visible
+                  // point IS a raw sample (or empty bucket).
+                  let maxSampleN = 0;
+                  let totalSampleN = 0;
+                  let bucketsSeen = 0;
+                  for (const sig of w.signals ?? []) {
+                    if (typeof sig !== 'number') continue;
+                    const arr = frames?.series(sig) ?? [];
+                    for (const f of arr) {
+                      const n = f.sampleN ?? 1;
+                      if (n > maxSampleN) maxSampleN = n;
+                      totalSampleN += n;
+                      bucketsSeen += 1;
+                    }
+                  }
+                  const isAggregated = maxSampleN > 1;
+                  const avgPerBucket = bucketsSeen > 0 ? totalSampleN / bucketsSeen : 0;
+                  return (
                   <>
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, letterSpacing: 1.2 }}>
                         <span>ZOOM</span>
-                        <span style={{ color: w.zoom ? SH_COLORS.accentBright : SH_COLORS.textFaint }}>
-                          {w.zoom ? `${Math.round(w.zoom[0]*3600)}s → ${Math.round(w.zoom[1]*3600)}s` : 'OFF'}
+                        <span style={{ color: SH_COLORS.textFaint }}>
+                          drag · dbl-click resets
                         </span>
                       </div>
-                      <div style={{ fontSize: 9, color: SH_COLORS.textFaint, marginBottom: 4 }}>Drag on plot to zoom · dbl-click to reset</div>
-                      {w.zoom && (
-                        <button onClick={() => patch(w.id, { zoom: null })} style={smallBtn()}>⤢ RESET ZOOM</button>
-                      )}
+                      <button onClick={() => onZoom?.(null)} style={smallBtn()}>⤢ RESET ZOOM</button>
+                    </div>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, letterSpacing: 1.2 }}>
+                        <span>DATA</span>
+                        <span style={{ color: isAggregated ? SH_COLORS.accentBright : SH_COLORS.textFaint }}>
+                          {bucketsSeen === 0
+                            ? '—'
+                            : isAggregated
+                              ? `AGGREGATED · avg ${avgPerBucket.toFixed(1)}/bucket`
+                              : 'RAW'}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 9, color: SH_COLORS.textFaint }}>
+                        {isAggregated
+                          ? 'Some samples merged. Zoom in to see more detail.'
+                          : bucketsSeen === 0
+                            ? 'No data in current window.'
+                            : 'Every point is an actual recorded sample.'}
+                      </div>
                     </div>
                     <div>
                       <div style={{ marginBottom: 5, letterSpacing: 1.2 }}>Y AXIS</div>
@@ -760,7 +798,8 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                       </div>
                     </div>
                   </>
-                )}
+                  );
+                })()}
                 <div>
                   <div style={{ marginBottom: 6, letterSpacing: 1.2 }}>CURRENT VALUE</div>
                   {w.signals.slice(0, 6).map((sid: any) => <SignalReadout key={sid} sig={sid} t={t} />)}
