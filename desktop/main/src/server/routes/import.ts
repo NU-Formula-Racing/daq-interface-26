@@ -9,8 +9,10 @@ export interface ImportResult {
 }
 
 export interface ImportDeps {
-  /** Called per uploaded file. Saves to disk + runs parser batch + returns result. */
-  onImport: (filename: string, body: Buffer) => Promise<ImportResult>;
+  /** Called per uploaded file. Saves to disk + runs parser batch + returns result.
+   *  When `reparse` is true, the dedup short-circuit is skipped so the parser
+   *  re-decodes the file with the current DBC and overwrites prior rows. */
+  onImport: (filename: string, body: Buffer, reparse: boolean) => Promise<ImportResult>;
 }
 
 /**
@@ -37,8 +39,10 @@ export function registerImportRoutes(app: FastifyInstance, deps: ImportDeps) {
         typeof headerName === 'string' && headerName.length > 0
           ? headerName
           : `upload-${Date.now()}.nfr`;
+      const q = (req.query ?? {}) as Record<string, unknown>;
+      const reparse = q.reparse === '1' || q.reparse === 'true';
       try {
-        const result = await deps.onImport(filename, body);
+        const result = await deps.onImport(filename, body, reparse);
         if (result.error) {
           reply.code(500);
           return result;

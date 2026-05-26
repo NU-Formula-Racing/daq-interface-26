@@ -47,7 +47,7 @@ export interface BuildAppOptions {
   onParserConfigChanged?: () => Promise<void>;
   dsn?: string;
   pgConnStr?: string;
-  onImport?: (filename: string, body: Buffer) => Promise<ImportResult>;
+  onImport?: (filename: string, body: Buffer, reparse: boolean) => Promise<ImportResult>;
   catalogDeps?: CatalogDeps;
   broadcastDeps?: BroadcastDeps;
   uninstallDeps?: UninstallDeps;

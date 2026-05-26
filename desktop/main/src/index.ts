@@ -302,7 +302,7 @@ export async function run(opts: {
     parser.start();
   };
 
-  const runBatchImport = async (filename: string, body: Buffer): Promise<ImportResult> => {
+  const runBatchImport = async (filename: string, body: Buffer, reparse: boolean): Promise<ImportResult> => {
     if (!pool || !dsn) return { session_id: null, row_count: 0, error: 'database not ready' };
     mkdirSync(NFR_UPLOADS_DIR, { recursive: true });
     const safeName = filename.replace(/[^A-Za-z0-9._-]/g, '_');
@@ -310,18 +310,22 @@ export async function run(opts: {
     writeFileSync(target, body);
 
     // Content-hash dedup: skip re-parsing if this exact file was already imported.
+    // When `reparse` is set, skip the short-circuit so the parser re-decodes the
+    // bytes with the current DBC and overwrites prior rows (deterministic UUID).
     const sourceFileHash = createHash('sha256').update(body).digest('hex');
-    const existing = await pool.query<{ id: string }>(
-      `SELECT id FROM sessions WHERE source_file_hash = $1 LIMIT 1`,
-      [sourceFileHash],
-    );
-    if (existing.rows.length > 0) {
-      const id = existing.rows[0].id;
-      const cnt = await pool.query<{ n: string }>(
-        `SELECT count(*)::text AS n FROM sd_readings WHERE session_id = $1`,
-        [id],
+    if (!reparse) {
+      const existing = await pool.query<{ id: string }>(
+        `SELECT id FROM sessions WHERE source_file_hash = $1 LIMIT 1`,
+        [sourceFileHash],
       );
-      return { session_id: id, row_count: Number(cnt.rows[0]?.n ?? '0') };
+      if (existing.rows.length > 0) {
+        const id = existing.rows[0].id;
+        const cnt = await pool.query<{ n: string }>(
+          `SELECT count(*)::text AS n FROM sd_readings WHERE session_id = $1`,
+          [id],
+        );
+        return { session_id: id, row_count: Number(cnt.rows[0]?.n ?? '0') };
+      }
     }
 
     const cfgNow = await getAppConfig(pool);

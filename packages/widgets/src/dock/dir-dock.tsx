@@ -308,6 +308,13 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
   const [dbcStatus, setDbcStatus] = useState<string>('');
   const [nfrStatus, setNfrStatus] = useState<string>('');
   const [nfrModalOpen, setNfrModalOpen] = useState(false);
+  const [reparseOnImport, setReparseOnImport] = useState(false);
+  // Hold the checkbox state in a ref so onPickNfr's file-input handler reads
+  // the latest value at click-time without re-binding the input listener.
+  const reparseRef = useRef(false);
+  reparseRef.current = reparseOnImport;
+  const [dbcMenuOpen, setDbcMenuOpen] = useState(false);
+  const [dbcViewerOpen, setDbcViewerOpen] = useState(false);
   const onPickDbc = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     e.target.value = '';
@@ -380,7 +387,10 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
       setImportState((s) => s && { ...s, index: i, currentFile: f.name });
       try {
         const buf = await f.arrayBuffer();
-        const res = await fetch('/api/import/nfr', {
+        const url = reparseRef.current
+          ? '/api/import/nfr?reparse=1'
+          : '/api/import/nfr';
+        const res = await fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/octet-stream',
@@ -469,7 +479,50 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                   <span style={{ color: SH_COLORS.textMute, fontSize: 9, marginRight: 4 }}>{dbcStatus}</span>
                 )}
                 <input ref={fileRef} type="file" accept=".csv,text/csv" style={{ display: 'none' }} onChange={onPickDbc} />
-                <button onClick={() => fileRef.current?.click()} style={smallBtn()} title="Upload a new DBC CSV">↑ DBC</button>
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                  <button
+                    onClick={() => setDbcMenuOpen((v) => !v)}
+                    style={smallBtn()}
+                    title="DBC actions"
+                  >DBC ▾</button>
+                  {dbcMenuOpen && (
+                    <>
+                      <div
+                        onClick={() => setDbcMenuOpen(false)}
+                        style={{ position: 'fixed', inset: 0, zIndex: 90 }}
+                      />
+                      <div style={{
+                        position: 'absolute', top: '100%', right: 0, marginTop: 4,
+                        background: SH_COLORS.bg,
+                        border: `1px solid ${SH_COLORS.border}`,
+                        boxShadow: '0 6px 24px rgba(0,0,0,0.5)',
+                        zIndex: 91, minWidth: 180,
+                        fontFamily: '"JetBrains Mono", monospace',
+                      }}>
+                        <button
+                          onClick={() => { setDbcMenuOpen(false); fileRef.current?.click(); }}
+                          style={{
+                            display: 'block', width: '100%', textAlign: 'left',
+                            background: 'transparent', border: 'none',
+                            color: SH_COLORS.text, fontSize: 10, letterSpacing: 1.5,
+                            padding: '8px 12px', cursor: 'pointer',
+                            fontFamily: 'inherit',
+                          }}
+                        >↑ IMPORT NEW DBC…</button>
+                        <button
+                          onClick={() => { setDbcMenuOpen(false); setDbcViewerOpen(true); }}
+                          style={{
+                            display: 'block', width: '100%', textAlign: 'left',
+                            background: 'transparent', border: 'none',
+                            color: SH_COLORS.text, fontSize: 10, letterSpacing: 1.5,
+                            padding: '8px 12px', cursor: 'pointer', borderTop: `1px solid ${SH_COLORS.border}`,
+                            fontFamily: 'inherit',
+                          }}
+                        >👁 VIEW CURRENT DBC</button>
+                      </div>
+                    </>
+                  )}
+                </div>
               </>
             )}
             <button onClick={resetLayout} style={smallBtn()} title="Reset layout to default">⟲ RESET</button>
@@ -950,6 +1003,8 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
         </div>
       )}
 
+      {dbcViewerOpen && <DbcViewerModal onClose={() => setDbcViewerOpen(false)} />}
+
       {nfrModalOpen && (
         <div
           onClick={() => setNfrModalOpen(false)}
@@ -992,6 +1047,21 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                 Pick one or more .nfr binaries, or point at a folder. Each
                 file becomes a session in the database.
               </div>
+              <label style={{
+                display: 'flex', alignItems: 'flex-start', gap: 8,
+                fontSize: 11, color: SH_COLORS.textMute, lineHeight: 1.5,
+                fontFamily: '"Inter", system-ui, sans-serif',
+                cursor: 'pointer',
+                padding: '6px 0',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={reparseOnImport}
+                  onChange={(e) => setReparseOnImport(e.target.checked)}
+                  style={{ marginTop: 2 }}
+                />
+                <span>Re-decode with current DBC (overwrites existing rows)</span>
+              </label>
               <button
                 onClick={() => { setNfrModalOpen(false); nfrFileRef.current?.click(); }}
                 style={{
@@ -1315,6 +1385,172 @@ function SignalReadout({ sig }: { sig: any; t: number }) {
   );
 }
 
+
+interface DbcRow {
+  frame_id: string;
+  message_name: string;
+  sender: string;
+  signal_name: string;
+  start_bit: number | null;
+  size_bits: number | null;
+  factor: number | null;
+  offset: number | null;
+  min: number | null;
+  max: number | null;
+  unit: string;
+  cycle_ms: number | null;
+  data_type: string;
+}
+
+function DbcViewerModal({ onClose }: { onClose: () => void }) {
+  const [path, setPath] = useState<string | null>(null);
+  const [rows, setRows] = useState<DbcRow[] | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const [filter, setFilter] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/dbc/current')
+      .then(async (r) => {
+        const body = await r.json().catch(() => ({} as any));
+        if (cancelled) return;
+        if (!r.ok || body?.error) {
+          setErr(body?.error ?? `HTTP ${r.status}`);
+          return;
+        }
+        setPath(body.path ?? null);
+        setRows(Array.isArray(body.rows) ? body.rows : []);
+      })
+      .catch((e) => { if (!cancelled) setErr(String(e)); });
+    return () => { cancelled = true; };
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (!rows) return [];
+    const q = filter.trim().toLowerCase();
+    if (q.length === 0) return rows;
+    return rows.filter((r) =>
+      r.signal_name.toLowerCase().includes(q) ||
+      r.message_name.toLowerCase().includes(q) ||
+      r.sender.toLowerCase().includes(q) ||
+      r.unit.toLowerCase().includes(q) ||
+      r.frame_id.toLowerCase().includes(q),
+    );
+  }, [rows, filter]);
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 100,
+        background: 'rgba(0,0,0,0.6)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: 'min(1100px, 92vw)', height: 'min(720px, 86vh)',
+          background: SH_COLORS.bg,
+          border: `1px solid ${SH_COLORS.border}`,
+          boxShadow: '0 12px 48px rgba(0,0,0,0.6)',
+          fontFamily: '"JetBrains Mono", monospace',
+          color: SH_COLORS.text,
+          display: 'flex', flexDirection: 'column', minHeight: 0,
+        }}
+      >
+        <div style={{
+          padding: '10px 14px',
+          borderBottom: `1px solid ${SH_COLORS.border}`,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+        }}>
+          <span style={{ fontSize: 10, letterSpacing: 1.5, color: SH_COLORS.textFaint }}>
+            DBC · {rows ? `${rows.length} signals` : 'loading…'}
+          </span>
+          <span
+            onClick={onClose}
+            style={{ color: SH_COLORS.textFaint, cursor: 'pointer', userSelect: 'none' }}
+          >×</span>
+        </div>
+        <div style={{
+          padding: '8px 14px', borderBottom: `1px solid ${SH_COLORS.border}`,
+          display: 'flex', alignItems: 'center', gap: 10, fontSize: 10,
+        }}>
+          <span style={{ color: SH_COLORS.textFaint }}>PATH</span>
+          <span style={{ color: SH_COLORS.textMute, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+            {path ?? '—'}
+          </span>
+          <input
+            type="text"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder="filter signal/message/sender/unit"
+            style={{
+              fontFamily: 'inherit', fontSize: 10,
+              background: SH_COLORS.bgElev,
+              border: `1px solid ${SH_COLORS.border}`,
+              color: SH_COLORS.text,
+              padding: '4px 8px', width: 280,
+            }}
+          />
+        </div>
+        <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
+          {err ? (
+            <div style={{ padding: 16, color: '#f87171', fontSize: 11 }}>{err}</div>
+          ) : !rows ? (
+            <div style={{ padding: 16, color: SH_COLORS.textFaint, fontSize: 11 }}>LOADING…</div>
+          ) : (
+            <table style={{
+              width: '100%', borderCollapse: 'collapse', fontSize: 10,
+            }}>
+              <thead style={{ position: 'sticky', top: 0, background: SH_COLORS.bg }}>
+                <tr style={{ color: SH_COLORS.textFaint, textAlign: 'left' }}>
+                  {['FRAME', 'MESSAGE', 'SENDER', 'SIGNAL', 'BIT', 'LEN', 'FACTOR', 'OFFSET', 'MIN', 'MAX', 'UNIT', 'CYCLE', 'TYPE'].map((h) => (
+                    <th key={h} style={{ padding: '6px 8px', borderBottom: `1px solid ${SH_COLORS.border}`, fontWeight: 500, letterSpacing: 1 }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((r, i) => (
+                  <tr key={`${r.frame_id}-${r.signal_name}-${i}`} style={{ color: SH_COLORS.textMute }}>
+                    <td style={dbcCell()}>{r.frame_id}</td>
+                    <td style={dbcCell()}>{r.message_name}</td>
+                    <td style={dbcCell()}>{r.sender}</td>
+                    <td style={{ ...dbcCell(), color: SH_COLORS.text }}>{r.signal_name}</td>
+                    <td style={dbcCell()}>{r.start_bit ?? ''}</td>
+                    <td style={dbcCell()}>{r.size_bits ?? ''}</td>
+                    <td style={dbcCell()}>{r.factor ?? ''}</td>
+                    <td style={dbcCell()}>{r.offset ?? ''}</td>
+                    <td style={dbcCell()}>{r.min ?? ''}</td>
+                    <td style={dbcCell()}>{r.max ?? ''}</td>
+                    <td style={dbcCell()}>{r.unit}</td>
+                    <td style={dbcCell()}>{r.cycle_ms ?? ''}</td>
+                    <td style={dbcCell()}>{r.data_type}</td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr><td colSpan={13} style={{ padding: 16, color: SH_COLORS.textFaint, fontSize: 11 }}>
+                    no rows match filter
+                  </td></tr>
+                )}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function dbcCell(): React.CSSProperties {
+  return {
+    padding: '4px 8px',
+    borderBottom: `1px solid rgba(255,255,255,0.04)`,
+    whiteSpace: 'nowrap',
+  };
+}
 
 function smallBtn(): React.CSSProperties {
   return {
