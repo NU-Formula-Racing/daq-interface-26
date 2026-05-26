@@ -19,6 +19,10 @@ export interface SessionDetail extends Session {
     signal_name: string;
     unit: string | null;
   }>;
+  /** Earliest sample timestamp from sd_readings for this session — the
+   *  authoritative anchor for replay x-axis labels. Null when the session
+   *  has no rows. */
+  data_start_ts: string | null;
 }
 
 export interface WindowRow {

@@ -27,6 +27,11 @@ export interface SessionDetail extends Session {
     signal_name: string;
     unit: string | null;
   }>;
+  /** Timestamp of the earliest row in sd_readings for this session.
+   *  Authoritative for "when did the actual data start?" — independent
+   *  of sessions.started_at, which can drift if the .nfr header was
+   *  parsed in the wrong timezone. Null when the session has no rows. */
+  data_start_ts: string | null;
 }
 
 export async function listSessions(pool: pg.Pool): Promise<Session[]> {
@@ -64,7 +69,21 @@ export async function getSession(
     `SELECT signal_id, source, signal_name, unit FROM get_session_signals($1)`,
     [id]
   );
-  return { ...rows[0], signals: sigs.rows };
+
+  // Earliest actual reading — the trusted anchor for x-axis labels in the
+  // replay widget. Cheap query: covers the (session_id, signal_id, ts)
+  // index. Returns null when the session has zero rows.
+  const dataStart = await pool.query<{ data_start_ts: string | null }>(
+    `SELECT MIN(ts)::text AS data_start_ts
+     FROM sd_readings WHERE session_id = $1`,
+    [id]
+  );
+
+  return {
+    ...rows[0],
+    signals: sigs.rows,
+    data_start_ts: dataStart.rows[0]?.data_start_ts ?? null,
+  };
 }
 
 export type SessionPatch = Partial<
