@@ -191,7 +191,7 @@ function LiveGroup({
         fontSize: 9, letterSpacing: 1.5,
         color: '#fbbf24',
       }}>
-        ● LIVE · {sessions.length} session{sessions.length === 1 ? '' : 's'}
+        ● MOST RECENT LIVE SESSION
       </div>
       {sessions.map((s) => {
         const active = s.id === currentId;
@@ -291,12 +291,16 @@ export function SessionPicker() {
     () => (sessions ?? []).filter((s) => s.source === 'sd_import'),
     [sessions],
   );
-  const liveSessions = useMemo(
-    () => (sessions ?? [])
+  // Only ever surface the most-recent live session. The live-sync worker
+  // wipes prior local live sessions on each new session_started, so under
+  // normal flow there is at most one anyway; this guards against any
+  // leftovers from an aborted prior run.
+  const liveSessions = useMemo(() => {
+    const list = (sessions ?? [])
       .filter((s) => s.source === 'live')
-      .sort((a, b) => (a.started_at < b.started_at ? 1 : -1)),
-    [sessions],
-  );
+      .sort((a, b) => (a.started_at < b.started_at ? 1 : -1));
+    return list.length > 0 ? [list[0]] : [];
+  }, [sessions]);
 
   // YYYY-MM-DD → Session[]
   const dayMap = useMemo(() => {
