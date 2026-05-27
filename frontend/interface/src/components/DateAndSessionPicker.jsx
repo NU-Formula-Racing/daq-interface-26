@@ -34,6 +34,7 @@ export default function DateAndSessionPicker({
   sessionId,
   onSessionId,
   formatSessionLabel,
+  liveSessions = [],
 }) {
   const sessionsForDate = useMemo(
     () =>
@@ -55,6 +56,14 @@ export default function DateAndSessionPicker({
     return `#${num} · ${t}${dur}`;
   };
 
+  const liveLabel = (s) => {
+    const t = new Date(s.started_at).toLocaleTimeString([], {
+      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
+    });
+    const status = s.ended_at ? "ENDED" : "LIVE";
+    return `${status} · ${t}${s.machine ? ` · ${s.machine}` : ""}`;
+  };
+
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
       <DatePicker value={selectedDate} onChange={onSelectedDate} />
@@ -63,8 +72,24 @@ export default function DateAndSessionPicker({
         onChange={(e) => onSessionId(e.target.value || null)}
         style={inputStyle}
       >
-        {sessionsForDate.length === 0 && <option value="">No sessions</option>}
-        {sessionsForDate.map((s, idx) => (
+        {liveSessions.length > 0 && (
+          <optgroup label="● LIVE (last 12h)">
+            {liveSessions.map((s) => (
+              <option key={s.id} value={s.id}>{liveLabel(s)}</option>
+            ))}
+          </optgroup>
+        )}
+        {liveSessions.length > 0 && sessionsForDate.length > 0 && (
+          <optgroup label={`Date — ${selectedDate}`}>
+            {sessionsForDate.map((s, idx) => (
+              <option key={s.id} value={s.id}>{dayLabel(s, idx)}</option>
+            ))}
+          </optgroup>
+        )}
+        {liveSessions.length === 0 && sessionsForDate.length === 0 && (
+          <option value="">No sessions</option>
+        )}
+        {liveSessions.length === 0 && sessionsForDate.map((s, idx) => (
           <option key={s.id} value={s.id}>{dayLabel(s, idx)}</option>
         ))}
       </select>

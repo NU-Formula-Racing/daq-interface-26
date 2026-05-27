@@ -9,7 +9,10 @@ import { useSupabaseCatalog } from '@/adapters/useSupabaseCatalog';
 import { useSessionList } from '@/adapters/useSessionList';
 import { useSupabaseFrames } from '@/adapters/useSupabaseFrames';
 import { useSupabaseLiveFrames } from '@/adapters/useSupabaseLiveFrames';
+import { useSupabaseLiveReplay } from '@/adapters/useSupabaseLiveReplay';
 import { useSessionSignalIds } from '@/adapters/useSessionSignalIds';
+import { useLiveSessionSignalIds } from '@/adapters/useLiveSessionSignalIds';
+import { useLiveSessions } from '@/adapters/useLiveSessions';
 import DateAndSessionPicker from '@/components/DateAndSessionPicker';
 
 // DockDirection uses its own storage key internally ('nfr-dock-layout-v2').
@@ -51,9 +54,15 @@ export default function AppRoute() {
 
   const catalog = useSupabaseCatalog();
   const { sessions } = useSessionList(200);
+  const { sessions: liveSessions } = useLiveSessions();
 
-  // Replay-mode session selection (only meaningful when mode === 'replay').
-  const session = sessions.find((s) => s.id === sessionId) ?? sessions[0] ?? null;
+  // Replay-mode selection: the picker may point at either an SD session
+  // (sessions) or a live session (liveSessions). Resolve to whichever
+  // matches the URL ?session= id, defaulting to the first SD session.
+  const sdSession = sessions.find((s) => s.id === sessionId) ?? null;
+  const liveSession = liveSessions.find((s) => s.id === sessionId) ?? null;
+  const session = sdSession ?? liveSession ?? sessions[0] ?? null;
+  const isLiveSession = !!liveSession;
 
   const urlDate = search.get('date');
   const selectedDate =
@@ -88,25 +97,47 @@ export default function AppRoute() {
     return () => clearInterval(interval);
   }, [catalog]);
 
-  const { ids: sessionSignalIds, status: idsStatus } = useSessionSignalIds(
-    mode === 'replay' ? (session?.id ?? null) : null,
+  // Available-signal sets for both flavours; pick the right one downstream.
+  const sdIds = useSessionSignalIds(
+    mode === 'replay' && !isLiveSession ? (session?.id ?? null) : null,
   );
+  const liveIds = useLiveSessionSignalIds(
+    mode === 'replay' && isLiveSession ? (session?.id ?? null) : null,
+  );
+  const sessionSignalIds = isLiveSession ? liveIds.ids : sdIds.ids;
+  const idsStatus = isLiveSession ? liveIds.status : sdIds.status;
 
-  // Both adapters mount on every render but only the active one hits Supabase.
-  // Replay only triggers when given a session + signals; live always streams.
-  const replay = useSupabaseFrames({
-    sessionId: mode === 'replay' ? (session?.id ?? null) : null,
-    signalIds: mode === 'replay' ? signalIds : [],
-    start: mode === 'replay' ? (session?.started_at ?? null) : null,
-    end: mode === 'replay' ? (session?.ended_at ?? null) : null,
+  // Three adapters; only one is active per render based on `mode` and
+  // whether the currently-selected replay session is live or SD.
+  //  - useSupabaseFrames     → SD replay (sd_readings, get_signals_window)
+  //  - useSupabaseLiveReplay → live replay (live_readings, get_live_signals_window)
+  //  - useSupabaseLiveFrames → live tick mode (Realtime subscription)
+  // For live sessions still in progress, end is null; fall back to "now"
+  // so the windowed fetch covers everything received so far.
+  const replayEnd = session?.ended_at ?? (isLiveSession ? new Date().toISOString() : null);
+  const sdReplay = useSupabaseFrames({
+    sessionId: mode === 'replay' && !isLiveSession ? (session?.id ?? null) : null,
+    signalIds: mode === 'replay' && !isLiveSession ? signalIds : [],
+    start: mode === 'replay' && !isLiveSession ? (session?.started_at ?? null) : null,
+    end: mode === 'replay' && !isLiveSession ? (session?.ended_at ?? null) : null,
+  });
+  const liveReplay = useSupabaseLiveReplay({
+    sessionId: mode === 'replay' && isLiveSession ? (session?.id ?? null) : null,
+    signalIds: mode === 'replay' && isLiveSession ? signalIds : [],
+    start: mode === 'replay' && isLiveSession ? (session?.started_at ?? null) : null,
+    end: mode === 'replay' && isLiveSession ? replayEnd : null,
   });
   const live = useSupabaseLiveFrames(mode === 'live');
 
-  const { store, status } = mode === 'live' ? live : replay;
+  const { store, status } =
+    mode === 'live' ? live :
+    isLiveSession ? liveReplay :
+    sdReplay;
 
   const sessionSlot = mode === 'replay' ? (
     <DateAndSessionPicker
       sessions={sessions}
+      liveSessions={liveSessions}
       selectedDate={selectedDate}
       onSelectedDate={setSelectedDate}
       sessionId={session?.id ?? null}
@@ -153,7 +184,13 @@ export default function AppRoute() {
             onT={setT}
             mode={mode}
             onMode={setMode}
-            durationSecs={mode === 'live' ? 0 : (session?.duration_secs ?? 0)}
+            durationSecs={
+            mode === 'live'
+              ? 0
+              : isLiveSession
+                ? Math.max(0, (Date.parse(replayEnd) - Date.parse(session?.started_at)) / 1000)
+                : (session?.duration_secs ?? 0)
+          }
             density="comfortable"
             graphStyle="line"
             frames={store}
