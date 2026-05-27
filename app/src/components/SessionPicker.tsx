@@ -10,6 +10,20 @@ const MONTH_NAMES = [
 ];
 const DOW_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
+/** "1h 23m", "12m 34s", "45s", "—" while still recording. */
+function formatDuration(startedAt: string, endedAt: string | null): string | null {
+  if (!endedAt) return null;
+  const ms = Date.parse(endedAt) - Date.parse(startedAt);
+  if (!Number.isFinite(ms) || ms <= 0) return null;
+  const totalSecs = Math.round(ms / 1000);
+  const h = Math.floor(totalSecs / 3600);
+  const m = Math.floor((totalSecs % 3600) / 60);
+  const s = totalSecs % 60;
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
 function smallBtn(): React.CSSProperties {
   return {
     display: 'inline-flex', alignItems: 'center', padding: '3px 7px',
@@ -143,6 +157,7 @@ function SessionDayList({
       </div>
       {sessions.map((s) => {
         const active = s.id === currentId;
+        const dur = formatDuration(s.started_at, s.ended_at);
         return (
           <div
             key={s.id}
@@ -157,9 +172,19 @@ function SessionDayList({
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
               <span>{new Date(s.started_at).toLocaleTimeString()}</span>
-              <span style={{ color: SH_COLORS.textFaint, fontSize: 9 }}>
-                {s.source_file ? s.source_file.split('/').slice(-1)[0] : s.id.slice(0, 8)}
-              </span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 0 }}>
+                <span style={{
+                  color: SH_COLORS.textFaint, fontSize: 9,
+                  maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>
+                  {s.source_file ? s.source_file.split('/').slice(-1)[0] : s.id.slice(0, 8)}
+                </span>
+                {dur && (
+                  <span style={{ color: SH_COLORS.textMute, fontSize: 9, marginTop: 1 }}>
+                    {dur}
+                  </span>
+                )}
+              </div>
             </div>
             <div style={{
               marginTop: 2, color: SH_COLORS.textMute, fontSize: 9,
@@ -196,6 +221,7 @@ function LiveGroup({
       {sessions.map((s) => {
         const active = s.id === currentId;
         const ended = s.ended_at !== null;
+        const dur = formatDuration(s.started_at, s.ended_at);
         return (
           <div
             key={s.id}
@@ -212,14 +238,19 @@ function LiveGroup({
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
               <span>{new Date(s.started_at).toLocaleString()}</span>
-              <span style={{
-                fontSize: 8, letterSpacing: 1.5,
-                color: ended ? SH_COLORS.textFaint : '#fbbf24',
-                border: `1px solid ${ended ? SH_COLORS.border : 'rgba(251,191,36,0.6)'}`,
-                padding: '1px 5px',
-              }}>
-                {ended ? 'ENDED' : 'LIVE'}
-              </span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
+                <span style={{
+                  fontSize: 8, letterSpacing: 1.5,
+                  color: ended ? SH_COLORS.textFaint : '#fbbf24',
+                  border: `1px solid ${ended ? SH_COLORS.border : 'rgba(251,191,36,0.6)'}`,
+                  padding: '1px 5px',
+                }}>
+                  {ended ? 'ENDED' : 'LIVE'}
+                </span>
+                {dur && (
+                  <span style={{ color: SH_COLORS.textMute, fontSize: 9 }}>{dur}</span>
+                )}
+              </div>
             </div>
             <div style={{ marginTop: 2, color: SH_COLORS.textMute, fontSize: 9 }}>
               {s.id.slice(0, 8)}
