@@ -196,7 +196,9 @@ export function StorageLocalTab(props: StorageLocalTabProps) {
                   </td>
                 </tr>
                 {daySessions.map((s) => {
-                  const st = statuses[s.id]?.kind ?? 'idle';
+                  const row = statuses[s.id];
+                  const st = row?.kind ?? 'idle';
+                  const errMsg = row?.kind === 'error' ? row.message : null;
                   return (
                     <tr key={s.id} className="border-b border-[color:var(--color-border)]/50">
                       <td className="py-1 px-2 w-6">
@@ -211,9 +213,17 @@ export function StorageLocalTab(props: StorageLocalTabProps) {
                         {st === 'ok' && <span className="text-green-300">Uploaded</span>}
                         {st === 'already_synced' && <span className="text-yellow-300">Already synced</span>}
                         {st === 'error' && (
-                          <span>
-                            <span className="text-red-300">Error</span>{' '}
+                          <span className="inline-flex items-baseline gap-2">
+                            <span className="text-red-300">Error</span>
                             <button className="underline" onClick={() => retry(s.id)}>Retry</button>
+                            {errMsg && (
+                              <span
+                                className="text-[10px] text-red-200/70 max-w-[420px] truncate"
+                                title={errMsg}
+                              >
+                                {errMsg}
+                              </span>
+                            )}
                           </span>
                         )}
                       </td>

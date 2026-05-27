@@ -9,6 +9,9 @@ interface UnsyncedSummary {
 
 export function registerUnsyncedSummaryRoutes(app: FastifyInstance, pool: pg.Pool) {
   app.get('/api/cloud/unsynced-summary', async (): Promise<UnsyncedSummary> => {
+    // Only SD imports go through the Spaces upload path. Live sessions sync
+    // to Supabase on their own schedule and have no Parquet representation,
+    // so they should never appear here as "unsynced".
     const { rows } = await pool.query<{ id: string; row_count: string }>(
       `SELECT s.id, COALESCE(c.row_count, 0)::text AS row_count
        FROM sessions s
@@ -18,6 +21,7 @@ export function registerUnsyncedSummaryRoutes(app: FastifyInstance, pool: pg.Poo
          GROUP BY session_id
        ) c ON c.session_id = s.id
        WHERE s.manifest_key IS NULL
+         AND s.source = 'sd_import'
        ORDER BY s.started_at DESC`,
     );
     const sessionIds = rows.map((r) => r.id);
