@@ -149,28 +149,46 @@ export function CloudConfig() {
         )}
       </div>
 
-      <label className="flex items-center gap-2 text-[11px] cursor-pointer pt-1">
-        <input
-          type="checkbox"
-          checked={status?.cloudLiveEnabled ?? false}
-          onChange={async (e) => {
-            // Capture target.checked synchronously: React resets controlled
-            // inputs back to the declared `checked` value during the await,
-            // which inverts the value `flashInfo` would otherwise read.
-            const next = e.target.checked;
-            try {
-              await apiPost('/api/cloud/config', { cloudLiveEnabled: next });
-              flashInfo(next ? 'Live cloud stream enabled.' : 'Live cloud stream disabled.');
-              refresh();
-            } catch (err) { flashError(`Toggle failed: ${String(err)}`); }
-          }}
-          className="accent-[color:var(--color-accent)]"
-        />
-        <span>
-          Stream live frames to Supabase <code>rt_readings</code> (truncated nightly).
-          Takes effect on next desktop launch.
-        </span>
-      </label>
+      {/* Live cloud sync toggle. Disabled unless the user has supplied their
+          OWN Supabase URL + anon key — the bundled defaults are read-only
+          credentials shared across all installs, and writing live data with
+          them would let anyone with the app push frames to the team project.
+          Each recording machine should authenticate with its own write key. */}
+      {(() => {
+        const hasUserCreds = !!(status?.supabaseUrl && status?.hasSupabaseAnonKey);
+        return (
+          <div className="pt-1 space-y-1">
+            <label className={`flex items-center gap-2 text-[11px] ${hasUserCreds ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}>
+              <input
+                type="checkbox"
+                disabled={!hasUserCreds}
+                checked={status?.cloudLiveEnabled ?? false}
+                onChange={async (e) => {
+                  const next = e.target.checked;
+                  try {
+                    await apiPost('/api/cloud/config', { cloudLiveEnabled: next });
+                    flashInfo(next ? 'Live cloud sync enabled.' : 'Live cloud sync disabled.');
+                    refresh();
+                  } catch (err) { flashError(`Toggle failed: ${String(err)}`); }
+                }}
+                className="accent-[color:var(--color-accent)]"
+              />
+              <span>
+                Stream live frames to Supabase <code>live_readings</code> (12 h rolling retention).
+                Takes effect on next desktop launch.
+              </span>
+            </label>
+            {!hasUserCreds && (
+              <div className="text-[10px] text-[color:var(--color-text-mute)] pl-6">
+                Requires your own Supabase URL + anon key — expand <strong>OVERRIDE SUPABASE
+                (ADVANCED)</strong> above and save them first. The bundled defaults are
+                read-only and shared across all installs; only the recording
+                machine should be writing.
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       <div className="flex flex-wrap gap-2 pt-1">
         <button
