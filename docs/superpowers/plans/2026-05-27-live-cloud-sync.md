@@ -35,23 +35,30 @@ public website.
 - [ ] Unit test: feed fake parser events, assert correct Supabase calls.
 - [ ] Commit.
 
-## Phase 3 — App replay picker + window RPC
+## Phase 3 — Desktop picker surfaces local live sessions
 
-- [ ] New Supabase RPC `get_live_signals_window` (mirror of
-      `get_signals_window`, reads `live_readings`).
-- [ ] New hook `app/src/hooks/useLiveSessionsCloud.ts` — lists live
-      sessions over the last 12 h.
-- [ ] New hook `app/src/hooks/useLiveReplayFrames.ts` — analogous to
-      `useReplayFrames` but fetches via Supabase RPC.
-- [ ] Session picker: add "LIVE TODAY" group at the top.
-- [ ] New route `/replay/live/:id` reusing the existing `Replay.tsx` with
-      a `source='live'` prop.
+The desktop user is the recording user, so live data is already in the
+local DB — they don't need to pull from Supabase to view their own. The
+cloud-fetch path is a Phase 4 concern (for the website).
+
+- [ ] SessionPicker: stop filtering `source = 'live'` out. Group the
+      most-recent live session at the top of the dropdown with a "LIVE"
+      badge so it's visually distinct.
+- [ ] Add the live session's `started_at` to its row label.
 - [ ] Commit.
 
-## Phase 4 — Website parity
+## Phase 4 — Website + cloud live picker
 
-- [ ] Apply Phase 3 changes inside `frontend/interface/src/`.
-- [ ] Confirm the existing read creds reach the new Supabase tables.
+This is where Supabase-direct reads come in.
+
+- [ ] New `frontend/interface` hooks: `useLiveSessionsCloud`,
+      `useLiveReplayFrames` — call the Supabase RPCs (`get_live_signals_window`)
+      with the bundled anon creds.
+- [ ] Website session picker: "LIVE TODAY" group at the top, sourced from
+      Supabase.
+- [ ] Reuse the existing replay layout but feed it from the cloud-backed
+      frames store.
+- [ ] Confirm bundled anon creds reach the new tables.
 - [ ] Commit.
 
 ## Phase 5 — UX polish

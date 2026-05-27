@@ -176,6 +176,63 @@ function SessionDayList({
   );
 }
 
+function LiveGroup({
+  sessions, currentId, onPick,
+}: {
+  sessions: Session[];
+  currentId: string | null;
+  onPick: (id: string) => void;
+}) {
+  return (
+    <div style={{ borderBottom: `1px solid ${SH_COLORS.border}` }}>
+      <div style={{
+        padding: '8px 12px 4px',
+        fontFamily: '"JetBrains Mono", monospace',
+        fontSize: 9, letterSpacing: 1.5,
+        color: '#fbbf24',
+      }}>
+        ● LIVE · {sessions.length} session{sessions.length === 1 ? '' : 's'}
+      </div>
+      {sessions.map((s) => {
+        const active = s.id === currentId;
+        const ended = s.ended_at !== null;
+        return (
+          <div
+            key={s.id}
+            onClick={() => onPick(s.id)}
+            style={{
+              padding: '8px 12px',
+              cursor: 'pointer',
+              background: active ? 'rgba(167,139,250,0.12)' : 'transparent',
+              fontFamily: '"JetBrains Mono", monospace',
+              fontSize: 10,
+              color: SH_COLORS.text,
+              borderTop: `1px solid ${SH_COLORS.border}`,
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+              <span>{new Date(s.started_at).toLocaleString()}</span>
+              <span style={{
+                fontSize: 8, letterSpacing: 1.5,
+                color: ended ? SH_COLORS.textFaint : '#fbbf24',
+                border: `1px solid ${ended ? SH_COLORS.border : 'rgba(251,191,36,0.6)'}`,
+                padding: '1px 5px',
+              }}>
+                {ended ? 'ENDED' : 'LIVE'}
+              </span>
+            </div>
+            <div style={{ marginTop: 2, color: SH_COLORS.textMute, fontSize: 9 }}>
+              {s.id.slice(0, 8)}
+              {s.track && ` · ${s.track}`}
+              {s.driver && ` · ${s.driver}`}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function SessionPicker() {
   const navigate = useNavigate();
   const params = useParams();
@@ -227,9 +284,17 @@ export function SessionPicker() {
     autoJumpedRef.current = true;
   }, [open, sessions]);
 
-  // Filter to SD imports only — live sessions are excluded from the picker.
+  // SD imports drive the calendar view (one logical day per cell). Live
+  // sessions get their own group above the calendar — they're short, you
+  // only ever have one or two, and they don't make sense on a date grid.
   const sdSessions = useMemo(
     () => (sessions ?? []).filter((s) => s.source === 'sd_import'),
+    [sessions],
+  );
+  const liveSessions = useMemo(
+    () => (sessions ?? [])
+      .filter((s) => s.source === 'live')
+      .sort((a, b) => (a.started_at < b.started_at ? 1 : -1)),
     [sessions],
   );
 
@@ -317,18 +382,30 @@ export function SessionPicker() {
                 onBack={() => setSelectedDate(null)}
               />
             ) : (
-              <CalendarPanel
-                cursor={cursor}
-                cells={cells}
-                onPrev={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))}
-                onNext={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))}
-                onToday={() => {
-                  const now = new Date();
-                  setCursor(new Date(now.getFullYear(), now.getMonth(), 1));
-                }}
-                onPickDate={(iso) => setSelectedDate(iso)}
-                emptyHint={sdSessions.length === 0 ? 'No imported sessions yet' : null}
-              />
+              <>
+                {liveSessions.length > 0 && (
+                  <LiveGroup
+                    sessions={liveSessions}
+                    currentId={currentId}
+                    onPick={(id) => {
+                      navigate(`/sessions/${id}`);
+                      setOpen(false);
+                    }}
+                  />
+                )}
+                <CalendarPanel
+                  cursor={cursor}
+                  cells={cells}
+                  onPrev={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))}
+                  onNext={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))}
+                  onToday={() => {
+                    const now = new Date();
+                    setCursor(new Date(now.getFullYear(), now.getMonth(), 1));
+                  }}
+                  onPickDate={(iso) => setSelectedDate(iso)}
+                  emptyHint={sdSessions.length === 0 ? 'No imported sessions yet' : null}
+                />
+              </>
             )}
           </div>
         </>
