@@ -48,6 +48,7 @@ export interface BuildAppOptions {
   dsn?: string;
   pgConnStr?: string;
   onImport?: (filename: string, body: Buffer, reparse: boolean) => Promise<ImportResult>;
+  onImportCancel?: () => boolean;
   catalogDeps?: CatalogDeps;
   broadcastDeps?: BroadcastDeps;
   uninstallDeps?: UninstallDeps;
@@ -154,7 +155,10 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
       registerDbAdminRoutes(app, { pool: opts.pool, dsn: opts.dsn });
     }
     if (opts.onImport) {
-      registerImportRoutes(app, { onImport: opts.onImport });
+      registerImportRoutes(app, {
+        onImport: opts.onImport,
+        onCancel: opts.onImportCancel ?? (() => false),
+      });
     }
     if (opts.broadcastDeps) {
       registerBroadcastRoutes(app, opts.broadcastDeps);

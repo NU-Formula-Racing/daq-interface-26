@@ -345,11 +345,18 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
     index: number;
     currentFile: string;
     succeeded: number;
+    skipped: number;
     failed: number;
+    cancelled: number;
     totalRows: number;
+    skippedFiles: string[];
     errors: string[];
     done: boolean;
+    wasCancelled: boolean;
   } | null>(null);
+  // Cancel flag so the overlay's CANCEL button can stop the queue from
+  // advancing. The in-flight parser is killed server-side via /api/import/cancel.
+  const importCancelFlagRef = useRef(false);
 
   const onPickNfr = async (e: React.ChangeEvent<HTMLInputElement>) => {
     // Snapshot the files BEFORE resetting the input — `e.target.files` is a
@@ -365,24 +372,36 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
       return;
     }
 
+    importCancelFlagRef.current = false;
     setImportState({
       open: true,
       total: nfrs.length,
       index: 0,
       currentFile: nfrs[0].name,
       succeeded: 0,
+      skipped: 0,
       failed: 0,
+      cancelled: 0,
       totalRows: 0,
+      skippedFiles: [],
       errors: [],
       done: false,
+      wasCancelled: false,
     });
 
     let succeeded = 0;
+    let skipped = 0;
     let failed = 0;
+    let cancelled = 0;
     let totalRows = 0;
+    const skippedFiles: string[] = [];
     const errors: string[] = [];
 
     for (let i = 0; i < nfrs.length; i++) {
+      if (importCancelFlagRef.current) {
+        cancelled += nfrs.length - i;
+        break;
+      }
       const f = nfrs[i];
       setImportState((s) => s && { ...s, index: i, currentFile: f.name });
       try {
@@ -400,24 +419,43 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
         });
         const body = await res.json().catch(() => ({} as any));
         if (!res.ok || body?.error) {
-          failed++;
-          errors.push(`${f.name}: ${body?.error ?? `HTTP ${res.status}`}`);
+          if (body?.error === 'cancelled' || importCancelFlagRef.current) {
+            cancelled++;
+          } else {
+            failed++;
+            errors.push(`${f.name}: ${body?.error ?? `HTTP ${res.status}`}`);
+          }
+        } else if (body?.skipped) {
+          skipped++;
+          skippedFiles.push(f.name);
         } else {
           succeeded++;
           totalRows += body.row_count ?? 0;
         }
       } catch (err) {
-        failed++;
-        errors.push(`${f.name}: ${String(err)}`);
+        if (importCancelFlagRef.current) {
+          cancelled++;
+        } else {
+          failed++;
+          errors.push(`${f.name}: ${String(err)}`);
+        }
       }
       setImportState((s) =>
-        s && { ...s, succeeded, failed, totalRows, errors: [...errors] },
+        s && { ...s, succeeded, skipped, failed, cancelled, totalRows, skippedFiles: [...skippedFiles], errors: [...errors] },
       );
     }
 
-    setImportState((s) => s && { ...s, done: true, index: nfrs.length });
+    setImportState((s) => s && {
+      ...s,
+      done: true,
+      index: nfrs.length,
+      cancelled,
+      wasCancelled: importCancelFlagRef.current,
+    });
     setNfrStatus(
-      `Imported ${succeeded}/${nfrs.length} · ${totalRows.toLocaleString()} rows${failed > 0 ? ` · ${failed} failed` : ''}`,
+      importCancelFlagRef.current
+        ? `Cancelled · ${succeeded} parsed · ${cancelled} skipped via cancel${failed > 0 ? ` · ${failed} failed` : ''}`
+        : `Imported ${succeeded}/${nfrs.length} · ${totalRows.toLocaleString()} rows${skipped > 0 ? ` · ${skipped} skipped` : ''}${failed > 0 ? ` · ${failed} failed` : ''}`,
     );
     setTimeout(() => setNfrStatus(''), 8000);
   };
@@ -920,14 +958,38 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
               <span style={{ fontSize: 11, letterSpacing: 1.5, color: SH_COLORS.textFaint }}>
-                {importState.done ? 'IMPORT COMPLETE' : 'IMPORTING…'}
+                {importState.done
+                  ? (importState.wasCancelled ? 'IMPORT CANCELLED' : 'IMPORT COMPLETE')
+                  : 'IMPORTING…'}
               </span>
-              {importState.done && (
-                <span
-                  onClick={() => setImportState(null)}
-                  style={{ color: SH_COLORS.textFaint, cursor: 'pointer', userSelect: 'none' }}
-                >×</span>
-              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                {!importState.done && (
+                  <button
+                    onClick={() => {
+                      importCancelFlagRef.current = true;
+                      // Kill the parser server-side; the in-flight fetch will
+                      // resolve with error 'cancelled' once the child exits.
+                      fetch('/api/import/cancel', { method: 'POST' }).catch(() => {});
+                    }}
+                    style={{
+                      padding: '4px 10px',
+                      background: 'transparent',
+                      border: '1px solid #f87171',
+                      color: '#f87171',
+                      fontFamily: '"JetBrains Mono", monospace',
+                      fontSize: 10, letterSpacing: 1.5, cursor: 'pointer',
+                      borderRadius: 2,
+                    }}
+                    title="Stop the running parser and skip remaining files"
+                  >■ CANCEL</button>
+                )}
+                {importState.done && (
+                  <span
+                    onClick={() => setImportState(null)}
+                    style={{ color: SH_COLORS.textFaint, cursor: 'pointer', userSelect: 'none' }}
+                  >×</span>
+                )}
+              </div>
             </div>
 
             <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -964,6 +1026,35 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                   {importState.totalRows.toLocaleString()} rows
                 </span>
               </div>
+
+              <div style={{
+                display: 'flex', gap: 12,
+                fontSize: 10, color: SH_COLORS.textMute, letterSpacing: 1,
+              }}>
+                <span><span style={{ color: SH_COLORS.accentBright }}>{importState.succeeded}</span> PARSED</span>
+                <span><span style={{ color: '#fbbf24' }}>{importState.skipped}</span> SKIPPED</span>
+                <span><span style={{ color: '#f87171' }}>{importState.failed}</span> FAILED</span>
+                {importState.cancelled > 0 && (
+                  <span><span style={{ color: '#9ca3af' }}>{importState.cancelled}</span> CANCELLED</span>
+                )}
+              </div>
+
+              {importState.skippedFiles.length > 0 && (
+                <div style={{
+                  padding: 10,
+                  background: 'rgba(251,191,36,0.06)',
+                  border: '1px solid rgba(251,191,36,0.25)',
+                  borderRadius: 2,
+                  fontSize: 10, color: '#fde68a', maxHeight: 140, overflow: 'auto',
+                }}>
+                  <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                    {importState.skipped} skipped (already imported — tick "Re-decode" to overwrite):
+                  </div>
+                  {importState.skippedFiles.map((name, i) => (
+                    <div key={i} style={{ marginTop: 2, wordBreak: 'break-word' }}>· {name}</div>
+                  ))}
+                </div>
+              )}
 
               {importState.errors.length > 0 && (
                 <div style={{
@@ -1245,9 +1336,39 @@ function DockSignalPicker({ selected, onPick, favorites, onToggleFav, onCollapse
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const toggle = (gid: string) => setCollapsed((c) => ({ ...c, [gid]: !c[gid] }));
 
+  // The ACTIVE filter calls frames.latest(...) at render time. The picker
+  // doesn't otherwise depend on frame data, so without a subscription it
+  // would freeze on whatever was true at mount — the filter would never
+  // pick up signals that started flowing later. Subscribe and force a
+  // re-render at ~2 Hz while ACTIVE is on (more than enough for a sidebar).
+  const [, forceTick] = useState(0);
+  useEffect(() => {
+    if (!activeOnly || !frames) return;
+    let scheduled = false;
+    const unsubscribe = frames.subscribe(() => {
+      if (scheduled) return;
+      scheduled = true;
+      setTimeout(() => {
+        scheduled = false;
+        forceTick((n) => n + 1);
+      }, 500);
+    });
+    return unsubscribe;
+  }, [activeOnly, frames]);
+
+  // ACTIVE filter semantics differ by mode:
+  //   - Replay (available set is known): "has data anywhere in this session"
+  //     = the available set itself. frames.latest() would only include signals
+  //     already lazy-fetched into the window, which is too strict.
+  //   - Live (no available set): "currently streaming" = frames.latest != null.
+  const isActive = (id: number): boolean => {
+    if (available) return available.has(id);
+    return (frames?.latest(id) ?? null) !== null;
+  };
+
   const matches = catalog.ALL.filter((s) => {
     if (available && !available.has(s.id)) return false;
-    if (activeOnly && (frames?.latest(s.id) ?? null) === null) return false;
+    if (activeOnly && !isActive(s.id)) return false;
     if (!q) return true;
     return s.name.toLowerCase().includes(q.toLowerCase()) || s.groupName.toLowerCase().includes(q.toLowerCase());
   });
@@ -1278,7 +1399,7 @@ function DockSignalPicker({ selected, onPick, favorites, onToggleFav, onCollapse
             {favorites.map((id) => {
               const s = catalog.resolve(id); if (!s) return null;
               if (available && !available.has(s.id)) return null;
-              if (activeOnly && (frames?.latest(s.id) ?? null) === null) return null;
+              if (activeOnly && !isActive(s.id)) return null;
               return <SigRow key={id} s={s} selected={selected === id} fav onPick={onPick} onToggleFav={onToggleFav} />;
             })}
           </div>

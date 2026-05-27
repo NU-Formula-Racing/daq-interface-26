@@ -1201,6 +1201,24 @@ export function SignalPicker({ onPick, selected = [], compact = false, filter = 
   const [groupFilter, setGroupFilter] = useState<string>('all');
   const q = (onFilterChange ? filter : localFilter).toLowerCase();
 
+  // ACTIVE filter reads frames.latest at render time; without a subscription
+  // it'd freeze on whatever signals were live at mount. Throttled re-render
+  // while activeOnly is on.
+  const [, forceTick] = useState(0);
+  React.useEffect(() => {
+    if (!activeOnly || !frames) return;
+    let scheduled = false;
+    const unsubscribe = frames.subscribe(() => {
+      if (scheduled) return;
+      scheduled = true;
+      setTimeout(() => {
+        scheduled = false;
+        forceTick((n) => n + 1);
+      }, 500);
+    });
+    return unsubscribe;
+  }, [activeOnly, frames]);
+
   const matches = catalog.ALL.filter((s) => {
     if (groupFilter !== 'all' && s.group !== groupFilter) return false;
     if (activeOnly && (frames?.latest(s.id) ?? null) === null) return false;

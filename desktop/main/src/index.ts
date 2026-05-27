@@ -302,6 +302,18 @@ export async function run(opts: {
     parser.start();
   };
 
+  // Tracks the parser child currently running on behalf of /api/import/nfr,
+  // so /api/import/cancel can kill it. Only one parser runs at a time (the
+  // client uploads files sequentially), so a single slot is enough.
+  let currentParserChild: import('child_process').ChildProcess | null = null;
+  const cancelImport = (): boolean => {
+    if (currentParserChild && !currentParserChild.killed) {
+      try { currentParserChild.kill('SIGTERM'); } catch { /* ignore */ }
+      return true;
+    }
+    return false;
+  };
+
   const runBatchImport = async (filename: string, body: Buffer, reparse: boolean): Promise<ImportResult> => {
     if (!pool || !dsn) return { session_id: null, row_count: 0, error: 'database not ready' };
     mkdirSync(NFR_UPLOADS_DIR, { recursive: true });
@@ -324,7 +336,7 @@ export async function run(opts: {
           `SELECT count(*)::text AS n FROM sd_readings WHERE session_id = $1`,
           [id],
         );
-        return { session_id: id, row_count: Number(cnt.rows[0]?.n ?? '0') };
+        return { session_id: id, row_count: Number(cnt.rows[0]?.n ?? '0'), skipped: true };
       }
     }
 
@@ -340,16 +352,28 @@ export async function run(opts: {
         env: { ...process.env, NFR_DB_URL: importDsn },
         stdio: ['ignore', 'pipe', 'pipe'],
       });
+      currentParserChild = child;
       let stdout = '';
       let stderr = '';
       child.stdout.on('data', (d) => { stdout += String(d); });
       child.stderr.on('data', (d) => { stderr += String(d); });
-      child.on('close', async (code) => {
+      child.on('close', async (code, signalName) => {
+        if (currentParserChild === child) currentParserChild = null;
+        // If we killed the child (via /api/import/cancel), it exits with
+        // signal SIGTERM and code=null — surface that as a clean cancel.
+        if (signalName === 'SIGTERM' || signalName === 'SIGKILL') {
+          resolve({ session_id: null, row_count: 0, error: 'cancelled' });
+          return;
+        }
         if (code !== 0) {
+          // Surface the *tail* of stderr (where Python tracebacks end) and dump
+          // the full log to the desktop console for diagnosis.
+          if (stderr) console.error(`[parser ${filename}] exit ${code}:\n${stderr}`);
+          const tail = stderr.length > 1200 ? '…' + stderr.slice(-1200) : stderr;
           resolve({
             session_id: null,
             row_count: 0,
-            error: `parser exit ${code}: ${stderr.slice(0, 500)}`,
+            error: `parser exit ${code}: ${tail}`,
           });
           return;
         }
@@ -435,6 +459,7 @@ export async function run(opts: {
     dsn: dsn ?? undefined,
     pgConnStr: dsn ?? undefined,
     onImport: runBatchImport,
+    onImportCancel: cancelImport,
     catalogDeps,
     broadcastDeps,
     cloudDefaults,

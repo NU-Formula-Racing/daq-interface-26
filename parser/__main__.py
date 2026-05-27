@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import traceback
 from pathlib import Path
 
 # Make sibling modules importable regardless of cwd.
@@ -82,7 +83,13 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 0
     except Exception as err:  # noqa: BLE001
+        # Send the short form on the JSON channel (for in-app surface), and
+        # the full traceback on stderr so the desktop can capture it for
+        # debugging. Without the traceback the only hint left is psycopg's
+        # "pipeline aborted" cleanup line, which is useless on its own.
         emitter.error(str(err))
+        traceback.print_exc(file=sys.stderr)
+        sys.stderr.flush()
         return 1
     return 2
 

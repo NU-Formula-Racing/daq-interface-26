@@ -5,6 +5,10 @@ const MAX_NFR_BYTES = 200 * 1024 * 1024; // 200 MB per file
 export interface ImportResult {
   session_id: string | null;
   row_count: number;
+  /** True when the file was dedup-skipped (same source_file_hash already in DB)
+   *  and the parser was not re-run. The returned row_count is the existing
+   *  session's count, not a fresh decode. */
+  skipped?: boolean;
   error?: string;
 }
 
@@ -13,6 +17,10 @@ export interface ImportDeps {
    *  When `reparse` is true, the dedup short-circuit is skipped so the parser
    *  re-decodes the file with the current DBC and overwrites prior rows. */
   onImport: (filename: string, body: Buffer, reparse: boolean) => Promise<ImportResult>;
+  /** Kill any currently-running parser child process. Returns true if a child
+   *  was killed, false if nothing was running. The parser commits in one
+   *  transaction so a kill mid-parse leaves the DB untouched for that file. */
+  onCancel: () => boolean;
 }
 
 /**
@@ -54,4 +62,11 @@ export function registerImportRoutes(app: FastifyInstance, deps: ImportDeps) {
       }
     },
   );
+
+  // Cancel any parser child currently spawned by /api/import/nfr. The client
+  // calls this from its CANCEL button; cheap and idempotent.
+  app.post('/api/import/cancel', async () => {
+    const killed = deps.onCancel();
+    return { killed };
+  });
 }
