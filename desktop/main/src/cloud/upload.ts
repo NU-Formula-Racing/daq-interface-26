@@ -98,7 +98,36 @@ export async function uploadSession(opts: {
       totalBytes += f.bytes;
     }
 
-    // 6. Upload manifest.json.
+    // 6. Upload signal_map.json sidecar.
+    //
+    // The desktop assigns signal_definitions.id locally; the cloud catalog
+    // assigns its own. Parquets are written with LOCAL ids, but the website's
+    // signals-window edge function gets cloud ids in its request. The
+    // sidecar lets the edge function translate cloud_id → local_id by joining
+    // on (source, name) without any cloud DB write on the upload path. See
+    // docs/desktop-signal-map-upload.md and supabase/functions/signals-window/.
+    const { rows: mapRows } = await pool.query<{
+      local_id: number; source: string; name: string;
+    }>(
+      `SELECT DISTINCT sd.id AS local_id, sd.source, sd.signal_name AS name
+       FROM sd_readings r
+       JOIN signal_definitions sd ON sd.id = r.signal_id
+       WHERE r.session_id = $1
+       ORDER BY sd.source, sd.signal_name`,
+      [sessionId],
+    );
+    const signalMap = {
+      session_id: sessionId,
+      signals: mapRows.map((r) => ({ local_id: r.local_id, source: r.source, name: r.name })),
+    };
+    const signalMapKey = `sessions/${sessionId}/signal_map.json`;
+    await spaces.putBytes(
+      signalMapKey,
+      Buffer.from(JSON.stringify(signalMap)),
+      'application/json',
+    );
+
+    // 7. Upload manifest.json.
     const manifestKey = `sessions/${sessionId}/manifest.json`;
     const manifestBody = Buffer.from(JSON.stringify(manifest, null, 2));
     await spaces.putBytes(manifestKey, manifestBody, 'application/json');
@@ -108,12 +137,12 @@ export async function uploadSession(opts: {
       throw new Error('manifest readback hash mismatch');
     }
 
-    // 7. Commit to cloud catalog.
+    // 8. Commit to cloud catalog.
     await commitSessionToCatalog(sb, {
       sessionId, sessionRow, manifest, totalBytes, machine,
     });
 
-    // 8. Mirror blobs locally + mark synced (only now).
+    // 9. Mirror blobs locally + mark synced (only now).
     for (const m of manifest.files) {
       await upsertBlob(pool, {
         sessionId, source: m.source, objectKey: m.object_key,
