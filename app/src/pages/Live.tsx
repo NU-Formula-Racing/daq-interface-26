@@ -4,6 +4,45 @@ import { SignalsProvider, useCatalog } from '../components/SignalsProvider.tsx';
 import { DockDirection } from '@nfr/widgets';
 import { SessionPicker } from '../components/SessionPicker.tsx';
 import { useLiveTodayFrames } from '../hooks/useLiveTodayFrames.ts';
+import { useLiveStatus } from '../hooks/useLiveStatus.ts';
+
+/** Top-bar pill showing LoRa link health (rssi + snr). Each parser packet
+ *  brings one signal_quality event; useLiveStatus tracks the most recent. */
+function LinkQualityBadge() {
+  const status = useLiveStatus();
+  const rssi = status.rssi;
+  const snr = status.snr;
+  const connected = status.basestation === 'connected';
+  // Colour by RSSI: stronger is brighter. -70 dBm is comfortable, below
+  // -100 starts losing packets in practice.
+  const color =
+    !connected || rssi == null ? '#6f7278'
+    : rssi >= -70 ? '#7ec98f'
+    : rssi >= -90 ? '#e8a648'
+    : '#e06c6c';
+  return (
+    <span
+      title={connected ? `Basestation ${status.port ?? ''}` : 'Basestation disconnected'}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: 6,
+        padding: '3px 8px', marginRight: 8,
+        fontFamily: '"JetBrains Mono", monospace',
+        fontSize: 10, letterSpacing: 1,
+        border: '1px solid rgba(255,255,255,0.09)',
+        color,
+      }}
+    >
+      <span style={{
+        width: 6, height: 6, borderRadius: '50%',
+        background: connected ? color : '#6f7278',
+        opacity: connected ? 1 : 0.4,
+      }} />
+      <span>RSSI {rssi != null ? `${rssi}` : '—'} dBm</span>
+      <span style={{ color: 'rgba(255,255,255,0.25)' }}>·</span>
+      <span>SNR {snr != null ? snr.toFixed(1) : '—'} dB</span>
+    </span>
+  );
+}
 
 const LIVE_THRESHOLD = 0.995; // Anything ≥ this counts as "snap to live"
 
@@ -157,7 +196,12 @@ function LiveInner({ navigate }: LiveInnerProps) {
         frames={store}
         exportHref={null}
         navigate={navigate}
-        sessionSlot={<SessionPicker />}
+        sessionSlot={
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <LinkQualityBadge />
+            <SessionPicker />
+          </div>
+        }
       />
     </div>
   );
