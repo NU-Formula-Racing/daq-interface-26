@@ -125,7 +125,9 @@ export default function Settings() {
 
         <h1 className="text-sm tracking-widest text-[color:var(--color-text)] uppercase">Database</h1>
 
-        <Storage />
+        <CollapsibleSection title="Cloud sync" defaultOpen={false}>
+          <Storage />
+        </CollapsibleSection>
 
         <LiveSerialPort />
 
@@ -260,6 +262,35 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <fieldset className="border border-[color:var(--color-border)] p-4 space-y-3">
       <legend className="px-2 text-[10px] tracking-widest text-[color:var(--color-text-mute)]">{title}</legend>
       {children}
+    </fieldset>
+  );
+}
+
+function CollapsibleSection({
+  title, defaultOpen = false, children,
+}: {
+  title: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <fieldset className="border border-[color:var(--color-border)] p-0 space-y-0">
+      <legend className="px-2">
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="inline-flex items-center gap-2 text-[10px] tracking-widest text-[color:var(--color-text-mute)] hover:text-[color:var(--color-text)] cursor-pointer"
+        >
+          <span style={{ display: 'inline-block', width: 10 }}>{open ? '▾' : '▸'}</span>
+          {title}
+        </button>
+      </legend>
+      {open && (
+        <div className="p-4 space-y-3">
+          {children}
+        </div>
+      )}
     </fieldset>
   );
 }

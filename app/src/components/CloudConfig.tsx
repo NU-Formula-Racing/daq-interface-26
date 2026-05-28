@@ -45,7 +45,16 @@ export function CloudConfig() {
   const flashError = (msg: string) => { setInfo(''); setError(msg); setTimeout(() => setError(''), 8000); };
   const flashInfo  = (msg: string) => { setError(''); setInfo(msg);  setTimeout(() => setInfo(''),  6000); };
 
+  // True when any input has a non-empty value to send. Keeps the Save
+  // button honest — clicking it with no changes was a silent no-op.
+  const hasChanges = [
+    supabaseUrl, supabaseAnonKey,
+    spacesEndpoint, spacesRegion, spacesBucket,
+    spacesAccessKey, spacesSecretKey,
+  ].some((s) => s.trim().length > 0);
+
   const onSave = async () => {
+    if (!hasChanges) return;
     setBusy(true);
     try {
       const patch: Record<string, string> = {};
@@ -57,6 +66,12 @@ export function CloudConfig() {
       if (spacesAccessKey) patch.spacesAccessKey = spacesAccessKey.trim();
       if (spacesSecretKey) patch.spacesSecretKey = spacesSecretKey.trim();
       await apiPost('/api/cloud/config', patch);
+      // Clear inputs after a successful save so the form reflects the new
+      // baseline rather than re-showing the values the user just submitted.
+      setSupabaseUrl('');
+      setSpacesEndpoint('');
+      setSpacesRegion('');
+      setSpacesBucket('');
       setSupabaseAnonKey('');
       setSpacesAccessKey('');
       setSpacesSecretKey('');
@@ -193,7 +208,8 @@ export function CloudConfig() {
       <div className="flex flex-wrap gap-2 pt-1">
         <button
           onClick={onSave}
-          disabled={busy}
+          disabled={busy || !hasChanges}
+          title={hasChanges ? 'Save credentials' : 'No changes to save'}
           className="px-3 py-1.5 border border-[color:var(--color-border)] text-[11px] tracking-widest disabled:opacity-50 hover:bg-[color:var(--color-bg)]"
         >
           {busy ? 'SAVING…' : 'SAVE'}

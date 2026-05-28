@@ -8,10 +8,16 @@ const sessions = [
 ];
 
 describe('StorageLocalTab', () => {
+  // Days are collapsed by default — expand before clicking row checkboxes.
+  const expandDay = (date: string) => {
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(date, 'i') }));
+  };
+
   it('uploads selected unsynced sessions and surfaces already-synced state', async () => {
     const upload = vi.fn()
       .mockResolvedValueOnce({ status: 'ok', uploadedBytes: 100 });
     render(<StorageLocalTab sessions={sessions} uploadSession={upload} />);
+    expandDay('2026-05-20');
     fireEvent.click(screen.getByLabelText('select-a'));
     fireEvent.click(screen.getByRole('button', { name: /upload selected/i }));
     await waitFor(() => expect(upload).toHaveBeenCalledWith('a'));
@@ -24,6 +30,7 @@ describe('StorageLocalTab', () => {
       existing: { uploaded_by_machine: 'other-mac', uploaded_at: '2026-05-23T00:00:00Z' },
     });
     render(<StorageLocalTab sessions={sessions} uploadSession={upload} />);
+    expandDay('2026-05-20');
     fireEvent.click(screen.getByLabelText('select-a'));
     fireEvent.click(screen.getByRole('button', { name: /upload selected/i }));
     // The phrase appears in both the row status and the modal — scope to dialog.
