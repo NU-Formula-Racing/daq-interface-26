@@ -1,33 +1,127 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SignalsProvider } from '../components/SignalsProvider.tsx';
+import { SignalsProvider, useCatalog } from '../components/SignalsProvider.tsx';
 import { DockDirection } from '@nfr/widgets';
 import { SessionPicker } from '../components/SessionPicker.tsx';
-import { useLiveFrames } from '../hooks/useLiveFrames.ts';
-import { useLiveStatus } from '../hooks/useLiveStatus.ts';
+import { useLiveTodayFrames } from '../hooks/useLiveTodayFrames.ts';
 
 const LIVE_THRESHOLD = 0.995; // Anything ≥ this counts as "snap to live"
 
+function chicagoMidnightIso(): string {
+  // Today's date in the America/Chicago timezone.
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Chicago',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+  });
+  // 'en-CA' formats as YYYY-MM-DD.
+  const ymd = fmt.format(new Date()); // e.g. "2026-05-28"
+  const localMidnight = new Date(`${ymd}T00:00:00Z`).getTime();
+  // Chicago offset in minutes for today (handles CDT/CST). Format a known
+  // instant in Chicago and parse the offset back out.
+  const offsetStr = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Chicago',
+    timeZoneName: 'longOffset',
+    year: 'numeric',
+  }).formatToParts(new Date())
+    .find((p) => p.type === 'timeZoneName')?.value ?? 'GMT-06:00';
+  const m = offsetStr.match(/GMT([+-])(\d{2}):(\d{2})/);
+  const offsetMins = m ? (m[1] === '-' ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3])) : -360;
+  // localMidnight is the UTC instant matching "ymd 00:00 UTC"; subtract
+  // Chicago's offset to get the UTC instant matching "ymd 00:00 America/Chicago".
+  return new Date(localMidnight - offsetMins * 60_000).toISOString();
+}
+
 export default function Live() {
   const navigate = useNavigate();
-  const status = useLiveStatus();
-  const frames = useLiveFrames();
+  return (
+    <SignalsProvider>
+      <LiveInner navigate={navigate} />
+    </SignalsProvider>
+  );
+}
+
+interface LiveInnerProps {
+  navigate: (path: string) => void;
+}
+
+function LiveInner({ navigate }: LiveInnerProps) {
+  const catalog = useCatalog();
+  const { store, ensureWindow } = useLiveTodayFrames();
   const [t, setT] = useState(1);
   const [mode, setMode] = useState<'live' | 'replay'>('live');
   const rafRef = useRef<number | null>(null);
 
-  // Reset the frames buffer (and its first/latest timestamps) every time a
-  // new session starts so the bottom timer reflects this session only.
-  useEffect(() => {
-    frames.reset();
-  }, [status.session_id]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Visible window — starts at today's Chicago midnight, ends at "now".
+  // FramesStore handles real-time WS pushes; ensureWindow backfills
+  // any older slice the user scrolls into.
+  const [visStart, setVisStart] = useState<string>(() => chicagoMidnightIso());
+  const [visEnd, setVisEnd] = useState<string>(() => new Date().toISOString());
 
-  // Duration = (latest frame ts) − (first frame ts). Updates as frames flow.
-  const first = frames.firstTs();
-  const last = frames.latestTs();
-  const elapsedSecs = first && last
-    ? Math.max(0, (new Date(last).getTime() - new Date(first).getTime()) / 1000)
-    : 0;
+  // Resolve widget-layout signal entries through the catalog and extract numeric
+  // ids. Polls localStorage because the dock has no callback API for layout
+  // changes. Same approach as Replay.tsx.
+  const [signalIds, setSignalIds] = useState<number[]>([]);
+  const lastIdsRef = useRef<string>('');
+  useEffect(() => {
+    if (!catalog) return;
+    const tick = () => {
+      try {
+        const raw = localStorage.getItem('nfr-dock-layout-v2');
+        const widgets = raw ? JSON.parse(raw) : [];
+        const ids = new Set<number>();
+        for (const w of widgets ?? []) {
+          for (const sig of w.signals ?? []) {
+            const resolved = catalog.resolve(sig);
+            if (resolved) ids.add(resolved.id);
+          }
+        }
+        const sorted = [...ids].sort((a, b) => a - b);
+        const key = sorted.join(',');
+        if (key !== lastIdsRef.current) {
+          lastIdsRef.current = key;
+          setSignalIds(sorted);
+        }
+      } catch {
+        /* ignore */
+      }
+    };
+    tick();
+    const iv = setInterval(tick, 500);
+    return () => clearInterval(iv);
+  }, [catalog]);
+
+  // At the live edge, advance visEnd every 250ms so the dock follows
+  // the streaming front.
+  useEffect(() => {
+    if (t < LIVE_THRESHOLD) return;
+    const iv = setInterval(() => setVisEnd(new Date().toISOString()), 250);
+    return () => clearInterval(iv);
+  }, [t]);
+
+  // Day rollover: if midnight Chicago passes while the app is open,
+  // drop accumulated frames and restart at the new day.
+  useEffect(() => {
+    const checkRollover = () => {
+      const todayMidnight = chicagoMidnightIso();
+      if (todayMidnight !== visStart) {
+        store.reset();
+        setVisStart(todayMidnight);
+        setVisEnd(new Date().toISOString());
+      }
+    };
+    const iv = setInterval(checkRollover, 60_000);
+    return () => clearInterval(iv);
+  }, [visStart, store]);
+
+  // Fetch any missing data when signal selection or window changes.
+  useEffect(() => {
+    if (signalIds.length === 0) return;
+    void ensureWindow(visStart, visEnd, signalIds);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signalIds.join(','), visStart, visEnd]);
+
+  // Visible-window duration drives the dock slider.
+  const elapsedSecs = Math.max(0, (Date.parse(visEnd) - Date.parse(visStart)) / 1000);
 
   useEffect(() => {
     if (mode !== 'live') return;
@@ -51,22 +145,20 @@ export default function Live() {
   };
 
   return (
-    <SignalsProvider>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-        <DockDirection
-          t={t}
-          onT={handleT}
-          mode={mode}
-          onMode={setMode}
-          durationSecs={elapsedSecs}
-          density="compact"
-          graphStyle="line"
-          frames={frames}
-          exportHref={status.session_id ? `/api/sessions/${status.session_id}/export.csv` : null}
-          navigate={navigate}
-          sessionSlot={<SessionPicker />}
-        />
-      </div>
-    </SignalsProvider>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+      <DockDirection
+        t={t}
+        onT={handleT}
+        mode={mode}
+        onMode={setMode}
+        durationSecs={elapsedSecs}
+        density="compact"
+        graphStyle="line"
+        frames={store}
+        exportHref={null}
+        navigate={navigate}
+        sessionSlot={<SessionPicker />}
+      />
+    </div>
   );
 }
