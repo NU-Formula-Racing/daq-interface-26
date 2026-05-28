@@ -7,6 +7,15 @@
 // decode throws "parquet unsupported compression codec: ZSTD" — and on
 // larger files (e.g. 611KB BMS) the unhandled rejection hangs the isolate
 // long enough to trip a gateway 503.
+//
+// SIGNAL ID TRANSLATION: parquet files store the desktop's local
+// signal_definitions.id, which generally does NOT match the cloud's
+// signal_definitions.id (the desktop's live-stream path translates via
+// (source, name) but the parquet writer does not). To bridge, the desktop
+// is expected to upload `sessions/<id>/signal_map.json` per session — see
+// `docs/desktop-signal-map-upload.md`. If that file is missing the function
+// falls back to direct cloud-id matching, which only happens to work when
+// the two catalogs happen to be aligned.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { parquetReadObjects } from 'npm:hyparquet@1.17.1';
@@ -37,6 +46,17 @@ interface ParquetRow {
   value: number;
 }
 
+interface SignalMapEntry {
+  local_id: number;
+  source: string;
+  name: string;
+}
+
+interface SignalMap {
+  session_id: string;
+  signals: SignalMapEntry[];
+}
+
 const SPACES_BASE = Deno.env.get('SPACES_PUBLIC_BASE')
   ?? 'https://nfrinterface.sfo3.digitaloceanspaces.com';
 
@@ -50,6 +70,17 @@ async function fetchParquet(url: string): Promise<ArrayBuffer> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`fetch ${url} -> ${res.status} ${res.statusText}`);
   return await res.arrayBuffer();
+}
+
+async function fetchSignalMap(sessionId: string): Promise<SignalMap | null> {
+  const url = `${SPACES_BASE}/sessions/${sessionId}/signal_map.json`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return await res.json() as SignalMap;
+  } catch {
+    return null;
+  }
 }
 
 function rowTsMs(ts: unknown): number {
@@ -98,14 +129,17 @@ Deno.serve(async (req) => {
     return new Response('[]', { headers: { ...CORS, 'content-type': 'application/json' } });
   }
 
-  const bySource = new Map<string, Set<number>>();
+  // Group requested cloud-ids by source. We also remember the (source, name)
+  // pair for each cloud-id so we can translate to local ids via signal_map.json.
+  interface Want { cloudId: number; name: string; }
+  const wantsBySource = new Map<string, Want[]>();
   for (const d of defs) {
     const safe = String(d.source).replace(/[^A-Za-z0-9_.-]/g, '_');
-    const set = bySource.get(safe) ?? new Set<number>();
-    set.add(d.id);
-    bySource.set(safe, set);
+    const arr = wantsBySource.get(safe) ?? [];
+    arr.push({ cloudId: d.id, name: d.signal_name });
+    wantsBySource.set(safe, arr);
   }
-  if (bySource.size === 0) {
+  if (wantsBySource.size === 0) {
     return new Response('[]', { headers: { ...CORS, 'content-type': 'application/json' } });
   }
 
@@ -119,24 +153,55 @@ Deno.serve(async (req) => {
     return new Response('bucket_secs too small', { status: 400, headers: CORS });
   }
 
+  // Load the per-session signal map (desktop-local id -> name + source).
+  // When present, we translate cloud_id -> local_id by joining on
+  // (source, name) and filter the parquet by local_id. When absent (old
+  // uploads, or before the desktop change ships) we fall back to assuming
+  // cloud_id == local_id, which gives empty results for mismatched catalogs.
+  const signalMap = await fetchSignalMap(body.session_id);
+  // nameByLocalId is keyed by `${safeSource}\0${name}` -> local_id.
+  const localIdByKey = new Map<string, number>();
+  if (signalMap?.signals) {
+    for (const s of signalMap.signals) {
+      const safe = String(s.source).replace(/[^A-Za-z0-9_.-]/g, '_');
+      localIdByKey.set(`${safe}\0${s.name}`, s.local_id);
+    }
+  }
+
   interface Agg { min: number; max: number; sum: number; n: number; }
   const aggs = new Map<string, Agg>();
 
   try {
     const tasks: Promise<void>[] = [];
-    for (const [safe, idsSet] of bySource) {
+    for (const [safe, wants] of wantsBySource) {
       const url = `${SPACES_BASE}/sessions/${body.session_id}/${safe}.parquet`;
+
+      // Build the local-id filter for this source. If we have a signal_map,
+      // translate each requested cloud_id via (source, name). Otherwise pass
+      // cloud_ids through and hope.
+      const localIdToCloudId = new Map<number, number>();
+      for (const w of wants) {
+        const localId = signalMap
+          ? localIdByKey.get(`${safe}\0${w.name}`)
+          : w.cloudId;
+        if (typeof localId === 'number') {
+          localIdToCloudId.set(localId, w.cloudId);
+        }
+      }
+      if (localIdToCloudId.size === 0) continue;
+
       tasks.push((async () => {
         try {
           const buf = await fetchParquet(url);
           const rows = await parquetReadObjects({ file: buf, compressors }) as ParquetRow[];
           for (const r of rows) {
-            const sid = Number(r.signal_id);
-            if (!idsSet.has(sid)) continue;
+            const localId = Number(r.signal_id);
+            const cloudId = localIdToCloudId.get(localId);
+            if (cloudId === undefined) continue;
             const tsMs = rowTsMs(r.timestamp);
             if (tsMs < startMs || tsMs >= endMs) continue;
             const bStart = Math.floor(tsMs / bucketMs) * bucketMs;
-            const key = `${bStart}|${sid}`;
+            const key = `${bStart}|${cloudId}`;
             const v = Number(r.value);
             const a = aggs.get(key);
             if (a) {
