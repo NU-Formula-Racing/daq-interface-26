@@ -114,43 +114,22 @@ END;
 $$ LANGUAGE plpgsql STABLE;
 
 
--- get_session_signal_ids: distinct signal IDs that have at least one row
--- in sd_readings for a given session. Used by the active-signals sidebar
--- filter on the frontend.
+-- get_session_signal_ids: distinct signal IDs present in a session.
+-- Used by the active-signals sidebar filter on the frontend.
 --
--- Implementation: loose index scan via recursive CTE. A plain
--- `SELECT DISTINCT signal_id WHERE session_id = $1` reads every matching
--- row (~40s on a 4M-row session) because Postgres has no skip-scan. The
--- recursive form jumps from one distinct signal_id to the next using the
--- composite index (session_id, signal_id, timestamp), turning the scan
--- into O(distinct_signals · log n) instead of O(rows).
+-- Bulk readings live as per-source Parquet files in DO Spaces, not in
+-- this DB. session_blobs holds one row per uploaded Parquet (one per CAN
+-- source per session); joining that to signal_definitions on `source`
+-- enumerates which signal_ids the session can serve.
 CREATE OR REPLACE FUNCTION get_session_signal_ids(p_session_id UUID)
-RETURNS TABLE (signal_id SMALLINT) AS $$
-BEGIN
-  RETURN QUERY
-  WITH RECURSIVE t AS (
-    (
-      SELECT r.signal_id
-      FROM sd_readings r
-      WHERE r.session_id = p_session_id
-      ORDER BY r.signal_id
-      LIMIT 1
-    )
-    UNION ALL
-    SELECT (
-      SELECT r.signal_id
-      FROM sd_readings r
-      WHERE r.session_id = p_session_id
-        AND r.signal_id > t.signal_id
-      ORDER BY r.signal_id
-      LIMIT 1
-    )
-    FROM t
-    WHERE t.signal_id IS NOT NULL
-  )
-  SELECT t.signal_id FROM t WHERE t.signal_id IS NOT NULL ORDER BY t.signal_id;
-END;
-$$ LANGUAGE plpgsql STABLE;
+RETURNS TABLE (signal_id SMALLINT)
+LANGUAGE sql STABLE AS $$
+  SELECT DISTINCT sd.id::SMALLINT AS signal_id
+  FROM session_blobs sb
+  JOIN signal_definitions sd ON sd.source = sb.source
+  WHERE sb.session_id = p_session_id
+  ORDER BY sd.id;
+$$;
 
 
 -- list_sessions: paginated session list with derived duration. Drives the

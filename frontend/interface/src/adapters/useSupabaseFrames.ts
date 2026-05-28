@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { SupabaseFramesStore, type RpcRow } from './SupabaseFramesStore';
-import { bucketFor } from './bucketFor';
 import { FramesCache } from './framesCache';
 
 export type FetchStatus =
@@ -61,8 +60,8 @@ export function useSupabaseFrames(args: UseSupabaseFramesArgs) {
 
     const startMs = Date.parse(args.start);
     const endMs = Date.parse(args.end);
-    const durationSecs = Math.max(1, Math.round((endMs - startMs) / 1000));
-    const bucketSecs = bucketFor(durationSecs, args.targetBuckets ?? 800);
+    const durationSecs = Math.max(0.001, (endMs - startMs) / 1000);
+    const bucketSecs = durationSecs / (args.targetBuckets ?? 800);
 
     const windowChanged =
       stateRef.current.sessionId !== args.sessionId ||
@@ -89,16 +88,18 @@ export function useSupabaseFrames(args: UseSupabaseFramesArgs) {
 
     let cancelled = false;
     setStatus({ kind: 'loading' });
-    supabase.rpc('get_signals_window', {
-      p_session_id: args.sessionId,
-      p_signal_ids: toFetch,
-      p_start: args.start,
-      p_end: args.end,
-      p_bucket_secs: bucketSecs,
+    supabase.functions.invoke('signals-window', {
+      body: {
+        session_id: args.sessionId,
+        signal_ids: toFetch,
+        start: args.start,
+        end: args.end,
+        bucket_secs: bucketSecs,
+      },
     }).then(({ data, error }) => {
       if (cancelled) return;
       if (error) {
-        console.error('get_signals_window failed', error);
+        console.error('signals-window failed', error);
         setStatus({ kind: 'error', message: error.message });
         return;
       }

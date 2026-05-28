@@ -3,12 +3,12 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { useSupabaseFrames } from './useSupabaseFrames';
 
 vi.mock('@/lib/supabaseClient', () => {
-  const rpc = vi.fn();
-  return { supabase: { rpc } };
+  const invoke = vi.fn();
+  return { supabase: { functions: { invoke } } };
 });
 
 import { supabase } from '@/lib/supabaseClient';
-const rpc = supabase.rpc as unknown as ReturnType<typeof vi.fn>;
+const invoke = supabase.functions.invoke as unknown as ReturnType<typeof vi.fn>;
 
 const baseArgs = {
   sessionId: 'sess-1',
@@ -17,8 +17,8 @@ const baseArgs = {
 };
 
 beforeEach(() => {
-  rpc.mockReset();
-  rpc.mockResolvedValue({ data: [], error: null });
+  invoke.mockReset();
+  invoke.mockResolvedValue({ data: [], error: null });
 });
 
 describe('useSupabaseFrames', () => {
@@ -28,12 +28,12 @@ describe('useSupabaseFrames', () => {
       { initialProps: { ids: [1] } },
     );
     await waitFor(() => expect(result.current.status.kind).toBe('ready'));
-    expect(rpc).toHaveBeenCalledTimes(1);
+    expect(invoke).toHaveBeenCalledTimes(1);
 
     rerender({ ids: [] });
     rerender({ ids: [1] });
     await new Promise((r) => setTimeout(r, 20));
-    expect(rpc).toHaveBeenCalledTimes(1);
+    expect(invoke).toHaveBeenCalledTimes(1);
   });
 
   it('only fetches newly added signals', async () => {
@@ -41,12 +41,12 @@ describe('useSupabaseFrames', () => {
       ({ ids }: { ids: number[] }) => useSupabaseFrames({ ...baseArgs, signalIds: ids }),
       { initialProps: { ids: [1] } },
     );
-    await waitFor(() => expect(rpc).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(invoke).toHaveBeenCalledTimes(1));
     rerender({ ids: [1, 2, 3] });
-    await waitFor(() => expect(rpc).toHaveBeenCalledTimes(2));
-    const secondCall = rpc.mock.calls[1];
-    expect(secondCall[0]).toBe('get_signals_window');
-    expect(new Set(secondCall[1].p_signal_ids)).toEqual(new Set([2, 3]));
+    await waitFor(() => expect(invoke).toHaveBeenCalledTimes(2));
+    const secondCall = invoke.mock.calls[1];
+    expect(secondCall[0]).toBe('signals-window');
+    expect(new Set(secondCall[1].body.signal_ids)).toEqual(new Set([2, 3]));
   });
 
   it('resets when sessionId changes', async () => {
@@ -54,10 +54,10 @@ describe('useSupabaseFrames', () => {
       ({ sid }: { sid: string }) => useSupabaseFrames({ ...baseArgs, sessionId: sid, signalIds: [1] }),
       { initialProps: { sid: 'sess-1' } },
     );
-    await waitFor(() => expect(rpc).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(invoke).toHaveBeenCalledTimes(1));
     rerender({ sid: 'sess-2' });
-    await waitFor(() => expect(rpc).toHaveBeenCalledTimes(2));
-    const secondCall = rpc.mock.calls[1];
-    expect(secondCall[1].p_session_id).toBe('sess-2');
+    await waitFor(() => expect(invoke).toHaveBeenCalledTimes(2));
+    const secondCall = invoke.mock.calls[1];
+    expect(secondCall[1].body.session_id).toBe('sess-2');
   });
 });
