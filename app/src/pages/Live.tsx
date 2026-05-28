@@ -91,11 +91,18 @@ function LiveInner({ navigate }: LiveInnerProps) {
   const [mode, setMode] = useState<'live' | 'replay'>('live');
   const rafRef = useRef<number | null>(null);
 
-  // Visible window — starts at today's Chicago midnight, ends at "now".
-  // FramesStore handles real-time WS pushes; ensureWindow backfills
-  // any older slice the user scrolls into.
-  const [visStart, setVisStart] = useState<string>(() => chicagoMidnightIso());
+  // Visible window. visStart is null until the first frame arrives — the
+  // dock should not "look like" a live session is happening when nothing
+  // is streaming. Once data shows up (either WS push or the catch-up
+  // ensureWindow against earlier-today rows), we anchor visStart to the
+  // first timestamp the store has seen. visEnd is "now" while at the
+  // live edge.
   const [visEnd, setVisEnd] = useState<string>(() => new Date().toISOString());
+  const [scrollback, setScrollback] = useState<string | null>(null);
+  // The earliest timestamp the store has seen — re-reads when frames push.
+  const storeFirstTs = store.firstTs();
+  const visStart = scrollback ?? storeFirstTs ?? visEnd;
+  const hasData = storeFirstTs !== null;
 
   // Resolve widget-layout signal entries through the catalog and extract numeric
   // ids. Polls localStorage because the dock has no callback API for layout
@@ -141,30 +148,38 @@ function LiveInner({ navigate }: LiveInnerProps) {
     return () => clearInterval(iv);
   }, [t]);
 
-  // Day rollover: if midnight Chicago passes while the app is open,
-  // drop accumulated frames and restart at the new day.
+  // Day rollover: if midnight Chicago passes, drop the in-memory store
+  // (so old frames stop appearing under the new day's slider) and clear
+  // any scroll-back anchor.
+  const [dayAnchor, setDayAnchor] = useState<string>(() => chicagoMidnightIso());
   useEffect(() => {
     const checkRollover = () => {
       const todayMidnight = chicagoMidnightIso();
-      if (todayMidnight !== visStart) {
+      if (todayMidnight !== dayAnchor) {
         store.reset();
-        setVisStart(todayMidnight);
+        setScrollback(null);
+        setDayAnchor(todayMidnight);
         setVisEnd(new Date().toISOString());
       }
     };
     const iv = setInterval(checkRollover, 60_000);
     return () => clearInterval(iv);
-  }, [visStart, store]);
+  }, [dayAnchor, store]);
 
-  // Fetch any missing data when signal selection or window changes.
+  // Catch-up fetch: on mount (or signal-selection change) hit /api/live/window
+  // for today's Chicago-midnight → now so earlier-today rows are loaded into
+  // the store. Once that returns, store.firstTs() goes non-null and the
+  // slider starts counting from the actual first-data timestamp.
   useEffect(() => {
     if (signalIds.length === 0) return;
-    void ensureWindow(visStart, visEnd, signalIds);
+    void ensureWindow(dayAnchor, visEnd, signalIds);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signalIds.join(','), visStart, visEnd]);
+  }, [signalIds.join(','), dayAnchor, visEnd]);
 
-  // Visible-window duration drives the dock slider.
-  const elapsedSecs = Math.max(0, (Date.parse(visEnd) - Date.parse(visStart)) / 1000);
+  // Visible-window duration drives the dock slider. Zero until data exists.
+  const elapsedSecs = hasData
+    ? Math.max(0, (Date.parse(visEnd) - Date.parse(visStart)) / 1000)
+    : 0;
 
   useEffect(() => {
     if (mode !== 'live') return;
