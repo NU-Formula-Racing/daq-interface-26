@@ -3,11 +3,10 @@
 Wire format from the LoRa basestation (telemetry-26 base-station firmware,
 processIncomingPackets):
 
-  +--------+------+-----+-----+----------------+
-  | sync   | rssi | snr | len | payload[len]   |
-  | 2 B    | i16  | f32 | u8  | len bytes      |
-  | AA 55  |      |     |     |                |
-  +--------+------+-----+-----+----------------+
+  +------+-----+-----+----------------+
+  | rssi | snr | len | payload[len]   |
+  | i16  | f32 | u8  | len bytes      |
+  +------+-----+-----+----------------+
 
 `len` is the byte count of `payload`. `payload` is a packed sequence of
 18-byte can::CanFrame records (defined in core/drivers/can/can_types.hpp):
@@ -38,38 +37,23 @@ from nfr_reader import FRAME_SIZE
 RECONNECT_INTERVAL = 2.0
 IDLE_TIMEOUT = 10.0
 
-SYNC_BYTES = b"\xAA\x55"
-HEADER_SIZE = 2 + 2 + 4 + 1  # sync + rssi + snr + len = 9 bytes
-HEADER_STRUCT = struct.Struct("<2shfB")  # sync, rssi (i16), snr (f32), len (u8)
-# `len` is u8 so the LoRa FIFO ceiling (255 bytes) is also the protocol
-# ceiling — anything above is by definition desync garbage.
-MAX_PAYLOAD = 255
+HEADER_SIZE = 2 + 4 + 1  # rssi + snr + len = 7 bytes
+HEADER_STRUCT = struct.Struct("<hfB")  # rssi (i16), snr (f32), len (u8)
 
 
 def _parse_packets(buf: bytes) -> tuple[list[SourceEvent], bytes]:
     """Drain as many complete USB packets as possible from `buf`.
 
-    Returns (events_in_order, remaining_bytes). On a desync (bad sync bytes
-    or absurd payload size), advances one byte at a time until the next
-    valid-looking sync. This makes the parser self-recovering after a
-    partial-buffer startup or a basestation reset.
+    Returns (events_in_order, remaining_bytes). Stream is assumed to be
+    byte-aligned to a packet boundary; if a payload size is not a multiple
+    of FRAME_SIZE, we drop one byte and try to resync.
     """
     events: list[SourceEvent] = []
     i = 0
     while i + HEADER_SIZE <= len(buf):
-        # Resync to the next 0xAA 0x55 if needed.
-        if buf[i : i + 2] != SYNC_BYTES:
-            nxt = buf.find(SYNC_BYTES, i + 1)
-            if nxt < 0:
-                # Keep the last byte in case it's the start of a future sync.
-                i = max(i, len(buf) - 1)
-                break
-            i = nxt
-            continue
-
-        sync, rssi, snr, payload_size = HEADER_STRUCT.unpack_from(buf, i)
-        if payload_size > MAX_PAYLOAD:
-            # Definitely garbage — skip past this sync and try again.
+        rssi, snr, payload_size = HEADER_STRUCT.unpack_from(buf, i)
+        if payload_size % FRAME_SIZE != 0:
+            # Misaligned — drop a byte and try again.
             i += 1
             continue
         if i + HEADER_SIZE + payload_size > len(buf):
