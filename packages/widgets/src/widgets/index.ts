@@ -19,5 +19,6 @@ export {
   getGgSource,
   setGgSource,
   ggSignalNames,
+  effectiveWidgetSignalIds,
 } from './widgets.tsx';
 export type { GgSource } from './widgets.tsx';

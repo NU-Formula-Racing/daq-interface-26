@@ -694,6 +694,39 @@ export function setGgSource(src: GgSource): GgSource {
   return src;
 }
 
+/** Compute the effective signal IDs a widget needs from the catalog.
+ *
+ *  Most widgets just use their explicit `signals` array, but auto-discovery
+ *  widgets (`cellv`, `gg`) don't store their signals in the layout — they
+ *  resolve them at render time. The replay/live fetch loop was missing
+ *  those IDs, so cell-voltage and g-g plots stayed empty until the user
+ *  happened to add the underlying signals to some other widget.
+ *
+ *  Pass the resolved catalog and the current GG source preference. */
+export function effectiveWidgetSignalIds(
+  widget: { type?: string; signals?: any[] },
+  catalog: import('../signals/catalog.ts').SignalCatalog,
+  ggSrc: GgSource = 'raw',
+): number[] {
+  const out = new Set<number>();
+  for (const s of widget.signals ?? []) {
+    const r = catalog.resolve(s);
+    if (r) out.add(r.id);
+  }
+  if (widget.type === 'cellv') {
+    for (const s of catalog.ALL) {
+      if (/^cell_v_(\d+)$/i.test(s.name)) out.add(s.id);
+    }
+  } else if (widget.type === 'gg') {
+    const [xn, yn] = ggSignalNames(ggSrc);
+    const x = catalog.byName(xn);
+    const y = catalog.byName(yn);
+    if (x) out.add(x.id);
+    if (y) out.add(y.id);
+  }
+  return [...out];
+}
+
 interface GgPlotWidgetProps {
   t: number;
   mode?: 'live' | 'replay';

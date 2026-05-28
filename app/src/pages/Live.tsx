@@ -4,6 +4,7 @@ import { SignalsProvider, useCatalog } from '../components/SignalsProvider.tsx';
 import { DockDirection } from '@nfr/widgets';
 import { SessionPicker } from '../components/SessionPicker.tsx';
 import { useLiveTodayFrames } from '../hooks/useLiveTodayFrames.ts';
+import { effectiveWidgetSignalIds, getGgSource } from '@nfr/widgets';
 import { useLiveStatus } from '../hooks/useLiveStatus.ts';
 
 /** Top-bar pill showing LoRa link health (rssi + snr). Each parser packet
@@ -107,11 +108,14 @@ function LiveInner({ navigate }: LiveInnerProps) {
       try {
         const raw = localStorage.getItem('nfr-dock-layout-v2');
         const widgets = raw ? JSON.parse(raw) : [];
+        const ggSrc = getGgSource();
         const ids = new Set<number>();
+        // Shared expansion: auto-discovery widgets (cellv, gg) get their
+        // resolved signal IDs added even when their layout entry has an
+        // empty signals[] array.
         for (const w of widgets ?? []) {
-          for (const sig of w.signals ?? []) {
-            const resolved = catalog.resolve(sig);
-            if (resolved) ids.add(resolved.id);
+          for (const id of effectiveWidgetSignalIds(w, catalog, ggSrc)) {
+            ids.add(id);
           }
         }
         const sorted = [...ids].sort((a, b) => a - b);

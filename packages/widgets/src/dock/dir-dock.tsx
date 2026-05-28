@@ -12,6 +12,10 @@ import {
   WIDGET_TYPES,
   fmtValOrEnum,
   parseEnumMap,
+  getGgSource,
+  setGgSource,
+  ggSignalNames,
+  type GgSource,
 } from '../widgets/widgets.tsx';
 import type { Signal } from '../signals/catalog.ts';
 import type { FramesStore } from '../data/types.ts';
@@ -901,6 +905,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                   </>
                   );
                 })()}
+                {w.type === 'gg' && <GgSourcePanel />}
                 <div>
                   <div style={{ marginBottom: 6, letterSpacing: 1.2 }}>CURRENT VALUE</div>
                   {w.signals.slice(0, 6).map((sid: any) => <SignalReadout key={sid} sig={sid} t={t} />)}
@@ -1316,6 +1321,33 @@ function SegBtn({ active, onClick, children }: { active?: boolean; onClick?: () 
       color: active ? SH_COLORS.text : SH_COLORS.textMute,
       fontFamily: '"JetBrains Mono", monospace', fontSize: 9, letterSpacing: 1, cursor: 'pointer',
     }}>{children}</button>
+  );
+}
+
+/** Inspector panel for a g-g plot widget: pick which acceleration pair feeds
+ *  the scatter. Persists to localStorage; all open g-g plots re-read on the
+ *  resulting storage event so the switch is live. */
+function GgSourcePanel() {
+  const [src, setSrc] = useState<GgSource>(() => getGgSource());
+  const choose = (next: GgSource) => { setGgSource(next); setSrc(next); };
+  const [rawX, rawY] = ggSignalNames('raw');
+  const [noGX, noGY] = ggSignalNames('no-g');
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, letterSpacing: 1.2 }}>
+        <span>SOURCE</span>
+        <span style={{ color: SH_COLORS.textFaint }}>signal pair</span>
+      </div>
+      <div style={{ display: 'flex', gap: 4, marginBottom: 6 }}>
+        <SegBtn active={src === 'raw'} onClick={() => choose('raw')}>WITH G</SegBtn>
+        <SegBtn active={src === 'no-g'} onClick={() => choose('no-g')}>NO-G</SegBtn>
+      </div>
+      <div style={{ fontSize: 9, color: SH_COLORS.textFaint, lineHeight: 1.4 }}>
+        {src === 'raw'
+          ? <><code>{rawX}</code> · <code>{rawY}</code></>
+          : <><code>{noGX}</code> · <code>{noGY}</code></>}
+      </div>
+    </div>
   );
 }
 

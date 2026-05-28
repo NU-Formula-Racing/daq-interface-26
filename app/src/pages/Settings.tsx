@@ -7,7 +7,6 @@ import { Broadcast } from '../components/Broadcast.tsx';
 import { LiveSerialPort } from '../components/LiveSerialPort.tsx';
 import { CloudConfig } from '../components/CloudConfig.tsx';
 import { Uninstall } from '../components/Uninstall.tsx';
-import { GgPlotSource } from '../components/GgPlotSource.tsx';
 
 interface DbStats {
   sessions: number;
@@ -131,8 +130,6 @@ export default function Settings() {
         </CollapsibleSection>
 
         <LiveSerialPort />
-
-        <GgPlotSource />
 
         <Broadcast />
 
