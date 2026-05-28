@@ -91,17 +91,19 @@ function LiveInner({ navigate }: LiveInnerProps) {
   const [mode, setMode] = useState<'live' | 'replay'>('live');
   const rafRef = useRef<number | null>(null);
 
-  // Visible window. visStart is null until the first frame arrives — the
-  // dock should not "look like" a live session is happening when nothing
-  // is streaming. Once data shows up (either WS push or the catch-up
-  // ensureWindow against earlier-today rows), we anchor visStart to the
-  // first timestamp the store has seen. visEnd is "now" while at the
-  // live edge.
+  // Visible window. visEnd auto-advances to "now" while at the live edge.
+  // visStart is anchored to the first timestamp the store has seen — so
+  // the slider stays at 0 until real data arrives.
+  // `frozenWindow`, when set, freezes both ends — that's how zoom works on
+  // the live page. Data ingestion (WS push, ensureWindow) keeps running;
+  // we just stop following the edge in the UI.
   const [visEnd, setVisEnd] = useState<string>(() => new Date().toISOString());
-  const [scrollback, setScrollback] = useState<string | null>(null);
+  const [frozenWindow, setFrozenWindow] = useState<{ start: string; end: string } | null>(null);
   // The earliest timestamp the store has seen — re-reads when frames push.
   const storeFirstTs = store.firstTs();
-  const visStart = scrollback ?? storeFirstTs ?? visEnd;
+  const liveStart = storeFirstTs ?? visEnd;
+  const visStart = frozenWindow?.start ?? liveStart;
+  const effectiveVisEnd = frozenWindow?.end ?? visEnd;
   const hasData = storeFirstTs !== null;
 
   // Resolve widget-layout signal entries through the catalog and extract numeric
@@ -140,24 +142,26 @@ function LiveInner({ navigate }: LiveInnerProps) {
     return () => clearInterval(iv);
   }, [catalog]);
 
-  // At the live edge, advance visEnd every 250ms so the dock follows
-  // the streaming front.
+  // At the live edge AND not zoomed, advance visEnd every 250 ms so the
+  // dock follows the streaming front. When the user zooms, frozenWindow
+  // pins both ends and this effect goes idle.
   useEffect(() => {
+    if (frozenWindow !== null) return;
     if (t < LIVE_THRESHOLD) return;
     const iv = setInterval(() => setVisEnd(new Date().toISOString()), 250);
     return () => clearInterval(iv);
-  }, [t]);
+  }, [t, frozenWindow]);
 
   // Day rollover: if midnight Chicago passes, drop the in-memory store
   // (so old frames stop appearing under the new day's slider) and clear
-  // any scroll-back anchor.
+  // any zoom freeze.
   const [dayAnchor, setDayAnchor] = useState<string>(() => chicagoMidnightIso());
   useEffect(() => {
     const checkRollover = () => {
       const todayMidnight = chicagoMidnightIso();
       if (todayMidnight !== dayAnchor) {
         store.reset();
-        setScrollback(null);
+        setFrozenWindow(null);
         setDayAnchor(todayMidnight);
         setVisEnd(new Date().toISOString());
       }
@@ -165,6 +169,28 @@ function LiveInner({ navigate }: LiveInnerProps) {
     const iv = setInterval(checkRollover, 60_000);
     return () => clearInterval(iv);
   }, [dayAnchor, store]);
+
+  // Zoom handler: drag-select on a graph fires this with [a, b] fractions
+  // of the current window. Convert to absolute timestamps and freeze.
+  // Reset (null) returns to following the live edge.
+  const handleZoom = (z: [number, number] | null) => {
+    if (z === null) {
+      setFrozenWindow(null);
+      setT(1);
+      return;
+    }
+    const startMs = Date.parse(visStart);
+    const endMs = Date.parse(effectiveVisEnd);
+    const span = endMs - startMs;
+    if (!Number.isFinite(span) || span <= 0) return;
+    setFrozenWindow({
+      start: new Date(startMs + z[0] * span).toISOString(),
+      end: new Date(startMs + z[1] * span).toISOString(),
+    });
+    // Drop below LIVE_THRESHOLD so the slider visually shows we're no
+    // longer at the live edge.
+    setT(0.5);
+  };
 
   // Catch-up fetch: on mount (or signal-selection change) hit /api/live/window
   // for today's Chicago-midnight → now so earlier-today rows are loaded into
@@ -178,7 +204,7 @@ function LiveInner({ navigate }: LiveInnerProps) {
 
   // Visible-window duration drives the dock slider. Zero until data exists.
   const elapsedSecs = hasData
-    ? Math.max(0, (Date.parse(visEnd) - Date.parse(visStart)) / 1000)
+    ? Math.max(0, (Date.parse(effectiveVisEnd) - Date.parse(visStart)) / 1000)
     : 0;
 
   useEffect(() => {
@@ -215,6 +241,10 @@ function LiveInner({ navigate }: LiveInnerProps) {
         frames={store}
         exportHref={null}
         navigate={navigate}
+        onZoom={handleZoom}
+        zoomActive={frozenWindow !== null}
+        windowStartTs={visStart}
+        windowEndTs={effectiveVisEnd}
         sessionSlot={
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <LinkQualityBadge />

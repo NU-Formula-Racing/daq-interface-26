@@ -78,6 +78,14 @@ interface GraphWidgetProps {
    *  drive's 14th minute still reads "14:00 → 14:30" instead of "00:00
    *  → 00:30". Falls back to window-relative labels when unset. */
   sessionStartTs?: string | null;
+  /** Live-mode window override (absolute timestamps). When BOTH are set,
+   *  the widget draws frames whose ts falls in [start, end], positioned
+   *  by their actual timestamp rather than by buffer index. Used by the
+   *  Live page to freeze the visible window on zoom. When unset and
+   *  mode === 'live', the widget self-computes a rolling window from
+   *  frames.latestTs() and the `window` fraction. */
+  windowStartTs?: string | null;
+  windowEndTs?: string | null;
 }
 
 export function GraphWidget({
@@ -85,6 +93,7 @@ export function GraphWidget({
   density = 'normal', compact = false, showAxes = true, showCursor = true, height,
   zoom = null, onZoom, mode = 'replay', signalColors, showRange = true,
   zoomActive = false, sessionStartTs = null,
+  windowStartTs = null, windowEndTs = null,
 }: GraphWidgetProps) {
   const catalog = useCatalog();
   const frames = useFrames();
@@ -148,49 +157,86 @@ export function GraphWidget({
     }
     return out;
   };
+  // Live mode uses an absolute time window so dot positions are stable
+  // frame-to-frame (only NEW frames move, existing dots stay put as the
+  // window scrolls). When the caller supplies windowStartTs/windowEndTs
+  // those are used verbatim (Live page freezes them on zoom); otherwise
+  // we self-compute a rolling window of width (full-session-span * win)
+  // ending at frames.latestTs().
+  let liveWinStartMs: number | null = null;
+  let liveWinEndMs: number | null = null;
+  if (mode === 'live') {
+    if (windowStartTs && windowEndTs) {
+      liveWinStartMs = Date.parse(windowStartTs);
+      liveWinEndMs = Date.parse(windowEndTs);
+    } else if (frames) {
+      const latest = frames.latestTs();
+      const first = frames.firstTs();
+      if (latest && first) {
+        const latestMs = Date.parse(latest);
+        const firstAllMs = Date.parse(first);
+        liveWinEndMs = latestMs;
+        const span = Math.max(1, latestMs - firstAllMs);
+        liveWinStartMs = Math.max(firstAllMs, latestMs - span * win);
+      }
+    }
+  }
+
   const series = signals.map((sid: any) => {
     const sig = catalog.resolve(sid);
     if (!sig) return null;
     const all = frames?.series(sig.id) ?? [];
     if (all.length === 0) return { sig, data: new Array(N).fill(0), vMin: null as number[] | null, vMax: null as number[] | null, empty: true };
 
-    // Decide which slice of the buffer to render.
-    // - Live: rolling window — last `win` fraction of the buffer ending at "now".
-    // - Zoomed (either mode): the zoom range maps to a fraction of the buffer.
-    // - Replay (no zoom): full buffer; the scrubber just moves the cursor.
+    // Decide which frames are visible.
+    //  - Live (timestamp window known): filter by absolute ts. New frames
+    //    appear at the right edge; existing dots keep their X position
+    //    until the window itself scrolls. No index jitter.
+    //  - Zoomed (either mode): zoom range maps to a fraction of the buffer.
+    //  - Replay (no zoom): full buffer; scrubber just moves the cursor.
     const len = all.length;
-    const winLen = Math.max(8, Math.floor(len * win));
-    let start: number, end: number;
-    if (zoom && zoom.length === 2) {
-      start = Math.max(0, Math.floor(zoom[0] * len));
-      end = Math.max(start + 1, Math.min(len, Math.ceil(zoom[1] * len)));
-    } else if (mode === 'live') {
-      end = len;
-      start = Math.max(0, len - winLen);
+    let visibleFrames: typeof all = [];
+    if (mode === 'live' && liveWinStartMs != null && liveWinEndMs != null) {
+      const startMs = liveWinStartMs;
+      const endMs = liveWinEndMs;
+      visibleFrames = all.filter((f) => {
+        const ms = Date.parse(f.ts);
+        return ms >= startMs && ms <= endMs;
+      });
+    } else if (zoom && zoom.length === 2) {
+      const s = Math.max(0, Math.floor(zoom[0] * len));
+      const e = Math.max(s + 1, Math.min(len, Math.ceil(zoom[1] * len)));
+      visibleFrames = all.slice(s, e);
     } else {
-      start = 0;
-      end = len;
+      visibleFrames = all;
     }
-    const slicedFrames = all.slice(start, end);
-    if (slicedFrames.length === 0) return { sig, data: new Array(N).fill(0), vMin: null, vMax: null, empty: true };
+    if (visibleFrames.length === 0) return { sig, data: new Array(N).fill(0), vMin: null, vMax: null, empty: true };
 
-    const valueRaw = slicedFrames.map((f) => f.value);
+    const valueRaw = visibleFrames.map((f) => f.value);
     const data = resampleToN(valueRaw, N);
 
-    // For dots mode: capture per-sample (x-fraction, value) so the render can
-    // position each dot at its true timestamp instead of using the resampled-
-    // uniform array. Avoids "all dots overlap into a line" when zoomed in to a
-    // window containing fewer raw samples than plot pixels.
+    // Per-sample (x-fraction, value) — basis for both dot positions AND
+    // the live-mode line path. In live mode the fraction is computed
+    // against the absolute window so dots don't shuffle with each new
+    // frame. In replay we keep the per-slice fraction for back-compat.
     let dots: { f: number; v: number }[] | null = null;
-    if (slicedFrames.length > 0) {
-      const firstTs = Date.parse(slicedFrames[0].ts);
-      const lastTs = Date.parse(slicedFrames[slicedFrames.length - 1].ts);
+    if (mode === 'live' && liveWinStartMs != null && liveWinEndMs != null) {
+      const startMs = liveWinStartMs;
+      const span = Math.max(1, liveWinEndMs - startMs);
+      dots = visibleFrames.map((f) => ({
+        f: (Date.parse(f.ts) - startMs) / span,
+        v: f.value,
+      }));
+    } else if (visibleFrames.length > 0) {
+      const firstTs = Date.parse(visibleFrames[0].ts);
+      const lastTs = Date.parse(visibleFrames[visibleFrames.length - 1].ts);
       const span = Math.max(1, lastTs - firstTs);
-      dots = slicedFrames.map((f) => ({
+      dots = visibleFrames.map((f) => ({
         f: (Date.parse(f.ts) - firstTs) / span,
         v: f.value,
       }));
     }
+    const slicedFrames = visibleFrames; // alias for downstream range logic
 
     // Build vMin/vMax tracks only if at least one frame has a real spread.
     const hasRange = slicedFrames.some(
@@ -297,6 +343,25 @@ export function GraphWidget({
     }
     let d = `M ${x(0)} ${y(data[0])}`;
     for (let i = 1; i < data.length; i++) d += ` L ${x(i)} ${y(data[i])}`;
+    return d;
+  };
+  /** Timestamp-positioned line — one segment per consecutive dot pair.
+   *  Lets the live-mode line scroll in lock-step with its underlying
+   *  dots instead of being smoothed by the uniform-N resample (whose
+   *  bucket boundaries shift on every frame). */
+  const dotsLinePath = (dots: { f: number; v: number }[]) => {
+    if (dots.length === 0) return '';
+    let d = `M ${padL + dots[0].f * plotW} ${y(dots[0].v)}`;
+    if (style === 'step') {
+      for (let i = 1; i < dots.length; i++) {
+        d += ` L ${padL + dots[i].f * plotW} ${y(dots[i - 1].v)}`;
+        d += ` L ${padL + dots[i].f * plotW} ${y(dots[i].v)}`;
+      }
+    } else {
+      for (let i = 1; i < dots.length; i++) {
+        d += ` L ${padL + dots[i].f * plotW} ${y(dots[i].v)}`;
+      }
+    }
     return d;
   };
   const areaPathFor = (data: number[]) => {
@@ -535,7 +600,13 @@ export function GraphWidget({
                   out.push(<circle key={i} cx={padL + p.f * plotW} cy={y(p.v)} r={2} fill={color} />);
                 }
                 return out;
-              })() : (
+              })() : mode === 'live' && s.dots && s.dots.length > 0 ? (
+                // Live mode: draw the line from the timestamp-positioned dots
+                // so it scrolls in lock-step with them rather than being
+                // smoothed by the uniform-N resample.
+                <path d={dotsLinePath(s.dots)} fill="none" stroke={color} strokeWidth={1.5}
+                  strokeLinejoin="round" strokeLinecap="round" />
+              ) : (
                 <path d={pathFor(s.data)} fill="none" stroke={color} strokeWidth={1.5}
                   strokeLinejoin="round" strokeLinecap="round" />
               )}
@@ -1533,8 +1604,12 @@ interface WidgetShellProps {
   /** ISO timestamp of the session start. Forwarded to graph widgets so
    *  their x-axis labels read as elapsed-into-session at any zoom. */
   sessionStartTs?: string | null;
+  /** Forwarded to graph widgets so the live page can freeze the visible
+   *  window on zoom (both null in replay mode). */
+  windowStartTs?: string | null;
+  windowEndTs?: string | null;
 }
-export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick, onSettings, onZoom, zoomActive, sessionStartTs }: WidgetShellProps) {
+export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick, onSettings, onZoom, zoomActive, sessionStartTs, windowStartTs, windowEndTs }: WidgetShellProps) {
   const [typeOpen, setTypeOpen] = useState(false);
   const compact = density === 'compact';
   const frames = useFrames();
@@ -1578,7 +1653,7 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
       // sub-slicing into it — that would compound the orchestrator's zoom and
       // shrink the visible range on every drag.
       // widget.graphStyle overrides the dock-level default per-graph.
-      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={widget.graphStyle ?? graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} zoomActive={zoomActive} sessionStartTs={sessionStartTs} />;
+      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={widget.graphStyle ?? graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} zoomActive={zoomActive} sessionStartTs={sessionStartTs} windowStartTs={windowStartTs} windowEndTs={windowEndTs} />;
       case 'numeric': return <NumericWidget signal={widget.signals[0]} t={t} compact={compact} />;
       case 'gauge': return <GaugeWidget signal={widget.signals[0]} t={t} />;
       case 'bar': return <BarWidget signals={widget.signals} t={t} />;

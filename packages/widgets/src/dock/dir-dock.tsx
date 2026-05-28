@@ -100,6 +100,8 @@ interface DockDirectionProps {
   /** ISO timestamp of the session start. Forwarded to widgets so their
    *  x-axis labels read as elapsed-into-session at any zoom level. */
   sessionStartTs?: string | null;
+  windowStartTs?: string | null;
+  windowEndTs?: string | null;
 }
 
 const DROPPABLE_TYPES = [
@@ -167,7 +169,7 @@ function DropTypePopup({
   );
 }
 
-export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true, availableSignalIds = null, onZoom, zoomActive, sessionStartTs }: DockDirectionProps) {
+export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true, availableSignalIds = null, onZoom, zoomActive, sessionStartTs, windowStartTs, windowEndTs }: DockDirectionProps) {
   const catalog = useCatalog();
   const [widgets, setWidgets] = useState<any[]>(loadLayout);
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
@@ -723,6 +725,8 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                     onZoom={onZoom}
                     zoomActive={zoomActive}
                     sessionStartTs={sessionStartTs}
+                    windowStartTs={windowStartTs}
+                    windowEndTs={windowEndTs}
                     draggable
                     onDragStart={(e) => startMove(w, e)}
                   />
