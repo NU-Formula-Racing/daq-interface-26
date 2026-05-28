@@ -1,20 +1,13 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { useSession } from "@/context/SessionContext";
 import { motion } from "framer-motion";
-import DateAndSessionPicker from "@/components/DateAndSessionPicker";
+import SessionPicker from "@/components/SessionPicker";
 import "./TopBar.css";
-
-function formatSessionLabel(session) {
-  const num = session.session_number != null ? session.session_number : "?";
-  return `Session #${num}`;
-}
 
 export default function SessionIndicator() {
   const {
     mode,
     sessionId,
-    selectedDate,
-    setSelectedDate,
     availableSessions,
     setSessionId,
   } = useSession();
@@ -80,13 +73,10 @@ export default function SessionIndicator() {
           whiteSpace: "nowrap",
         }}
       >
-        <DateAndSessionPicker
-          sessions={availableSessions.map((s) => ({ ...s, date: selectedDate }))}
-          selectedDate={selectedDate}
-          onSelectedDate={setSelectedDate}
-          sessionId={sessionId}
-          onSessionId={setSessionId}
-          formatSessionLabel={formatSessionLabel}
+        <SessionPicker
+          sessions={availableSessions}
+          currentId={sessionId}
+          onPick={setSessionId}
         />
       </motion.div>
     </motion.div>

@@ -147,7 +147,8 @@ RETURNS TABLE (
   duration_secs integer,
   driver text,
   car text,
-  session_number integer
+  session_number integer,
+  source text
 )
 LANGUAGE sql
 STABLE
@@ -155,7 +156,7 @@ AS $$
   SELECT
     s.id, s.date, s.started_at, s.ended_at,
     EXTRACT(EPOCH FROM (s.ended_at - s.started_at))::INT AS duration_secs,
-    s.driver, s.car, s.session_number
+    s.driver, s.car, s.session_number, s.source
   FROM sessions s
   WHERE s.ended_at IS NOT NULL
   ORDER BY s.started_at DESC

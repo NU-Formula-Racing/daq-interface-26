@@ -10,6 +10,7 @@ export interface SessionListItem {
   driver: string | null;
   car: string | null;
   session_number: number | null;
+  source: string | null;
 }
 
 export function useSessionList(limit = 50) {

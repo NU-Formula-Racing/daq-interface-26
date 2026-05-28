@@ -13,7 +13,7 @@ import { useSupabaseLiveReplay } from '@/adapters/useSupabaseLiveReplay';
 import { useSessionSignalIds } from '@/adapters/useSessionSignalIds';
 import { useLiveSessionSignalIds } from '@/adapters/useLiveSessionSignalIds';
 import { useLiveSessions } from '@/adapters/useLiveSessions';
-import DateAndSessionPicker from '@/components/DateAndSessionPicker';
+import SessionPicker from '@/components/SessionPicker';
 
 // DockDirection uses its own storage key internally ('nfr-dock-layout-v2').
 // We read from the same key to know which signals are currently in the dock.
@@ -63,24 +63,6 @@ export default function AppRoute() {
   const liveSession = liveSessions.find((s) => s.id === sessionId) ?? null;
   const session = sdSession ?? liveSession ?? sessions[0] ?? null;
   const isLiveSession = !!liveSession;
-
-  const urlDate = search.get('date');
-  const selectedDate =
-    urlDate ?? session?.date ?? new Date().toISOString().split('T')[0];
-
-  const setSelectedDate = (date) => setSearch((p) => {
-    p.set('date', date);
-    p.delete('session');
-    return p;
-  });
-
-  useEffect(() => {
-    if (mode !== 'replay' || sessionId) return;
-    const firstForDate = sessions.find((s) => s.date === selectedDate);
-    if (firstForDate) {
-      setSearch((p) => { p.set('session', firstForDate.id); return p; }, { replace: true });
-    }
-  }, [mode, sessionId, selectedDate, sessions, setSearch]);
 
   // Track which signals the dock currently has (from localStorage).
   const [signalIds, setSignalIds] = useState([]);
@@ -135,22 +117,15 @@ export default function AppRoute() {
     sdReplay;
 
   const sessionSlot = mode === 'replay' ? (
-    <DateAndSessionPicker
+    <SessionPicker
       sessions={sessions}
       liveSessions={liveSessions}
-      selectedDate={selectedDate}
-      onSelectedDate={setSelectedDate}
-      sessionId={session?.id ?? null}
-      onSessionId={(id) => setSearch((p) => {
+      currentId={session?.id ?? null}
+      onPick={(id) => setSearch((p) => {
         if (id) p.set('session', id); else p.delete('session');
+        p.delete('date');
         return p;
       })}
-      formatSessionLabel={(s, num) => {
-        const time = new Date(s.started_at).toLocaleTimeString([], {
-          hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
-        });
-        return `#${num} · ${time} · ${s.duration_secs}s`;
-      }}
     />
   ) : (
     <span style={{
