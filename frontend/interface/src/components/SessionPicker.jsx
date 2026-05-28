@@ -17,6 +17,14 @@ const MONTH_NAMES = [
 ];
 const DOW_LABELS = ['S','M','T','W','T','F','S'];
 
+/** Extract "LOG_0014" from a source_file like
+ *  "/tmp/nfr-uploads/1779904279038-LOG_0014.NFR". Falls back to null. */
+function logNumber(sourceFile) {
+  if (!sourceFile) return null;
+  const m = String(sourceFile).match(/LOG_\d+/i);
+  return m ? m[0].toUpperCase() : null;
+}
+
 function smallBtn() {
   return {
     display: 'inline-flex', alignItems: 'center', padding: '3px 7px',
@@ -152,6 +160,7 @@ function SessionDayList({ date, sessions, currentId, onPick, onBack }) {
       </div>
       {sessions.map((s) => {
         const active = s.id === currentId;
+        const log = logNumber(s.source_file);
         return (
           <div
             key={s.id}
@@ -165,9 +174,16 @@ function SessionDayList({ date, sessions, currentId, onPick, onBack }) {
           >
             <div style={{ display:'flex', justifyContent:'space-between', gap: 8 }}>
               <span>{new Date(s.started_at).toLocaleTimeString()}</span>
-              <span style={{ color: COLORS.textFaint, fontSize: 9 }}>
-                {s.id.slice(0, 8)}
-              </span>
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end' }}>
+                {log && (
+                  <span style={{ color: COLORS.text, fontSize: 10, letterSpacing: 0.5 }}>
+                    {log}
+                  </span>
+                )}
+                <span style={{ color: COLORS.textFaint, fontSize: 9 }}>
+                  {s.id.slice(0, 8)}
+                </span>
+              </div>
             </div>
             {(s.driver || s.car) && (
               <div style={{
@@ -239,11 +255,12 @@ export default function SessionPicker({ sessions, currentId, onPick, liveSession
     sessions?.find((s) => s.id === currentId) ??
     liveSessions?.find((s) => s.id === currentId);
   const isLiveCurrent = currentId && liveSessions?.some((s) => s.id === currentId);
+  const currentLog = current ? logNumber(current.source_file) : null;
   const label = currentId
     ? current
       ? isLiveCurrent
         ? `● LIVE · ${current.id.slice(0, 8)}`
-        : `${new Date(current.started_at).toLocaleDateString()} · ${currentId.slice(0, 8)}`
+        : `${new Date(current.started_at).toLocaleDateString()} · ${currentLog ?? currentId.slice(0, 8)}`
       : currentId.slice(0, 8)
     : 'Select session';
 

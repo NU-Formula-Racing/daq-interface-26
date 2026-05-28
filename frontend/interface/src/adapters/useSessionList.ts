@@ -11,6 +11,7 @@ export interface SessionListItem {
   car: string | null;
   session_number: number | null;
   source: string | null;
+  source_file: string | null;
 }
 
 export function useSessionList(limit = 50) {
