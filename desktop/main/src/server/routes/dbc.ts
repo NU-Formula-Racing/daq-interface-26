@@ -23,7 +23,11 @@ export function registerDbcRoutes(app: FastifyInstance, deps: DbcUploadDeps) {
       return { error: 'expected CSV body (text/csv or {"csv": "..."} JSON)' };
     }
 
-    const trimmed = body.trim();
+    // Excel's "CSV UTF-8" export on Windows prepends a U+FEFF byte-order
+    // mark. JS `.trim()` already drops it, but strip explicitly so the
+    // logic stays obvious to readers and survives any future trim change.
+    const noBom = body.charCodeAt(0) === 0xFEFF ? body.slice(1) : body;
+    const trimmed = noBom.trim();
     if (trimmed.length === 0) {
       reply.code(400);
       return { error: 'empty CSV' };
@@ -31,7 +35,10 @@ export function registerDbcRoutes(app: FastifyInstance, deps: DbcUploadDeps) {
     const firstLine = trimmed.split(/\r?\n/, 1)[0]?.toLowerCase() ?? '';
     if (!firstLine.includes('message id') || !firstLine.includes('signal name')) {
       reply.code(400);
-      return { error: 'CSV header must include "Message ID" and "Signal Name" columns' };
+      return {
+        error: 'CSV header must include "Message ID" and "Signal Name" columns',
+        detail: `first line was: ${firstLine.slice(0, 200)}`,
+      };
     }
 
     await writeFile(deps.storePath, trimmed + '\n', 'utf-8');

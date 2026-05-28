@@ -12,8 +12,12 @@ def compile_csv(csv_path):
 
     decode_table = {}
 
-    # Open and read the CSV files
-    with open(csv_path, newline="") as f:
+    # Open and read the CSV file. encoding="utf-8-sig" is the cross-platform
+    # safe choice: it decodes the UTF-8 the desktop server writes, transparently
+    # strips a BOM if one is present (Excel "CSV UTF-8" exports add one), and
+    # avoids Windows' default cp1252 (which would mangle non-ASCII content and
+    # leave the BOM as a literal \ufeff at the start of the first column name).
+    with open(csv_path, newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
 
         current_frame_id = None

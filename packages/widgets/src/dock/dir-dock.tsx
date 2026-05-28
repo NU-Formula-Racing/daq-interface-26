@@ -556,7 +556,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                             padding: '8px 12px', cursor: 'pointer', borderTop: `1px solid ${SH_COLORS.border}`,
                             fontFamily: 'inherit',
                           }}
-                        >👁 VIEW CURRENT DBC</button>
+                        >VIEW CURRENT DBC</button>
                       </div>
                     </>
                   )}
