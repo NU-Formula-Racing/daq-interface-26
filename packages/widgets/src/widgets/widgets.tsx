@@ -775,9 +775,12 @@ export function GgPlotWidget({
   const ys = ySig && frames ? frames.series(ySig.id) : [];
   const n = Math.min(xs.length, ys.length);
 
-  // Conventional g-g plot: square aspect, single shared scale across both
-  // axes, origin at (0, 0), values in g, auto-fit symmetric around 0 with a
-  // 2 g floor so the friction circle is always visible.
+  // Conventional g-g plot for our convention: X_Axis_Acceleration is
+  // longitudinal (throttle/brake) and plots VERTICALLY — throttle up,
+  // brake down. Y_Axis_Acceleration is lateral (cornering) and plots
+  // HORIZONTALLY. Single shared scale, origin at (0, 0), values in g,
+  // auto-fit symmetric around 0 with a 2 g floor so the friction circle
+  // is always visible.
   const GRAVITY = 9.80665;
   const PAD = 8;
   const plotW = Math.max(20, size.w - PAD * 2);
@@ -834,14 +837,15 @@ export function GgPlotWidget({
         <line x1={cx} y1={cy - half} x2={cx} y2={cy + half} stroke={W_COLORS.gridMid} strokeWidth={0.5} />
         <rect x={cx - half} y={cy - half} width={side} height={side} fill="none" stroke={W_COLORS.border} strokeWidth={0.5} />
 
-        {/* points (current scrubber position drawn separately, on top) */}
+        {/* points (current scrubber position drawn separately, on top).
+            Horizontal screen = Y_Axis_Accel (lateral); vertical = X_Axis_Accel (longitudinal). */}
         {Array.from({ length: n }, (_, i) => {
           if (i === cursorIdx) return null; // draw the cursor point on top
           return (
             <circle
               key={i}
-              cx={toScreenX(xs[i].value)}
-              cy={toScreenY(ys[i].value)}
+              cx={toScreenX(ys[i].value)}
+              cy={toScreenY(xs[i].value)}
               r={1.3}
               fill={W_COLORS.accent}
               opacity={0.55}
@@ -852,15 +856,15 @@ export function GgPlotWidget({
         {n > 0 && cursorIdx >= 0 && cursorIdx < n && (
           <g>
             <circle
-              cx={toScreenX(xs[cursorIdx].value)}
-              cy={toScreenY(ys[cursorIdx].value)}
+              cx={toScreenX(ys[cursorIdx].value)}
+              cy={toScreenY(xs[cursorIdx].value)}
               r={3}
               fill={W_COLORS.accent}
               opacity={0.95}
             />
             <circle
-              cx={toScreenX(xs[cursorIdx].value)}
-              cy={toScreenY(ys[cursorIdx].value)}
+              cx={toScreenX(ys[cursorIdx].value)}
+              cy={toScreenY(xs[cursorIdx].value)}
               r={6}
               fill="none"
               stroke={W_COLORS.accent}
@@ -869,11 +873,13 @@ export function GgPlotWidget({
             />
           </g>
         )}
-        {/* axis labels (g) */}
-        <text x={cx + half - 2} y={cy - 4} textAnchor="end" fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
+        {/* axis labels (g) — X label sits at the top of the vertical
+            axis (longitudinal up = throttle); Y label sits at the right
+            end of the horizontal axis (lateral right = right cornering). */}
+        <text x={cx + 4} y={cy - half + 10} fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
           X (g)
         </text>
-        <text x={cx + 4} y={cy - half + 10} fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
+        <text x={cx + half - 2} y={cy - 4} textAnchor="end" fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
           Y (g)
         </text>
         <text x={cx + scale * 1 + 2} y={cy + 9} fontSize={8} fill={W_COLORS.textFaint} fontFamily="monospace">
