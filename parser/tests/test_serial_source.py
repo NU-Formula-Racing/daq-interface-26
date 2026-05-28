@@ -64,3 +64,34 @@ def test_back_to_back_packets() -> None:
     assert rest == b""
     frame_ids = [e.frame_id for e in events if e.kind == "frame"]
     assert frame_ids == [0x111, 0x222]
+
+
+def test_resync_skips_prefix_garbage() -> None:
+    """A junk prefix before the first valid packet should be discarded."""
+    pkt = _packet(-42, 7.5, [_can_frame(123, 0x100, b"\x01\x02\x03")])
+    buf = b"\x00\x01\x02\x03\x04\x05" + pkt
+    events, rest = _parse_packets(buf)
+    assert rest == b""
+    frames = [e for e in events if e.kind == "frame"]
+    assert len(frames) == 1
+    assert frames[0].frame_id == 0x100
+    assert frames[0].ts_ms == 123
+
+
+def test_resync_recovers_from_mid_stream_byte_loss() -> None:
+    """A single junk byte between two valid packets shouldn't lose both."""
+    a = _packet(-10, 1.0, [_can_frame(1, 0x111, b"\x01")])
+    b = _packet(-20, 2.0, [_can_frame(2, 0x222, b"\x02\x03")])
+    buf = a + b"\xff" + b
+    events, rest = _parse_packets(buf)
+    assert rest == b""
+    frame_ids = [e.frame_id for e in events if e.kind == "frame"]
+    assert frame_ids == [0x111, 0x222]
+
+
+def test_partial_header_carryover() -> None:
+    """A buffer shorter than HEADER_SIZE should yield no events and be preserved."""
+    partial = b"\x01\x02\x03"
+    events, rest = _parse_packets(partial)
+    assert events == []
+    assert rest == partial

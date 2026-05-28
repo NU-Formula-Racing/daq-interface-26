@@ -25,6 +25,7 @@ rssi and snr for the most recent packet so the UI can show link health.
 """
 from __future__ import annotations
 
+import math
 import struct
 import time
 from typing import Iterator
@@ -52,8 +53,33 @@ def _parse_packets(buf: bytes) -> tuple[list[SourceEvent], bytes]:
     i = 0
     while i + HEADER_SIZE <= len(buf):
         rssi, snr, payload_size = HEADER_STRUCT.unpack_from(buf, i)
+
+        # Resync sanity checks: when we land on a misaligned header (after
+        # a real desync, dropped byte, or junk prefix), the bytes we read
+        # as rssi/snr/payload_size will almost always look obviously wrong.
+        # Each check below filters out a class of garbage; combined they
+        # cut the false-positive resync rate by orders of magnitude.
+        #
+        # The basestation never sends empty payloads (a packet always
+        # carries at least one CanFrame), so payload_size == 0 means we
+        # are misaligned.
+        if payload_size == 0:
+            i += 1
+            continue
+        # LoRa RSSI is in dBm and physically bounded; values outside
+        # [-150, 20] dBm are not legitimate link measurements.
+        if rssi < -150 or rssi > 20:
+            i += 1
+            continue
+        # SNR comes through as float32; misaligned reads regularly produce
+        # NaN/inf or huge magnitudes. Real link SNR sits in [-30, 30] dB.
+        if not math.isfinite(snr) or snr < -30.0 or snr > 30.0:
+            i += 1
+            continue
+        # Each CanFrame is exactly FRAME_SIZE bytes, so any valid payload
+        # must be a multiple of FRAME_SIZE. A misaligned read will almost
+        # always have a fractional length here.
         if payload_size % FRAME_SIZE != 0:
-            # Misaligned — drop a byte and try again.
             i += 1
             continue
         if i + HEADER_SIZE + payload_size > len(buf):
