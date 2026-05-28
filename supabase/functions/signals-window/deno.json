@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "hyparquet": "npm:hyparquet@1.17.1",
+    "hyparquet-compressors": "npm:hyparquet-compressors@1.1.1"
+  }
+}
