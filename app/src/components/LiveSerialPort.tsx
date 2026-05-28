@@ -18,7 +18,10 @@ export function LiveSerialPort() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>('');
 
+  const [scanning, setScanning] = useState(false);
+
   const refresh = async () => {
+    setScanning(true);
     try {
       const [{ ports }, cfg, st] = await Promise.all([
         apiGet<{ ports: SerialPort[] }>('/api/serial/ports'),
@@ -32,6 +35,8 @@ export function LiveSerialPort() {
       if (st) setStatus(st);
     } catch (e) {
       setError(`Failed to load: ${(e as Error).message}`);
+    } finally {
+      setScanning(false);
     }
   };
 
@@ -88,17 +93,41 @@ export function LiveSerialPort() {
           )}
         </select>
         <button
+          type="button"
           onClick={refresh}
           disabled={busy}
-          className="px-3 py-1.5 border border-[color:var(--color-border)] text-[11px] tracking-widest disabled:opacity-50 hover:bg-[color:var(--color-bg)] uppercase"
+          style={{
+            padding: '6px 14px',
+            background: 'var(--color-panel)',
+            border: '1px solid var(--color-border-strong)',
+            color: 'var(--color-text)',
+            fontFamily: 'inherit',
+            fontSize: 11,
+            letterSpacing: 1.5,
+            textTransform: 'uppercase',
+            cursor: busy ? 'not-allowed' : 'pointer',
+            opacity: busy ? 0.5 : 1,
+          }}
           title="Re-scan attached USB-serial devices"
         >
-          Rescan
+          {scanning ? 'Rescanning…' : 'Rescan'}
         </button>
         <button
+          type="button"
           onClick={onSave}
           disabled={!canSave}
-          className="px-3 py-1.5 bg-[color:var(--color-accent)]/80 text-white border border-[color:var(--color-accent)] text-[11px] tracking-widest disabled:opacity-40 hover:bg-[color:var(--color-accent)] uppercase"
+          style={{
+            padding: '6px 14px',
+            background: canSave ? 'var(--color-accent)' : 'var(--color-panel)',
+            border: '1px solid ' + (canSave ? 'var(--color-accent)' : 'var(--color-border)'),
+            color: canSave ? '#fff' : 'var(--color-text-mute)',
+            fontFamily: 'inherit',
+            fontSize: 11,
+            letterSpacing: 1.5,
+            textTransform: 'uppercase',
+            cursor: canSave ? 'pointer' : 'not-allowed',
+            opacity: canSave ? 1 : 0.5,
+          }}
           title={canSave ? 'Save the selected port' : 'No changes to save'}
         >
           {busy ? 'Saving…' : 'Save'}
