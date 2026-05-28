@@ -1,6 +1,6 @@
 // Shared widget renderers. Pure presentational — read from current time/data.
 // Each widget: <GraphWidget/>, <NumericWidget/>, <GaugeWidget/>, <BarWidget/>, <HeatmapWidget/>
-import React, { useContext, useMemo, useRef, useState, useLayoutEffect } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState, useLayoutEffect } from 'react';
 import { FramesContext, useCatalog, useHover } from '../data/contexts.tsx';
 import type { Signal } from '../signals/catalog.ts';
 import { COLORS as W_COLORS } from '../theme/colors.ts';
@@ -661,10 +661,39 @@ export function GraphWidget({
 }
 
 // ────────────────────────────────────────────────────────────
-// G-G plot — fixed scatter of lateral vs longitudinal acceleration
-// from the IMU. Not customizable: signals are hard-wired to the
-// X_/Y_Axis_Acceleration channels off message 0x550.
+// G-G plot — scatter of lateral vs longitudinal acceleration from
+// the IMU. Source signal pair is user-selectable via the Settings
+// page; persisted in localStorage so the widget reads it at render
+// time without prop-drilling through every consumer.
 // ────────────────────────────────────────────────────────────
+
+export type GgSource = 'raw' | 'no-g';
+
+const GG_SOURCE_KEY = 'nfr-gg-plot-source';
+
+/** Names of the (X, Y) signal pair for the requested g-g source. */
+export function ggSignalNames(src: GgSource): [string, string] {
+  return src === 'no-g'
+    ? ['No_G_X_Axis_Acceleration', 'No_G_Y_Axis_Acceleration']
+    : ['X_Axis_Acceleration', 'Y_Axis_Acceleration'];
+}
+
+/** Read the persisted preference. SSR-safe. */
+export function getGgSource(): GgSource {
+  if (typeof window === 'undefined') return 'raw';
+  return window.localStorage.getItem(GG_SOURCE_KEY) === 'no-g' ? 'no-g' : 'raw';
+}
+
+/** Write the preference. Returns the value written. */
+export function setGgSource(src: GgSource): GgSource {
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(GG_SOURCE_KEY, src);
+    // Notify same-tab listeners; storage event only fires cross-tab.
+    window.dispatchEvent(new StorageEvent('storage', { key: GG_SOURCE_KEY, newValue: src }));
+  }
+  return src;
+}
+
 interface GgPlotWidgetProps {
   t: number;
   mode?: 'live' | 'replay';
@@ -696,8 +725,19 @@ export function GgPlotWidget({
     return () => ro.disconnect();
   }, []);
 
-  const xSig = catalog.byName('X_Axis_Acceleration');
-  const ySig = catalog.byName('Y_Axis_Acceleration');
+  // Re-read on storage change so flipping the preference in Settings
+  // updates every open G-G widget without a page reload.
+  const [src, setSrc] = useState<GgSource>(() => getGgSource());
+  useEffect(() => {
+    const handler = (e: StorageEvent) => {
+      if (e.key === GG_SOURCE_KEY) setSrc(getGgSource());
+    };
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, []);
+  const [xName, yName] = ggSignalNames(src);
+  const xSig = catalog.byName(xName);
+  const ySig = catalog.byName(yName);
   const xs = xSig && frames ? frames.series(xSig.id) : [];
   const ys = ySig && frames ? frames.series(ySig.id) : [];
   const n = Math.min(xs.length, ys.length);
@@ -839,9 +879,12 @@ export function CellVoltagesWidget(props: CellVoltagesWidgetProps) {
   // Discover Cell_V_<digits> signals; sort by cell index so the legend reads
   // 0, 1, 2, … rather than alphabetical 0, 1, 10, 11, 2.
   const cellSignals = useMemo(() => {
+    // Case-insensitive — newer DBCs emit cell_v_<n> while older ones used
+    // Cell_V_<n>; we match either so the widget keeps working through
+    // catalog naming churn.
     const matches: { id: number; idx: number }[] = [];
     for (const s of catalog.ALL) {
-      const m = /^Cell_V_(\d+)$/.exec(s.name);
+      const m = /^cell_v_(\d+)$/i.exec(s.name);
       if (m) matches.push({ id: s.id, idx: parseInt(m[1], 10) });
     }
     matches.sort((a, b) => a.idx - b.idx);
@@ -849,7 +892,7 @@ export function CellVoltagesWidget(props: CellVoltagesWidgetProps) {
   }, [catalog]);
 
   if (cellSignals.length === 0) {
-    return <EmptySlot label="No Cell_V_* signals in catalog" />;
+    return <EmptySlot label="No cell_v_* signals in catalog" />;
   }
   return (
     <GraphWidget

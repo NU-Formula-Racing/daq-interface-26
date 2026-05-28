@@ -16,4 +16,8 @@ export {
   NFRMark,
   WIDGET_TYPES,
   EmptySlot,
+  getGgSource,
+  setGgSource,
+  ggSignalNames,
 } from './widgets.tsx';
+export type { GgSource } from './widgets.tsx';
