@@ -18,6 +18,7 @@ from compile import compile_csv
 from db import (
     Reading,
     SignalDef,
+    copy_live_today,
     end_session_and_flush,
     insert_rt_batch,
     open_session,
@@ -70,6 +71,7 @@ def run_live(
     source: Iterable[SourceEvent],
     emitter: ProtocolEmitter,
     connect_time: datetime | None = None,
+    streaming_only: bool = False,
 ) -> RunSummary:
     decode_table = compile_csv(str(dbc_csv))
     defs, sender_lookup = _make_sig_lookups(decode_table)
@@ -87,7 +89,12 @@ def run_live(
 
         def _flush_rt() -> None:
             nonlocal rt_batch
-            if active_session is not None and rt_batch:
+            if not rt_batch:
+                return
+            if streaming_only:
+                copy_live_today(conn, rt_batch)
+                rt_batch = []
+            elif active_session is not None:
                 insert_rt_batch(conn, active_session, rt_batch)
                 rt_batch = []
 
@@ -101,10 +108,15 @@ def run_live(
             if evt.kind == "connected":
                 emitter.serial_status("connected", port=evt.port)
                 session_start = connect_time or datetime.now(timezone.utc)
-                active_session = open_session(
-                    conn, source="live", started_at=session_start
-                )
-                emitter.session_started(str(active_session), source="live")
+                if streaming_only:
+                    # No session in streaming-only mode; mark active so
+                    # downstream frame handling proceeds.
+                    active_session = "streaming"
+                else:
+                    active_session = open_session(
+                        conn, source="live", started_at=session_start
+                    )
+                    emitter.session_started(str(active_session), source="live")
 
             elif evt.kind == "frame":
                 if active_session is None:
@@ -140,18 +152,18 @@ def run_live(
             elif evt.kind == "disconnected":
                 _flush_rt()
                 _flush_out()
-                if active_session is not None:
+                if active_session is not None and not streaming_only:
                     row_count = end_session_and_flush(conn, active_session)
                     emitter.session_ended(str(active_session), row_count=row_count)
                     sessions_closed += 1
-                    active_session = None
+                active_session = None
                 emitter.serial_status("disconnected")
                 session_start = None
 
         # End-of-stream: close any open session.
         _flush_rt()
         _flush_out()
-        if active_session is not None:
+        if active_session is not None and not streaming_only:
             row_count = end_session_and_flush(conn, active_session)
             emitter.session_ended(str(active_session), row_count=row_count)
             sessions_closed += 1

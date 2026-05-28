@@ -167,3 +167,24 @@ def copy_sd_readings(
                 count += 1
     conn.commit()
     return count
+
+
+def copy_live_today(
+    conn: psycopg.Connection,
+    readings: Iterable[Reading],
+) -> int:
+    """Bulk-insert live-serial readings into the daily rolling buffer.
+
+    Same shape as copy_sd_readings but no session_id column — live_today
+    has no session affinity by design (truncated at Chicago midnight).
+    """
+    count = 0
+    with conn.cursor() as cur:
+        with cur.copy(
+            "COPY live_today (ts, signal_id, value) FROM STDIN"
+        ) as copy:
+            for r in readings:
+                copy.write_row((r.ts, r.signal_id, r.value))
+                count += 1
+    conn.commit()
+    return count
