@@ -201,69 +201,6 @@ function SessionDayList({
   );
 }
 
-function LiveGroup({
-  sessions, currentId, onPick,
-}: {
-  sessions: Session[];
-  currentId: string | null;
-  onPick: (id: string) => void;
-}) {
-  return (
-    <div style={{ borderBottom: `1px solid ${SH_COLORS.border}` }}>
-      <div style={{
-        padding: '8px 12px 4px',
-        fontFamily: '"JetBrains Mono", monospace',
-        fontSize: 9, letterSpacing: 1.5,
-        color: '#fbbf24',
-      }}>
-        ● MOST RECENT LIVE SESSION
-      </div>
-      {sessions.map((s) => {
-        const active = s.id === currentId;
-        const ended = s.ended_at !== null;
-        const dur = formatDuration(s.started_at, s.ended_at);
-        return (
-          <div
-            key={s.id}
-            onClick={() => onPick(s.id)}
-            style={{
-              padding: '8px 12px',
-              cursor: 'pointer',
-              background: active ? 'rgba(167,139,250,0.12)' : 'transparent',
-              fontFamily: '"JetBrains Mono", monospace',
-              fontSize: 10,
-              color: SH_COLORS.text,
-              borderTop: `1px solid ${SH_COLORS.border}`,
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-              <span>{new Date(s.started_at).toLocaleString()}</span>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
-                <span style={{
-                  fontSize: 8, letterSpacing: 1.5,
-                  color: ended ? SH_COLORS.textFaint : '#fbbf24',
-                  border: `1px solid ${ended ? SH_COLORS.border : 'rgba(251,191,36,0.6)'}`,
-                  padding: '1px 5px',
-                }}>
-                  {ended ? 'ENDED' : 'LIVE'}
-                </span>
-                {dur && (
-                  <span style={{ color: SH_COLORS.textMute, fontSize: 9 }}>{dur}</span>
-                )}
-              </div>
-            </div>
-            <div style={{ marginTop: 2, color: SH_COLORS.textMute, fontSize: 9 }}>
-              {s.id.slice(0, 8)}
-              {s.track && ` · ${s.track}`}
-              {s.driver && ` · ${s.driver}`}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 export function SessionPicker() {
   const navigate = useNavigate();
   const params = useParams();
@@ -315,23 +252,11 @@ export function SessionPicker() {
     autoJumpedRef.current = true;
   }, [open, sessions]);
 
-  // SD imports drive the calendar view (one logical day per cell). Live
-  // sessions get their own group above the calendar — they're short, you
-  // only ever have one or two, and they don't make sense on a date grid.
+  // SD imports drive the calendar view (one logical day per cell).
   const sdSessions = useMemo(
     () => (sessions ?? []).filter((s) => s.source === 'sd_import'),
     [sessions],
   );
-  // Only ever surface the most-recent live session. The live-sync worker
-  // wipes prior local live sessions on each new session_started, so under
-  // normal flow there is at most one anyway; this guards against any
-  // leftovers from an aborted prior run.
-  const liveSessions = useMemo(() => {
-    const list = (sessions ?? [])
-      .filter((s) => s.source === 'live')
-      .sort((a, b) => (a.started_at < b.started_at ? 1 : -1));
-    return list.length > 0 ? [list[0]] : [];
-  }, [sessions]);
 
   // YYYY-MM-DD → Session[]
   const dayMap = useMemo(() => {
@@ -418,16 +343,6 @@ export function SessionPicker() {
               />
             ) : (
               <>
-                {liveSessions.length > 0 && (
-                  <LiveGroup
-                    sessions={liveSessions}
-                    currentId={currentId}
-                    onPick={(id) => {
-                      navigate(`/sessions/${id}`);
-                      setOpen(false);
-                    }}
-                  />
-                )}
                 <CalendarPanel
                   cursor={cursor}
                   cells={cells}
