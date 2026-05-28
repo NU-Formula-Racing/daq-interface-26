@@ -83,6 +83,12 @@ def run_live(
         sig_id_map = upsert_signal_definitions(conn, defs)
 
         active_session = None  # UUID | None
+        # Separate boolean for "connection is live, process frames" so that
+        # `active_session` stays strictly UUID | None. In streaming_only mode
+        # there is no session row to associate with, but we still need to
+        # know the link is up; overloading active_session with a sentinel
+        # string would risk a future UUID consumer silently receiving it.
+        connection_active: bool = False
         rt_batch: list[Reading] = []
         out_rows: list[dict] = []
         session_start: datetime | None = None
@@ -109,9 +115,10 @@ def run_live(
                 emitter.serial_status("connected", port=evt.port)
                 session_start = connect_time or datetime.now(timezone.utc)
                 if streaming_only:
-                    # No session in streaming-only mode; mark active so
-                    # downstream frame handling proceeds.
-                    active_session = "streaming"
+                    # No session in streaming-only mode; mark the link as
+                    # active so downstream frame handling proceeds while
+                    # keeping active_session honestly None.
+                    connection_active = True
                 else:
                     active_session = open_session(
                         conn, source="live", started_at=session_start
@@ -119,7 +126,7 @@ def run_live(
                     emitter.session_started(str(active_session), source="live")
 
             elif evt.kind == "frame":
-                if active_session is None:
+                if active_session is None and not connection_active:
                     continue
                 decoded = decode_frame(evt.frame_id, evt.data, decode_table)
                 if not decoded:
@@ -157,6 +164,7 @@ def run_live(
                     emitter.session_ended(str(active_session), row_count=row_count)
                     sessions_closed += 1
                 active_session = None
+                connection_active = False
                 emitter.serial_status("disconnected")
                 session_start = None
 
