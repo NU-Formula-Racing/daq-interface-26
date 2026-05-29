@@ -1,6 +1,6 @@
 // Shared widget renderers. Pure presentational — read from current time/data.
 // Each widget: <GraphWidget/>, <NumericWidget/>, <GaugeWidget/>, <BarWidget/>, <HeatmapWidget/>
-import React, { useContext, useMemo, useRef, useState, useLayoutEffect } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState, useLayoutEffect } from 'react';
 import { FramesContext, useCatalog, useHover } from '../data/contexts.tsx';
 import type { Signal } from '../signals/catalog.ts';
 import { COLORS as W_COLORS } from '../theme/colors.ts';
@@ -78,6 +78,23 @@ interface GraphWidgetProps {
    *  drive's 14th minute still reads "14:00 → 14:30" instead of "00:00
    *  → 00:30". Falls back to window-relative labels when unset. */
   sessionStartTs?: string | null;
+  /** Live-mode window override (absolute timestamps). When BOTH are set,
+   *  the widget draws frames whose ts falls in [start, end], positioned
+   *  by their actual timestamp rather than by buffer index. Used by the
+   *  Live page to freeze the visible window on zoom. When unset and
+   *  mode === 'live', the widget self-computes a rolling window from
+   *  frames.latestTs() and the `window` fraction. */
+  windowStartTs?: string | null;
+  windowEndTs?: string | null;
+  /** Replay-only: width (in seconds) of the visible window around the
+   *  scrubber. Defaults to 60 s; null means "show the whole session"
+   *  (the historical behaviour). Lets the user keep long sessions from
+   *  being stretched flat across the dock — defaults to a tight,
+   *  scrubber-following view. */
+  replayWindowSecs?: number | null;
+  /** Replay-only: total session duration in seconds. Needed to convert
+   *  replayWindowSecs into a session fraction. Comes from DockDirection. */
+  sessionDurationSecs?: number;
 }
 
 export function GraphWidget({
@@ -85,6 +102,8 @@ export function GraphWidget({
   density = 'normal', compact = false, showAxes = true, showCursor = true, height,
   zoom = null, onZoom, mode = 'replay', signalColors, showRange = true,
   zoomActive = false, sessionStartTs = null,
+  windowStartTs = null, windowEndTs = null,
+  replayWindowSecs = 60, sessionDurationSecs = 0,
 }: GraphWidgetProps) {
   const catalog = useCatalog();
   const frames = useFrames();
@@ -109,12 +128,43 @@ export function GraphWidget({
     t0 = Math.max(0, zoom[0]);
     t1 = Math.min(1, zoom[1]);
     if (t1 - t0 < 1e-4) { t0 = 0; t1 = 1; }
+  } else if (mode === 'live' && windowStartTs && windowEndTs) {
+    // Live with an absolute window from the parent: drag fractions should
+    // be relative to that window, so the callback returns ranges the parent
+    // can map straight to absolute timestamps. Otherwise zoom in live
+    // converted [0..1] back to a session-fraction that almost always
+    // landed near the live edge.
+    t0 = 0;
+    t1 = 1;
   } else if (mode === 'live') {
     t1 = t;
     t0 = Math.max(0, t - win);
     if (t1 - t0 < win * 0.5) { t0 = 0; t1 = Math.max(win, t1); }
+  } else if (
+    mode === 'replay' &&
+    replayWindowSecs != null &&
+    replayWindowSecs > 0 &&
+    sessionDurationSecs > 0 &&
+    replayWindowSecs < sessionDurationSecs
+  ) {
+    // Replay with a configured window — show a sliding slice that follows
+    // the scrubber instead of stretching the whole session across the plot.
+    // Default 60 s keeps long drives readable; widget settings expose 5 m
+    // and "ALL" presets.
+    const winFrac = replayWindowSecs / sessionDurationSecs;
+    if (t < winFrac) {
+      // Cursor near the beginning — anchor the window at the session start
+      // so we don't show a half-empty window with the cursor hugging the
+      // right edge.
+      t0 = 0;
+      t1 = winFrac;
+    } else {
+      t1 = t;
+      t0 = t - winFrac;
+    }
   } else {
-    // Replay: show the entire session. The scrubber just moves the cursor.
+    // Replay with no window setting (or "ALL"): show the entire session.
+    // The scrubber just moves the cursor.
     t0 = 0;
     t1 = 1;
   }
@@ -148,49 +198,97 @@ export function GraphWidget({
     }
     return out;
   };
+  // Live mode uses an absolute time window so dot positions are stable
+  // frame-to-frame (only NEW frames move, existing dots stay put as the
+  // window scrolls). When the caller supplies windowStartTs/windowEndTs
+  // those are used verbatim (Live page freezes them on zoom); otherwise
+  // we self-compute a rolling window of width (full-session-span * win)
+  // ending at frames.latestTs().
+  let liveWinStartMs: number | null = null;
+  let liveWinEndMs: number | null = null;
+  if (mode === 'live') {
+    if (windowStartTs && windowEndTs) {
+      liveWinStartMs = Date.parse(windowStartTs);
+      liveWinEndMs = Date.parse(windowEndTs);
+    } else if (frames) {
+      const latest = frames.latestTs();
+      const first = frames.firstTs();
+      if (latest && first) {
+        const latestMs = Date.parse(latest);
+        const firstAllMs = Date.parse(first);
+        liveWinEndMs = latestMs;
+        const span = Math.max(1, latestMs - firstAllMs);
+        liveWinStartMs = Math.max(firstAllMs, latestMs - span * win);
+      }
+    }
+    // Per-widget time-window setting takes precedence: trim the window's
+    // start so we render only the last replayWindowSecs of data. Lets a
+    // long-running live session stay readable without dragging the slider.
+    // replayWindowSecs === null means ALL — don't trim.
+    if (
+      liveWinStartMs != null && liveWinEndMs != null &&
+      replayWindowSecs != null && replayWindowSecs > 0
+    ) {
+      const trimmedStart = liveWinEndMs - replayWindowSecs * 1000;
+      if (trimmedStart > liveWinStartMs) liveWinStartMs = trimmedStart;
+    }
+  }
+
   const series = signals.map((sid: any) => {
     const sig = catalog.resolve(sid);
     if (!sig) return null;
     const all = frames?.series(sig.id) ?? [];
     if (all.length === 0) return { sig, data: new Array(N).fill(0), vMin: null as number[] | null, vMax: null as number[] | null, empty: true };
 
-    // Decide which slice of the buffer to render.
-    // - Live: rolling window — last `win` fraction of the buffer ending at "now".
-    // - Zoomed (either mode): the zoom range maps to a fraction of the buffer.
-    // - Replay (no zoom): full buffer; the scrubber just moves the cursor.
+    // Decide which frames are visible.
+    //  - Live (timestamp window known): filter by absolute ts. New frames
+    //    appear at the right edge; existing dots keep their X position
+    //    until the window itself scrolls. No index jitter.
+    //  - Zoomed (either mode): zoom range maps to a fraction of the buffer.
+    //  - Replay (no zoom): full buffer; scrubber just moves the cursor.
     const len = all.length;
-    const winLen = Math.max(8, Math.floor(len * win));
-    let start: number, end: number;
-    if (zoom && zoom.length === 2) {
-      start = Math.max(0, Math.floor(zoom[0] * len));
-      end = Math.max(start + 1, Math.min(len, Math.ceil(zoom[1] * len)));
-    } else if (mode === 'live') {
-      end = len;
-      start = Math.max(0, len - winLen);
+    let visibleFrames: typeof all = [];
+    if (mode === 'live' && liveWinStartMs != null && liveWinEndMs != null) {
+      const startMs = liveWinStartMs;
+      const endMs = liveWinEndMs;
+      visibleFrames = all.filter((f) => {
+        const ms = Date.parse(f.ts);
+        return ms >= startMs && ms <= endMs;
+      });
+    } else if (zoom && zoom.length === 2) {
+      const s = Math.max(0, Math.floor(zoom[0] * len));
+      const e = Math.max(s + 1, Math.min(len, Math.ceil(zoom[1] * len)));
+      visibleFrames = all.slice(s, e);
     } else {
-      start = 0;
-      end = len;
+      visibleFrames = all;
     }
-    const slicedFrames = all.slice(start, end);
-    if (slicedFrames.length === 0) return { sig, data: new Array(N).fill(0), vMin: null, vMax: null, empty: true };
+    if (visibleFrames.length === 0) return { sig, data: new Array(N).fill(0), vMin: null, vMax: null, empty: true };
 
-    const valueRaw = slicedFrames.map((f) => f.value);
+    const valueRaw = visibleFrames.map((f) => f.value);
     const data = resampleToN(valueRaw, N);
 
-    // For dots mode: capture per-sample (x-fraction, value) so the render can
-    // position each dot at its true timestamp instead of using the resampled-
-    // uniform array. Avoids "all dots overlap into a line" when zoomed in to a
-    // window containing fewer raw samples than plot pixels.
+    // Per-sample (x-fraction, value) — basis for both dot positions AND
+    // the live-mode line path. In live mode the fraction is computed
+    // against the absolute window so dots don't shuffle with each new
+    // frame. In replay we keep the per-slice fraction for back-compat.
     let dots: { f: number; v: number }[] | null = null;
-    if (slicedFrames.length > 0) {
-      const firstTs = Date.parse(slicedFrames[0].ts);
-      const lastTs = Date.parse(slicedFrames[slicedFrames.length - 1].ts);
+    if (mode === 'live' && liveWinStartMs != null && liveWinEndMs != null) {
+      const startMs = liveWinStartMs;
+      const span = Math.max(1, liveWinEndMs - startMs);
+      dots = visibleFrames.map((f) => ({
+        f: (Date.parse(f.ts) - startMs) / span,
+        v: f.value,
+      }));
+    } else if (visibleFrames.length > 0) {
+      const firstTs = Date.parse(visibleFrames[0].ts);
+      const lastTs = Date.parse(visibleFrames[visibleFrames.length - 1].ts);
       const span = Math.max(1, lastTs - firstTs);
-      dots = slicedFrames.map((f) => ({
+      dots = visibleFrames.map((f) => ({
         f: (Date.parse(f.ts) - firstTs) / span,
         v: f.value,
       }));
     }
+    const slicedFrames = visibleFrames; // alias for downstream range logic
 
     // Build vMin/vMax tracks only if at least one frame has a real spread.
     const hasRange = slicedFrames.some(
@@ -297,6 +395,25 @@ export function GraphWidget({
     }
     let d = `M ${x(0)} ${y(data[0])}`;
     for (let i = 1; i < data.length; i++) d += ` L ${x(i)} ${y(data[i])}`;
+    return d;
+  };
+  /** Timestamp-positioned line — one segment per consecutive dot pair.
+   *  Lets the live-mode line scroll in lock-step with its underlying
+   *  dots instead of being smoothed by the uniform-N resample (whose
+   *  bucket boundaries shift on every frame). */
+  const dotsLinePath = (dots: { f: number; v: number }[]) => {
+    if (dots.length === 0) return '';
+    let d = `M ${padL + dots[0].f * plotW} ${y(dots[0].v)}`;
+    if (style === 'step') {
+      for (let i = 1; i < dots.length; i++) {
+        d += ` L ${padL + dots[i].f * plotW} ${y(dots[i - 1].v)}`;
+        d += ` L ${padL + dots[i].f * plotW} ${y(dots[i].v)}`;
+      }
+    } else {
+      for (let i = 1; i < dots.length; i++) {
+        d += ` L ${padL + dots[i].f * plotW} ${y(dots[i].v)}`;
+      }
+    }
     return d;
   };
   const areaPathFor = (data: number[]) => {
@@ -535,7 +652,13 @@ export function GraphWidget({
                   out.push(<circle key={i} cx={padL + p.f * plotW} cy={y(p.v)} r={2} fill={color} />);
                 }
                 return out;
-              })() : (
+              })() : mode === 'live' && s.dots && s.dots.length > 0 ? (
+                // Live mode: draw the line from the timestamp-positioned dots
+                // so it scrolls in lock-step with them rather than being
+                // smoothed by the uniform-N resample.
+                <path d={dotsLinePath(s.dots)} fill="none" stroke={color} strokeWidth={1.5}
+                  strokeLinejoin="round" strokeLinecap="round" />
+              ) : (
                 <path d={pathFor(s.data)} fill="none" stroke={color} strokeWidth={1.5}
                   strokeLinejoin="round" strokeLinecap="round" />
               )}
@@ -661,10 +784,72 @@ export function GraphWidget({
 }
 
 // ────────────────────────────────────────────────────────────
-// G-G plot — fixed scatter of lateral vs longitudinal acceleration
-// from the IMU. Not customizable: signals are hard-wired to the
-// X_/Y_Axis_Acceleration channels off message 0x550.
+// G-G plot — scatter of lateral vs longitudinal acceleration from
+// the IMU. Source signal pair is user-selectable via the Settings
+// page; persisted in localStorage so the widget reads it at render
+// time without prop-drilling through every consumer.
 // ────────────────────────────────────────────────────────────
+
+export type GgSource = 'raw' | 'no-g';
+
+const GG_SOURCE_KEY = 'nfr-gg-plot-source';
+
+/** Names of the (X, Y) signal pair for the requested g-g source. */
+export function ggSignalNames(src: GgSource): [string, string] {
+  return src === 'no-g'
+    ? ['No_G_X_Axis_Acceleration', 'No_G_Y_Axis_Acceleration']
+    : ['X_Axis_Acceleration', 'Y_Axis_Acceleration'];
+}
+
+/** Read the persisted preference. SSR-safe. */
+export function getGgSource(): GgSource {
+  if (typeof window === 'undefined') return 'raw';
+  return window.localStorage.getItem(GG_SOURCE_KEY) === 'no-g' ? 'no-g' : 'raw';
+}
+
+/** Write the preference. Returns the value written. */
+export function setGgSource(src: GgSource): GgSource {
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(GG_SOURCE_KEY, src);
+    // Notify same-tab listeners; storage event only fires cross-tab.
+    window.dispatchEvent(new StorageEvent('storage', { key: GG_SOURCE_KEY, newValue: src }));
+  }
+  return src;
+}
+
+/** Compute the effective signal IDs a widget needs from the catalog.
+ *
+ *  Most widgets just use their explicit `signals` array, but auto-discovery
+ *  widgets (`cellv`, `gg`) don't store their signals in the layout — they
+ *  resolve them at render time. The replay/live fetch loop was missing
+ *  those IDs, so cell-voltage and g-g plots stayed empty until the user
+ *  happened to add the underlying signals to some other widget.
+ *
+ *  Pass the resolved catalog and the current GG source preference. */
+export function effectiveWidgetSignalIds(
+  widget: { type?: string; signals?: any[] },
+  catalog: import('../signals/catalog.ts').SignalCatalog,
+  ggSrc: GgSource = 'raw',
+): number[] {
+  const out = new Set<number>();
+  for (const s of widget.signals ?? []) {
+    const r = catalog.resolve(s);
+    if (r) out.add(r.id);
+  }
+  if (widget.type === 'cellv') {
+    for (const s of catalog.ALL) {
+      if (/^cell_v_(\d+)$/i.test(s.name)) out.add(s.id);
+    }
+  } else if (widget.type === 'gg') {
+    const [xn, yn] = ggSignalNames(ggSrc);
+    const x = catalog.byName(xn);
+    const y = catalog.byName(yn);
+    if (x) out.add(x.id);
+    if (y) out.add(y.id);
+  }
+  return [...out];
+}
+
 interface GgPlotWidgetProps {
   t: number;
   mode?: 'live' | 'replay';
@@ -696,15 +881,29 @@ export function GgPlotWidget({
     return () => ro.disconnect();
   }, []);
 
-  const xSig = catalog.byName('X_Axis_Acceleration');
-  const ySig = catalog.byName('Y_Axis_Acceleration');
+  // Re-read on storage change so flipping the preference in Settings
+  // updates every open G-G widget without a page reload.
+  const [src, setSrc] = useState<GgSource>(() => getGgSource());
+  useEffect(() => {
+    const handler = (e: StorageEvent) => {
+      if (e.key === GG_SOURCE_KEY) setSrc(getGgSource());
+    };
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, []);
+  const [xName, yName] = ggSignalNames(src);
+  const xSig = catalog.byName(xName);
+  const ySig = catalog.byName(yName);
   const xs = xSig && frames ? frames.series(xSig.id) : [];
   const ys = ySig && frames ? frames.series(ySig.id) : [];
   const n = Math.min(xs.length, ys.length);
 
-  // Conventional g-g plot: square aspect, single shared scale across both
-  // axes, origin at (0, 0), values in g, auto-fit symmetric around 0 with a
-  // 2 g floor so the friction circle is always visible.
+  // Conventional g-g plot for our convention: X_Axis_Acceleration is
+  // longitudinal (throttle/brake) and plots VERTICALLY — throttle up,
+  // brake down. Y_Axis_Acceleration is lateral (cornering) and plots
+  // HORIZONTALLY. Single shared scale, origin at (0, 0), values in g,
+  // auto-fit symmetric around 0 with a 2 g floor so the friction circle
+  // is always visible.
   const GRAVITY = 9.80665;
   const PAD = 8;
   const plotW = Math.max(20, size.w - PAD * 2);
@@ -761,14 +960,15 @@ export function GgPlotWidget({
         <line x1={cx} y1={cy - half} x2={cx} y2={cy + half} stroke={W_COLORS.gridMid} strokeWidth={0.5} />
         <rect x={cx - half} y={cy - half} width={side} height={side} fill="none" stroke={W_COLORS.border} strokeWidth={0.5} />
 
-        {/* points (current scrubber position drawn separately, on top) */}
+        {/* points (current scrubber position drawn separately, on top).
+            Horizontal screen = Y_Axis_Accel (lateral); vertical = X_Axis_Accel (longitudinal). */}
         {Array.from({ length: n }, (_, i) => {
           if (i === cursorIdx) return null; // draw the cursor point on top
           return (
             <circle
               key={i}
-              cx={toScreenX(xs[i].value)}
-              cy={toScreenY(ys[i].value)}
+              cx={toScreenX(ys[i].value)}
+              cy={toScreenY(xs[i].value)}
               r={1.3}
               fill={W_COLORS.accent}
               opacity={0.55}
@@ -779,15 +979,15 @@ export function GgPlotWidget({
         {n > 0 && cursorIdx >= 0 && cursorIdx < n && (
           <g>
             <circle
-              cx={toScreenX(xs[cursorIdx].value)}
-              cy={toScreenY(ys[cursorIdx].value)}
+              cx={toScreenX(ys[cursorIdx].value)}
+              cy={toScreenY(xs[cursorIdx].value)}
               r={3}
               fill={W_COLORS.accent}
               opacity={0.95}
             />
             <circle
-              cx={toScreenX(xs[cursorIdx].value)}
-              cy={toScreenY(ys[cursorIdx].value)}
+              cx={toScreenX(ys[cursorIdx].value)}
+              cy={toScreenY(xs[cursorIdx].value)}
               r={6}
               fill="none"
               stroke={W_COLORS.accent}
@@ -796,11 +996,13 @@ export function GgPlotWidget({
             />
           </g>
         )}
-        {/* axis labels (g) */}
-        <text x={cx + half - 2} y={cy - 4} textAnchor="end" fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
+        {/* axis labels (g) — X label sits at the top of the vertical
+            axis (longitudinal up = throttle); Y label sits at the right
+            end of the horizontal axis (lateral right = right cornering). */}
+        <text x={cx + 4} y={cy - half + 10} fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
           X (g)
         </text>
-        <text x={cx + 4} y={cy - half + 10} fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
+        <text x={cx + half - 2} y={cy - 4} textAnchor="end" fontSize={9} fill={W_COLORS.textMute} fontFamily="monospace">
           Y (g)
         </text>
         <text x={cx + scale * 1 + 2} y={cy + 9} fontSize={8} fill={W_COLORS.textFaint} fontFamily="monospace">
@@ -839,9 +1041,12 @@ export function CellVoltagesWidget(props: CellVoltagesWidgetProps) {
   // Discover Cell_V_<digits> signals; sort by cell index so the legend reads
   // 0, 1, 2, … rather than alphabetical 0, 1, 10, 11, 2.
   const cellSignals = useMemo(() => {
+    // Case-insensitive — newer DBCs emit cell_v_<n> while older ones used
+    // Cell_V_<n>; we match either so the widget keeps working through
+    // catalog naming churn.
     const matches: { id: number; idx: number }[] = [];
     for (const s of catalog.ALL) {
-      const m = /^Cell_V_(\d+)$/.exec(s.name);
+      const m = /^cell_v_(\d+)$/i.exec(s.name);
       if (m) matches.push({ id: s.id, idx: parseInt(m[1], 10) });
     }
     matches.sort((a, b) => a.idx - b.idx);
@@ -849,7 +1054,7 @@ export function CellVoltagesWidget(props: CellVoltagesWidgetProps) {
   }, [catalog]);
 
   if (cellSignals.length === 0) {
-    return <EmptySlot label="No Cell_V_* signals in catalog" />;
+    return <EmptySlot label="No cell_v_* signals in catalog" />;
   }
   return (
     <GraphWidget
@@ -1323,8 +1528,15 @@ interface TimelineProps {
   durationSecs?: number;
   mode?: 'live' | 'replay';
   compact?: boolean;
+  /** True when live updates are paused (window frozen at "now"). The badge
+   *  reads PAUSED, the dot turns dim, and clicking the badge resumes. */
+  paused?: boolean;
+  /** When provided, the LIVE / PAUSED badge becomes a clickable button that
+   *  toggles pause without leaving the live edge. Lets the user freeze the
+   *  view to read values without dragging the slider. */
+  onTogglePause?: () => void;
 }
-export function Timeline({ t, onChange, durationSecs = 0, mode, compact }: TimelineProps) {
+export function Timeline({ t, onChange, durationSecs = 0, mode, compact, paused = false, onTogglePause }: TimelineProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [hoverX, setHoverX] = useState<number | null>(null);
   const [hoverFrac, setHoverFrac] = useState(0);
@@ -1364,10 +1576,43 @@ export function Timeline({ t, onChange, durationSecs = 0, mode, compact }: Timel
       padding: compact ? '6px 12px' : '8px 16px', background: SH_COLORS.bg,
       borderTop: `1px solid ${SH_COLORS.border}`, display: 'flex', alignItems: 'center', gap: 14,
     }}>
-      <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 11, color: mode === 'live' ? SH_COLORS.ok : SH_COLORS.textMute, letterSpacing: 0.5, minWidth: 90, display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{ width: 7, height: 7, borderRadius: '50%', background: mode === 'live' ? SH_COLORS.ok : SH_COLORS.accentBright, boxShadow: `0 0 6px ${mode === 'live' ? SH_COLORS.ok : SH_COLORS.accentBright}` }} />
-        {mode === 'live' ? 'LIVE' : 'REPLAY'} · {fmt(t * durationSecs)}
-      </div>
+      {(() => {
+        const isLive = mode === 'live';
+        const clickable = isLive && !!onTogglePause;
+        const label = isLive ? (paused ? 'PAUSED' : 'LIVE') : 'REPLAY';
+        const dotColor = isLive
+          ? (paused ? SH_COLORS.textFaint : SH_COLORS.ok)
+          : SH_COLORS.accentBright;
+        const textColor = isLive
+          ? (paused ? SH_COLORS.textMute : SH_COLORS.ok)
+          : SH_COLORS.textMute;
+        return (
+          <button
+            type="button"
+            onClick={clickable ? onTogglePause : undefined}
+            disabled={!clickable}
+            title={
+              clickable
+                ? (paused ? 'Click to resume live updates' : 'Click to pause — graphs freeze, ingestion continues')
+                : undefined
+            }
+            style={{
+              fontFamily: '"JetBrains Mono", monospace', fontSize: 11,
+              color: textColor, letterSpacing: 0.5, minWidth: 90,
+              display: 'flex', alignItems: 'center', gap: 6,
+              background: 'transparent', border: 'none', padding: 0,
+              cursor: clickable ? 'pointer' : 'default',
+            }}
+          >
+            <span style={{
+              width: 7, height: 7, borderRadius: '50%',
+              background: dotColor,
+              boxShadow: paused ? 'none' : `0 0 6px ${dotColor}`,
+            }} />
+            {label} · {fmt(t * durationSecs)}
+          </button>
+        );
+      })()}
 
       <div
         ref={ref}
@@ -1451,8 +1696,16 @@ interface WidgetShellProps {
   /** ISO timestamp of the session start. Forwarded to graph widgets so
    *  their x-axis labels read as elapsed-into-session at any zoom. */
   sessionStartTs?: string | null;
+  /** Forwarded to graph widgets so the live page can freeze the visible
+   *  window on zoom (both null in replay mode). */
+  windowStartTs?: string | null;
+  windowEndTs?: string | null;
+  /** Replay-only: total session duration in seconds; needed by graph
+   *  widgets to convert their per-widget replayWindow setting into a
+   *  fraction of the session. Forwarded from DockDirection.durationSecs. */
+  sessionDurationSecs?: number;
 }
-export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick, onSettings, onZoom, zoomActive, sessionStartTs }: WidgetShellProps) {
+export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick, onSettings, onZoom, zoomActive, sessionStartTs, windowStartTs, windowEndTs, sessionDurationSecs }: WidgetShellProps) {
   const [typeOpen, setTypeOpen] = useState(false);
   const compact = density === 'compact';
   const frames = useFrames();
@@ -1496,7 +1749,18 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
       // sub-slicing into it — that would compound the orchestrator's zoom and
       // shrink the visible range on every drag.
       // widget.graphStyle overrides the dock-level default per-graph.
-      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={widget.graphStyle ?? graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} zoomActive={zoomActive} sessionStartTs={sessionStartTs} />;
+      case 'graph': {
+        // Mode-specific default for the per-widget time window: in live mode
+        // a saved-but-unset widget defaults to 60 s so a long-running buffer
+        // doesn't stretch the most recent data into a sliver; in replay mode
+        // the same widget defaults to ALL so opening a session shows the
+        // whole drive (matches what users had before any per-widget setting
+        // existed). `replayWindowSecs === null` explicitly opts out of
+        // narrowing in either mode.
+        const defaultWin = mode === 'live' ? 60 : null;
+        const effectiveWin = widget.replayWindowSecs === undefined ? defaultWin : widget.replayWindowSecs;
+        return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={widget.graphStyle ?? graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} zoomActive={zoomActive} sessionStartTs={sessionStartTs} windowStartTs={windowStartTs} windowEndTs={windowEndTs} replayWindowSecs={effectiveWin} sessionDurationSecs={sessionDurationSecs} />;
+      }
       case 'numeric': return <NumericWidget signal={widget.signals[0]} t={t} compact={compact} />;
       case 'gauge': return <GaugeWidget signal={widget.signals[0]} t={t} />;
       case 'bar': return <BarWidget signals={widget.signals} t={t} />;

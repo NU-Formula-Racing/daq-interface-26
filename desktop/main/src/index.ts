@@ -18,6 +18,7 @@ import type { CatalogDeps } from './server/routes/catalog.ts';
 import { spawn } from 'child_process';
 import { createHash } from 'crypto';
 import { loadCloudDefaults } from './cloud/defaults.ts';
+import { startLiveTodayCleanupTimer } from './db/live-today-cleanup.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..', '..');
@@ -91,6 +92,7 @@ export async function run(opts: {
   let parser: ParserManager | null = null;
   let watcher: FolderWatcher | null = null;
   let liveStreamer: import('./cloud/live-stream.ts').LiveStreamer | null = null;
+  let stopLiveCleanup: (() => void) | null = null;
   let authToken: string | null = null;
   let pgManager: PostgresManager | null = null;
   let dsn: string | null = null;
@@ -176,13 +178,27 @@ export async function run(opts: {
       });
       parser.start();
 
-      // Live cloud broadcaster (optional; controlled by cloudLiveEnabled in config).
-      try {
-        const { startLiveStreamer } = await import('./cloud/live-stream.ts');
-        liveStreamer = await startLiveStreamer({ parser, pool });
-      } catch (err) {
-        console.error('live cloud broadcaster failed to start:', (err as Error).message);
-      }
+      // Daily live-mode cleanup: the parser now writes into `live_today`
+      // instead of session_started/session_ended-bracketed sd_readings, and
+      // the embedded Postgres has no pg_cron, so the desktop server drives
+      // the cleanup. Runs on boot and every 15 min.
+      stopLiveCleanup = startLiveTodayCleanupTimer(pool);
+
+      // live-cloud-sync — disabled.
+      // startLiveStreamer listened for `session_started`/`session_ended`
+      // parser events to know when a live session began/ended. After the
+      // daily-live-mode refactor (Task 3) the parser no longer emits those
+      // events in live mode (it writes straight to `live_today`), so the
+      // streamer would never see a live session start. The wiring is left
+      // in place so cloud sync can be re-enabled later with a different
+      // trigger (e.g. a periodic snapshot of `live_today`).
+      // try {
+      //   const { startLiveStreamer } = await import('./cloud/live-stream.ts');
+      //   liveStreamer = await startLiveStreamer({ parser, pool });
+      // } catch (err) {
+      //   console.error('live cloud broadcaster failed to start:', (err as Error).message);
+      // }
+      void liveStreamer;
 
       if (watchDir) {
         watcher = new FolderWatcher({
@@ -224,6 +240,7 @@ export async function run(opts: {
           onDisconnect: () => {
             console.error(`data drive disconnected: ${watchedPath}`);
             (async () => {
+              if (stopLiveCleanup) { stopLiveCleanup(); stopLiveCleanup = null; }
               if (parser) {
                 try { await parser.stop(); } catch { /* best effort */ }
                 parser = null;
@@ -476,6 +493,7 @@ export async function run(opts: {
   await app.listen({ port, host });
 
   const shutdown = async () => {
+    if (stopLiveCleanup) stopLiveCleanup();
     if (volumeWatcher) volumeWatcher.stop();
     if (parser) await parser.stop();
     if (watcher) await watcher.stop();

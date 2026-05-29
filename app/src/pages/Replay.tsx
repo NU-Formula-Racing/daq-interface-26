@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { SignalsProvider, useCatalog } from '../components/SignalsProvider.tsx';
-import { DockDirection } from '@nfr/widgets';
+import { DockDirection, effectiveWidgetSignalIds, getGgSource } from '@nfr/widgets';
 import { SessionPicker } from '../components/SessionPicker.tsx';
 import { useReplayFrames } from '../hooks/useReplayFrames.ts';
 import { useSessionSignalIds } from '../hooks/useSessionSignalIds.ts';
@@ -91,11 +91,16 @@ function ReplayInner({ id, detail, navigate }: ReplayInnerProps) {
       try {
         const raw = localStorage.getItem('nfr-dock-layout-v2');
         const widgets = raw ? JSON.parse(raw) : [];
+        const ggSrc = getGgSource();
         const ids = new Set<number>();
+        // Use the shared expansion helper so auto-discovery widgets
+        // (cellv, gg) request the signals they actually render. The old
+        // path only collected w.signals[] so cell-voltages / g-g plots
+        // stayed empty until their underlying signals happened to appear
+        // in some other widget's signal list.
         for (const w of widgets ?? []) {
-          for (const sig of w.signals ?? []) {
-            const resolved = catalog.resolve(sig);
-            if (resolved) ids.add(resolved.id);
+          for (const id of effectiveWidgetSignalIds(w, catalog, ggSrc)) {
+            ids.add(id);
           }
         }
         const sorted = [...ids].sort((a, b) => a - b);

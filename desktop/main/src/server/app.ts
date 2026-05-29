@@ -12,6 +12,7 @@ import { registerSessionRoutes } from './routes/sessions.ts';
 import { registerSignalRoutes } from './routes/signals.ts';
 import { registerWebSockets } from './ws.ts';
 import { registerLiveRoutes } from './routes/live.ts';
+import { registerLiveWindowRoutes } from './routes/live-window.ts';
 import { registerExportRoutes } from './routes/export.ts';
 import { registerSetupRoutes, type SetupState } from './routes/setup.ts';
 import { registerDbcRoutes } from './routes/dbc.ts';
@@ -110,6 +111,8 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     if (opts.parser) {
       registerWebSockets(app, opts.parser);
       registerLiveRoutes(app, opts.parser);
+      const { registerSimulateRoutes } = await import('./routes/simulate.ts');
+      registerSimulateRoutes(app, { parser: opts.parser, pool });
     }
 
     app.get('/api/health', async () => ({ status: 'ok' }));
@@ -143,6 +146,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
 
     registerSessionRoutes(app, pool);
     registerSignalRoutes(app, pool);
+    registerLiveWindowRoutes(app, { pool });
     registerExportRoutes(app, pool);
     if (opts.dbcStorePath && opts.onDbcChanged) {
       registerDbcRoutes(app, {

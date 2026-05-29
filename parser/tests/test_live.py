@@ -94,3 +94,48 @@ def test_run_live_handles_reconnect_as_new_session(
     with psycopg.connect(scratch_db) as conn:
         sessions = conn.execute("SELECT count(*) FROM sessions").fetchone()[0]
     assert sessions == 2
+
+
+def test_run_live_streaming_only_writes_live_today_and_skips_session(
+    scratch_db: str, tmp_path: Path
+) -> None:
+    dbc = tmp_path / "dbc.csv"
+    dbc.write_text(DBC_CSV)
+
+    events: list[SourceEvent] = [
+        SourceEvent(kind="connected", port="/dev/ttyFAKE"),
+        SourceEvent(kind="frame", ts_ms=0, frame_id=0x123, data=_frames_for(1200)),
+        SourceEvent(kind="frame", ts_ms=10, frame_id=0x123, data=_frames_for(1210)),
+        SourceEvent(kind="disconnected"),
+    ]
+
+    buf = io.StringIO()
+    emitter = ProtocolEmitter(buf)
+
+    summary = run_live(
+        dsn=scratch_db,
+        dbc_csv=dbc,
+        source=iter(events),
+        emitter=emitter,
+        streaming_only=True,
+    )
+
+    # No sessions opened/closed in streaming-only mode.
+    assert summary.sessions_closed == 0
+    assert summary.rows_written == 2
+
+    with psycopg.connect(scratch_db) as conn:
+        sessions = conn.execute("SELECT count(*) FROM sessions").fetchone()[0]
+        rt = conn.execute("SELECT count(*) FROM rt_readings").fetchone()[0]
+        sd = conn.execute("SELECT count(*) FROM sd_readings").fetchone()[0]
+        live = conn.execute("SELECT count(*) FROM live_today").fetchone()[0]
+    assert sessions == 0
+    assert rt == 0
+    assert sd == 0
+    assert live >= 1
+
+    events_out = [json.loads(l) for l in buf.getvalue().strip().splitlines()]
+    types = [e["type"] for e in events_out]
+    assert "session_started" not in types
+    assert "session_ended" not in types
+    assert "frames" in types

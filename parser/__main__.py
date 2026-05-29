@@ -67,6 +67,7 @@ def main(argv: list[str] | None = None) -> int:
                 dbc_csv=args.dbc,
                 source=serial_events(args.port, args.baud),
                 emitter=emitter,
+                streaming_only=True,
             )
             return 0
         if args.mode == "batch":

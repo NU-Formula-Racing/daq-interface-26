@@ -18,6 +18,7 @@ from compile import compile_csv
 from db import (
     Reading,
     SignalDef,
+    copy_live_today,
     end_session_and_flush,
     insert_rt_batch,
     open_session,
@@ -27,7 +28,11 @@ from decode import decode_frame
 from protocol import ProtocolEmitter
 
 BATCH_SIZE = 50
-PROTOCOL_BATCH_ROWS = 100  # max rows per outbound `frames` message
+# Safety cap on rows per outbound `frames` event. In practice we flush after
+# every CAN frame so this only kicks in if a single frame somehow decodes
+# into a large pile of signals. The DB-write batch (BATCH_SIZE above) is
+# independent and stays at 50 for COPY throughput.
+PROTOCOL_BATCH_ROWS = 100
 
 
 @dataclass(frozen=True)
@@ -70,6 +75,7 @@ def run_live(
     source: Iterable[SourceEvent],
     emitter: ProtocolEmitter,
     connect_time: datetime | None = None,
+    streaming_only: bool = False,
 ) -> RunSummary:
     decode_table = compile_csv(str(dbc_csv))
     defs, sender_lookup = _make_sig_lookups(decode_table)
@@ -81,13 +87,24 @@ def run_live(
         sig_id_map = upsert_signal_definitions(conn, defs)
 
         active_session = None  # UUID | None
+        # Separate boolean for "connection is live, process frames" so that
+        # `active_session` stays strictly UUID | None. In streaming_only mode
+        # there is no session row to associate with, but we still need to
+        # know the link is up; overloading active_session with a sentinel
+        # string would risk a future UUID consumer silently receiving it.
+        connection_active: bool = False
         rt_batch: list[Reading] = []
         out_rows: list[dict] = []
         session_start: datetime | None = None
 
         def _flush_rt() -> None:
             nonlocal rt_batch
-            if active_session is not None and rt_batch:
+            if not rt_batch:
+                return
+            if streaming_only:
+                copy_live_today(conn, rt_batch)
+                rt_batch = []
+            elif active_session is not None:
                 insert_rt_batch(conn, active_session, rt_batch)
                 rt_batch = []
 
@@ -101,20 +118,39 @@ def run_live(
             if evt.kind == "connected":
                 emitter.serial_status("connected", port=evt.port)
                 session_start = connect_time or datetime.now(timezone.utc)
-                active_session = open_session(
-                    conn, source="live", started_at=session_start
-                )
-                emitter.session_started(str(active_session), source="live")
+                if streaming_only:
+                    # No session in streaming-only mode; mark the link as
+                    # active so downstream frame handling proceeds while
+                    # keeping active_session honestly None.
+                    connection_active = True
+                else:
+                    active_session = open_session(
+                        conn, source="live", started_at=session_start
+                    )
+                    emitter.session_started(str(active_session), source="live")
 
             elif evt.kind == "frame":
-                if active_session is None:
+                if active_session is None and not connection_active:
                     continue
                 decoded = decode_frame(evt.frame_id, evt.data, decode_table)
                 if not decoded:
                     continue
-                ts = (session_start or datetime.now(timezone.utc)) + timedelta(
-                    milliseconds=evt.ts_ms or 0
-                )
+                # In streaming_only (serial-live) mode evt.ts_ms is the car's
+                # internal CAN-bus timestamp (e.g. milliseconds since ECU
+                # power-on). Adding it to session_start produces timestamps
+                # potentially far in the future relative to the desktop's
+                # wall clock — graphs windowed against "now" would then
+                # filter every frame out (numerics show the value but the
+                # line stays empty). Use the parser's reception time
+                # instead. Batch/file replay keeps the session_start+ts_ms
+                # composition because there ts_ms represents the relative
+                # offset within the recording.
+                if streaming_only:
+                    ts = datetime.now(timezone.utc)
+                else:
+                    ts = (session_start or datetime.now(timezone.utc)) + timedelta(
+                        milliseconds=evt.ts_ms or 0
+                    )
                 for signal_name, value in decoded.items():
                     sender = sender_lookup.get(
                         (evt.frame_id, signal_name), "unknown"
@@ -133,6 +169,10 @@ def run_live(
                         _flush_rt()
                     if len(out_rows) >= PROTOCOL_BATCH_ROWS:
                         _flush_out()
+                # Flush the WS payload after every CAN frame so the dock sees
+                # values the instant they're decoded. The DB-write batch is
+                # independent (it accumulates to BATCH_SIZE for COPY perf).
+                _flush_out()
 
             elif evt.kind == "signal_quality":
                 emitter.signal_quality(rssi=evt.rssi or 0, snr=float(evt.snr or 0.0))
@@ -140,18 +180,19 @@ def run_live(
             elif evt.kind == "disconnected":
                 _flush_rt()
                 _flush_out()
-                if active_session is not None:
+                if active_session is not None and not streaming_only:
                     row_count = end_session_and_flush(conn, active_session)
                     emitter.session_ended(str(active_session), row_count=row_count)
                     sessions_closed += 1
-                    active_session = None
+                active_session = None
+                connection_active = False
                 emitter.serial_status("disconnected")
                 session_start = None
 
         # End-of-stream: close any open session.
         _flush_rt()
         _flush_out()
-        if active_session is not None:
+        if active_session is not None and not streaming_only:
             row_count = end_session_and_flush(conn, active_session)
             emitter.session_ended(str(active_session), row_count=row_count)
             sessions_closed += 1

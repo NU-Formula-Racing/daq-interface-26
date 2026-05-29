@@ -39,6 +39,78 @@ Notes, design files, and references for the project. Nothing here runs.
 
 The DBC file. It is the lookup table that tells the parser how to turn raw CAN bytes into named signals like `BMS_SOC` or `Battery_Voltage`. If the firmware on the car changes its message layout, this file has to change too.
 
+## Using the app — first-time walkthrough
+
+This section is for someone who just installed the .dmg and wants to know what every screen does. If you've never opened the app before, start here.
+
+### Live mode
+
+This is what you see when the app first opens. The dock is your dashboard — graphs, numbers, gauges, gg-plot, cell-voltage strip, etc. — fed by the basestation receiver over USB.
+
+**One-time setup.** Plug the USB receiver in, then go to **Settings → Live serial port**. Click **Rescan**, pick the device that shows up (something like `cu.usbmodem326D...` on macOS or `COM5` on Windows), click **Save**. The parser restarts and the dock starts receiving frames whenever the basestation has signal. The dropdown only shows USB-serial devices — the storage USB is filtered out.
+
+**Top-bar pill (RSSI + SNR).** Bottom-right of the top bar there's a pill showing `RSSI ... dBm · SNR ... dB`. Colour-codes by RSSI (green ≥ -70, amber ≥ -90, red below, grey when the receiver is unplugged). The pill is also a button — click it to open the **Live Tools** modal:
+
+- **Reset live data** wipes the daily `live_today` buffer and clears the dock's in-memory store. Useful when you want to start from a clean slate.
+- **Test with synthetic data** lets you pick signals from the DBC catalog (only signals with a usable min/max range are listed) and click **▶ START TEST**. The desktop emits a 10 Hz sine wave per selected signal — each one getting its own frequency and phase so they don't all peak together — directly into the same WebSocket fan-out real frames use. Graphs immediately oscillate between each signal's catalog min and max. While running, the pill border + dot turn green and the badge reads `SIM`. Click the pill again, hit **■ STOP TEST**.
+
+**Pause the view.** Bottom-left of the dock there's a small green `LIVE` indicator next to the elapsed-time counter. Click it → label turns to `PAUSED`, the dot dims, the time axis freezes so you can read values without dragging the slider. Data ingestion keeps running — the store still receives frames, they just stay invisible. Click again to resume; the right edge snaps back to "now".
+
+**Zoom on a graph.** Click-drag horizontally on any graph to zoom into a range. The corner reset-zoom button appears. In live mode, zoom freezes the visible window (same effect as pausing) without stopping ingestion — reset to resume following live data.
+
+**Time window per graph.** Each graph has a gear icon → opens an inspector panel. In there, the **TIME WINDOW** section sets how much of the past the graph shows: `1 MIN` (default in live mode), `5 MIN`, or `ALL`. In live mode this caps how far back the line goes so a long buffer doesn't squeeze the most recent data into a sliver. In replay mode the default is `ALL` (full session) — flip to `1 MIN` / `5 MIN` if you want a tight window that follows the scrubber.
+
+**G-G plot.** Defaults to the raw IMU acceleration pair (`X_Axis_Acceleration` / `Y_Axis_Acceleration`, with gravity). Open the widget's gear icon → **SOURCE** section → flip to **NO-G** to use the gravity-compensated pair (`No_G_X_Axis_Acceleration` / `No_G_Y_Axis_Acceleration`). X plots vertically (throttle/brake = up/down), Y plots horizontally (cornering = left/right).
+
+**Cell voltages.** Add the Cell-V widget and it auto-discovers all `cell_v_<n>` (or `Cell_V_<n>`) signals from the DBC and plots them as a single multi-line graph.
+
+**Live data retention.** The `live_today` table is cleared every day at midnight America/Chicago. The desktop runs a cleanup query every 15 min that deletes anything from before today; you don't have to do anything.
+
+### Replay mode
+
+For watching a session that's already been recorded, either pulled from the cloud or imported from a `.nfr` file off the SD card.
+
+**Open a session.** Click the session picker dropdown in the top bar. You get a calendar showing which days have sessions; click a day → list of sessions for that date with duration + driver/track/car. Most recent live session also appears at the very top if you have one. Click a session to load it.
+
+**Scrubbing.** Drag the slider at the bottom to move the cursor through the session. Graphs show data around the cursor's position.
+
+**Zoom.** Click-drag horizontally on a graph to zoom into a range. The visible-window narrowing applies across all graphs since they share a window. Double-click or hit reset-zoom to restore.
+
+**Time window per graph.** Same `1 MIN` / `5 MIN` / `ALL` toggle as live mode (gear icon → TIME WINDOW). Default in replay is `ALL`. Switch to `1 MIN` if you want a narrow window that follows the scrubber as you drag through a long session.
+
+### Importing data
+
+The dock has an **↑ IMPORT NFR** button. Click it → pick **SINGLE FILE** or **FOLDER**. Folder mode imports every `.nfr` file inside in one shot with a progress overlay. If a file's content hash matches one already in your DB, the import is skipped (so re-importing a folder is safe).
+
+**Re-decode with current DBC.** The import modal has a "Re-decode with current DBC (overwrites existing rows)" checkbox. Tick it if you've fixed the DBC since the original import and want to reprocess existing sessions. Without the box, dedup skips matching files.
+
+**Cancel.** The progress overlay has a red **■ CANCEL** button. Click it → the current parse is killed mid-flight (DB transaction rolls back, no rows land for that file), and queued files are skipped.
+
+**Skipped vs failed vs cancelled.** The overlay shows three counters and a yellow list of skipped files so you can tell at a glance what got dedup'd vs what actually parsed.
+
+### DBC files
+
+The dock has a **DBC ▾** menu in the top bar.
+
+- **Import new DBC…** uploads a CSV that becomes the active DBC (parser restarts). Cross-platform: handles Excel's UTF-8 BOM, CRLF line endings, etc.
+- **VIEW CURRENT DBC** opens a filterable table showing every signal in the loaded DBC with its frame ID, message, sender, start_bit, length, factor, offset, min/max, unit, cycle, and type.
+
+### Settings page
+
+Click the gear icon top-right to open Settings. Worth knowing:
+
+- **Live serial port** — covered above. Save button greys out when the selected port matches what's already saved.
+- **Cloud sync** — collapsible section (▸ to expand). Lists every local session grouped by day; expand a day to see individual sessions with date, hash, sync status. Days with an active upload error auto-expand. Each row shows `date · short-id · sync-state · status/Retry`. Bulk-upload, retry, delete-local, etc. are here. Live sessions are filtered out of this list (they don't have a Spaces upload path).
+- **Cloud config** — Supabase + Spaces credentials. The .app ships with read-only defaults baked in so reading from the cloud "just works". The override sections (`▸ OVERRIDE SUPABASE (ADVANCED)` and `▸ WRITE CREDENTIALS (FOR UPLOADING)`) collapse by default; expand to paste your own. **SAVE** is disabled until you've actually changed something.
+- **Live cloud sync** (under Cloud config) — toggle to push live frames to Supabase for cross-machine viewing. Disabled until you've supplied your own Supabase write creds (the bundled defaults are read-only).
+- **Broadcast** — makes the dock reachable on the local network at `http://<your-ip>:4444`. Useful for putting the dashboard on a phone or tablet during testing.
+- **Database tools** — stats, clear-by-date, CSV / SQL export, SQL import. Same data flow as the cloud sync but local-only.
+- **Activity heatmap** — calendar showing which days you have data for.
+
+### Sessions list
+
+Top bar has a **SESSIONS** button → page listing every session in the local DB, newest first, with id / date / source / row count. Click one to open it in replay.
+
 ## Syncing data with the cloud (push and pull)
 
 Cloud sync works like `git`. There are two directions, and they each have a clear winner:

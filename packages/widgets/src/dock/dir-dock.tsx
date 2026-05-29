@@ -12,6 +12,10 @@ import {
   WIDGET_TYPES,
   fmtValOrEnum,
   parseEnumMap,
+  getGgSource,
+  setGgSource,
+  ggSignalNames,
+  type GgSource,
 } from '../widgets/widgets.tsx';
 import type { Signal } from '../signals/catalog.ts';
 import type { FramesStore } from '../data/types.ts';
@@ -96,6 +100,13 @@ interface DockDirectionProps {
   /** ISO timestamp of the session start. Forwarded to widgets so their
    *  x-axis labels read as elapsed-into-session at any zoom level. */
   sessionStartTs?: string | null;
+  windowStartTs?: string | null;
+  windowEndTs?: string | null;
+  /** Live page: true while the user has clicked the LIVE badge to pause
+   *  the auto-advance. Forwarded to the Timeline so the badge can render
+   *  PAUSED and act as a toggle. */
+  paused?: boolean;
+  onTogglePause?: () => void;
 }
 
 const DROPPABLE_TYPES = [
@@ -163,7 +174,7 @@ function DropTypePopup({
   );
 }
 
-export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true, availableSignalIds = null, onZoom, zoomActive, sessionStartTs }: DockDirectionProps) {
+export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true, availableSignalIds = null, onZoom, zoomActive, sessionStartTs, windowStartTs, windowEndTs, paused, onTogglePause }: DockDirectionProps) {
   const catalog = useCatalog();
   const [widgets, setWidgets] = useState<any[]>(loadLayout);
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
@@ -556,7 +567,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                             padding: '8px 12px', cursor: 'pointer', borderTop: `1px solid ${SH_COLORS.border}`,
                             fontFamily: 'inherit',
                           }}
-                        >👁 VIEW CURRENT DBC</button>
+                        >VIEW CURRENT DBC</button>
                       </div>
                     </>
                   )}
@@ -719,6 +730,9 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                     onZoom={onZoom}
                     zoomActive={zoomActive}
                     sessionStartTs={sessionStartTs}
+                    windowStartTs={windowStartTs}
+                    windowEndTs={windowEndTs}
+                    sessionDurationSecs={durationSecs}
                     draggable
                     onDragStart={(e) => startMove(w, e)}
                   />
@@ -898,9 +912,34 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                         <SegBtn active={(w.graphStyle ?? graphStyle) === 'dots'} onClick={() => patch(w.id, { graphStyle: 'dots' })}>DOTS</SegBtn>
                       </div>
                     </div>
+                    {/* Time window: sliding slice the widget renders. Default
+                        is mode-specific (60 s live, ALL replay) so a
+                        user-saved widget with replayWindowSecs===undefined
+                        gets the right behaviour in each mode. The toggle
+                        applies in both modes. */}
+                    {(() => {
+                      const defaultForMode = mode === 'live' ? 60 : null;
+                      const cur = w.replayWindowSecs === undefined ? defaultForMode : w.replayWindowSecs;
+                      return (
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, letterSpacing: 1.2 }}>
+                            <span>TIME WINDOW</span>
+                            <span style={{ color: SH_COLORS.textFaint }}>
+                              {cur === null ? 'ALL' : cur >= 60 ? `${cur / 60}m` : `${cur}s`}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', gap: 4 }}>
+                            <SegBtn active={cur === 60}  onClick={() => patch(w.id, { replayWindowSecs: 60 })}>1 MIN</SegBtn>
+                            <SegBtn active={cur === 300} onClick={() => patch(w.id, { replayWindowSecs: 300 })}>5 MIN</SegBtn>
+                            <SegBtn active={cur === null} onClick={() => patch(w.id, { replayWindowSecs: null })}>ALL</SegBtn>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </>
                   );
                 })()}
+                {w.type === 'gg' && <GgSourcePanel />}
                 <div>
                   <div style={{ marginBottom: 6, letterSpacing: 1.2 }}>CURRENT VALUE</div>
                   {w.signals.slice(0, 6).map((sid: any) => <SignalReadout key={sid} sig={sid} t={t} />)}
@@ -918,7 +957,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
         })()}
       </div>
 
-      <Timeline t={t} onChange={onT} durationSecs={durationSecs} mode={mode} compact />
+      <Timeline t={t} onChange={onT} durationSecs={durationSecs} mode={mode} compact paused={paused} onTogglePause={onTogglePause} />
 
       {pendingDrop && (
         <DropTypePopup
@@ -1316,6 +1355,33 @@ function SegBtn({ active, onClick, children }: { active?: boolean; onClick?: () 
       color: active ? SH_COLORS.text : SH_COLORS.textMute,
       fontFamily: '"JetBrains Mono", monospace', fontSize: 9, letterSpacing: 1, cursor: 'pointer',
     }}>{children}</button>
+  );
+}
+
+/** Inspector panel for a g-g plot widget: pick which acceleration pair feeds
+ *  the scatter. Persists to localStorage; all open g-g plots re-read on the
+ *  resulting storage event so the switch is live. */
+function GgSourcePanel() {
+  const [src, setSrc] = useState<GgSource>(() => getGgSource());
+  const choose = (next: GgSource) => { setGgSource(next); setSrc(next); };
+  const [rawX, rawY] = ggSignalNames('raw');
+  const [noGX, noGY] = ggSignalNames('no-g');
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, letterSpacing: 1.2 }}>
+        <span>SOURCE</span>
+        <span style={{ color: SH_COLORS.textFaint }}>signal pair</span>
+      </div>
+      <div style={{ display: 'flex', gap: 4, marginBottom: 6 }}>
+        <SegBtn active={src === 'raw'} onClick={() => choose('raw')}>WITH G</SegBtn>
+        <SegBtn active={src === 'no-g'} onClick={() => choose('no-g')}>NO-G</SegBtn>
+      </div>
+      <div style={{ fontSize: 9, color: SH_COLORS.textFaint, lineHeight: 1.4 }}>
+        {src === 'raw'
+          ? <><code>{rawX}</code> · <code>{rawY}</code></>
+          : <><code>{noGX}</code> · <code>{noGY}</code></>}
+      </div>
+    </div>
   );
 }
 

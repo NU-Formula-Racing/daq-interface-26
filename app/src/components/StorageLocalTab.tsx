@@ -48,6 +48,13 @@ export function StorageLocalTab(props: StorageLocalTabProps) {
     useState<{ machine: string | null; at: string | null } | null>(null);
   const [deleteConfirm, setDeleteConfirm] =
     useState<{ ids: string[]; approxBytes: number } | null>(null);
+  // Per-day collapse: every day starts collapsed so the list shows only one
+  // row per date. Click a header to expand. Days with an active error get
+  // expanded automatically so the user can see what failed without hunting.
+  const [openDays, setOpenDays] = useState<Set<string>>(new Set());
+  const toggleDayOpen = (date: string) => setOpenDays((s) => {
+    const n = new Set(s); n.has(date) ? n.delete(date) : n.add(date); return n;
+  });
 
   // Group sessions by date so a user who parsed a whole day with the wrong DBC
   // can wipe the day in one shot.
@@ -173,68 +180,97 @@ export function StorageLocalTab(props: StorageLocalTabProps) {
         </div>
       )}
 
-      <table className="w-full text-[11px]">
-        <tbody>
-          {byDate.map(([date, daySessions]) => {
-            const dayIds = daySessions.map((s) => s.id);
-            const allDaySelected = dayIds.every((id) => selected.has(id));
-            const someDaySelected = !allDaySelected && dayIds.some((id) => selected.has(id));
-            return (
-              <>
-                <tr key={`hdr-${date}`} className="bg-[color:var(--color-bg)]">
-                  <td colSpan={4} className="py-1 px-2 border-b border-[color:var(--color-border)]">
-                    <label className="inline-flex items-center gap-2 text-[10px] tracking-widest text-[color:var(--color-text-mute)] cursor-pointer">
-                      <input
-                        type="checkbox"
-                        aria-label={`select-day-${date}`}
-                        checked={allDaySelected}
-                        ref={(el) => { if (el) el.indeterminate = someDaySelected; }}
-                        onChange={() => toggleDay(date)}
-                      />
-                      <span>{date} — {daySessions.length} session(s)</span>
-                    </label>
-                  </td>
-                </tr>
-                {daySessions.map((s) => {
-                  const row = statuses[s.id];
-                  const st = row?.kind ?? 'idle';
-                  const errMsg = row?.kind === 'error' ? row.message : null;
-                  return (
-                    <tr key={s.id} className="border-b border-[color:var(--color-border)]/50">
-                      <td className="py-1 px-2 w-6">
+      <div className="text-[11px]">
+        {byDate.map(([date, daySessions]) => {
+          const dayIds = daySessions.map((s) => s.id);
+          const allDaySelected = dayIds.every((id) => selected.has(id));
+          const someDaySelected = !allDaySelected && dayIds.some((id) => selected.has(id));
+          const dayHasError = dayIds.some((id) => statuses[id]?.kind === 'error');
+          const isOpen = openDays.has(date) || dayHasError;
+          const syncedCount = daySessions.filter((s) => s.synced_at).length;
+          const unsyncedCount = daySessions.length - syncedCount;
+          return (
+            <div key={date} className="border-b border-[color:var(--color-border)]">
+              {/* Day header row — checkbox toggles whole-day selection;
+                  clicking the title area toggles expand/collapse. */}
+              <div className="flex items-center gap-2 py-1 px-2 bg-[color:var(--color-bg)]">
+                <input
+                  type="checkbox"
+                  aria-label={`select-day-${date}`}
+                  checked={allDaySelected}
+                  ref={(el) => { if (el) el.indeterminate = someDaySelected; }}
+                  onChange={() => toggleDay(date)}
+                />
+                <button
+                  type="button"
+                  onClick={() => toggleDayOpen(date)}
+                  className="flex-1 text-left flex items-center gap-2 text-[10px] tracking-widest text-[color:var(--color-text-mute)] hover:text-[color:var(--color-text)] cursor-pointer"
+                  title={isOpen ? 'Collapse' : 'Expand'}
+                >
+                  <span style={{ display: 'inline-block', width: 8 }}>{isOpen ? '▾' : '▸'}</span>
+                  <span>{date}</span>
+                  <span className="text-[color:var(--color-text-faint)]">·</span>
+                  <span>{daySessions.length} session{daySessions.length === 1 ? '' : 's'}</span>
+                  {syncedCount > 0 && (
+                    <span className="text-green-300/70">· {syncedCount} synced</span>
+                  )}
+                  {unsyncedCount > 0 && (
+                    <span className="text-yellow-300/70">· {unsyncedCount} local-only</span>
+                  )}
+                </button>
+              </div>
+
+              {isOpen && (
+                <div className="pl-6">
+                  {daySessions.map((s) => {
+                    const row = statuses[s.id];
+                    const st = row?.kind ?? 'idle';
+                    const errMsg = row?.kind === 'error' ? row.message : null;
+                    return (
+                      <div
+                        key={s.id}
+                        className="flex items-center gap-3 py-1 px-2 border-t border-[color:var(--color-border)]/30"
+                      >
                         <input
                           type="checkbox" aria-label={`select-${s.id}`}
                           checked={selected.has(s.id)} onChange={() => toggle(s.id)} />
-                      </td>
-                      <td className="font-mono text-[10px]">{s.id.slice(0, 8)}</td>
-                      <td>{s.synced_at ? 'cloud + local' : 'local only'}</td>
-                      <td>
-                        {st === 'uploading' && 'Uploading\u2026'}
-                        {st === 'ok' && <span className="text-green-300">Uploaded</span>}
-                        {st === 'already_synced' && <span className="text-yellow-300">Already synced</span>}
-                        {st === 'error' && (
-                          <span className="inline-flex items-baseline gap-2">
-                            <span className="text-red-300">Error</span>
-                            <button className="underline" onClick={() => retry(s.id)}>Retry</button>
-                            {errMsg && (
-                              <span
-                                className="text-[10px] text-red-200/70 max-w-[420px] truncate"
-                                title={errMsg}
-                              >
-                                {errMsg}
-                              </span>
-                            )}
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </>
-            );
-          })}
-        </tbody>
-      </table>
+                        <span className="font-mono text-[10px] text-[color:var(--color-text-mute)]">
+                          {date}
+                        </span>
+                        <span className="font-mono text-[10px]">
+                          {s.id.slice(0, 8)}
+                        </span>
+                        <span className="text-[10px] text-[color:var(--color-text-mute)]">
+                          {s.synced_at ? 'cloud+local' : 'local only'}
+                        </span>
+                        <span className="flex-1 text-right text-[10px]">
+                          {st === 'uploading' && 'Uploading\u2026'}
+                          {st === 'ok' && <span className="text-green-300">Uploaded</span>}
+                          {st === 'already_synced' && <span className="text-yellow-300">Already synced</span>}
+                          {st === 'error' && (
+                            <span className="inline-flex items-baseline gap-2 justify-end">
+                              <span className="text-red-300">Error</span>
+                              <button className="underline" onClick={() => retry(s.id)}>Retry</button>
+                              {errMsg && (
+                                <span
+                                  className="text-[10px] text-red-200/70 max-w-[420px] truncate"
+                                  title={errMsg}
+                                >
+                                  {errMsg}
+                                </span>
+                              )}
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
       {syncedModal && (
         <div role="dialog" className="border border-yellow-700/60 px-3 py-2 text-[11px]">

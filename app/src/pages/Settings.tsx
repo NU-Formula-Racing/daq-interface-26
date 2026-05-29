@@ -125,7 +125,9 @@ export default function Settings() {
 
         <h1 className="text-sm tracking-widest text-[color:var(--color-text)] uppercase">Database</h1>
 
-        <Storage />
+        <CollapsibleSection title="Cloud sync" defaultOpen={false}>
+          <Storage />
+        </CollapsibleSection>
 
         <LiveSerialPort />
 
@@ -260,6 +262,40 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <fieldset className="border border-[color:var(--color-border)] p-4 space-y-3">
       <legend className="px-2 text-[10px] tracking-widest text-[color:var(--color-text-mute)]">{title}</legend>
       {children}
+    </fieldset>
+  );
+}
+
+function CollapsibleSection({
+  title, defaultOpen = false, children,
+}: {
+  title: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <fieldset className="border border-[color:var(--color-border)] p-0">
+      {/* Header click target spans the whole width so the section feels like
+          a tappable card, not a thin underlined link in a fieldset legend. */}
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-4 py-3 text-left bg-[color:var(--color-panel)]/40 hover:bg-[color:var(--color-panel)]/70 cursor-pointer"
+      >
+        <span className="inline-flex items-center gap-2 text-[11px] tracking-widest text-[color:var(--color-text)] uppercase">
+          <span style={{ display: 'inline-block', width: 10 }}>{open ? '▾' : '▸'}</span>
+          {title}
+        </span>
+        <span className="text-[9px] tracking-widest text-[color:var(--color-text-faint)]">
+          {open ? 'HIDE' : 'SHOW'}
+        </span>
+      </button>
+      {open && (
+        <div className="p-4 space-y-3 border-t border-[color:var(--color-border)]">
+          {children}
+        </div>
+      )}
     </fieldset>
   );
 }
