@@ -28,7 +28,11 @@ from decode import decode_frame
 from protocol import ProtocolEmitter
 
 BATCH_SIZE = 50
-PROTOCOL_BATCH_ROWS = 100  # max rows per outbound `frames` message
+# Safety cap on rows per outbound `frames` event. In practice we flush after
+# every CAN frame so this only kicks in if a single frame somehow decodes
+# into a large pile of signals. The DB-write batch (BATCH_SIZE above) is
+# independent and stays at 50 for COPY throughput.
+PROTOCOL_BATCH_ROWS = 100
 
 
 @dataclass(frozen=True)
@@ -152,6 +156,10 @@ def run_live(
                         _flush_rt()
                     if len(out_rows) >= PROTOCOL_BATCH_ROWS:
                         _flush_out()
+                # Flush the WS payload after every CAN frame so the dock sees
+                # values the instant they're decoded. The DB-write batch is
+                # independent (it accumulates to BATCH_SIZE for COPY perf).
+                _flush_out()
 
             elif evt.kind == "signal_quality":
                 emitter.signal_quality(rssi=evt.rssi or 0, snr=float(evt.snr or 0.0))
