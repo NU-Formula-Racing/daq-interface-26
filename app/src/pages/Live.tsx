@@ -6,6 +6,48 @@ import { SessionPicker } from '../components/SessionPicker.tsx';
 import { useLiveTodayFrames } from '../hooks/useLiveTodayFrames.ts';
 import { effectiveWidgetSignalIds, getGgSource } from '@nfr/widgets';
 import { useLiveStatus } from '../hooks/useLiveStatus.ts';
+import { apiPost } from '../api/client.ts';
+
+/** Wipe-the-live-buffer button next to the LinkQualityBadge. Testing aid:
+ *  reload the live page from empty without restarting the desktop. */
+function ResetLiveButton({ onReset }: { onReset: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const click = async () => {
+    if (busy) return;
+    if (!confirm('Wipe live_today? This deletes every row in the daily buffer (testing only).')) return;
+    setBusy(true);
+    try {
+      await apiPost<{ deleted: number }>('/api/live/reset', {});
+      onReset();
+    } catch (err) {
+      alert(`Reset failed: ${String(err)}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={click}
+      disabled={busy}
+      title="Wipe live_today (testing)"
+      style={{
+        padding: '3px 8px',
+        marginRight: 8,
+        background: 'transparent',
+        border: '1px solid rgba(242,87,87,0.4)',
+        color: '#f87171',
+        fontFamily: '"JetBrains Mono", monospace',
+        fontSize: 10,
+        letterSpacing: 1,
+        cursor: busy ? 'not-allowed' : 'pointer',
+        opacity: busy ? 0.5 : 1,
+      }}
+    >
+      {busy ? '…' : '■ RESET'}
+    </button>
+  );
+}
 
 /** Top-bar pill showing LoRa link health (rssi + snr). Each parser packet
  *  brings one signal_quality event; useLiveStatus tracks the most recent. */
@@ -247,6 +289,15 @@ function LiveInner({ navigate }: LiveInnerProps) {
         windowEndTs={effectiveVisEnd}
         sessionSlot={
           <div style={{ display: 'flex', alignItems: 'center' }}>
+            <ResetLiveButton onReset={() => {
+              // Drop everything in-memory and unfreeze the window so the
+              // dock immediately reflects the empty table. The auto-advance
+              // effect will resume next tick.
+              store.reset();
+              setFrozenWindow(null);
+              setVisEnd(new Date().toISOString());
+              setT(1);
+            }} />
             <LinkQualityBadge />
             <SessionPicker />
           </div>

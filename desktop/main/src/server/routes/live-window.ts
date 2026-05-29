@@ -22,4 +22,12 @@ export function registerLiveWindowRoutes(app: FastifyInstance, deps: LiveWindowD
     );
     return rows;
   });
+
+  // Testing/dev helper: wipe the daily live buffer. Cheap, no FKs to
+  // cascade. Use case is the user wanting to re-seed the page with a
+  // clean slate during basestation testing.
+  app.post('/api/live/reset', async () => {
+    const { rowCount } = await deps.pool.query('DELETE FROM live_today');
+    return { deleted: rowCount ?? 0 };
+  });
 }
