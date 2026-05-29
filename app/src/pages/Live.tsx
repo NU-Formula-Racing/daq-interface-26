@@ -390,6 +390,10 @@ function LiveInner({ navigate }: LiveInnerProps) {
   // we just stop following the edge in the UI.
   const [visEnd, setVisEnd] = useState<string>(() => new Date().toISOString());
   const [frozenWindow, setFrozenWindow] = useState<{ start: string; end: string } | null>(null);
+  // True when the user clicked LIVE in the bottom-left to freeze the
+  // visible window without dragging the slider. Data ingestion (WS push,
+  // catchup fetch) keeps running — only the visEnd advance stops.
+  const [paused, setPaused] = useState(false);
   // The earliest timestamp the store has seen — re-reads when frames push.
   const storeFirstTs = store.firstTs();
   const liveStart = storeFirstTs ?? visEnd;
@@ -433,15 +437,16 @@ function LiveInner({ navigate }: LiveInnerProps) {
     return () => clearInterval(iv);
   }, [catalog]);
 
-  // At the live edge AND not zoomed, advance visEnd every 250 ms so the
-  // dock follows the streaming front. When the user zooms, frozenWindow
-  // pins both ends and this effect goes idle.
+  // At the live edge AND not zoomed AND not paused, advance visEnd every
+  // 250 ms so the dock follows the streaming front. When the user zooms
+  // or hits pause, this effect goes idle and the visible window freezes.
   useEffect(() => {
     if (frozenWindow !== null) return;
+    if (paused) return;
     if (t < LIVE_THRESHOLD) return;
     const iv = setInterval(() => setVisEnd(new Date().toISOString()), 250);
     return () => clearInterval(iv);
-  }, [t, frozenWindow]);
+  }, [t, frozenWindow, paused]);
 
   // Day rollover: if midnight Chicago passes, drop the in-memory store
   // (so old frames stop appearing under the new day's slider) and clear
@@ -536,6 +541,13 @@ function LiveInner({ navigate }: LiveInnerProps) {
         zoomActive={frozenWindow !== null}
         windowStartTs={visStart}
         windowEndTs={effectiveVisEnd}
+        paused={paused}
+        onTogglePause={() => {
+          // Resuming snaps visEnd back to "now" so the auto-advance picks
+          // up cleanly without showing a stale right edge for 250 ms.
+          if (paused) setVisEnd(new Date().toISOString());
+          setPaused((p) => !p);
+        }}
         sessionSlot={
           <LiveTopBar
             catalog={catalog}

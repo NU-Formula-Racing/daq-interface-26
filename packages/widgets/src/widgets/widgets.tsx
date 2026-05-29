@@ -221,6 +221,17 @@ export function GraphWidget({
         liveWinStartMs = Math.max(firstAllMs, latestMs - span * win);
       }
     }
+    // Per-widget time-window setting takes precedence: trim the window's
+    // start so we render only the last replayWindowSecs of data. Lets a
+    // long-running live session stay readable without dragging the slider.
+    // replayWindowSecs === null means ALL — don't trim.
+    if (
+      liveWinStartMs != null && liveWinEndMs != null &&
+      replayWindowSecs != null && replayWindowSecs > 0
+    ) {
+      const trimmedStart = liveWinEndMs - replayWindowSecs * 1000;
+      if (trimmedStart > liveWinStartMs) liveWinStartMs = trimmedStart;
+    }
   }
 
   const series = signals.map((sid: any) => {
@@ -1517,8 +1528,15 @@ interface TimelineProps {
   durationSecs?: number;
   mode?: 'live' | 'replay';
   compact?: boolean;
+  /** True when live updates are paused (window frozen at "now"). The badge
+   *  reads PAUSED, the dot turns dim, and clicking the badge resumes. */
+  paused?: boolean;
+  /** When provided, the LIVE / PAUSED badge becomes a clickable button that
+   *  toggles pause without leaving the live edge. Lets the user freeze the
+   *  view to read values without dragging the slider. */
+  onTogglePause?: () => void;
 }
-export function Timeline({ t, onChange, durationSecs = 0, mode, compact }: TimelineProps) {
+export function Timeline({ t, onChange, durationSecs = 0, mode, compact, paused = false, onTogglePause }: TimelineProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [hoverX, setHoverX] = useState<number | null>(null);
   const [hoverFrac, setHoverFrac] = useState(0);
@@ -1558,10 +1576,43 @@ export function Timeline({ t, onChange, durationSecs = 0, mode, compact }: Timel
       padding: compact ? '6px 12px' : '8px 16px', background: SH_COLORS.bg,
       borderTop: `1px solid ${SH_COLORS.border}`, display: 'flex', alignItems: 'center', gap: 14,
     }}>
-      <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 11, color: mode === 'live' ? SH_COLORS.ok : SH_COLORS.textMute, letterSpacing: 0.5, minWidth: 90, display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{ width: 7, height: 7, borderRadius: '50%', background: mode === 'live' ? SH_COLORS.ok : SH_COLORS.accentBright, boxShadow: `0 0 6px ${mode === 'live' ? SH_COLORS.ok : SH_COLORS.accentBright}` }} />
-        {mode === 'live' ? 'LIVE' : 'REPLAY'} · {fmt(t * durationSecs)}
-      </div>
+      {(() => {
+        const isLive = mode === 'live';
+        const clickable = isLive && !!onTogglePause;
+        const label = isLive ? (paused ? 'PAUSED' : 'LIVE') : 'REPLAY';
+        const dotColor = isLive
+          ? (paused ? SH_COLORS.textFaint : SH_COLORS.ok)
+          : SH_COLORS.accentBright;
+        const textColor = isLive
+          ? (paused ? SH_COLORS.textMute : SH_COLORS.ok)
+          : SH_COLORS.textMute;
+        return (
+          <button
+            type="button"
+            onClick={clickable ? onTogglePause : undefined}
+            disabled={!clickable}
+            title={
+              clickable
+                ? (paused ? 'Click to resume live updates' : 'Click to pause — graphs freeze, ingestion continues')
+                : undefined
+            }
+            style={{
+              fontFamily: '"JetBrains Mono", monospace', fontSize: 11,
+              color: textColor, letterSpacing: 0.5, minWidth: 90,
+              display: 'flex', alignItems: 'center', gap: 6,
+              background: 'transparent', border: 'none', padding: 0,
+              cursor: clickable ? 'pointer' : 'default',
+            }}
+          >
+            <span style={{
+              width: 7, height: 7, borderRadius: '50%',
+              background: dotColor,
+              boxShadow: paused ? 'none' : `0 0 6px ${dotColor}`,
+            }} />
+            {label} · {fmt(t * durationSecs)}
+          </button>
+        );
+      })()}
 
       <div
         ref={ref}
@@ -1698,7 +1749,18 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
       // sub-slicing into it — that would compound the orchestrator's zoom and
       // shrink the visible range on every drag.
       // widget.graphStyle overrides the dock-level default per-graph.
-      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={widget.graphStyle ?? graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} zoomActive={zoomActive} sessionStartTs={sessionStartTs} windowStartTs={windowStartTs} windowEndTs={windowEndTs} replayWindowSecs={widget.replayWindowSecs === undefined ? 60 : widget.replayWindowSecs} sessionDurationSecs={sessionDurationSecs} />;
+      case 'graph': {
+        // Mode-specific default for the per-widget time window: in live mode
+        // a saved-but-unset widget defaults to 60 s so a long-running buffer
+        // doesn't stretch the most recent data into a sliver; in replay mode
+        // the same widget defaults to ALL so opening a session shows the
+        // whole drive (matches what users had before any per-widget setting
+        // existed). `replayWindowSecs === null` explicitly opts out of
+        // narrowing in either mode.
+        const defaultWin = mode === 'live' ? 60 : null;
+        const effectiveWin = widget.replayWindowSecs === undefined ? defaultWin : widget.replayWindowSecs;
+        return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={widget.graphStyle ?? graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} zoomActive={zoomActive} sessionStartTs={sessionStartTs} windowStartTs={windowStartTs} windowEndTs={windowEndTs} replayWindowSecs={effectiveWin} sessionDurationSecs={sessionDurationSecs} />;
+      }
       case 'numeric': return <NumericWidget signal={widget.signals[0]} t={t} compact={compact} />;
       case 'gauge': return <GaugeWidget signal={widget.signals[0]} t={t} />;
       case 'bar': return <BarWidget signals={widget.signals} t={t} />;

@@ -102,6 +102,11 @@ interface DockDirectionProps {
   sessionStartTs?: string | null;
   windowStartTs?: string | null;
   windowEndTs?: string | null;
+  /** Live page: true while the user has clicked the LIVE badge to pause
+   *  the auto-advance. Forwarded to the Timeline so the badge can render
+   *  PAUSED and act as a toggle. */
+  paused?: boolean;
+  onTogglePause?: () => void;
 }
 
 const DROPPABLE_TYPES = [
@@ -169,7 +174,7 @@ function DropTypePopup({
   );
 }
 
-export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true, availableSignalIds = null, onZoom, zoomActive, sessionStartTs, windowStartTs, windowEndTs }: DockDirectionProps) {
+export function DockDirection({ t, mode, onMode, onT, durationSecs, density, graphStyle, frames, exportHref, navigate, sessionSlot, allowDataImport = true, availableSignalIds = null, onZoom, zoomActive, sessionStartTs, windowStartTs, windowEndTs, paused, onTogglePause }: DockDirectionProps) {
   const catalog = useCatalog();
   const [widgets, setWidgets] = useState<any[]>(loadLayout);
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
@@ -907,14 +912,18 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                         <SegBtn active={(w.graphStyle ?? graphStyle) === 'dots'} onClick={() => patch(w.id, { graphStyle: 'dots' })}>DOTS</SegBtn>
                       </div>
                     </div>
-                    {/* Replay-only: width of the sliding window around the
-                        scrubber. Default 60 s keeps long sessions readable. */}
-                    {mode === 'replay' && (() => {
-                      const cur = w.replayWindowSecs === undefined ? 60 : w.replayWindowSecs;
+                    {/* Time window: sliding slice the widget renders. Default
+                        is mode-specific (60 s live, ALL replay) so a
+                        user-saved widget with replayWindowSecs===undefined
+                        gets the right behaviour in each mode. The toggle
+                        applies in both modes. */}
+                    {(() => {
+                      const defaultForMode = mode === 'live' ? 60 : null;
+                      const cur = w.replayWindowSecs === undefined ? defaultForMode : w.replayWindowSecs;
                       return (
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, letterSpacing: 1.2 }}>
-                            <span>REPLAY WINDOW</span>
+                            <span>TIME WINDOW</span>
                             <span style={{ color: SH_COLORS.textFaint }}>
                               {cur === null ? 'ALL' : cur >= 60 ? `${cur / 60}m` : `${cur}s`}
                             </span>
@@ -948,7 +957,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
         })()}
       </div>
 
-      <Timeline t={t} onChange={onT} durationSecs={durationSecs} mode={mode} compact />
+      <Timeline t={t} onChange={onT} durationSecs={durationSecs} mode={mode} compact paused={paused} onTogglePause={onTogglePause} />
 
       {pendingDrop && (
         <DropTypePopup
