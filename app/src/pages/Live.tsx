@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SignalsProvider, useCatalog } from '../components/SignalsProvider.tsx';
 import { DockDirection } from '@nfr/widgets';
@@ -6,84 +6,315 @@ import { SessionPicker } from '../components/SessionPicker.tsx';
 import { useLiveTodayFrames } from '../hooks/useLiveTodayFrames.ts';
 import { effectiveWidgetSignalIds, getGgSource } from '@nfr/widgets';
 import { useLiveStatus } from '../hooks/useLiveStatus.ts';
-import { apiPost } from '../api/client.ts';
+import { apiGet, apiPost } from '../api/client.ts';
+import type { SignalCatalog } from '@nfr/widgets';
 
-/** Wipe-the-live-buffer button next to the LinkQualityBadge. Testing aid:
- *  reload the live page from empty without restarting the desktop. */
-function ResetLiveButton({ onReset }: { onReset: () => void }) {
-  const [busy, setBusy] = useState(false);
-  const click = async () => {
-    if (busy) return;
-    if (!confirm('Wipe live_today? This deletes every row in the daily buffer (testing only).')) return;
-    setBusy(true);
+interface SimStatus { running: boolean; signalIds: number[] }
+
+/** Top-bar slot for the live page: link-quality badge (acts as a button)
+ *  + tools modal + session picker. Owns the modal state and polls the
+ *  simulator status so the badge can show 'SIM' while a test is active. */
+function LiveTopBar({
+  catalog, onReset,
+}: {
+  catalog: SignalCatalog;
+  onReset: () => void;
+}) {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [sim, setSim] = useState<SimStatus>({ running: false, signalIds: [] });
+  const refreshSim = async () => {
     try {
-      await apiPost<{ deleted: number }>('/api/live/reset', {});
-      onReset();
-    } catch (err) {
-      alert(`Reset failed: ${String(err)}`);
-    } finally {
-      setBusy(false);
-    }
+      setSim(await apiGet<SimStatus>('/api/live/simulate/status'));
+    } catch {/* badge falls back to running=false */}
   };
+  // Mount-time fetch + poll every 5 s so a refresh, or a simulation started
+  // from another window, surfaces in the badge.
+  useEffect(() => {
+    void refreshSim();
+    const iv = setInterval(() => { void refreshSim(); }, 5000);
+    return () => clearInterval(iv);
+  }, []);
   return (
-    <button
-      type="button"
-      onClick={click}
-      disabled={busy}
-      title="Wipe live_today (testing)"
-      style={{
-        padding: '3px 8px',
-        marginRight: 8,
-        background: 'transparent',
-        border: '1px solid rgba(242,87,87,0.4)',
-        color: '#f87171',
-        fontFamily: '"JetBrains Mono", monospace',
-        fontSize: 10,
-        letterSpacing: 1,
-        cursor: busy ? 'not-allowed' : 'pointer',
-        opacity: busy ? 0.5 : 1,
-      }}
-    >
-      {busy ? '…' : '■ RESET'}
-    </button>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <LinkQualityBadge
+        testRunning={sim.running}
+        onClick={() => setModalOpen(true)}
+      />
+      <SessionPicker />
+      {modalOpen && (
+        <LiveToolsModal
+          catalog={catalog}
+          sim={sim}
+          onSimChange={(next) => setSim(next)}
+          onReset={onReset}
+          onClose={() => setModalOpen(false)}
+        />
+      )}
+    </div>
   );
 }
 
-/** Top-bar pill showing LoRa link health (rssi + snr). Each parser packet
- *  brings one signal_quality event; useLiveStatus tracks the most recent. */
-function LinkQualityBadge() {
+/** Modal launched from the link-quality badge. Two sections:
+ *  - Reset: wipes live_today on the desktop.
+ *  - Test: pick signals from the catalog → POST /api/live/simulate/start;
+ *    when running, the modal shows a Stop button and a list of what's
+ *    being driven. Synthetic frames flow through the same WS path real
+ *    frames do, so the dock can't tell them apart. */
+function LiveToolsModal({
+  catalog, sim, onSimChange, onReset, onClose,
+}: {
+  catalog: SignalCatalog;
+  sim: SimStatus;
+  onSimChange: (next: SimStatus) => void;
+  onReset: () => void;
+  onClose: () => void;
+}) {
+  const [filter, setFilter] = useState('');
+  const [selected, setSelected] = useState<Set<number>>(() => new Set(sim.signalIds));
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const filtered = useMemo(() => {
+    const q = filter.trim().toLowerCase();
+    const all = catalog.ALL;
+    if (q.length === 0) return all.slice(0, 200);
+    return all
+      .filter((s) => s.name.toLowerCase().includes(q) || s.groupName.toLowerCase().includes(q))
+      .slice(0, 200);
+  }, [catalog, filter]);
+
+  const toggle = (id: number) => setSelected((s) => {
+    const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n;
+  });
+
+  const doReset = async () => {
+    if (!confirm('Wipe live_today? This deletes every row in the daily buffer.')) return;
+    setBusy(true); setErr(null);
+    try {
+      await apiPost('/api/live/reset', {});
+      onReset();
+      onClose();
+    } catch (e) {
+      setErr(`Reset failed: ${String(e)}`);
+    } finally { setBusy(false); }
+  };
+
+  const start = async () => {
+    if (selected.size === 0) { setErr('Pick at least one signal first.'); return; }
+    setBusy(true); setErr(null);
+    try {
+      const r = await apiPost<SimStatus>('/api/live/simulate/start', {
+        signalIds: [...selected],
+      });
+      onSimChange(r);
+      onClose();
+    } catch (e) {
+      setErr(`Start failed: ${String(e)}`);
+    } finally { setBusy(false); }
+  };
+
+  const stop = async () => {
+    setBusy(true); setErr(null);
+    try {
+      const r = await apiPost<SimStatus>('/api/live/simulate/stop', {});
+      onSimChange(r);
+    } catch (e) {
+      setErr(`Stop failed: ${String(e)}`);
+    } finally { setBusy(false); }
+  };
+
+  const overlay: React.CSSProperties = {
+    position: 'fixed', inset: 0, zIndex: 200,
+    background: 'rgba(0,0,0,0.6)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  };
+  const panel: React.CSSProperties = {
+    width: 'min(560px, 92vw)', maxHeight: '85vh',
+    background: '#1e1f22', border: '1px solid rgba(255,255,255,0.12)',
+    boxShadow: '0 12px 48px rgba(0,0,0,0.6)',
+    display: 'flex', flexDirection: 'column', minHeight: 0,
+    fontFamily: '"JetBrains Mono", monospace', color: '#dfe1e5',
+  };
+  const headerStyle: React.CSSProperties = {
+    padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.08)',
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+  };
+
+  return (
+    <div onClick={onClose} style={overlay}>
+      <div onClick={(e) => e.stopPropagation()} style={panel}>
+        <div style={headerStyle}>
+          <span style={{ fontSize: 10, letterSpacing: 1.5, color: 'rgba(255,255,255,0.5)' }}>
+            LIVE TOOLS
+          </span>
+          <span onClick={onClose} style={{ cursor: 'pointer', color: 'rgba(255,255,255,0.5)' }}>×</span>
+        </div>
+
+        <div style={{ overflow: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 18, minHeight: 0 }}>
+          {err && (
+            <div style={{
+              border: '1px solid rgba(242,87,87,0.4)', color: '#f4a8a8',
+              padding: '6px 10px', fontSize: 10,
+            }}>{err}</div>
+          )}
+
+          <section>
+            <div style={{ fontSize: 10, letterSpacing: 1.5, color: 'rgba(255,255,255,0.7)', marginBottom: 6 }}>
+              RESET LIVE DATA
+            </div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginBottom: 8, lineHeight: 1.5 }}>
+              Wipes <code>live_today</code> on the desktop and clears the in-memory
+              dock store. Useful for re-seeding a basestation test from a clean
+              slate.
+            </div>
+            <button
+              type="button" disabled={busy} onClick={doReset}
+              style={{
+                padding: '6px 14px',
+                background: 'transparent', color: '#f87171',
+                border: '1px solid rgba(242,87,87,0.4)',
+                fontFamily: 'inherit', fontSize: 11, letterSpacing: 1.5,
+                cursor: busy ? 'not-allowed' : 'pointer',
+              }}
+            >■ RESET</button>
+          </section>
+
+          <section>
+            <div style={{ fontSize: 10, letterSpacing: 1.5, color: 'rgba(255,255,255,0.7)', marginBottom: 6 }}>
+              TEST WITH SYNTHETIC DATA {sim.running && <span style={{ color: '#7ec98f' }}>· RUNNING</span>}
+            </div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginBottom: 8, lineHeight: 1.5 }}>
+              Pick signals from the DBC catalog. The server emits a 10 Hz
+              sine-wave per signal through the full live pipeline (parser-event
+              fan-out → WS broadcast → dock store → graph), exactly the same
+              path real basestation frames take. Each signal swings between
+              its catalog min/max so the graphs visibly move.
+            </div>
+
+            {sim.running ? (
+              <div style={{
+                display: 'flex', flexDirection: 'column', gap: 6,
+                fontSize: 11, color: 'rgba(255,255,255,0.7)',
+              }}>
+                <div>Currently driving {sim.signalIds.length} signal(s).</div>
+                <button
+                  type="button" disabled={busy} onClick={stop}
+                  style={{
+                    alignSelf: 'flex-start', padding: '6px 14px',
+                    background: 'rgba(242,87,87,0.18)', color: '#f4a8a8',
+                    border: '1px solid rgba(242,87,87,0.5)',
+                    fontFamily: 'inherit', fontSize: 11, letterSpacing: 1.5,
+                    cursor: busy ? 'not-allowed' : 'pointer',
+                  }}
+                >■ STOP TEST</button>
+              </div>
+            ) : (
+              <>
+                <input
+                  type="text" placeholder="filter signals…"
+                  value={filter} onChange={(e) => setFilter(e.target.value)}
+                  style={{
+                    width: '100%', boxSizing: 'border-box',
+                    padding: '5px 8px', fontSize: 11, fontFamily: 'inherit',
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    color: 'inherit', marginBottom: 6,
+                  }}
+                />
+                <div style={{
+                  maxHeight: 220, overflow: 'auto',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  fontSize: 10, marginBottom: 8,
+                }}>
+                  {filtered.map((s) => (
+                    <label key={s.id} style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '3px 8px', cursor: 'pointer',
+                      borderBottom: '1px solid rgba(255,255,255,0.04)',
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={selected.has(s.id)}
+                        onChange={() => toggle(s.id)}
+                      />
+                      <span style={{ color: 'rgba(255,255,255,0.85)' }}>{s.name}</span>
+                      <span style={{ color: 'rgba(255,255,255,0.4)', marginLeft: 'auto' }}>
+                        {s.groupName}
+                      </span>
+                    </label>
+                  ))}
+                  {filtered.length === 0 && (
+                    <div style={{ padding: 10, color: 'rgba(255,255,255,0.4)' }}>no matches</div>
+                  )}
+                </div>
+                <button
+                  type="button" disabled={busy || selected.size === 0} onClick={start}
+                  style={{
+                    padding: '6px 14px',
+                    background: 'rgba(126,201,143,0.18)', color: '#a5dfb4',
+                    border: '1px solid rgba(126,201,143,0.5)',
+                    fontFamily: 'inherit', fontSize: 11, letterSpacing: 1.5,
+                    cursor: busy || selected.size === 0 ? 'not-allowed' : 'pointer',
+                    opacity: selected.size === 0 ? 0.5 : 1,
+                  }}
+                >▶ START TEST ({selected.size})</button>
+              </>
+            )}
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Clickable LoRa link health pill. Shows rssi/snr from useLiveStatus,
+ *  opens the LiveToolsModal on click. Border turns green while a test
+ *  simulation is running so it's clear from the top bar alone that the
+ *  data on screen is synthetic. */
+function LinkQualityBadge({
+  onClick, testRunning,
+}: {
+  onClick: () => void;
+  testRunning: boolean;
+}) {
   const status = useLiveStatus();
   const rssi = status.rssi;
   const snr = status.snr;
   const connected = status.basestation === 'connected';
   // Colour by RSSI: stronger is brighter. -70 dBm is comfortable, below
   // -100 starts losing packets in practice.
-  const color =
+  const rssiColor =
     !connected || rssi == null ? '#6f7278'
     : rssi >= -70 ? '#7ec98f'
     : rssi >= -90 ? '#e8a648'
     : '#e06c6c';
+  const borderColor = testRunning ? 'rgba(126,201,143,0.9)' : 'rgba(255,255,255,0.09)';
   return (
-    <span
-      title={connected ? `Basestation ${status.port ?? ''}` : 'Basestation disconnected'}
+    <button
+      type="button"
+      onClick={onClick}
+      title={testRunning ? 'SIMULATION RUNNING — click to open Live tools' : 'Live tools (reset / simulate)'}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 6,
         padding: '3px 8px', marginRight: 8,
         fontFamily: '"JetBrains Mono", monospace',
         fontSize: 10, letterSpacing: 1,
-        border: '1px solid rgba(255,255,255,0.09)',
-        color,
+        background: 'transparent',
+        border: `1px solid ${borderColor}`,
+        color: rssiColor,
+        cursor: 'pointer',
       }}
     >
       <span style={{
         width: 6, height: 6, borderRadius: '50%',
-        background: connected ? color : '#6f7278',
-        opacity: connected ? 1 : 0.4,
+        background: testRunning ? '#7ec98f' : (connected ? rssiColor : '#6f7278'),
+        opacity: testRunning || connected ? 1 : 0.4,
       }} />
+      {testRunning && <span style={{ color: '#7ec98f', fontWeight: 600 }}>SIM</span>}
       <span>RSSI {rssi != null ? `${rssi}` : '—'} dBm</span>
       <span style={{ color: 'rgba(255,255,255,0.25)' }}>·</span>
       <span>SNR {snr != null ? snr.toFixed(1) : '—'} dB</span>
-    </span>
+    </button>
   );
 }
 
@@ -288,19 +519,15 @@ function LiveInner({ navigate }: LiveInnerProps) {
         windowStartTs={visStart}
         windowEndTs={effectiveVisEnd}
         sessionSlot={
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <ResetLiveButton onReset={() => {
-              // Drop everything in-memory and unfreeze the window so the
-              // dock immediately reflects the empty table. The auto-advance
-              // effect will resume next tick.
+          <LiveTopBar
+            catalog={catalog}
+            onReset={() => {
               store.reset();
               setFrozenWindow(null);
               setVisEnd(new Date().toISOString());
               setT(1);
-            }} />
-            <LinkQualityBadge />
-            <SessionPicker />
-          </div>
+            }}
+          />
         }
       />
     </div>

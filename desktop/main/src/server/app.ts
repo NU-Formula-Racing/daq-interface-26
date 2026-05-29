@@ -111,6 +111,8 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     if (opts.parser) {
       registerWebSockets(app, opts.parser);
       registerLiveRoutes(app, opts.parser);
+      const { registerSimulateRoutes } = await import('./routes/simulate.ts');
+      registerSimulateRoutes(app, { parser: opts.parser, pool });
     }
 
     app.get('/api/health', async () => ({ status: 'ok' }));
