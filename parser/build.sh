@@ -26,13 +26,25 @@ fi
 # Guard against the silent-bundle bug: PyInstaller's --hidden-import only
 # bundles psycopg_binary if it's importable at build time. Without it the
 # resulting binary runs but blows up at first DB call with 'no pq wrapper
-# available'. Verify the import works before we start spending minutes
-# building, so the failure points at the cause instead of the symptom.
-if ! "$PY" -c "import psycopg_binary, serial, serial.tools.list_ports" >/dev/null 2>&1; then
+# available'. Print the actual ImportError so the cause is obvious — the
+# previous version captured stderr silently which made CI failures opaque.
+# We also try each module independently so we can call out exactly which
+# one is missing on the runner.
+missing=()
+for mod in psycopg_binary serial serial.tools.list_ports; do
+  err="$("$PY" -c "import $mod" 2>&1)" || missing+=("$mod: $err")
+done
+if [ ${#missing[@]} -gt 0 ]; then
   echo "ERROR: build environment is missing required modules." >&2
-  echo "       psycopg_binary, serial, serial.tools.list_ports must be" >&2
-  echo "       importable from $PY before running build.sh." >&2
-  echo "       Try:  pip install psycopg[binary] pyserial pyinstaller" >&2
+  echo "       Python: $PY" >&2
+  for line in "${missing[@]}"; do
+    echo "         $line" >&2
+  done
+  echo >&2
+  echo "       Installed packages (pip list):" >&2
+  "$PY" -m pip list 2>&1 | sed 's/^/         /' >&2
+  echo >&2
+  echo "       Try:  pip install 'psycopg[binary]' pyserial pyinstaller" >&2
   exit 1
 fi
 
