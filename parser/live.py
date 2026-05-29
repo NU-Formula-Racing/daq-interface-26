@@ -135,9 +135,22 @@ def run_live(
                 decoded = decode_frame(evt.frame_id, evt.data, decode_table)
                 if not decoded:
                     continue
-                ts = (session_start or datetime.now(timezone.utc)) + timedelta(
-                    milliseconds=evt.ts_ms or 0
-                )
+                # In streaming_only (serial-live) mode evt.ts_ms is the car's
+                # internal CAN-bus timestamp (e.g. milliseconds since ECU
+                # power-on). Adding it to session_start produces timestamps
+                # potentially far in the future relative to the desktop's
+                # wall clock — graphs windowed against "now" would then
+                # filter every frame out (numerics show the value but the
+                # line stays empty). Use the parser's reception time
+                # instead. Batch/file replay keeps the session_start+ts_ms
+                # composition because there ts_ms represents the relative
+                # offset within the recording.
+                if streaming_only:
+                    ts = datetime.now(timezone.utc)
+                else:
+                    ts = (session_start or datetime.now(timezone.utc)) + timedelta(
+                        milliseconds=evt.ts_ms or 0
+                    )
                 for signal_name, value in decoded.items():
                     sender = sender_lookup.get(
                         (evt.frame_id, signal_name), "unknown"
