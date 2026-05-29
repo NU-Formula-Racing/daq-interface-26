@@ -86,6 +86,15 @@ interface GraphWidgetProps {
    *  frames.latestTs() and the `window` fraction. */
   windowStartTs?: string | null;
   windowEndTs?: string | null;
+  /** Replay-only: width (in seconds) of the visible window around the
+   *  scrubber. Defaults to 60 s; null means "show the whole session"
+   *  (the historical behaviour). Lets the user keep long sessions from
+   *  being stretched flat across the dock — defaults to a tight,
+   *  scrubber-following view. */
+  replayWindowSecs?: number | null;
+  /** Replay-only: total session duration in seconds. Needed to convert
+   *  replayWindowSecs into a session fraction. Comes from DockDirection. */
+  sessionDurationSecs?: number;
 }
 
 export function GraphWidget({
@@ -94,6 +103,7 @@ export function GraphWidget({
   zoom = null, onZoom, mode = 'replay', signalColors, showRange = true,
   zoomActive = false, sessionStartTs = null,
   windowStartTs = null, windowEndTs = null,
+  replayWindowSecs = 60, sessionDurationSecs = 0,
 }: GraphWidgetProps) {
   const catalog = useCatalog();
   const frames = useFrames();
@@ -130,8 +140,31 @@ export function GraphWidget({
     t1 = t;
     t0 = Math.max(0, t - win);
     if (t1 - t0 < win * 0.5) { t0 = 0; t1 = Math.max(win, t1); }
+  } else if (
+    mode === 'replay' &&
+    replayWindowSecs != null &&
+    replayWindowSecs > 0 &&
+    sessionDurationSecs > 0 &&
+    replayWindowSecs < sessionDurationSecs
+  ) {
+    // Replay with a configured window — show a sliding slice that follows
+    // the scrubber instead of stretching the whole session across the plot.
+    // Default 60 s keeps long drives readable; widget settings expose 5 m
+    // and "ALL" presets.
+    const winFrac = replayWindowSecs / sessionDurationSecs;
+    if (t < winFrac) {
+      // Cursor near the beginning — anchor the window at the session start
+      // so we don't show a half-empty window with the cursor hugging the
+      // right edge.
+      t0 = 0;
+      t1 = winFrac;
+    } else {
+      t1 = t;
+      t0 = t - winFrac;
+    }
   } else {
-    // Replay: show the entire session. The scrubber just moves the cursor.
+    // Replay with no window setting (or "ALL"): show the entire session.
+    // The scrubber just moves the cursor.
     t0 = 0;
     t1 = 1;
   }
@@ -1616,8 +1649,12 @@ interface WidgetShellProps {
    *  window on zoom (both null in replay mode). */
   windowStartTs?: string | null;
   windowEndTs?: string | null;
+  /** Replay-only: total session duration in seconds; needed by graph
+   *  widgets to convert their per-widget replayWindow setting into a
+   *  fraction of the session. Forwarded from DockDirection.durationSecs. */
+  sessionDurationSecs?: number;
 }
-export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick, onSettings, onZoom, zoomActive, sessionStartTs, windowStartTs, windowEndTs }: WidgetShellProps) {
+export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, density = 'comfortable', graphStyle = 'line', children, draggable, onDragStart, onHeaderClick, onSettings, onZoom, zoomActive, sessionStartTs, windowStartTs, windowEndTs, sessionDurationSecs }: WidgetShellProps) {
   const [typeOpen, setTypeOpen] = useState(false);
   const compact = density === 'compact';
   const frames = useFrames();
@@ -1661,7 +1698,7 @@ export function WidgetShell({ widget, t, mode = 'replay', onChange, onRemove, de
       // sub-slicing into it — that would compound the orchestrator's zoom and
       // shrink the visible range on every drag.
       // widget.graphStyle overrides the dock-level default per-graph.
-      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={widget.graphStyle ?? graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} zoomActive={zoomActive} sessionStartTs={sessionStartTs} windowStartTs={windowStartTs} windowEndTs={windowEndTs} />;
+      case 'graph': return <GraphWidget signals={widget.signals} t={t} mode={mode} window={widget.window || 0.05} style={widget.graphStyle ?? graphStyle} compact={compact} zoom={null} onZoom={(z) => onZoom?.(z)} signalColors={widget.signalColors} showRange={widget.showRange} zoomActive={zoomActive} sessionStartTs={sessionStartTs} windowStartTs={windowStartTs} windowEndTs={windowEndTs} replayWindowSecs={widget.replayWindowSecs === undefined ? 60 : widget.replayWindowSecs} sessionDurationSecs={sessionDurationSecs} />;
       case 'numeric': return <NumericWidget signal={widget.signals[0]} t={t} compact={compact} />;
       case 'gauge': return <GaugeWidget signal={widget.signals[0]} t={t} />;
       case 'bar': return <BarWidget signals={widget.signals} t={t} />;

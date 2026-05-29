@@ -727,6 +727,7 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                     sessionStartTs={sessionStartTs}
                     windowStartTs={windowStartTs}
                     windowEndTs={windowEndTs}
+                    sessionDurationSecs={durationSecs}
                     draggable
                     onDragStart={(e) => startMove(w, e)}
                   />
@@ -906,6 +907,26 @@ export function DockDirection({ t, mode, onMode, onT, durationSecs, density, gra
                         <SegBtn active={(w.graphStyle ?? graphStyle) === 'dots'} onClick={() => patch(w.id, { graphStyle: 'dots' })}>DOTS</SegBtn>
                       </div>
                     </div>
+                    {/* Replay-only: width of the sliding window around the
+                        scrubber. Default 60 s keeps long sessions readable. */}
+                    {mode === 'replay' && (() => {
+                      const cur = w.replayWindowSecs === undefined ? 60 : w.replayWindowSecs;
+                      return (
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, letterSpacing: 1.2 }}>
+                            <span>REPLAY WINDOW</span>
+                            <span style={{ color: SH_COLORS.textFaint }}>
+                              {cur === null ? 'ALL' : cur >= 60 ? `${cur / 60}m` : `${cur}s`}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', gap: 4 }}>
+                            <SegBtn active={cur === 60}  onClick={() => patch(w.id, { replayWindowSecs: 60 })}>1 MIN</SegBtn>
+                            <SegBtn active={cur === 300} onClick={() => patch(w.id, { replayWindowSecs: 300 })}>5 MIN</SegBtn>
+                            <SegBtn active={cur === null} onClick={() => patch(w.id, { replayWindowSecs: null })}>ALL</SegBtn>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </>
                   );
                 })()}
