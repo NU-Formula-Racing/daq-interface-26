@@ -118,6 +118,14 @@ export function GraphWidget({
     t0 = Math.max(0, zoom[0]);
     t1 = Math.min(1, zoom[1]);
     if (t1 - t0 < 1e-4) { t0 = 0; t1 = 1; }
+  } else if (mode === 'live' && windowStartTs && windowEndTs) {
+    // Live with an absolute window from the parent: drag fractions should
+    // be relative to that window, so the callback returns ranges the parent
+    // can map straight to absolute timestamps. Otherwise zoom in live
+    // converted [0..1] back to a session-fraction that almost always
+    // landed near the live edge.
+    t0 = 0;
+    t1 = 1;
   } else if (mode === 'live') {
     t1 = t;
     t0 = Math.max(0, t - win);
