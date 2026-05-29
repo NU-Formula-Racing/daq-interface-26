@@ -30,23 +30,22 @@ fi
 # previous version captured stderr silently which made CI failures opaque.
 # We also try each module independently so we can call out exactly which
 # one is missing on the runner.
-missing=()
-for mod in psycopg_binary serial serial.tools.list_ports; do
-  err="$("$PY" -c "import $mod" 2>&1)" || missing+=("$mod: $err")
-done
-if [ ${#missing[@]} -gt 0 ]; then
+# `psycopg_binary` must be imported via `psycopg` — recent releases reject
+# direct `import psycopg_binary` with "the psycopg package should be
+# imported before psycopg_binary". Importing `psycopg` itself loads the
+# binary backend implicitly, which is what we actually need for the
+# bundled binary to work.
+err="$("$PY" -c "import psycopg, serial, serial.tools.list_ports" 2>&1)" || {
   echo "ERROR: build environment is missing required modules." >&2
   echo "       Python: $PY" >&2
-  for line in "${missing[@]}"; do
-    echo "         $line" >&2
-  done
+  echo "$err" | sed 's/^/         /' >&2
   echo >&2
   echo "       Installed packages (pip list):" >&2
   "$PY" -m pip list 2>&1 | sed 's/^/         /' >&2
   echo >&2
   echo "       Try:  pip install 'psycopg[binary]' pyserial pyinstaller" >&2
   exit 1
-fi
+}
 
 "$PYINSTALLER" \
   --onefile \
