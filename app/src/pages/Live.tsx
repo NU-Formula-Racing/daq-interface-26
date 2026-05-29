@@ -74,14 +74,21 @@ function LiveToolsModal({
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  // Only show signals that actually carry a usable range — anything where
+  // min === max (or both are the catalog's 0/1 default) would simulate as
+  // a flat line, which isn't a useful test target. Filtering here keeps
+  // the dropdown to "valid DBC signals" the way the user expects.
+  const validSignals = useMemo(
+    () => catalog.ALL.filter((s) => Number.isFinite(s.min) && Number.isFinite(s.max) && s.max > s.min),
+    [catalog],
+  );
   const filtered = useMemo(() => {
     const q = filter.trim().toLowerCase();
-    const all = catalog.ALL;
-    if (q.length === 0) return all.slice(0, 200);
-    return all
+    if (q.length === 0) return validSignals.slice(0, 200);
+    return validSignals
       .filter((s) => s.name.toLowerCase().includes(q) || s.groupName.toLowerCase().includes(q))
       .slice(0, 200);
-  }, [catalog, filter]);
+  }, [validSignals, filter]);
 
   const toggle = (id: number) => setSelected((s) => {
     const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n;
@@ -103,9 +110,20 @@ function LiveToolsModal({
     if (selected.size === 0) { setErr('Pick at least one signal first.'); return; }
     setBusy(true); setErr(null);
     try {
-      const r = await apiPost<SimStatus>('/api/live/simulate/start', {
-        signalIds: [...selected],
-      });
+      // Resolve each id back to its catalog signal so we can ship min/max
+      // (the server has no min/max columns to query).
+      const signals: Array<{ id: number; name: string; min: number; max: number }> = [];
+      for (const id of selected) {
+        const sig = catalog.resolve(id);
+        if (sig && Number.isFinite(sig.min) && Number.isFinite(sig.max) && sig.max > sig.min) {
+          signals.push({ id: sig.id, name: sig.name, min: sig.min, max: sig.max });
+        }
+      }
+      if (signals.length === 0) {
+        setErr('No selected signals have a usable min/max range.');
+        return;
+      }
+      const r = await apiPost<SimStatus>('/api/live/simulate/start', { signals });
       onSimChange(r);
       onClose();
     } catch (e) {

@@ -52,32 +52,33 @@ export function registerSimulateRoutes(app: FastifyInstance, deps: SimulateDeps)
     if (state.timer) {
       return { running: true, signalIds: state.signalIds, message: 'already running' };
     }
-    const body = (req.body ?? {}) as { signalIds?: number[] };
-    const ids = (body.signalIds ?? []).filter((n) => typeof n === 'number' && Number.isFinite(n));
-    if (ids.length === 0) {
-      reply.code(400);
-      return { error: 'expected non-empty signalIds[] in body' };
-    }
-    // Load min/max for each requested signal so the wave fits the catalog
-    // range. Falls back to [0, 1] if the catalog doesn't carry one.
-    const { rows } = await deps.pool.query<{
-      id: number; signal_name: string;
-      min_value: number | null; max_value: number | null;
-    }>(
-      `SELECT id, signal_name, min_value, max_value
-       FROM signal_definitions WHERE id = ANY($1::int[])`,
-      [ids],
+    // Catalog min/max comes from the DBC and lives on the client; sending
+    // it with the start request avoids a fragile DB schema dependency
+    // (signal_definitions has no min/max columns) and keeps the simulator
+    // honest about each signal's expected range.
+    const body = (req.body ?? {}) as {
+      signals?: Array<{ id: number; name?: string; min: number; max: number }>;
+    };
+    const reqSigs = (body.signals ?? []).filter(
+      (s) =>
+        s != null &&
+        typeof s.id === 'number' && Number.isFinite(s.id) &&
+        typeof s.min === 'number' && Number.isFinite(s.min) &&
+        typeof s.max === 'number' && Number.isFinite(s.max) &&
+        s.max > s.min,
     );
-    state.defs = new Map();
-    for (const r of rows) {
-      const min = r.min_value ?? 0;
-      const max = r.max_value ?? (min === 0 ? 1 : min * 1.5);
-      state.defs.set(r.id, { min, max, signal_name: r.signal_name });
+    if (reqSigs.length === 0) {
+      reply.code(400);
+      return { error: 'expected signals: [{id, name?, min, max}, …] with max > min' };
     }
-    state.signalIds = ids;
+    state.defs = new Map();
+    for (const s of reqSigs) {
+      state.defs.set(s.id, { min: s.min, max: s.max, signal_name: s.name ?? `signal_${s.id}` });
+    }
+    state.signalIds = reqSigs.map((s) => s.id);
     state.startMs = Date.now();
     state.timer = setInterval(() => { void tick(deps); }, TICK_MS);
-    return { running: true, signalIds: ids };
+    return { running: true, signalIds: state.signalIds };
   });
 
   app.post('/api/live/simulate/stop', async () => {
