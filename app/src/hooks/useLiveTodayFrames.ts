@@ -94,14 +94,17 @@ export function useLiveTodayFrames(): UseLiveTodayFramesResult {
       return !ranges.some(([s, e]) => s <= start && end <= e);
     });
     if (need.length === 0) return;
-    const durationSecs = Math.max(0.001, (Date.parse(end) - Date.parse(start)) / 1000);
-    const bucketSecs = durationSecs / TARGET_BUCKETS;
     setStatus('loading');
+    // Live mode: ask for raw rows, no bucket averaging. The avg-per-bucket
+    // path produced fractional values and wrap-spikes for integer/cyclic
+    // signals like RTC_Second. We accept the row-count cap on long windows
+    // (~100k rows, set server-side) — sufficient for the rolling-day buffer
+    // at typical CAN rates.
     const url =
       `/api/live/window?ids=${need.join(',')}` +
       `&start=${encodeURIComponent(start)}` +
       `&end=${encodeURIComponent(end)}` +
-      `&bucket=${bucketSecs}`;
+      `&raw=1`;
     try {
       const rows = await apiGet<SignalWindowRow[]>(url);
       store.push(rows.map((r) => ({

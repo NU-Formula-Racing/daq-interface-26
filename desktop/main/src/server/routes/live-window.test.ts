@@ -31,4 +31,22 @@ describe('GET /api/live/window', () => {
     expect(res.statusCode).toBe(400);
     expect(query).not.toHaveBeenCalled();
   });
+
+  it('raw=1 hits live_today directly and returns one row per sample', async () => {
+    const query = vi.fn(async () => ({ rows: [
+      { ts: '2026-05-28T05:00:00Z', signal_id: 1, signal_name: 'X', unit: '',
+        value_min: 23, value_max: 23, value_avg: 23, sample_n: 1 },
+    ] }));
+    const app = Fastify();
+    registerLiveWindowRoutes(app, { pool: { query } as any });
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/live/window?ids=1&start=2026-05-28T05:00:00Z&end=2026-05-28T06:00:00Z&raw=1',
+    });
+    expect(res.statusCode).toBe(200);
+    expect(query).toHaveBeenCalledTimes(1);
+    const [sql] = (query as any).mock.calls[0];
+    expect(sql).toMatch(/FROM live_today/);
+    expect(sql).not.toMatch(/get_live_today_window/);
+  });
 });
