@@ -171,6 +171,14 @@ The output ends up in `desktop/release/`.
 
 ## Changelog
 
+### v0.7.8
+
+- **Bundled DBC updated.** `NFR26DBC.csv` refreshed with the latest
+  signal definitions (+44 / −39 rows vs v0.7.7). Affects the default
+  shipped with the .app and the parser's fallback when the user
+  hasn't uploaded one; existing users with a custom uploaded DBC are
+  unaffected (their `active-dbc.csv` keeps taking precedence).
+
 ### v0.7.7
 
 - **Live mode renderer no longer grows unbounded in RAM.** The frame

@@ -10,17 +10,17 @@ Message ID,Message Name,Sender,Signal Name,Start Bit,Size (bits),Factor,Offset,M
 0x2A3,PDM_Coolant,PDM,Coolant_1_Volt,0,16,0.01,0,0,3.3,V,500,float
 ,PDM_Coolant,PDM,Coolant_2_Volt,16,16,0.01,0,0,3.3,V,500,float
 ,PDM_Coolant,PDM,Coolant_3_Volt,32,16,0.01,0,0,3.3,V,500,float
-0x28B,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,RPM,0,16,1,0,,,RPM,100,int16_t
-,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,Motor_Current,16,16,0.1,0,,,A,100,int16_t
-,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,DC_Voltage,32,16,0.1,0,,,V,100,int16_t
-,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,DC_Current,48,16,0.1,0,,,A,100,int16_t
-0x28C,Front_Right_Inverter_Temp_Status,Front-Right-Inverter,IGBT_Temp,0,16,0.1,0,,,deg C,1000,int16_t
-,Front_Right_Inverter_Temp_Status,Front-Right-Inverter,Motor_Temp,16,16,0.1,0,,,deg C,1000,int16_t
-0x28D,Front_Right_Inverter_Current_Draw,Front-Right-Inverter,Ah_Drawn,0,16,0.0001,0,,,Ah,100,uint32_t
-,Front_Right_Inverter_Current_Draw,Front-Right-Inverter,Ah_Charged,32,32,0.0001,0,,,Ah,100,uint32_t
-0x28E,Front_Right_Inverter_Power_Draw,Front-Right-Inverter,Wh_Drawn,0,32,0.001,0,,,Wh,100,uint32_t
-,Front_Right_Inverter_Power_Draw,Front-Right-Inverter,Wh_Charged,32,32,0.001,0,,,Wh,100,uint32_t
-0x28A,Front_Right_Inverter_Fault_Status,Front-Right-Inverter,Fault_Code,0,8,1,0,,,"0x00: NONE
+0x28B,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,FR_RPM,0,16,1,0,,,RPM,100,int16_t
+,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,FR_Motor_Current,16,16,0.1,0,,,A,100,int16_t
+,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,FR_DC_Voltage,32,16,0.1,0,,,V,100,int16_t
+,Front_Right_Inverter_Motor_Status,Front-Right-Inverter,FR_DC_Current,48,16,0.1,0,,,A,100,int16_t
+0x28C,Front_Right_Inverter_Temp_Status,Front-Right-Inverter,FR_IGBT_Temp,0,16,0.1,0,,,deg C,1000,int16_t
+,Front_Right_Inverter_Temp_Status,Front-Right-Inverter,FR_Motor_Temp,16,16,0.1,0,,,deg C,1000,int16_t
+0x28D,Front_Right_Inverter_Current_Draw,Front-Right-Inverter,FR_Ah_Drawn,0,16,0.0001,0,,,Ah,100,uint32_t
+,Front_Right_Inverter_Current_Draw,Front-Right-Inverter,FR_Ah_Charged,32,32,0.0001,0,,,Ah,100,uint32_t
+0x28E,Front_Right_Inverter_Power_Draw,Front-Right-Inverter,FR_Wh_Drawn,0,32,0.001,0,,,Wh,100,uint32_t
+,Front_Right_Inverter_Power_Draw,Front-Right-Inverter,FR_Wh_Charged,32,32,0.001,0,,,Wh,100,uint32_t
+0x28A,Front_Right_Inverter_Fault_Status,Front-Right-Inverter,FR_Fault_Code,0,8,1,0,,,"0x00: NONE
 0x01: OVER_VOLTAGE
 0x02: UNDER_VOLTAGE
 0x03: DRV_FAULT
@@ -48,17 +48,17 @@ Message ID,Message Name,Sender,Signal Name,Start Bit,Size (bits),Factor,Offset,M
 0x19: ENCODER_NO_MAGNET
 0x1A: ENCODER_MAGNET_TOO_STRONG
 0x1B: PHASE_FILTER_FAULT",,uint8_t
-0x286,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,RPM,0,16,1,0,,,RPM,100,int16_t
-,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,Motor_Current,16,16,0.1,0,,,A,100,int16_t
-,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,DC_Voltage,32,16,0.1,0,,,V,100,int16_t
-,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,DC_Current,48,16,0.1,0,,,A,100,int16_t
-0x287,Front_Left_Inverter_Temp_Status,Front-Left-Inverter,IGBT_Temp,0,16,0.1,0,,,deg C,1000,int16_t
-,Front_Left_Inverter_Temp_Status,Front-Left-Inverter,Motor_Temp,16,16,0.1,0,,,deg C,1000,int16_t
-0x288,Front_Left_Inverter_Current_Draw,Front-Left-Inverter,Ah_Drawn,0,16,0.0001,0,,,Ah,100,uint32_t
-,Front_Left_Inverter_Current_Draw,Front-Left-Inverter,Ah_Charged,32,32,0.0001,0,,,Ah,100,uint32_t
-0x289,Front_Left_Inverter_Power_Draw,Front-Left-Inverter,Wh_Drawn,0,32,0.001,0,,,Wh,100,uint32_t
-,Front_Left_Inverter_Power_Draw,Front-Left-Inverter,Wh_Charged,32,32,0.001,0,,,Wh,100,uint32_t
-0x285,Front_Left_Inverter_Fault_Status,Front-Left-Inverter,Fault_Code,0,8,1,0,,,"0x00: NONE
+0x286,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,FL_RPM,0,16,1,0,,,RPM,100,int16_t
+,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,FL_Motor_Current,16,16,0.1,0,,,A,100,int16_t
+,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,FL_DC_Voltage,32,16,0.1,0,,,V,100,int16_t
+,Front_Left_Inverter_Motor_Status,Front-Left-Inverter,FL_DC_Current,48,16,0.1,0,,,A,100,int16_t
+0x287,Front_Left_Inverter_Temp_Status,Front-Left-Inverter,FL_IGBT_Temp,0,16,0.1,0,,,deg C,1000,int16_t
+,Front_Left_Inverter_Temp_Status,Front-Left-Inverter,FL_Motor_Temp,16,16,0.1,0,,,deg C,1000,int16_t
+0x288,Front_Left_Inverter_Current_Draw,Front-Left-Inverter,FL_Ah_Drawn,0,16,0.0001,0,,,Ah,100,uint32_t
+,Front_Left_Inverter_Current_Draw,Front-Left-Inverter,FL_Ah_Charged,32,32,0.0001,0,,,Ah,100,uint32_t
+0x289,Front_Left_Inverter_Power_Draw,Front-Left-Inverter,FL_Wh_Drawn,0,32,0.001,0,,,Wh,100,uint32_t
+,Front_Left_Inverter_Power_Draw,Front-Left-Inverter,FL_Wh_Charged,32,32,0.001,0,,,Wh,100,uint32_t
+0x285,Front_Left_Inverter_Fault_Status,Front-Left-Inverter,FL_Fault_Code,0,8,1,0,,,"0x00: NONE
 0x01: OVER_VOLTAGE
 0x02: UNDER_VOLTAGE
 0x03: DRV_FAULT
@@ -86,17 +86,17 @@ Message ID,Message Name,Sender,Signal Name,Start Bit,Size (bits),Factor,Offset,M
 0x19: ENCODER_NO_MAGNET
 0x1A: ENCODER_MAGNET_TOO_STRONG
 0x1B: PHASE_FILTER_FAULT",,uint8_t
-0x281,Rear_Inverter_Motor_Status,Rear Inverter,RPM,0,16,1,0,,,RPM,100,int16_t
-,Rear_Inverter_Motor_Status,Rear Inverter,Motor_Current,16,16,0.1,0,,,A,100,int16_t
-,Rear_Inverter_Motor_Status,Rear Inverter,DC_Voltage,32,16,0.1,0,,,V,100,int16_t
-,Rear_Inverter_Motor_Status,Rear Inverter,DC_Current,48,16,0.1,0,,,A,100,int16_t
-0x282,Rear_Inverter_Temp_Status,Rear Inverter,IGBT_Temp,0,16,0.1,0,,,deg C,1000,int16_t
-,Rear_Inverter_Temp_Status,Rear Inverter,Motor_Temp,16,16,0.1,0,,,deg C,1000,int16_t
-0x283,Rear_Inverter_Current_Draw,Rear Inverter,Ah_Drawn,0,16,0.0001,0,,,Ah,100,uint32_t
-,Rear_Inverter_Current_Draw,Rear Inverter,Ah_Charged,32,32,0.0001,0,,,Ah,100,uint32_t
-0x284,Rear_Inverter_Power_Draw,Rear Inverter,Wh_Drawn,0,32,0.001,0,,,Wh,100,uint32_t
-,Rear_Inverter_Power_Draw,Rear Inverter,Wh_Charged,32,32,0.001,0,,,Wh,100,uint32_t
-0x280,Rear_Inverter_Fault_Status,Rear Inverter,Fault_Code,0,8,1,0,,,"0x00: NONE
+0x281,Rear_Inverter_Motor_Status,Rear Inverter,B_RPM,0,16,1,0,,,RPM,100,int16_t
+,Rear_Inverter_Motor_Status,Rear Inverter,B_Motor_Current,16,16,0.1,0,,,A,100,int16_t
+,Rear_Inverter_Motor_Status,Rear Inverter,B_DC_Voltage,32,16,0.1,0,,,V,100,int16_t
+,Rear_Inverter_Motor_Status,Rear Inverter,B_DC_Current,48,16,0.1,0,,,A,100,int16_t
+0x282,Rear_Inverter_Temp_Status,Rear Inverter,B_IGBT_Temp,0,16,0.1,0,,,deg C,1000,int16_t
+,Rear_Inverter_Temp_Status,Rear Inverter,B_Motor_Temp,16,16,0.1,0,,,deg C,1000,int16_t
+0x283,Rear_Inverter_Current_Draw,Rear Inverter,B_Ah_Drawn,0,16,0.0001,0,,,Ah,100,uint32_t
+,Rear_Inverter_Current_Draw,Rear Inverter,B_Ah_Charged,32,32,0.0001,0,,,Ah,100,uint32_t
+0x284,Rear_Inverter_Power_Draw,Rear Inverter,B_Wh_Drawn,0,32,0.001,0,,,Wh,100,uint32_t
+,Rear_Inverter_Power_Draw,Rear Inverter,B_Wh_Charged,32,32,0.001,0,,,Wh,100,uint32_t
+0x280,Rear_Inverter_Fault_Status,Rear Inverter,B_Fault_Code,0,8,1,0,,,"0x00: NONE
 0x01: OVER_VOLTAGE
 0x02: UNDER_VOLTAGE
 0x03: DRV_FAULT
@@ -495,7 +495,7 @@ Protocol violation error locations (data[3]):
 ,BR_Broker_CAN_Error_Msg,DAQ-BR-Wheel,BR_Sus_Pot_Error,16,16,1,0,0,1,Bool,1000,int16_t
 ,BR_Broker_CAN_Error_Msg,DAQ-BR-Wheel,BR_Tire_Temp_Error,32,16,1,0,0,1,Bool,1000,int16_t
 ,BR_Broker_CAN_Error_Msg,DAQ-BR-Wheel,BR_Heartbeat_Count,48,16,1,0,0,65536,HAL Tick,1000,int16_t
-0x570,BR_Broker_Sus_Calibrated,DAQ-BR-Wheel,BR_Strain_Gauge_Calibrated,0,32,1,0,-8388608,8388607,lbs,10,float
+0x570,BR_Broker_Sus_Calibrated,DAQ-BR-Wheel,BR_Strain_Gauge_Calibrated,0,32,0.001,0,-8388608,8388607,lbs,10,float
 ,BR_Broker_Sus_Calibrated,DAQ-BR-Wheel,BR_Sus_Pot_Calibrated,32,32,1,0,0,4095,ADC Values,10,float
 0x532,BL_Broker_Temp1,DAQ-BL-Wheel,BL_Tire_Temp_0,0,16,0.01,0,0,60,Celcius,1000,float
 ,BL_Broker_Temp1,DAQ-BL-Wheel,BL_Tire_Temp_1,16,16,0.01,0,0,60,Celcius,1000,float
@@ -511,7 +511,7 @@ Protocol violation error locations (data[3]):
 ,BL_Broker_CAN_Error_Msg,DAQ-BL-Wheel,BL_Sus_Pot_Error,16,16,1,0,0,1,Bool,1000,int16_t
 ,BL_Broker_CAN_Error_Msg,DAQ-BL-Wheel,BL_Tire_Temp_Error,32,16,1,0,0,1,Bool,1000,int16_t
 ,BL_Broker_CAN_Error_Msg,DAQ-BL-Wheel,BL_Heartbeat_Count,48,16,1,0,0,65536,HAL Tick,1000,int16_t
-0x571,BL_Broker_Sus_Calibrated,DAQ-BL-Wheel,BL_Strain_Gauge_Calibrated,0,32,1,0,-8388608,8388607,lbs,10,float
+0x571,BL_Broker_Sus_Calibrated,DAQ-BL-Wheel,BL_Strain_Gauge_Calibrated,0,32,0.001,0,-8388608,8388607,lbs,10,float
 ,BL_Broker_Sus_Calibrated,DAQ-BL-Wheel,BL_Sus_Pot_Calibrated,32,32,1,0,0,4095,ADC Values,10,float
 0x534,FR_Broker_Temp1,DAQ-FR-Wheel,FR_Tire_Temp_0,0,16,0.01,0,0,60,Celcius,1000,float
 ,FR_Broker_Temp1,DAQ-FR-Wheel,FR_Tire_Temp_1,16,16,0.01,0,0,60,Celcius,1000,float
@@ -527,7 +527,7 @@ Protocol violation error locations (data[3]):
 ,FR_Broker_CAN_Error_Msg,DAQ-FR-Wheel,FR_Sus_Pot_Error,16,16,1,0,0,1,Bool,1000,int16_t
 ,FR_Broker_CAN_Error_Msg,DAQ-FR-Wheel,FR_Tire_Temp_Error,32,16,1,0,0,1,Bool,1000,int16_t
 ,FR_Broker_CAN_Error_Msg,DAQ-FR-Wheel,FR_Heartbeat_Count,48,16,1,0,0,65536,HAL Tick,1000,int16_t
-0x572,FR_Broker_Sus_Calibrated,DAQ-FR-Wheel,FR_Strain_Gauge_Calibrated,0,32,1,0,-8388608,8388607,lbs,10,float
+0x572,FR_Broker_Sus_Calibrated,DAQ-FR-Wheel,FR_Strain_Gauge_Calibrated,0,32,0.001,0,-8388608,8388607,lbs,10,float
 ,FR_Broker_Sus_Calibrated,DAQ-FR-Wheel,FR_Sus_Pot_Calibrated,32,32,1,0,0,4095,ADC Values,10,float
 0x536,FL_Broker_Temp1,DAQ-FL-Wheel,FL_Tire_Temp_0,0,16,0.01,0,0,60,Celcius,1000,float
 ,FL_Broker_Temp1,DAQ-FL-Wheel,FL_Tire_Temp_1,16,16,0.01,0,0,60,Celcius,1000,float
@@ -543,7 +543,7 @@ Protocol violation error locations (data[3]):
 ,FL_Broker_CAN_Error_Msg,DAQ-FL-Wheel,FL_Sus_Pot_Error,16,16,1,0,0,1,Bool,1000,int16_t
 ,FL_Broker_CAN_Error_Msg,DAQ-FL-Wheel,FL_Tire_Temp_Error,32,16,1,0,0,1,Bool,1000,int16_t
 ,FL_Broker_CAN_Error_Msg,DAQ-FL-Wheel,FL_Heartbeat_Count,48,16,1,0,0,65536,HAL Tick,1000,int16_t
-0x573,FL_Broker_Sus_Calibrated,DAQ-FL-Wheel,FL_Strain_Gauge_Calibrated,0,32,1,0,-8388608,8388607,lbs,10,float
+0x573,FL_Broker_Sus_Calibrated,DAQ-FL-Wheel,FL_Strain_Gauge_Calibrated,0,32,0.001,0,-8388608,8388607,lbs,10,float
 ,FL_Broker_Sus_Calibrated,DAQ-FL-Wheel,FL_Sus_Pot_Calibrated,32,32,1,0,0,4095,ADC Values,10,float
 0x550,IMU_Acceleration,DAQ-IMU,X_Axis_Acceleration,0,21,0.00012208,0,-160,160,m/s^2,200,float
 ,IMU_Acceleration,DAQ-IMU,Y_Axis_Acceleration,21,21,0.00012208,0,-160,160,m/s^2,200,float
@@ -565,6 +565,7 @@ Protocol violation error locations (data[3]):
 ,IMU_Mag,DAQ-IMU,Z_Axis_Magnetometer,42,21,0.00012208,0,-2.5,2.5,Gauss,200,float
 0x556,IMU_Pres_Temp,DAQ-IMU,Temperature,0,21,0.00012208,0,-40,85,degC,200,float
 ,IMU_Pres_Temp,DAQ-IMU,Pressure,21,21,0.00012208,0,0,120,kPa,200,float
+,IMU_Pres_Temp,DAQ-IMU,Delta_Time,42,21,0.00012208,0,0,500,seconds,200,float
 0x557,IMU_Acceleration_No_G,DAQ-IMU,No_G_X_Axis_Acceleration,0,21,0.00012208,0,-160,160,m/s^2,10,float
 ,IMU_Acceleration_No_G,DAQ-IMU,No_G_Y_Axis_Acceleration,21,21,0.00012208,0,-160,160,m/s^2,10,float
 ,IMU_Acceleration_No_G,DAQ-IMU,No_G_Z_Axis_Acceleration,42,21,0.00012208,0,-160,160,m/s^2,10,float
@@ -580,6 +581,9 @@ Protocol violation error locations (data[3]):
 ,IMU_UTC_Time,DAQ-IMU,UTC_Minutes,32,8,1,0,0,59,minutes,50,uint8_t
 ,IMU_UTC_Time,DAQ-IMU,UTC_Seconds,40,8,1,0,0,59,seconds,50,uint8_t
 ,IMU_UTC_Time,DAQ-IMU,UTC_Milliseconds,48,16,1,0,0,999,milliseconds ,50,uint16_t
+0x55A,IMU_Delta_Vel,DAQ-IMU,X_Axis_Delta_Velocity,0,21,0.00048832,0,-500,500,m/s,200,float
+,IMU_Delta_Vel,DAQ-IMU,Y_Axis_Delta_Velocity,21,21,0.00048832,0,-500,500,m/s,200,float
+,IMU_Delta_Vel,DAQ-IMU,Z_Axis_Delta_Velocity,42,21,0.00048832,0,-500,500,m/s,200,float
 0x520,Telemetry_RTC_Time,DAQ-Telemetry,RTC_Hour,0,8,1,0,0,23,hours,1000,uint8_t
 ,Telemetry_RTC_Time,DAQ-Telemetry,RTC_Minute,8,8,1,0,0,59,minutes,1000,uint8_t
 ,Telemetry_RTC_Time,DAQ-Telemetry,RTC_Second,16,8,1,0,0,59,seconds,1000,uint8_t
@@ -588,7 +592,7 @@ Protocol violation error locations (data[3]):
 ,Telemetry_RTC_Date,DAQ-Telemetry,RTC_Month,8,8,1,0,1,12,,1000,uint8_t
 ,Telemetry_RTC_Date,DAQ-Telemetry,RTC_Day,16,8,1,0,1,31,,1000,uint8_t
 ,Telemetry_RTC_Date,DAQ-Telemetry,RTC_Weekday,24,8,1,0,1,7,,1000,uint8_t
-0x522,Telemetry_Odometer,DAQ-Telemetry,Miles_Driven,0,32,1,0,0,,mi,100,float
+0x522,Telemetry_Odometer,DAQ-Telemetry,Miles_Driven,0,32,0.001,0,0,,mi,100,float
 0x523,Telemetry_Status,DAQ-Telemetry,Log_File,0,16,1,0,0,9999,,1000,uint16_t
 ,Telemetry_Status,DAQ-Telemetry,Logging_Status,16,8,1,0,0,4,"0x00: OK
 0x01: CARD_NOT_DETECTED
@@ -839,3 +843,4 @@ Protocol violation error locations (data[3]):
 ,BMS_OWC_S_2,BMS,OWC_Cell_113,48,1,1,0,,,,30000,bool
 ,BMS_OWC_S_2,BMS,OWC_Cell_114,49,1,1,0,,,,30000,bool
 ,BMS_OWC_S_2,BMS,OWC_Cell_115,50,1,1,0,,,,30000,bool
+0x130,BMS_Charger_Current,BMS,Charger_Current_Set,0,16,1,0,0,20,,30000,uint16_t
