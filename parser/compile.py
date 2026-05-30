@@ -58,9 +58,16 @@ def compile_csv(csv_path):
             scale = float(row["Factor"])
             offset = float(row["Offset"])
 
-            # Determine signed vs unsigned from Data Type
+            # Determine signed vs unsigned from Data Type. "float" and
+            # "double" are both treated as float-like: 32/64-bit fields
+            # unpack via IEEE in decode.py, narrower fields (the IMU's
+            # 21-bit fixed-point pretending to be a float/double) fall
+            # through to the signed-int branch with proper sign-extension.
+            # Previously only "float" was recognised, so DBC entries
+            # marked "double" (e.g. IMU_Position_INS lat/lon at 21 bits)
+            # got decoded as unsigned and lost their negative half.
             data_type = row["Data Type"].lower()
-            is_float = data_type == "float"
+            is_float = data_type in ("float", "double")
             signed = (data_type.startswith("int") and not data_type.startswith("uint")) or is_float
 
             unit = row.get("Unit") or None
