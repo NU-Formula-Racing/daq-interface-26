@@ -57,6 +57,22 @@ export class ParserManager extends EventEmitter {
     this.spawn();
   }
 
+  /**
+   * Stop the current subprocess and respawn with new options, preserving
+   * this manager's identity so existing 'event'/'stderr'/'exit' listeners
+   * (e.g. the live-mode WS broadcaster) keep receiving events from the
+   * fresh child. Callers must use this instead of creating a new
+   * ParserManager when the DBC / serial port / replay config changes.
+   */
+  async restart(newOpts: ParserManagerOptions): Promise<void> {
+    await this.stop();
+    this.opts = newOpts;
+    this.stopRequested = false;
+    this.buf = '';
+    this.stderrBuf = '';
+    this.spawn();
+  }
+
   async stop(): Promise<void> {
     this.stopRequested = true;
     if (!this.child) return;

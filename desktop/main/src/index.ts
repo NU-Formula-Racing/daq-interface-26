@@ -308,15 +308,19 @@ export async function run(opts: {
 
     const newArgs = parserIsPython ? [PARSER_PY, ...newSubArgs] : newSubArgs;
 
-    await parser.stop();
-    parser = new ParserManager({
+    // Restart in-place so the EventEmitter identity is preserved — the WS
+    // broadcaster, /api/live status route, and simulate route all attached
+    // listeners to this exact instance at app-build time, and dropping it
+    // would mean live frames decoded by the fresh child never reach the UI
+    // (the user-visible symptom: "DBC didn't update" — the dock just freezes
+    // on stale values from before the upload).
+    await parser.restart({
       command: parserBinary,
       args: newArgs,
       env: { ...process.env, NFR_DB_URL: dsn },
       restartOnExit: !replayFileNow,
       restartDelayMs: 2_000,
     });
-    parser.start();
   };
 
   // Tracks the parser child currently running on behalf of /api/import/nfr,
