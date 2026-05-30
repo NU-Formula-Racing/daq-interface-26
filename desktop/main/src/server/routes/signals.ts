@@ -47,7 +47,13 @@ export function registerSignalRoutes(app: FastifyInstance, pool: pg.Pool) {
         reply.code(400);
         return { error: 'invalid_bucket' };
       }
-      return getSignalsWindow(pool, req.params.id, signalIds, start, end, bucketSecs);
+      const t0 = performance.now();
+      const result = await getSignalsWindow(pool, req.params.id, signalIds, start, end, bucketSecs);
+      console.log(
+        `[signals-window] route total=${(performance.now() - t0).toFixed(0)}ms ` +
+        `(includes query+map; subtract the inner log to get serialization wait)`,
+      );
+      return result;
     }
   );
 }

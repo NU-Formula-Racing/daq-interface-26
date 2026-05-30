@@ -171,6 +171,16 @@ The output ends up in `desktop/release/`.
 
 ## Changelog
 
+### v0.7.3
+
+- **Replay-open timing logs.** Three boundaries instrumented so a slow open
+  can be attributed: `query` (embedded Postgres), `map` (Node row
+  materialization), `route total` (Fastify request) on the server console,
+  and `fetch` + `ingest` on the browser DevTools console. Output prefix is
+  `[signals-window]` (server) and `[replay-frames]` (client). Used to
+  diagnose whether USB-disk random I/O, JSON serialization, or
+  client-side sort is the dominant cost when opening long replays.
+
 ### v0.7.2
 
 Bug fixes shipped on top of the v0.7.0 daily-live-mode redesign:

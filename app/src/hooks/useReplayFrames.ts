@@ -127,11 +127,24 @@ export function useReplayFrames(args: UseReplayFramesArgs) {
       `&start=${encodeURIComponent(args.start)}` +
       `&end=${encodeURIComponent(args.end)}` +
       `&bucket=${bucketSecs}`;
+    // Timing the open path for performance investigation: `fetch` is the
+    // HTTP round trip (which already includes the server-side query+map);
+    // `ingest` is the client-side per-signal sort + listener notify; the
+    // gap between server total and `fetch` here is roughly the JSON parse
+    // + network/IPC overhead.
+    const tFetch = performance.now();
     apiGet<SignalWindowRow[]>(url)
       .then((rows) => {
         if (cancelled) return;
+        const fetchMs = performance.now() - tFetch;
+        const tIngest = performance.now();
         store.ingest(rows);
+        const ingestMs = performance.now() - tIngest;
         cache.recordFetch(args.sessionId!, toFetch, args.start!, args.end!, bucketSecs);
+        console.log(
+          `[replay-frames] ids=${toFetch.length} rows=${rows.length} ` +
+          `fetch=${fetchMs.toFixed(0)}ms ingest=${ingestMs.toFixed(0)}ms`,
+        );
         setStatus('ready');
       })
       .catch((err) => {

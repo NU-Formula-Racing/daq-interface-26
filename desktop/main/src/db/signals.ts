@@ -69,6 +69,7 @@ export async function getSignalsWindow(
   bucketSecs: number
 ): Promise<SignalWindowRow[]> {
   if (signalIds.length === 0) return [];
+  const tQuery = performance.now();
   const { rows } = await pool.query<{
     ts: Date;
     signal_id: number;
@@ -83,7 +84,9 @@ export async function getSignalsWindow(
      FROM get_signals_window($1, $2::integer[], $3::timestamptz, $4::timestamptz, $5::double precision)`,
     [sessionId, signalIds, start, end, bucketSecs]
   );
-  return rows.map((r) => ({
+  const queryMs = performance.now() - tQuery;
+  const tMap = performance.now();
+  const out = rows.map((r) => ({
     ts: r.ts.toISOString(),
     signal_id: r.signal_id,
     signal_name: r.signal_name,
@@ -93,4 +96,15 @@ export async function getSignalsWindow(
     value_avg: Number(r.value_avg),
     sample_n: r.sample_n,
   }));
+  const mapMs = performance.now() - tMap;
+  // Timing breakdown for replay-open performance investigation. `query` is
+  // the embedded-PG round trip (dominated by random I/O on slow disks);
+  // `map` is the Node-side row materialization. Logged at info so it shows
+  // up in the desktop console without flipping a debug flag.
+  console.log(
+    `[signals-window] session=${sessionId.slice(0, 8)} ids=${signalIds.length} ` +
+    `bucket=${bucketSecs.toFixed(3)}s rows=${rows.length} ` +
+    `query=${queryMs.toFixed(0)}ms map=${mapMs.toFixed(0)}ms`,
+  );
+  return out;
 }
