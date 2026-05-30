@@ -171,7 +171,7 @@ The output ends up in `desktop/release/`.
 
 ## Changelog
 
-### v0.7.1
+### v0.7.2
 
 Bug fixes shipped on top of the v0.7.0 daily-live-mode redesign:
 
