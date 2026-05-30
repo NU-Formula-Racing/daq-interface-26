@@ -90,6 +90,15 @@ jobs:
           npm run package
 
       # ---- Upload as workflow artifact (always) ----
+      # Each platform's build is published as a workflow artifact. The
+      # `release` job below downloads all three and attaches them to the
+      # GitHub Release in a single softprops/action-gh-release@v2 call.
+      # Previously each build job uploaded directly to the release, but
+      # action-gh-release isn't safe for concurrent writes against the
+      # same tag — the second runner to finish would "recreate" the
+      # release, silently deleting assets the earlier runner had just
+      # uploaded. v0.7.4 through v0.7.8 each lost their macOS/Linux
+      # binaries to this race.
       - name: Upload build artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -98,12 +107,25 @@ jobs:
           path: ${{ matrix.artifact_glob }}
           if-no-files-found: warn
 
-      # ---- Attach to the GitHub Release (only for tag pushes) ----
-      - name: Upload to release
-        if: startsWith(github.ref, 'refs/tags/v')
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          # Pulls every artifact produced by the build matrix into
+          # artifacts/<artifact-name>/<file>. The glob below picks them
+          # all up without having to enumerate platforms here.
+
+      - name: Attach binaries to release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ matrix.artifact_glob }}
+          files: |
+            artifacts/**/*.dmg
+            artifacts/**/*.zip
+            artifacts/**/*.AppImage
           body: |
             ## Install
 
