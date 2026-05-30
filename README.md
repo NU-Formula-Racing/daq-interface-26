@@ -171,6 +171,22 @@ The output ends up in `desktop/release/`.
 
 ## Changelog
 
+### v0.7.7
+
+- **Live mode renderer no longer grows unbounded in RAM.** The frame
+  store now caps each signal at 50 000 in-memory rows (~28 min at
+  30 Hz). When a buffer crosses the cap it gets trimmed back to 37 500
+  in a single splice, so the per-push cost stays amortized O(1). Rows
+  trimmed from memory still exist in `live_today` on disk;
+  `ensureWindow` pages them back in if the user scrolls past the
+  in-memory window. No on-screen change at typical use.
+- **Live mode push path is no longer O(n log n).** The store used to
+  re-sort every signal's entire buffer on every WS batch — at hour 1
+  this was sorting millions of already-sorted rows. Now: append-only,
+  with a per-row ordering check that triggers a sort just for buffers
+  where an out-of-order row actually arrived (the
+  `ensureWindow` × WS-edge race). Hot path is O(rows-in-batch).
+
 ### v0.7.6
 
 - **Replay-open: ANALYZE the rollup so the planner uses its index.**

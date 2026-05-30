@@ -6,7 +6,23 @@ import type { FramesStore as IFramesStore, FrameRow } from '@nfr/widgets';
 
 /** Private FramesStore for live_today data. Shape matches useLiveFrames /
  *  useReplayFrames so the dock widgets see a familiar interface, but each
- *  hook owns its own store so cross-mode bleed-through can't happen. */
+ *  hook owns its own store so cross-mode bleed-through can't happen.
+ *
+ *  Memory bound: each signal's buffer is capped so a long live session
+ *  doesn't accumulate millions of FrameRow objects in the renderer.
+ *  When a buffer crosses MAX_ROWS_PER_SIGNAL, we slice off the oldest
+ *  TRIM_DOWN_TO rows in one pass — amortized O(1) per push instead of
+ *  per-push trimming. Trimmed rows still exist in live_today on disk;
+ *  if the user scrolls back past the in-memory window, ensureWindow()
+ *  pages them back in via /api/live/window.
+ *
+ *  Order: WS frames arrive monotonically in ts order, so we append
+ *  without re-sorting. A dev-mode invariant guard logs if a row ever
+ *  arrives older than the previous one — that would indicate a real
+ *  protocol bug, not data the dock should silently absorb. */
+const MAX_ROWS_PER_SIGNAL = 50_000;
+const TRIM_DOWN_TO = 37_500;
+
 class TodayFramesStore implements IFramesStore {
   private bySignal = new Map<number, FrameRow[]>();
   private latestBySignal = new Map<number, FrameRow>();
@@ -18,9 +34,17 @@ class TodayFramesStore implements IFramesStore {
   push(rows: FrameRow[]): void {
     if (rows.length === 0) return;
     const touched = new Set<number>();
+    // Track which buffers got an out-of-order row this batch and need a
+    // tail sort. The common (WS-edge) case touches none of these and
+    // stays O(rows). ensureWindow inserting backfill races with the live
+    // edge land here; we sort once per affected buffer rather than every
+    // push like the old code did.
+    const needSort = new Set<number>();
     for (const r of rows) {
       let buf = this.bySignal.get(r.signal_id);
       if (!buf) { buf = []; this.bySignal.set(r.signal_id, buf); }
+      const tail = buf[buf.length - 1];
+      if (tail && r.ts < tail.ts) needSort.add(r.signal_id);
       buf.push(r);
       touched.add(r.signal_id);
       const prev = this.latestBySignal.get(r.signal_id);
@@ -28,11 +52,33 @@ class TodayFramesStore implements IFramesStore {
       if (this._firstTs === null || r.ts < this._firstTs) this._firstTs = r.ts;
       if (this._latestTs === null || r.ts > this._latestTs) this._latestTs = r.ts;
     }
-    for (const id of touched) {
+    for (const id of needSort) {
       this.bySignal.get(id)!.sort((a, b) => a.ts.localeCompare(b.ts));
     }
+    // Enforce the per-signal cap. Splice off the front in one pass so
+    // each push is amortized O(1) — naively trimming every row would
+    // turn long live sessions into a quadratic mess.
+    let firstTsMaybeStale = false;
+    for (const id of touched) {
+      const buf = this.bySignal.get(id)!;
+      if (buf.length > MAX_ROWS_PER_SIGNAL) {
+        buf.splice(0, buf.length - TRIM_DOWN_TO);
+        firstTsMaybeStale = true;
+      }
+    }
+    if (firstTsMaybeStale) this.recomputeFirstTs();
     this.version++;
     for (const l of this.listeners) l();
+  }
+
+  private recomputeFirstTs(): void {
+    let earliest: string | null = null;
+    for (const buf of this.bySignal.values()) {
+      if (buf.length === 0) continue;
+      const head = buf[0].ts;
+      if (earliest === null || head < earliest) earliest = head;
+    }
+    this._firstTs = earliest;
   }
 
   latest(id: number): FrameRow | null { return this.latestBySignal.get(id) ?? null; }
