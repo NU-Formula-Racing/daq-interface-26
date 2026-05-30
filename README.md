@@ -171,6 +171,21 @@ The output ends up in `desktop/release/`.
 
 ## Changelog
 
+### v0.7.6
+
+- **Replay-open: ANALYZE the rollup so the planner uses its index.**
+  v0.7.4's backfill populated `sd_rollup_1s` but never ran `ANALYZE`,
+  so Postgres' stats for that table still reflected the empty
+  post-CREATE state. With no stats it defaulted to a seq scan over
+  the entire rollup on every call — which is exactly why the v0.7.5
+  explicit-branch rewrite didn't move the needle. Migration `0018`
+  runs `ANALYZE` once on existing installs; `0019` folds it into
+  `populate_sd_rollup` so new imports stay analyzed.
+- **`/api/sessions/:id/signals/window/explain` diagnostic route.**
+  Returns the `EXPLAIN (ANALYZE, BUFFERS)` plan for the same call
+  shape as the data route. Useful for confirming the index is being
+  used, or for catching the next time a query falls off the fast path.
+
 ### v0.7.5
 
 - **Replay-open: explicit-branch `get_signals_window`.** The v0.7.4

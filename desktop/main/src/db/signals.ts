@@ -63,7 +63,9 @@ export async function getSessionSignalIds(
 /** Ensure the 1-second rollup is populated for this session. No-op if it
  *  already has rows. Used for sessions imported before v0.7.4 (the rollup
  *  is built at import time for new ones). Slow on the first call for a
- *  large legacy session; subsequent opens hit the rollup directly. */
+ *  large legacy session; subsequent opens hit the rollup directly.
+ *  ANALYZE is run after populate so the planner has up-to-date stats —
+ *  without it PG defaults to a seq scan that defeats the whole point. */
 async function ensureRollup(pool: pg.Pool, sessionId: string): Promise<void> {
   const { rows } = await pool.query<{ has: boolean }>(
     `SELECT EXISTS (
@@ -77,11 +79,31 @@ async function ensureRollup(pool: pg.Pool, sessionId: string): Promise<void> {
     `SELECT populate_sd_rollup($1)`,
     [sessionId],
   );
+  await pool.query('ANALYZE sd_rollup_1s');
   console.log(
     `[signals-window] lazy-backfill session=${sessionId.slice(0, 8)} ` +
     `rollup_rows=${built[0]?.populate_sd_rollup ?? 0} ` +
     `took=${(performance.now() - t).toFixed(0)}ms`,
   );
+}
+
+/** EXPLAIN ANALYZE for the same call shape as getSignalsWindow. Returns
+ *  the plan as joined text for the diagnostic /explain route. */
+export async function explainSignalsWindow(
+  pool: pg.Pool,
+  sessionId: string,
+  signalIds: number[],
+  start: string,
+  end: string,
+  bucketSecs: number,
+): Promise<string> {
+  await ensureRollup(pool, sessionId);
+  const { rows } = await pool.query<{ 'QUERY PLAN': string }>(
+    `EXPLAIN (ANALYZE, BUFFERS)
+     SELECT * FROM get_signals_window($1, $2::integer[], $3::timestamptz, $4::timestamptz, $5::double precision)`,
+    [sessionId, signalIds, start, end, bucketSecs],
+  );
+  return rows.map((r) => r['QUERY PLAN']).join('\n');
 }
 
 export async function getSignalsWindow(

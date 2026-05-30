@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import type pg from 'pg';
 import {
+  explainSignalsWindow,
   getSessionSignalIds,
   getSignalsWindow,
   getSignalWindow,
@@ -54,6 +55,35 @@ export function registerSignalRoutes(app: FastifyInstance, pool: pg.Pool) {
         `(includes query+map; subtract the inner log to get serialization wait)`,
       );
       return result;
+    }
+  );
+
+  // Diagnostic: returns the EXPLAIN ANALYZE plan text for the same query
+  // shape as /signals/window. Used to investigate slow opens —
+  // `curl http://127.0.0.1:4444/api/sessions/<id>/signals/window/explain?ids=...`
+  // and the body shows whether PG used the rollup index, did a seq scan,
+  // or fell back to a poor plan from missing stats.
+  app.get<{
+    Params: { id: string };
+    Querystring: { ids: string; start: string; end: string; bucket: string };
+  }>(
+    '/api/sessions/:id/signals/window/explain',
+    async (req, reply) => {
+      const { ids, start, end, bucket } = req.query;
+      if (!ids || !start || !end || !bucket) {
+        reply.code(400);
+        return { error: 'missing_query_param' };
+      }
+      const signalIds = ids
+        .split(',')
+        .map((s) => Number(s))
+        .filter((n) => Number.isFinite(n));
+      const bucketSecs = Number(bucket);
+      const plan = await explainSignalsWindow(
+        pool, req.params.id, signalIds, start, end, bucketSecs,
+      );
+      reply.type('text/plain');
+      return plan;
     }
   );
 }
