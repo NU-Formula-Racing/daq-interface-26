@@ -171,6 +171,18 @@ The output ends up in `desktop/release/`.
 
 ## Changelog
 
+### v0.7.5
+
+- **Replay-open: explicit-branch `get_signals_window`.** The v0.7.4
+  UNION-ALL form relied on the planner constant-folding
+  `p_bucket_secs >= 1.0` to prune the raw-`sd_readings` branch, but
+  for parameterized SQL functions Postgres often plans both branches
+  anyway — the raw branch then does its index seek even though it
+  returns no rows, costing ~1 s on USB-backed disks. Migration `0017`
+  rewrites the function in PL/pgSQL with an explicit `IF`: only the
+  chosen branch is planned per call. Observed query time on the
+  example session: ~1100 ms → expected sub-100 ms.
+
 ### v0.7.4
 
 - **Replay open is ~100x faster on long sessions.** Migration `0016`
