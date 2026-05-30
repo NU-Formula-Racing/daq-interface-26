@@ -437,15 +437,26 @@ function LiveInner({ navigate }: LiveInnerProps) {
     return () => clearInterval(iv);
   }, [catalog]);
 
-  // At the live edge AND not zoomed AND not paused, advance visEnd every
-  // 250 ms so the dock follows the streaming front. When the user zooms
-  // or hits pause, this effect goes idle and the visible window freezes.
+  // At the live edge AND not zoomed AND not paused, advance visEnd on
+  // every animation frame so the dock follows the streaming front
+  // smoothly (~60 Hz when visible, automatically backed off when the
+  // tab isn't). The previous 250 ms setInterval made the edge stairstep
+  // at 4 Hz regardless of how fast frames actually arrived — data that
+  // landed at e.g. +100 ms didn't appear on-screen until the next tick.
+  // rAF gives us the data-as-it-comes-in feel without overwhelming the
+  // renderer (the browser caps to display refresh rate). When the user
+  // zooms or hits pause, this effect goes idle and the window freezes.
   useEffect(() => {
     if (frozenWindow !== null) return;
     if (paused) return;
     if (t < LIVE_THRESHOLD) return;
-    const iv = setInterval(() => setVisEnd(new Date().toISOString()), 250);
-    return () => clearInterval(iv);
+    let raf = 0;
+    const tick = () => {
+      setVisEnd(new Date().toISOString());
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, [t, frozenWindow, paused]);
 
   // Day rollover: if midnight Chicago passes, drop the in-memory store

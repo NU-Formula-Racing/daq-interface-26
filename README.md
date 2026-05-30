@@ -171,6 +171,16 @@ The output ends up in `desktop/release/`.
 
 ## Changelog
 
+### v0.7.9
+
+- **Live edge advances at display refresh, not 4 Hz.** `Live.tsx` was
+  driving `visEnd` with `setInterval(..., 250)`, so the visible-window
+  right edge stairstepped at 4 Hz no matter how fast frames actually
+  arrived — a sample landing at +100 ms wouldn't appear until the next
+  tick. Switched to `requestAnimationFrame`: ~60 Hz when the tab is
+  visible, browser-throttled when it isn't. Data now shows as fast as
+  the WebSocket can deliver it.
+
 ### v0.7.8
 
 - **Bundled DBC updated.** `NFR26DBC.csv` refreshed with the latest
