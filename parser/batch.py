@@ -158,6 +158,10 @@ def run_batch_import(
                 "WHERE id = %s",
                 (session_id, header.start_time + timedelta(milliseconds=last_ts_ms), session_id),
             )
+            # Pre-aggregate into the 1-second rollup so replay opens don't
+            # have to scan raw sd_readings every time. ~1000x less random
+            # I/O at query time; the rollup itself adds ~1% to import.
+            cur.execute("SELECT populate_sd_rollup(%s)", (str(session_id),))
         conn.commit()
 
         emitter.import_progress(str(nfr_file), pct=100)

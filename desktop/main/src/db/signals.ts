@@ -60,6 +60,30 @@ export async function getSessionSignalIds(
   return rows.map((r) => r.signal_id);
 }
 
+/** Ensure the 1-second rollup is populated for this session. No-op if it
+ *  already has rows. Used for sessions imported before v0.7.4 (the rollup
+ *  is built at import time for new ones). Slow on the first call for a
+ *  large legacy session; subsequent opens hit the rollup directly. */
+async function ensureRollup(pool: pg.Pool, sessionId: string): Promise<void> {
+  const { rows } = await pool.query<{ has: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1 FROM sd_rollup_1s WHERE session_id = $1 LIMIT 1
+     ) AS has`,
+    [sessionId],
+  );
+  if (rows[0]?.has) return;
+  const t = performance.now();
+  const { rows: built } = await pool.query<{ populate_sd_rollup: number }>(
+    `SELECT populate_sd_rollup($1)`,
+    [sessionId],
+  );
+  console.log(
+    `[signals-window] lazy-backfill session=${sessionId.slice(0, 8)} ` +
+    `rollup_rows=${built[0]?.populate_sd_rollup ?? 0} ` +
+    `took=${(performance.now() - t).toFixed(0)}ms`,
+  );
+}
+
 export async function getSignalsWindow(
   pool: pg.Pool,
   sessionId: string,
@@ -69,6 +93,9 @@ export async function getSignalsWindow(
   bucketSecs: number
 ): Promise<SignalWindowRow[]> {
   if (signalIds.length === 0) return [];
+  // Only the rollup path benefits from backfill. Sub-second buckets hit
+  // raw sd_readings anyway, so don't pay the existence check for them.
+  if (bucketSecs >= 1.0) await ensureRollup(pool, sessionId);
   const tQuery = performance.now();
   const { rows } = await pool.query<{
     ts: Date;

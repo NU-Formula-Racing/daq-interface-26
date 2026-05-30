@@ -171,6 +171,21 @@ The output ends up in `desktop/release/`.
 
 ## Changelog
 
+### v0.7.4
+
+- **Replay open is ~100x faster on long sessions.** Migration `0016`
+  adds `sd_rollup_1s`, a 1-second pre-aggregated rollup of `sd_readings`
+  (`min`, `max`, `sum`, `n` per `(session_id, signal_id, second)`).
+  `get_signals_window` now reads from the rollup whenever the graph
+  bucket is `>= 1 s` (essentially every replay view), and falls back to
+  raw `sd_readings` only for sub-second zoom-ins. The numbers are
+  identical — `min` of mins, `max` of maxes, and `sum / sample_n` for
+  the average are exact relative to the raw samples. The parser
+  populates the rollup at the end of each batch import (~1% added cost);
+  sessions imported before this version are lazily backfilled on first
+  open (one slow open, fast forever after). The `[signals-window]
+  lazy-backfill` log line marks when that happens.
+
 ### v0.7.3
 
 - **Replay-open timing logs.** Three boundaries instrumented so a slow open
