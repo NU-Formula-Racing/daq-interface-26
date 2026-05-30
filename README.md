@@ -168,3 +168,36 @@ cd desktop && npm run package
 ```
 
 The output ends up in `desktop/release/`.
+
+## Changelog
+
+### v0.7.1
+
+Bug fixes shipped on top of the v0.7.0 daily-live-mode redesign:
+
+- **Live: DBC upload now actually re-decodes the stream.** Uploading a new
+  DBC restarted the parser subprocess but replaced the `ParserManager`
+  instance, so the WebSocket fan-out (and `/api/live/status`, simulate
+  route) kept listening to the dead old instance. The dock froze on
+  stale values from before the upload — which read as "still parsing
+  with the old DBC". `ParserManager` now exposes a `restart()` that
+  respawns the child in place, preserving listener identity. (#20)
+- **Live: RSSI/SNR badge no longer stays grayed when the link is up.**
+  Two stacked bugs caused this. (1) `GET /api/live/status` never tracked
+  link metrics, so a page that mounted mid-stream got `null` until the
+  *next* `signal_quality` packet happened to arrive — packets that fired
+  before the WebSocket opened were lost. The route now persists the
+  latest RSSI/SNR and clears them on basestation disconnect. (2)
+  `useLiveStatus` replaced the whole state when the initial GET
+  resolved, clobbering any RSSI/SNR the WebSocket had already set in
+  the gap between mount and fetch. It now merges. (#17)
+- **Parser: 21-bit IMU "float"/"double" signals decode signed.**
+  Already-resolved bugs (#15 GG plot only Q1, #16 IMU values
+  out-of-range with no negatives) traced to the same root cause: 21-bit
+  IMU fields marked `float` or `double` in the DBC were being decoded
+  as unsigned, wrapping the negative half of the range to large
+  positives. `decode.py` gates the IEEE-754 unpack path on
+  `length in (32, 64)` so sub-word "float"/"double" entries fall
+  through to the signed-int sign-extension branch; `compile.py` marks
+  both `float` and `double` data types as `is_float=True` with
+  `signed=True`. Re-parse pre-fix sessions to get correct values.
