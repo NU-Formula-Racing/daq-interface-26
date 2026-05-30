@@ -19,7 +19,12 @@ export function useLiveStatus(): LiveStatus {
     let cancelled = false;
     apiGet<LiveStatus>('/api/live/status')
       .then((s) => {
-        if (!cancelled) setState(s);
+        if (cancelled) return;
+        // Merge instead of replace: a `signal_quality` event can arrive
+        // over WS between mount and this fetch resolving, and replacing
+        // the whole state would clobber the rssi/snr it set — leaving
+        // the badge grayed until the *next* packet arrived.
+        setState((prev) => ({ ...prev, ...s }));
       })
       .catch(() => {});
     const sub = subscribeEvents((ev: ParserEvent) => {
