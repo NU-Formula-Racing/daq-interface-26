@@ -1,6 +1,6 @@
 {
   "name": "daq-desktop",
-  "version": "0.7.9",
+  "version": "0.7.11",
   "private": true,
   "type": "module",
   "scripts": {
@@ -22,6 +22,7 @@
     "chokidar": "^4.0.1",
     "fastify": "^5.1.0",
     "pg": "^8.13.1",
+    "pg-cursor": "^2.20.0",
     "ws": "^8.18.0"
   },
   "optionalDependencies": {
@@ -30,6 +31,7 @@
   "devDependencies": {
     "@types/node": "^22.10.1",
     "@types/pg": "^8.11.10",
+    "@types/pg-cursor": "^2.7.2",
     "@types/supertest": "^6.0.2",
     "@types/ws": "^8.5.13",
     "electron": "^34.5.8",
